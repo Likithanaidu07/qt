@@ -1,0 +1,14 @@
+#widget_2 QPushButton{
+border-radius: 8px;
+border: 1px solid #485F6B;
+background: #485F6B;
+box-shadow: 5px 4px 4.2px 0px rgba(0, 0, 0, 0.10);
+color: #FFF;
+text-align: center;
+font-size: 14px;
+font-style: normal;
+font-weight: 500;
+line-height: normal;
+}
+
+

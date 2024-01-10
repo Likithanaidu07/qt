@@ -1,0 +1,40 @@
+<RCC>
+    <qresource prefix="/">
+        <file>Vector.png</file>
+        <file>RacingSansOne-Regular.ttf</file>
+        <file>ALGO METHODS.png</file>
+        <file>WorkSans-Bold.ttf</file>
+        <file>WorkSans-ExtraBold.ttf</file>
+        <file>close_window_icon.png</file>
+        <file>minimize_window_icon.png</file>
+        <file>maximize_window_icon.png</file>
+        <file>menu.png</file>
+        <file>button_close.png</file>
+        <file>Am Logomark - Standard.png</file>
+        <file>search.png</file>
+        <file>left_arrow.png</file>
+        <file>right_arrow.png</file>
+        <file>Frame 366.png</file>
+        <file>Convert to Algo.png</file>
+        <file>dock_close.png</file>
+        <file>dock_maximize.png</file>
+        <file>dock_minimize.png</file>
+        <file>Frame 102.png</file>
+        <file>minimize_window_group.png</file>
+        <file>arrow_downward.png</file>
+        <file>arrow_upward.png</file>
+        <file>do_disturb.png</file>
+        <file>done_all.png</file>
+        <file>format_color_fill.png</file>
+        <file>replay.png</file>
+        <file>test_min.png</file>
+        <file>Frame 398.png</file>
+        <file>logo.ico</file>
+    </qresource>
+    <qresource prefix="/style">
+        <file>Style_Home.qss</file>
+        <file>Style_Login.qss</file>
+        <file>test_min.png</file>
+        <file>Style_AddAlgo.qss</file>
+    </qresource>
+</RCC>
