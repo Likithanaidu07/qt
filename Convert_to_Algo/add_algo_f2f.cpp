@@ -185,7 +185,11 @@ QString   add_algo_f2f::get_Algo_Name(PortfolioType algo_type,int leg1_token_num
         StockNameLeg3.chop(2);
         Algo_Name = Algo_Name+StockNameLeg1+"-"+StockNameLeg3;
     }
-
+    else if(algo_type==PortfolioType::BFLY_BID){
+        Algo_Name = "Bfly-";//Nifty-18000-CE-200";
+        double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number).toDouble());
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM")+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number) +"-"+QString::number(diff)+ContractDetail::getInstance().GetOptionType(leg1_token_number);
+    }
 
     return Algo_Name.toUpper();
 }

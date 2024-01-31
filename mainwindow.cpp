@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "ui_mainwindow.h"
 
 #include <QEvent>
 #include <QPropertyAnimation>
@@ -11,27 +12,27 @@
 #include <QFontDatabase>
 #include <QTreeView>
 #include <QStandardItemModel>
-
 #include "ContractDetail.h"
 #include "OrderBook/table_orderbook_delegate.h"
 #include "mysql_conn.h"
-#include "ui_mainwindow.h"
 
 static const char stylesheetvis[]= "background: #596167;" "border-radius: 10px;";
+
+extern MainWindow *MainWindowObj;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+
     QFontDatabase::addApplicationFont(":/WorkSans-Bold.ttf");
     QFontDatabase::addApplicationFont(":/WorkSans-ExtraBold.ttf");
 
     ui->setupUi(this);
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-
-
-
+    connect(this,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
     convertalgo=new ConvertAlgo_Win(this);
+
 //    QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect(convertalgo);
 //    effect->setBlurRadius(5);
 //    convertalgo->setGraphicsEffect(effect);
@@ -1231,7 +1232,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             }
 
             //send notifcation to backend server
-            quint16 command = 1;
+            quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
             const unsigned char dataBytes[] = { 0xFF, 0xFF };
             QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
             QByteArray msg = backend_comm->createPacket(command, data);
@@ -1243,19 +1244,28 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 void MainWindow::loadContract(){
 
     auto loadContract_BackgroundTask = [this]() {
-        emit display_log_text_signal("Loading contract....");
+
+        QString  htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QDateTime::currentDateTime().toString("hh:mm:ss dd-MM-yyyy")+"</span>"
+                              + "<span style='color: black;'>  Loading contract...</span> </p>";
+
+        emit display_log_text_signal(htmlContent);
+
         ContractDetail::getInstance().ReloadContractDetails();
         contractDetailsLoaded.storeRelaxed(1);
 
-
         //do the UI thread function inside here
-//        QMetaObject::invokeMethod(this, [this]() {
-//            //ui->stackedWidgetMain->setCurrentIndex(1);
-//            stackViewSwithAnimation(0,1,ui->stackedWidgetMain);
-//        });
+        //        QMetaObject::invokeMethod(this, [this]() {
+        //            //ui->stackedWidgetMain->setCurrentIndex(1);
+        //            stackViewSwithAnimation(0,1,ui->stackedWidgetMain);
+        //        });
         // Rest of your background task code...
         //if not logged in the data loading thread start by login function
-        emit display_log_text_signal("Contract file loaded...");
+
+        htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QDateTime::currentDateTime().toString("hh:mm:ss dd-MM-yyyy")+"</span>"
+                              + "<span style='color: black;'> Contract file loaded...</span> </p>";
+
+        emit display_log_text_signal(htmlContent);
+
         foo_token_number_start_strike = "";
 
         if(loggedInFlg.loadRelaxed()==1){
@@ -1784,5 +1794,15 @@ void MainWindow::T_Portfolio_Table_cellClicked(const QItemSelection &selected, c
         T_Portfolio_Model->portfolio_data_list[portfolio_table_slected_idx_for_editing.load()]->edting.storeRelaxed(0); // maked the row flg not editing, so the bg data will be updated.
         portfolio_table_slected_idx_for_editing.store(-1);
     }
+
+}
+
+void MainWindow::slotAddLogForAddAlgoRecord(QString str)
+{
+
+    // To show the latest log at top
+    htmlLogsContent.prepend(str);
+
+    ui->textEdit->setText(htmlLogsContent);
 
 }

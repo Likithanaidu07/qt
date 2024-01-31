@@ -51,7 +51,8 @@ public:
     QString AdditionalData1; //Type
     QString PortfolioType; //"Portfolio Type"
     QString Price(){ //Price
-        if (PortfolioTypeEnum == PortfolioType::BY || PortfolioTypeEnum == PortfolioType::BS || PortfolioTypeEnum == PortfolioType::BS1221)
+        if (PortfolioTypeEnum == PortfolioType::BY || PortfolioTypeEnum == PortfolioType::BS || PortfolioTypeEnum == PortfolioType::BS1221
+            || PortfolioTypeEnum == PortfolioType::BFLY_BID)
             return QString::number(Leg2.toDouble() - Leg1.toDouble(), 'f',decimal_precision);
         if (PortfolioTypeEnum == PortfolioType::R3L)
             return QString("%1:%2:%3").arg(Leg1Multiplier).arg(Leg2Multiplier).arg(Leg3Multiplier);
@@ -249,6 +250,7 @@ public:
         PortFolioType_String.insert(QString::number(PortfolioType::BS1221), "BY 1221");
         PortFolioType_String.insert(QString::number(PortfolioType::BS), "BY 1331");
         PortFolioType_String.insert(QString::number(PortfolioType::R2L), "RATIO");
+        PortFolioType_String.insert(QString::number(PortfolioType::BFLY_BID), "BLFY BID");
 
         if(PortFolioType_String.contains(portfolioType))
             return PortFolioType_String[portfolioType];

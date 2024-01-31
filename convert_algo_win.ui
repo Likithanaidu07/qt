@@ -289,11 +289,16 @@ background: #F2F5F8;
 border-radius: 6px;
 border: 0.5px solid #343A40;
 background: #FFF;
+ text-align: center;
 }
+
 QComboBox::drop-down{
 border-radius: 6px;
 background: #FFF;
-}</string>
+ text-align: center;
+
+}
+</string>
         </property>
        </widget>
       </item>
@@ -364,6 +369,9 @@ background: #E0E8EE;
          </item>
          <item row="1" column="0" colspan="4">
           <widget class="QTableWidget" name="tableWidget">
+           <property name="focusPolicy">
+            <enum>Qt::NoFocus</enum>
+           </property>
            <property name="styleSheet">
             <string notr="true">QTableView::item {
     background-color: #FFF;
@@ -375,10 +383,17 @@ background: #E0E8EE;
     font-weight: 600;
     line-height: normal;
 }
+
 QTableView::item:alternate {
     border: none; 
     background-color: #F5FAFD; 
-}</string>
+}
+
+QTableView::item:selected {
+    background-color: #42A5F5;
+    color: white; /* Optionally, set the text color for selected items */
+}
+</string>
            </property>
           </widget>
          </item>

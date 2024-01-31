@@ -1165,8 +1165,11 @@ border-top-left-radius: 0px;
     border-top-right-radius: 0px;
     border-bottom-right-radius: 8px;
     border-bottom-left-radius: 8px;
-background: #A3C5D4;
+background: #FFFFFF;
 }</string>
+            </property>
+            <property name="readOnly">
+             <bool>true</bool>
             </property>
             <property name="html">
              <string>&lt;!DOCTYPE HTML PUBLIC &quot;-//W3C//DTD HTML 4.0//EN&quot; &quot;http://www.w3.org/TR/REC-html40/strict.dtd&quot;&gt;

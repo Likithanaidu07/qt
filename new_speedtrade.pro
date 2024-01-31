@@ -16,6 +16,7 @@ SOURCES += \
     Convert_to_Algo/convert_algo_shared_var.cpp \
     Convert_to_Algo/convert_algo_win.cpp \
     Convert_to_Algo/convert_to_algo_bfly.cpp \
+    Convert_to_Algo/convert_to_algo_bfly_bid.cpp \
     Liners/liners_model.cpp \
     NetPosition/net_position_table_model.cpp \
     OrderBook/table_orderbook_delegate.cpp \
@@ -46,12 +47,14 @@ SOURCES += \
 
 HEADERS += \
     CombinedTracker/combined_tracker_table_model.h \
+    Common/macros.h \
     Conversions.h \
     Convert_to_Algo/add_algo_con_rev.h \
     Convert_to_Algo/add_algo_f2f.h \
     Convert_to_Algo/convert_algo_shared_var.h \
     Convert_to_Algo/convert_algo_win.h \
     Convert_to_Algo/convert_to_algo_bfly.h \
+    Convert_to_Algo/convert_to_algo_bfly_bid.h \
     Liners/liners_model.h \
     NetPosition/net_position_table_model.h \
     OrderBook/table_orderbook_delegate.h \

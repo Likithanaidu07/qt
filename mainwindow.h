@@ -32,8 +32,6 @@
 #include "Convert_to_Algo/convert_algo_win.h"
 #include"ui_loginwindow.h"
 
-
-
 class mysql_conn;
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -50,6 +48,7 @@ enum UI_UPDATE_TYPE{
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
     userInfo userData;
     void add_logs(QString str);
     bool pressed;
@@ -73,6 +72,8 @@ private:
     void createINIFileIfNotExist();
     void loadSettings();
     mysql_conn * db_conn;
+    QString  htmlLogsContent;
+
     QString base64_encode(QString str);
     QString base64_decode(QString str);
     void generateAlgo();
@@ -135,7 +136,7 @@ private:
     void start_backend_comm_socket_worker();
     void stop_backend_comm_socket_worker();
 
-    ConvertAlgo_Win *convertalgo;
+    class ConvertAlgo_Win *convertalgo;
 
 
 public slots:
@@ -151,6 +152,7 @@ public slots:
     void updatePortFolioStatus();
     void resizePortFolioTableColWidthSlot(int width);
     void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
+    void slotAddLogForAddAlgoRecord(QString str);
 
 private slots:
     void on_close_clicked();

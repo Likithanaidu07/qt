@@ -60,7 +60,7 @@ public:
 
     userInfo login( QString user_name,  QString password);
     void  getPortfoliosTableData(Table_Portfolios_Model* model,Combined_Tracker_Table_Model *comb_tracker_model,QHash<QString, PortfolioAvgPrice> &averagePriceList,QString user_id);
-    QHash<QString, contract_table> getContractTable(QHash<QString, QStringList> &_m_ContractDetailsFiltered,QStringList &F2F_data_list_Sorted_Key,QStringList &BFLY_data_list_Sorted_Key);
+    QHash<QString, contract_table> getContractTable(QHash<QString, QStringList> &_m_ContractDetailsFiltered,QStringList &F2F_data_list_Sorted_Key,QStringList &BFLY_data_list_Sorted_Key, QStringList &BFLY_BID_data_list_Sorted_Key);
     PortfolioType checkAlogTypeForTheData(QString instrument_type);
 
     QSqlQuery runQuery(QString qry_str);
@@ -82,6 +82,8 @@ private:
 
 
 signals:
+
+
 };
 
 #endif // mysql_conn_H

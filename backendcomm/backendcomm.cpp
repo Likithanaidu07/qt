@@ -3,6 +3,7 @@
 #include "QThread"
 #include "QAbstractSocket"
 #include <QElapsedTimer>
+#include <defines.h>
 BackendComm::BackendComm(QObject *parent) : QObject(parent)
 {
 
@@ -183,7 +184,7 @@ QByteArray BackendComm::intToByteArray(int value)
 }
 
 void BackendComm::sendKeepAlive(){
-    quint16 command = 0;
+    quint16 command = NOTIFICATION_TYPE::CMD_ID_DEFAULT;
     QByteArray data = intToByteArray(UserId);
     QByteArray pkt = this->createPacket(command, data);
     this->insertData(pkt);

@@ -169,6 +169,9 @@ background: #D9D9D9;
 padding: 4px 10px 4px 10px;
 }</string>
      </property>
+     <property name="text">
+      <string/>
+     </property>
      <property name="echoMode">
       <enum>QLineEdit::Password</enum>
      </property>
@@ -336,6 +339,9 @@ border: 1px solid #ADB5BD;
 background: #D9D9D9;
 padding: 4px 10px 4px 10px;
 }</string>
+     </property>
+     <property name="text">
+      <string/>
      </property>
      <property name="placeholderText">
       <string>Username</string>

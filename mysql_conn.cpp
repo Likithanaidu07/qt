@@ -371,6 +371,8 @@ void mysql_conn::logToDB(QString logMessage)
 
 
 PortfolioType mysql_conn::checkAlogTypeForTheData(QString instrument_type){
+    if(instrument_type=="OPTSTK"||instrument_type=="OPTIDX")
+        return PortfolioType::BFLY_BID;
     if(instrument_type=="OPTSTK"||instrument_type=="OPTIDX"||instrument_type=="OPTCUR"||instrument_type=="OPTIRC")
         return PortfolioType::BY;
     if(instrument_type=="FUTIDX"||instrument_type=="FUTSTK"||instrument_type=="FUTCUR"||instrument_type=="FUTIRC"||instrument_type=="FUTIRT")
@@ -470,7 +472,11 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
         //            StockNameLeg3.chop(2);
         Algo_Name = Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg1_token_number)+"-"+ContractDetail::getInstance().GetExpiry(leg1_token_number,"ddMMM")+"-"+ContractDetail::getInstance().GetStrikePrice(leg1_token_number)+"-"+ContractDetail::getInstance().GetStrikePrice(leg3_token_number);
     }
-    return Algo_Name.toUpper();
+    else if(algo_type==PortfolioType::BFLY_BID){
+        Algo_Name = "BflyBid-";//Nifty-18000-CE-200";
+        double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number).toDouble());
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM")+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number) +"-"+QString::number(diff)+ContractDetail::getInstance().GetOptionType(leg1_token_number);
+    }return Algo_Name.toUpper();
 }
 
 void mysql_conn::getTradeTableData(Trade_Table_Model *model, QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash)
@@ -574,7 +580,16 @@ void mysql_conn::getTradeTableData(Trade_Table_Model *model, QString user_id, QH
 
                     break;
                 }
+                case PortfolioType::BFLY_BID:{
+                    if(Leg1BuySellIndicator==1){
+                        Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
+                    }
+                    else{
+                        Exch_Price_val = static_cast<double>((leg3Price + leg1Price) * 1.0 - (2.0 * leg2Price)) / devicer;
+                    }
 
+                    break;
+                }
 
                 default:
                     break;
@@ -844,14 +859,16 @@ void mysql_conn::getNetPosTableData(Net_Position_Table_Model *model, QString use
 
 
 
-QHash<QString, contract_table> mysql_conn::getContractTable(QHash<QString, QStringList> &_m_ContractDetailsFiltered,QStringList &F2F_data_list_Sorted_Key,QStringList &BFLY_data_list_Sorted_Key){
+QHash<QString, contract_table> mysql_conn::getContractTable(QHash<QString, QStringList> &_m_ContractDetailsFiltered, QStringList &F2F_data_list_Sorted_Key, QStringList &BFLY_data_list_Sorted_Key, QStringList &BFLY_BID_data_list_Sorted_Key){
     QMutexLocker lock(&mutex);
 
     QHash<QString, contract_table> contract_table_hash;
     F2F_data_list_Sorted_Key.clear();
     BFLY_data_list_Sorted_Key.clear();
+    BFLY_BID_data_list_Sorted_Key.clear();
     QList <contract_table> BFLY_data_list;
     QList <contract_table> F2F_data_list;
+    QList <contract_table> BFLY_BID_data_list;
 
     QString msg;
     bool ok = checkDBOpened(msg);
@@ -899,6 +916,10 @@ QHash<QString, contract_table> mysql_conn::getContractTable(QHash<QString, QStri
                     F2F_data_list.append(contractTableTmp);
                     break;
                 }
+                case PortfolioType::BFLY_BID:{
+                    BFLY_BID_data_list.append(contractTableTmp);
+                    break;
+                }
 
 
                 default:
@@ -922,7 +943,9 @@ QHash<QString, contract_table> mysql_conn::getContractTable(QHash<QString, QStri
             for(int i=0;i<BFLY_data_list.length();i++){
                 BFLY_data_list_Sorted_Key.append(QString::number(BFLY_data_list[i].TokenNumber));
             }
-
+            for(int i=0;i<BFLY_BID_data_list.length();i++){
+                BFLY_BID_data_list_Sorted_Key.append(QString::number(BFLY_BID_data_list[i].TokenNumber));
+            }
 
 
         }
@@ -1103,6 +1126,13 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                               " and Leg3Ratio="+data.Leg3Ratio+
                               " and Leg4Ratio="+data.Leg4Ratio;
 
+                    //BFLY-BID
+                    else if(data.algo_type==QString::number(PortfolioType::BFLY_BID))
+                        str = "select  TraderID from Portfolios where TraderID="+data.user_id+
+                              " and PortfolioType="+ data.algo_type+
+                              " and Leg1TokenNo="+data.Leg1_token_number+
+                              " and Leg2TokenNo="+data.Leg2_token_number+
+                              " and Leg3TokenNo="+data.Leg3_token_number;
 
                     //CON-REV
                     //2L Straddle
@@ -1240,8 +1270,6 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
 
 
                             }
-
-
                             //OPEN_BY
                             else if(data.algo_type==QString::number(PortfolioType::OPEN_BY)){
                                 query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
@@ -1306,6 +1334,33 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                 query.bindValue(":Leg2Ratio", data.Leg2Ratio);
                                 query.bindValue(":Leg3Ratio", data.Leg3Ratio);
                                 query.bindValue(":Leg4Ratio", data.Leg4Ratio);
+
+                            }
+                            //BFLY_BID
+                            else if(data.algo_type==QString::number(PortfolioType::BFLY_BID)){
+                                query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
+                                              "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
+                                              ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                                              "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
+                                              "OrderQuantity) "
+                                              "VALUES (:PortfolioType, :TraderID, :Status,"
+                                              ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
+                                              ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                                              ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
+                                              ":OrderQuantity)");
+                                query.bindValue(":PortfolioType", data.algo_type);
+                                query.bindValue(":TraderID", data.user_id);
+                                query.bindValue(":Status", data.Algo_Status);
+                                query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
+                                query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
+                                query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
+                                query.bindValue(":BuyPriceDifference", 0);
+                                query.bindValue(":BuyTotalQuantity", 0);
+                                query.bindValue(":BuyTradedQuantity", 0);
+                                query.bindValue(":SellPriceDifference", 0);
+                                query.bindValue(":SellTotalQuantity", 0);
+                                query.bindValue(":SellTradedQuantity", 0);
+                                query.bindValue(":OrderQuantity", 0);
 
                             }
 

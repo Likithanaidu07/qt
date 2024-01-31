@@ -131,7 +131,7 @@ enum PortfolioType
     R2L = 200,
     OPEN_BY = 205, // open btfy
     OPEN_BOX = 206, // open btfy
-
+    BFLY_BID = 208,
     JBX,
     JBX_3L,
     JBX_2L,
@@ -288,7 +288,25 @@ struct Indices_Data_Struct{
     int display_widget_idx;
 };
 
+enum BID_TYPE{
+    INDEX_ALGO_BFLY_BID=0,
+    INDEX_ALGO_F2F,
+    INDEX_ALGO_BFLY,
+    INDEX_ALGO_CON_REV,
+    INDEX_ALGO_BOX,
+    INDEX_ALGO_Open_BFLY,
+    INDEX_ALGO_Open_BOX
+};
 
-
+enum NOTIFICATION_TYPE
+{
+    CMD_ID_DEFAULT = 0,
+    CMD_ID_PORTTFOLIO_NEW_1 = 1,
+    CMD_ID_TRADE_UPDATED_100 = 100,
+    CMD_ID_TRADE_UPDATED_200 = 200,
+    CMD_ID_PORTTFOLIO_UPDATED_201 = 201,
+    CMD_ID_TRADE_UPDATED_CMD_300 = 300,
+    CMD_ID_PORTTFOLIO_UPDATED_301 = 301
+};
 
 #endif // DEFINES_H

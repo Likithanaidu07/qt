@@ -26,8 +26,8 @@ public:
     void refreshTable();
     int switchstatetest() const;
 private:
-//    QStringList header={"Status","Algo ID","Algo Name","Rate", "Avg", "Diff" ,"TQ", "TTQ", "RQ", "Rate", "Avg", "Diff", "TQ", "TTQ", "RQ", "Qty Ratio", "Skip/Market Strike", "Cost", "Fut Price"};
-    QStringList header={"Status","Algo No."," Algo Name","Rate","Avg","Diff","TQ","TTQ","RQ","Rate", "Avg", "Diff","TQ","TTQ","RQ","Expiry 1", "Expiry 2", "Cost"};
+   QStringList header={"Status","Algo ID","Algo Name","Rate", "Avg", "Diff" ,"TQ", "TTQ", "RQ", "Rate", "Avg", "Diff", "TQ", "TTQ", "RQ", "Odr Qty" ,"Qty Ratio", "Skip/Market Strike", "Bid Leg", "Cost", "Fut Price"};
+    // QStringList header={"Status","Algo No."," Algo Name","Rate","Avg","Diff","TQ","TTQ","RQ","Rate", "Avg", "Diff","TQ","TTQ","RQ","Expiry 1", "Expiry 2", "Cost"};
     QString double_to_Human_Readable(double num, int precision) const;
     double devicer;
     int decimal_precision;

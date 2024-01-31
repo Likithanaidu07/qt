@@ -8,6 +8,7 @@ QString userNameLogged;
 QAtomicInt data_exchangeTimestamp(0);
 QAtomicInt portfolio_table_updating_db(0);
 std::atomic<int> portfolio_table_slected_idx_for_editing;
+MainWindow *MainWindowObj;
 
 void myMessageHandler(QtMsgType type, const QMessageLogContext &, const QString & msg)
 {
@@ -65,14 +66,15 @@ int main(int argc, char *argv[])
         }
     }
     MainWindow mainWindow;
+    MainWindowObj = &mainWindow;
    // UiUtils::SetMainWindow(&mainWindow);
     loginwindow loginWindow;
     QObject::connect(&loginWindow, &loginwindow::loginStatus, [&](const userInfo& userInfo) {
         if (userInfo.loggedIn) {
-            mainWindow.userData = userInfo;
-            QMetaObject::invokeMethod(&mainWindow, "showMaximized", Qt::QueuedConnection);
+            MainWindowObj->userData = userInfo;
+            QMetaObject::invokeMethod(MainWindowObj, "showMaximized", Qt::QueuedConnection);
             QMetaObject::invokeMethod(&loginWindow, "close", Qt::QueuedConnection);
-            QMetaObject::invokeMethod(&mainWindow, "loggedIn", Qt::QueuedConnection);
+            QMetaObject::invokeMethod(MainWindowObj, "loggedIn", Qt::QueuedConnection);
         }
         else if (userInfo.dbError){
             QMetaObject::invokeMethod(qApp, [userInfo]() {

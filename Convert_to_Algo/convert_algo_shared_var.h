@@ -17,6 +17,8 @@ public:
     QHash<QString, contract_table> fo_contract_table_hash; // this contract table for fo
     QStringList FO_F2F_data_list_Sorted_Key;
     QStringList FO_BFLY_data_list_Sorted_Key;
+    QStringList FO_BFLY_BID_data_list_Sorted_Key;
+
     //  QStringList CURR_F2F_data_list_Sorted_Key;
     // QStringList CURR_BFLY_data_list_Sorted_Key;
 

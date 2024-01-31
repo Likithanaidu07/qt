@@ -6,10 +6,13 @@ QHash<QString, QStringList> ContractDetail::m_ContractDetailsFiltered;
 
 QStringList ContractDetail::F2F_data_list_Sorted_Key;
 QStringList ContractDetail::BFLY_data_list_Sorted_Key;
+QStringList ContractDetail::BFLY_BID_data_list_Sorted_Key;
+
 //QStandardItemModel* ContractDetail::model_searchInstrument_BOX_Leg1  = nullptr;
 QStandardItemModel* ContractDetail::model_start_strike_BFLY = nullptr;
 QStandardItemModel* ContractDetail::model_searchInstrument_F2F_Leg1 = nullptr;
 QStandardItemModel* ContractDetail::model_FUT_CON_REV = nullptr;
+QStandardItemModel* ContractDetail::model_start_strike_BFLY_BID = nullptr;
 
 
 

@@ -61,6 +61,8 @@ loginwindow::loginwindow(QWidget *parent) :
                 if (settings.contains("remember_me")){
                     login_username = base64_decode(settings.value("login_username").toString());
                     login_password = base64_decode(settings.value("login_password").toString());
+//                    ui->lineEditUsername->setText("test1");
+//                    ui->lineEdit_Password->setText("MTIz");
                     ui->lineEditUsername->setText(login_username);
                     ui->lineEdit_Password->setText(login_password);
                 }
