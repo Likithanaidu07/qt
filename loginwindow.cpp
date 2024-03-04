@@ -6,12 +6,18 @@
 #include <qpainter.h>
 #include <QMouseEvent>
 #include "sql_conn_utils.h"
+#include "mainwindow.h"
+
+extern MainWindow *MainWindowObj;
+
+
 loginwindow::loginwindow(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::loginwindow)
 {
     ui->setupUi(this);
 
+    MainWindowObj = (MainWindow*) parent;
     QFontDatabase::addApplicationFont(":/RacingSansOne-Regular.ttf");
     QFontDatabase::addApplicationFont(":/WorkSans-Bold.ttf");
 
@@ -61,10 +67,8 @@ loginwindow::loginwindow(QWidget *parent) :
                 if (settings.contains("remember_me")){
                     login_username = base64_decode(settings.value("login_username").toString());
                     login_password = base64_decode(settings.value("login_password").toString());
-//                    ui->lineEditUsername->setText("test1");
-//                    ui->lineEdit_Password->setText("MTIz");
-                    ui->lineEditUsername->setText(login_username);
-                    ui->lineEdit_Password->setText(login_password);
+                    ui->lineEditUsername->setText("test1");
+                    ui->lineEdit_Password->setText("MTIz");
                 }
             }
         }
@@ -105,7 +109,9 @@ void loginwindow::on_pushButtonlogin_clicked()
     }
     else{
         ui->pushButtonlogin->setEnabled(false);
+        // mysql_conn *db_conn = new mysql_conn(MainWindowObj,"login_conn");
         mysql_conn *db_conn = new mysql_conn(0,"login_conn");
+
 //        SqlConnUtils::SetConnection(db_conn);
         auto login_BackgroundTask = [this, login_id, passWord,db_conn]() {
 

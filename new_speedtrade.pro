@@ -11,6 +11,7 @@ CONFIG += c++17
 
 SOURCES += \
     CombinedTracker/combined_tracker_table_model.cpp \
+    Conversions.cpp \
     Convert_to_Algo/add_algo_con_rev.cpp \
     Convert_to_Algo/add_algo_f2f.cpp \
     Convert_to_Algo/convert_algo_shared_var.cpp \
@@ -20,6 +21,8 @@ SOURCES += \
     Liners/liners_model.cpp \
     NetPosition/net_position_table_model.cpp \
     OrderBook/table_orderbook_delegate.cpp \
+    PortFolio/PortfolioParser.cpp \
+    PortFolio/portfolio_Object.cpp \
     PortFolio/portfolioheaderdelegate.cpp \
     PortFolio/portfolioheaderview.cpp \
     PortFolio/table_portfolios_custom.cpp \
@@ -31,9 +34,9 @@ SOURCES += \
     SlowDataIndices/slowdataindices.cpp \
     SwitchButton/switchbutton.cpp \
     TradePosition/trade_table_model.cpp \
-    UiUtils.cpp \
     backendcomm/backendcomm.cpp \
     contractdetail.cpp \
+    customDelegate.cpp \
     custom_grid_table/gridtableheadermodel.cpp \
     custom_grid_table/gridtableheaderview.cpp \
     custom_grid_table/gridtableview.cpp \
@@ -73,7 +76,6 @@ HEADERS += \
     SwitchButton/switchbutton.h \
     TradePosition/OrderBook_Object.h \
     TradePosition/trade_table_model.h \
-    UiUtils.h \
     backendcomm/backendcomm.h \
     contractdetail.h \
     customDelegate.h \

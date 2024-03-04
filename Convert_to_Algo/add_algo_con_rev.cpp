@@ -90,20 +90,15 @@ void add_algo_con_rev::selectedAction(){
     foo_token_number_fut="";
 
     //create qcompleter and fill with CON_REV model
-    custom_q_completer *fut_combination_Completer = new custom_q_completer(this);
-    fut_combination_Completer->setModel(model_FUT_CON_REV);
-    fut_combination_Completer->setCaseSensitivity(Qt::CaseInsensitive);
-    fut_combination_Completer->setCompletionMode(QCompleter::PopupCompletion);
-    fut_combination_Completer->setModelSorting(QCompleter::CaseSensitivelySortedModel);
-    fut_combination_Completer->setFilterMode(Qt::MatchContains);
-    QListView *view = (QListView *)fut_combination_Completer->popup();
-    view->setUniformItemSizes(true);
-    view->setLayoutMode(QListView::Batched);
-    lineEdit_Fut->setCompleter(fut_combination_Completer);
+    custom_q_completer *Start_strike_combination_Completer = new custom_q_completer( this);
+    Start_strike_combination_Completer->setModel(model_FUT_CON_REV);
+    Start_strike_combination_Completer->setCaseSensitivity(Qt::CaseInsensitive);
+    connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),Start_strike_combination_Completer, SLOT(newfilterItems(QString)));
+    lineEdit_Start_strike->setCompleter(Start_strike_combination_Completer);
 
     //foo_token_number assined for currently selected algo combination.
-    connect(fut_combination_Completer, QOverload<const QModelIndex &>::of(&QCompleter::activated), [=](const QModelIndex &index){
-        foo_token_number_fut = fut_combination_Completer->get_foo_token_number_for_selected(index);
+    connect(Start_strike_combination_Completer, QOverload<const QModelIndex &>::of(&QCompleter::activated), [=](const QModelIndex &index){
+        foo_token_number_fut = Start_strike_combination_Completer->get_foo_token_number_for_selected(index);
         //qDebug()<<"foo_token_number_fut: "<<foo_token_number_fut;
     });
 }

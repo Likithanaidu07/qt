@@ -8,6 +8,7 @@
 #include <QFontMetrics>
 #include <QStandardPaths>
 #include <QFontDatabase>
+#include <QStandardItemModel>
 
 struct CustomFormatting {
     QColor color;
@@ -43,6 +44,14 @@ void Table_Portfolios_Model::loadSettings(){
 
 }
 
+void Table_Portfolios_Model::onItemChanged(const QModelIndex &index)
+{
+    if (index.column() == PortfolioData_Idx::_Status)
+    {
+        setData(index, data(index, Qt::ItemIsUserCheckable).value<Qt::CheckState>(), Qt::ItemIsUserCheckable);
+    }
+}
+
 int Table_Portfolios_Model::rowCount(const QModelIndex & /*parent*/) const
 {
 
@@ -67,7 +76,6 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
     int r = index.row();
     int c = index.column();
 
-
     if(portfolio_data_list.length()==0)
         return QVariant();
 
@@ -76,29 +84,17 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
 
     PortfolioObject *portfolio = portfolio_data_list.at(index.row());
     switch (role) {
-//    case Qt::CheckStateRole: {
-//        if (c == PortfolioData_Idx::_Status){
-//            if (portfolio->StatusVal==QString::number(SwitchState::Checked))
-//                return SwitchState::Checked;
-//            else
-//                return SwitchState::Unchecked;
-//            // emit edit_Started(r,c);
-//        }
-//        else
-//            return QVariant();
-//    }
 
+    case Qt::ItemIsUserCheckable:
+    {
+        if (index.column() == PortfolioData_Idx::_Status) {
+            if (portfolio->StatusVal==QString::number(Qt::Checked))
+                return Qt::Checked;
+            else
+                return Qt::Unchecked;
+        }
+    }
 
-
-
-        /*case Qt::BackgroundRole: {
-          // this implemented for hilight currently editing row, just for testing.
-             if(portfolio->edting.loadRelaxed()==1){
-                return QVariant::fromValue(QColor(0,150,220));
-             }
-             else
-               return QVariant();
-          }*/
     case Qt::ForegroundRole: {
         if (c == PortfolioData_Idx::_BuyMarketRate){
                 return QVariant::fromValue(QColor(0,122,0));
@@ -166,7 +162,7 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         else if(index.column()==PortfolioData_Idx::_BuyMarketRate || index.column()==PortfolioData_Idx::_BuyAveragePrice || index.column()==PortfolioData_Idx::_BuyPriceDifference || index.column()==PortfolioData_Idx::_BuyTotalQuantity|| index.column()==PortfolioData_Idx::_BuyTradedQuantity || index.column()==PortfolioData_Idx::_BuyRemainingQuantity){
             return Qt::AlignCenter;
         }
-        else if(index.column()==PortfolioData_Idx::_SellMarketRate || index.column()==PortfolioData_Idx::_SellAveragePrice || index.column()==PortfolioData_Idx::_SellPriceDifference || index.column()==PortfolioData_Idx::_SellTotalQuantity || index.column()==PortfolioData_Idx::_SellTradedQuantity || index.column()==PortfolioData_Idx::_SellRemainingQuantity){
+        else if(index.column()==PortfolioData_Idx::_OrderQuantity || index.column()==PortfolioData_Idx::_SellMarketRate || index.column()==PortfolioData_Idx::_SellAveragePrice || index.column()==PortfolioData_Idx::_SellPriceDifference || index.column()==PortfolioData_Idx::_SellTotalQuantity || index.column()==PortfolioData_Idx::_SellTradedQuantity || index.column()==PortfolioData_Idx::_SellRemainingQuantity){
             return Qt::AlignCenter;
         }
         else if(index.column()==PortfolioData_Idx::_ExpiryDateTime || index.column()==PortfolioData_Idx::_Leg1){
@@ -245,9 +241,9 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         else if (index.column() == PortfolioData_Idx::_Cost) {
             return portfolio->Cost;
         }
-        /*else if (index.column() == PortfolioData_Idx::_OrderQuantity) {
+        else if (index.column() == PortfolioData_Idx::_OrderQuantity) {
                      return portfolio->OrderQuantity;
-                 }*/
+                 }
         /*else if (index.column() == PortfolioData_Idx::_InstrumentName) {
                      return portfolio->InstrumentName;
                  }*/
@@ -278,12 +274,6 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         PortfolioObject *portfolio = portfolio_data_list.at(index.row());
         portfolio->edting.storeRelaxed(1);
         qDebug()<<"editStarted";
-
-        if(c==PortfolioData_Idx::_Status){
-            emit edit_Started(r,c);
-            return portfolio->StatusVal;
-        }
-
         if(c==PortfolioData_Idx::_SellPriceDifference){
             emit edit_Started(r,c);
             return double_to_Human_Readable(portfolio->SellPriceDifference,decimal_precision);
@@ -324,7 +314,16 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
     QMutexLocker locker(&mutex); // Lock the mutex automatically
 
     int c=index.column();
-    if(role== Qt::EditRole){
+    if (role == Qt::ItemIsUserCheckable
+        && index.column() == PortfolioData_Idx::_Status)
+    {
+        portfolio_data_list[index.row()]->StatusVal = QString::number(value.toInt());
+        emit dataChanged(index, index, {role});
+        emit updateDBOnDataChanged(index);
+        return true;
+    }
+    if(role== Qt::EditRole)
+    {
         if (!checkIndex(index))
             return false;
         if(c==PortfolioData_Idx::_SellPriceDifference){
@@ -359,30 +358,10 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
             return true;
 
         }
-
-
         else
             return false;
 
     }
-  /*  else if (role == Qt::CheckStateRole&&c==PortfolioData_Idx::_Status)
-    {
-        if(portfolio_data_list[index.row()]->StatusVal != value.toString()){
-            int v =value.toInt();
-            qDebug()<<"Table_Portfolios_Model::setData: checkbox="<<value;
-
-            if(v==SwitchState::Checked)
-                v =  SwitchState::Unchecked;
-            else if (v==SwitchState::Unchecked)
-                v = SwitchState::Checked;
-
-            portfolio_data_list[index.row()]->StatusVal = QString::number(v);
-        }
-        emit editCompleted(value.toString(),index);
-        return true;
-
-    }*/
-
     return false;
 }
 
@@ -511,8 +490,10 @@ void Table_Portfolios_Model::setDataList(QList <PortfolioObject*> portfolio_data
     //new data so insert all to the list
     bool newTokenFound = false;
     QString largestText = "";
-    if(portfolio_data_list.length()==0){
-        for(int i=0;i<portfolio_data_list_new.length();i++){
+    if(portfolio_data_list.length()==0)
+    {
+        for(int i=0;i<portfolio_data_list_new.length();i++)
+        {
 
             beginInsertRows(QModelIndex(), i, i);
             // portfolio_data_list.insert(i,portfolio_data_list_new[i]);
@@ -535,9 +516,7 @@ void Table_Portfolios_Model::setDataList(QList <PortfolioObject*> portfolio_data
             largestText = "Algo Name";
         }
 
-        int width_ = fontMetrics.horizontalAdvance(largestText);
-
-        emit resizePortFolioTableColWidth( width_);
+        // emit resizePortFolioTableColWidth(fontMetrics.horizontalAdvance(largestText));
     }
     //check the data is new else skip
     else{
@@ -630,31 +609,29 @@ Qt::ItemFlags Table_Portfolios_Model::flags(const QModelIndex &index) const
 {
     int c=index.column();
     if(c==PortfolioData_Idx::_SellPriceDifference ||
-        c==PortfolioData_Idx::_Status ||
-
-            c==PortfolioData_Idx::_BuyPriceDifference ||
+        c==PortfolioData_Idx::_BuyPriceDifference ||
         c==PortfolioData_Idx::_SellTotalQuantity ||
         c==PortfolioData_Idx::_BuyTotalQuantity ||
         c==PortfolioData_Idx::_OrderQuantity)
     {
         return Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     }
-    /*else if(c==PortfolioData_Idx::_Status){
+    else if(c==PortfolioData_Idx::_Status){
 
         return Qt::ItemIsUserCheckable |QAbstractTableModel::flags(index);
-
-    }*/
+    }
 
     return QAbstractTableModel::flags(index);
 }
 
-QVariant Table_Portfolios_Model::headerData(int section, Qt::Orientation orientation,   int role) const
+QVariant Table_Portfolios_Model::headerData(int section, Qt::Orientation orientation, int role) const
 {
-    if (role != Qt::DisplayRole){
+    if (role != Qt::DisplayRole ){
         return QVariant();
     }
     if (orientation == Qt::Horizontal)
         return header.at(section);
+
     else
         return QString::number(section);
 
@@ -677,3 +654,34 @@ QHash<QString,PortFolioData_Less> Table_Portfolios_Model::getPortFolioDataLess()
 void Table_Portfolios_Model::refreshTable(){
     emit layoutChanged();
 }
+
+
+
+void Table_Portfolios_Model::setColumnWidths(QTableView *tableView) const {
+    for (int col = 0; col < columnCount(); ++col) {
+        int maxWidth = 0;
+
+        // Consider header text width
+        QVariant headerText = this->headerData(col, Qt::Horizontal, Qt::DisplayRole);
+        int headerWidth = tableView->fontMetrics().horizontalAdvance(headerText.toString());
+        maxWidth = qMax(maxWidth, headerWidth);
+
+        for (int row = 0; row < rowCount(); ++row) {
+            QModelIndex index = this->index(row, col);
+
+            // Use the font metrics of the QTableView
+            QString text = data(index, Qt::DisplayRole).toString();
+            int textWidth = tableView->fontMetrics().horizontalAdvance(text);
+
+            // Adjust the maximum width if necessary
+            maxWidth = qMax(maxWidth, textWidth);
+        }
+
+        // Add some padding
+        maxWidth += 30;
+
+        // Set the column width directly in the view
+        tableView->setColumnWidth(col, maxWidth);
+    }
+}
+

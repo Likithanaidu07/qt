@@ -52,9 +52,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName("New_SpeedTrade");
     QCoreApplication::setOrganizationName("New_AlgoMethods");
-    //#ifndef QT_DEBUG
+    // #ifndef QT_DEBUG
     qInstallMessageHandler(myMessageHandler);
-    //#endif
+    // #endif
     QFontDatabase::addApplicationFont(":/RacingSansOne-Regular.ttf");
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
@@ -65,10 +65,18 @@ int main(int argc, char *argv[])
             break;
         }
     }
+
+    if(QFileInfo::exists(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/contracts"+"/contracts.bin"))
+    {
+        QFile::remove(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/contracts"+"/contracts.bin");
+    }
+
     MainWindow mainWindow;
     MainWindowObj = &mainWindow;
+
    // UiUtils::SetMainWindow(&mainWindow);
-    loginwindow loginWindow;
+    loginwindow loginWindow(MainWindowObj);
+    QObject::connect(&loginWindow, &loginwindow::loginStatus,&mainWindow, &MainWindow::loggedInSucessful);
     QObject::connect(&loginWindow, &loginwindow::loginStatus, [&](const userInfo& userInfo) {
         if (userInfo.loggedIn) {
             MainWindowObj->userData = userInfo;

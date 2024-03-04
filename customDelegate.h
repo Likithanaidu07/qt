@@ -4,38 +4,14 @@
 #include <QObject>
 #include <QItemDelegate>
 #include <QStyledItemDelegate>
-#include "SwitchButton/switchbutton.h"
-
-
 
 class CustomDelegate : public QItemDelegate
 {
 public:
-    explicit CustomDelegate(QObject *parent = nullptr) : QItemDelegate(parent)
 
-    {}
+    explicit CustomDelegate(QObject *parent = nullptr);
 
-    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index)
-
-        const
-
-        override
-
-    {
-        if (index.column() == 0) {
-            // Create your custom widget instance here
-            SwitchButton *widget = new SwitchButton(parent);
-            // Set any initial properties of the widget
-            // ...
-
-            // Connect the widget's signals to your desired slots
-            // ...
-
-            return widget;
-        } else {
-            return QItemDelegate::createEditor(parent, option, index);
-        }
-    }
+    QWidget *createEditor(QWidget *parent, const QStyleOptionViewItem &option, const QModelIndex &index) const override ;
 };
 
 #endif // CUSTOMDELEGATE_H

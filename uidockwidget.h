@@ -25,26 +25,10 @@
 //#endif // UIDOCKWIDGET_H
 class DockWidget : public QDockWidget {
 public:
-    DockWidget(const QString &title, QWidget *parent = nullptr)
-        : QDockWidget(title, parent) {
-        setAcceptDrops(true);
-    }
+    explicit DockWidget(const QString &title, QWidget *parent = nullptr);
 
 protected:
-    void mousePressEvent(QMouseEvent *event) override {
-        if (event->button() == Qt::LeftButton) {
-            // Create a pixmap of the dock widget's content
-            QPixmap pixmap(size());
-            render(&pixmap);
 
-            // Create a drag object and set the pixmap as its visual representation
-            QDrag *drag = new QDrag(this);
-            drag->setPixmap(pixmap);
-
-            // Start the drag operation
-            drag->exec(Qt::MoveAction);
-        }
-        QDockWidget::mousePressEvent(event);
-    }
+    void mousePressEvent(QMouseEvent *event) override;
 };
 #endif

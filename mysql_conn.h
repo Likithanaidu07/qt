@@ -54,14 +54,13 @@ public:
 
     QString Password;
     QSqlDatabase db;
-    double devicer;
+    double devicer{100.0};
     int decimal_precision;
     QString InstrumentTypeFilter;
 
     userInfo login( QString user_name,  QString password);
     void  getPortfoliosTableData(Table_Portfolios_Model* model,Combined_Tracker_Table_Model *comb_tracker_model,QHash<QString, PortfolioAvgPrice> &averagePriceList,QString user_id);
-    QHash<QString, contract_table> getContractTable(QHash<QString, QStringList> &_m_ContractDetailsFiltered,QStringList &F2F_data_list_Sorted_Key,QStringList &BFLY_data_list_Sorted_Key, QStringList &BFLY_BID_data_list_Sorted_Key);
-    PortfolioType checkAlogTypeForTheData(QString instrument_type);
+    QMap<int, QHash<QString, contract_table>> getContractTable(QHash<QString, QStringList> &_m_ContractDetailsFiltered, QStringList &F2F_data_list_Sorted_Key, QStringList &BFLY_data_list_Sorted_Key, QStringList &BFLY_BID_data_list_Sorted_Key, userInfo userData);
 
     QSqlQuery runQuery(QString qry_str);
     bool updateDB_Table(QString query_str);
@@ -74,16 +73,24 @@ public:
     bool deleteAlgo(QString PortfolioNumber,QString &msg);
     void logToDB(QString logMessage);
 
+    QHash<QString, contract_table> prpareContractDataFromDB(QString queryStr, QSqlDatabase *db,QStringList &tokenData);
+
 private:
     bool checkDBOpened( QString &mesg);
     void loadSettings();
     QMutex mutex;
+    QString getAlgoTypeQuery(PortfolioType type, userInfo obj);
+    userInfo userLoginInfo;
+
+
 //    MainWindow MainWindow;
 
 
 signals:
-
+    void display_log_text_signal(QString);
 
 };
+
+
 
 #endif // mysql_conn_H

@@ -41,20 +41,15 @@ void add_algo_f2f::selectedAction(){
     foo_token_number_end_strike = "";
 
     //create qcompleter and fill with abovie model
-    custom_q_completer *completerLeg1 = new custom_q_completer(this);
-    completerLeg1->setModel(model_searchInstrument_F2F_Leg1);
-    completerLeg1->setCaseSensitivity(Qt::CaseInsensitive);
-    completerLeg1->setCompletionMode(QCompleter::PopupCompletion);
-    completerLeg1->setModelSorting(QCompleter::CaseSensitivelySortedModel);
-    completerLeg1->setFilterMode(Qt::MatchContains);
-    QListView *viewLeg1 = (QListView *)completerLeg1->popup();
-    viewLeg1->setUniformItemSizes(true);
-    viewLeg1->setLayoutMode(QListView::Batched);
-    lineEdit_searchInstrument_leg1->setCompleter(completerLeg1);
+    custom_q_completer *Start_strike_combination_Completer = new custom_q_completer( this);
+    Start_strike_combination_Completer->setModel(model_searchInstrument_F2F_Leg1);
+    Start_strike_combination_Completer->setCaseSensitivity(Qt::CaseInsensitive);
+    connect(lineEdit_searchInstrument_leg1, SIGNAL(textChanged(QString)),Start_strike_combination_Completer, SLOT(newfilterItems(QString)));
+    lineEdit_searchInstrument_leg1->setCompleter(Start_strike_combination_Completer);
 
     //foo_token_number assined for currently selected algo combination.
-    connect(completerLeg1, QOverload<const QModelIndex &>::of(&QCompleter::activated), [=](const QModelIndex &index){
-        foo_token_number_start_strike = completerLeg1->get_foo_token_number_for_selected(index);
+    connect(Start_strike_combination_Completer, QOverload<const QModelIndex &>::of(&QCompleter::activated), [=](const QModelIndex &index){
+        foo_token_number_start_strike = Start_strike_combination_Completer->get_foo_token_number_for_selected(index);
         //qDebug()<<"foo_token_number_start_strike: "<<foo_token_number_start_strike;
     });
 
@@ -163,32 +158,32 @@ QString   add_algo_f2f::get_Algo_Name(PortfolioType algo_type,int leg1_token_num
 //    }
     if(algo_type==PortfolioType::F2F){
         Algo_Name = "F2F-";//-Nifty";
-        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg1_token_number)+"-"+ContractDetail::getInstance().GetExpiry(leg1_token_number,"MMM")+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"MMM");
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg1_token_number,"MMM",algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"MMM",algo_type);
 
     }
     else if(algo_type==PortfolioType::BY){
         Algo_Name = "Bfly-";//Nifty-18000-CE-200";
-        double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number).toDouble());
-        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM")+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number) +"-"+QString::number(diff)+ContractDetail::getInstance().GetOptionType(leg1_token_number);
+        double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
     }
     else if(algo_type==PortfolioType::CR){
         Algo_Name = "CR-";//Nifty-17000";
         //            QString StockName = ContractDetail::getInstance().GetStockName(leg2_token_number);
         //            StockName.chop(2);
-        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM")+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number);
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type);
     }
     else if(algo_type==PortfolioType::BOX){
         Algo_Name = "BOX-";//18100-18200";
-        QString StockNameLeg1 = ContractDetail::getInstance().GetStockName(leg1_token_number);
+        QString StockNameLeg1 = ContractDetail::getInstance().GetStockName(leg1_token_number,algo_type);
         StockNameLeg1.chop(2);
-        QString StockNameLeg3 = ContractDetail::getInstance().GetStockName(leg3_token_number);
+        QString StockNameLeg3 = ContractDetail::getInstance().GetStockName(leg3_token_number,algo_type);
         StockNameLeg3.chop(2);
         Algo_Name = Algo_Name+StockNameLeg1+"-"+StockNameLeg3;
     }
     else if(algo_type==PortfolioType::BFLY_BID){
         Algo_Name = "Bfly-";//Nifty-18000-CE-200";
-        double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number).toDouble());
-        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM")+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number) +"-"+QString::number(diff)+ContractDetail::getInstance().GetOptionType(leg1_token_number);
+        double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
     }
 
     return Algo_Name.toUpper();

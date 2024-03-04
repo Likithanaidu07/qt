@@ -89,6 +89,8 @@ signals:
     void tabKeyPressed(nav_direction);
 
 private:
+
+
     double price_diff_incrementer = 0.05;
     double quantity_incrementer = 1.0;
     QString market_type;

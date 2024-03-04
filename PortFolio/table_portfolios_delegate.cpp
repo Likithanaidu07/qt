@@ -11,6 +11,7 @@
 #include "QDir"
 #include <QValidator>
 #include <QStandardPaths>
+#include <QCheckBox>
 
 Table_Portfolios_Delegate::Table_Portfolios_Delegate(QObject *parent)  : QStyledItemDelegate{parent}
 {
@@ -39,12 +40,6 @@ Table_Portfolios_Delegate::Table_Portfolios_Delegate(QObject *parent)  : QStyled
 QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOptionViewItem & option , const QModelIndex & index ) const
 {
     int c = index.column();
-    if(c == PortfolioData_Idx::_Status){
-//        QCheckBox* check = new QCheckBox(parent);
-//        return check;
-        SwitchButton* sbtn = new SwitchButton(parent);
-        return sbtn;
-    }
     if ( c == PortfolioData_Idx::_OrderQuantity)
     {
         QLineEdit *editor = new QLineEdit(parent);
@@ -79,23 +74,6 @@ QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOp
 void Table_Portfolios_Delegate::setEditorData(QWidget *editor, const QModelIndex &index) const
 {
     int c= index.column();
-    if(c == PortfolioData_Idx::_Status ){
-        int value = index.model()->data(index, Qt::CheckStateRole).toInt();
-        qDebug()<<"Table_Portfolios_Delegate::setEditorData: checkbox="<<value;
-//        QCheckBox* check = static_cast<QCheckBox*>(editor);
-        SwitchButton* sbtn =static_cast<SwitchButton*>(editor); // Default style is Style::ONOFF
-        bool current = sbtn->value();
-//        sbtn->setValue(!current);
-        if(value==0){
-//            check->setChecked(false);
-            sbtn->setValue(false);
-        }
-        else{
-//            check->setChecked(true);
-            sbtn->setValue(true);
-        }
-
-    }
 
     if(c==PortfolioData_Idx::_SellPriceDifference ||
         c==PortfolioData_Idx::_BuyPriceDifference ||
@@ -128,18 +106,8 @@ void Table_Portfolios_Delegate::setModelData(QWidget *editor, QAbstractItemModel
 {
     int c= index.column();
     if(c == PortfolioData_Idx::_Status ){
-//        QCheckBox* check = static_cast<QCheckBox*>(editor);
-//        int value =check->isChecked();
-
-        SwitchButton* sbtn = static_cast<SwitchButton*>(editor); // Default style is Style::ONOFF
-        bool value = sbtn->value();
-
-        qDebug()<<"Table_Portfolios_Delegate::setModelData: checkbox="<<value;
-
-//        if(value==portfolio_status::Filled)
-//            value = portfolio_status::DisabledByUser;
-//        else if (value==portfolio_status::DisabledByUser)
-//            value = portfolio_status::Active;
+       QCheckBox* check = static_cast<QCheckBox*>(editor);
+       int value =check->isChecked();
 
         if(value==SwitchState::Checked)
             value = SwitchState::Unchecked;
@@ -301,7 +269,6 @@ QSize Table_Portfolios_Delegate::sizeHint(const QStyleOptionViewItem &option, co
     return size;
 }
 
-
 void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     auto c= index.column();
@@ -314,8 +281,20 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         QStyledItemDelegate::paint(painter, op, index);
     }
 
-    if (c == PortfolioData_Idx::_Status || c==PortfolioData_Idx::_PortfolioNumber || c==PortfolioData_Idx::_AlgoName)
+    if(c == PortfolioData_Idx::_Status)
     {
+        QPixmap checkboxPixmap(32, 32);
+        checkboxPixmap.fill(Qt::transparent); // Fill with transparent background
+
+        QStyleOptionButton checkboxOption;
+        checkboxOption.state |= index.data(Qt::ItemIsUserCheckable).toBool() ? QStyle::State_On : QStyle::State_Off;
+        checkboxOption.rect = checkboxPixmap.rect(); // Adjust rect for drawing on the pixmap
+
+        // Manually draw the checkbox on the pixmap
+        QRect checkboxRect = checkboxOption.rect.adjusted(0, 0, -2, -2);
+        QPixmap pixmap(checkboxRect.width(), checkboxRect.height());  // Adjusted pixmap size
+        // Draw the pixmap with the updated position
+        QRect rect(option.rect.left(), option.rect.top(), checkboxRect.width(), checkboxRect.height());  // Adjusted rect position
 
         Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
         PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
@@ -324,6 +303,62 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         QColor color("#42A5F5");
         op.palette.setColor(QPalette::Highlight , color);
 
+        if(portfolio->StatusVal.toInt()==portfolio_status::Active)
+        {
+            QColor color("#FED9D9");
+            op.palette.setColor(QPalette::Highlight , Qt::transparent);
+            op.palette.setColor(QPalette::HighlightedText , Qt::black);
+            painter->fillRect(option.rect,  color);
+            double borderWidth = 0.5;
+            QColor myColor(108, 117, 125);
+            QPen pen(myColor);
+            pen.setWidthF(borderWidth);
+            painter->setPen(pen);
+            QPoint p1= option.rect.bottomLeft();
+            QPoint p2= option.rect.bottomRight();
+            p1.setX(p1.x()-5);
+            p2.setX(p2.x()+5);
+            painter->drawLine(p1,p2);
+
+            // Load an example image (replace with your logic to get the image)
+            QPixmap imagePixmap(":/enable.png");
+            if (!imagePixmap.isNull()) {
+                // Draw the image next to the checkbox
+                painter->drawPixmap(rect, imagePixmap);
+            }
+
+        }
+        else if(portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser)
+        {
+            QColor color("#FFF");
+            painter->fillRect(option.rect, color);
+            double borderWidth = 0.5;
+            QColor myColor(108, 117, 125);
+            QPen pen(myColor);
+            pen.setWidthF(borderWidth);
+            painter->setPen(pen);
+            painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
+
+            // Load an example image (replace with your logic to get the image)
+            QPixmap imagePixmap(":/disable.png");
+            if (!imagePixmap.isNull()) {
+                // Draw the image next to the checkbox
+                painter->drawPixmap(rect, imagePixmap);
+            }
+
+        }
+
+    }
+
+    if (/*c == PortfolioData_Idx::_Status ||*/ c==PortfolioData_Idx::_PortfolioNumber || c==PortfolioData_Idx::_AlgoName)
+    {
+
+        Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+        PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+
+        //42A5F5
+        QColor color("#42A5F5");
+        op.palette.setColor(QPalette::Highlight , color);
 
         if(portfolio->StatusVal.toInt()==portfolio_status::Active){
             QColor color("#E0F1FF");
@@ -340,8 +375,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             p2.setX(p2.x()+5);
             painter->drawLine(p1,p2);
         }
-
-        else if(portfolio->StatusVal.toInt()==portfolio_status::Filled){
+        else if(portfolio->StatusVal.toInt()==portfolio_status::Filled)
+        {
             QColor color("#E0F1FF");
             painter->fillRect(option.rect, color);
 
@@ -480,9 +515,18 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         }
         QStyledItemDelegate::paint(painter, op, index);
     }
-
-
-    else if(c==PortfolioData_Idx::_Leg1 || c==PortfolioData_Idx::_ExpiryDateTime || c==PortfolioData_Idx::_Cost){
+    else if(c==PortfolioData_Idx::_Leg1
+               || c==PortfolioData_Idx::_ExpiryDateTime
+               || c==PortfolioData_Idx::_Cost
+               || c == PortfolioData_Idx::_OrderQuantity
+               || c==PortfolioData_Idx::_InstrumentName
+               || c==PortfolioData_Idx::_Leg2
+               || c==PortfolioData_Idx::_Leg3
+               || c==PortfolioData_Idx::_AdditionalData1
+               || c==PortfolioData_Idx::_PortfolioType
+               || c==PortfolioData_Idx::_Price
+              || c==PortfolioData_Idx:: _FuturePrice)
+    {
         QStyleOptionViewItem op(option);
         QColor color("#42A5F5");
         op.palette.setColor(QPalette::Highlight , color);

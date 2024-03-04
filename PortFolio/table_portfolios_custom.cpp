@@ -9,6 +9,7 @@ table_portfolios_custom::table_portfolios_custom(QWidget *parent)
 {
     this->setEditTriggers(QAbstractItemView::NoEditTriggers |QAbstractItemView::DoubleClicked);
     viewport()->installEventFilter(this);
+
     setMouseTracking(true);
 }
 
@@ -23,7 +24,7 @@ void table_portfolios_custom::handleTabKeyPressFromEditableCell(nav_direction di
 
 void table_portfolios_custom::keyPressEvent(QKeyEvent *event)
 {
-    if(event->key() == Qt::Key_Tab || event->key() == Qt::Key_Backtab){
+     if(event->key() == Qt::Key_Tab || event->key() == Qt::Key_Backtab){
 
         nav_direction direction = nav_direction::nav_forward;
         if( event->key() == Qt::Key_Backtab)
@@ -36,9 +37,7 @@ void table_portfolios_custom::keyPressEvent(QKeyEvent *event)
 
     }
     else if(event->key() == Qt::Key_Space){
-        //do not send  spaceKeySignal if current index is _Status, because the update signal already send by checkbox itself
-
-        if(currentIndex().column()!=PortfolioData_Idx::_Status)
+       // if(currentIndex().column() == PortfolioData_Idx::_Status)
             emit spaceKeySignal();
     }
     /* else if (event->key() == Qt::Key_Left || event->key() == Qt::Key_Right)

@@ -11,7 +11,6 @@ extern QAtomicInt portfolio_table_updating_db;
 extern std::atomic<int> portfolio_table_slected_idx_for_editing;
 extern QString userNameLogged;
 
-
 //extern  QString MARKET_TYPE; // This will be either fo or cds. will load from setting.ini when app start
 #define CDS_DEVICER 10000000.0
 #define CDS_DECIMAL_PRECISION 4
@@ -131,7 +130,7 @@ enum PortfolioType
     R2L = 200,
     OPEN_BY = 205, // open btfy
     OPEN_BOX = 206, // open btfy
-    BFLY_BID = 208,
+    BFLY_BID = 250,
     JBX,
     JBX_3L,
     JBX_2L,
@@ -240,6 +239,9 @@ struct userInfo{
     QString loginResponse;
     int errorCode;
     int MaxPortfolioCount;
+
+    QMap<PortfolioType,QString> algoFilterMap;
+
 };
 
 struct cellData{
@@ -306,7 +308,7 @@ enum NOTIFICATION_TYPE
     CMD_ID_TRADE_UPDATED_200 = 200,
     CMD_ID_PORTTFOLIO_UPDATED_201 = 201,
     CMD_ID_TRADE_UPDATED_CMD_300 = 300,
-    CMD_ID_PORTTFOLIO_UPDATED_301 = 301
+    CMD_ID_PORTTFOLIO_UPDATED_301 = 301,
 };
 
 #endif // DEFINES_H

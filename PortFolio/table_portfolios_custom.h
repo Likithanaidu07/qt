@@ -2,6 +2,7 @@
 #define TABLE_PORTFOLIOS_CUSTOM_H
 
 #include <QObject>
+#include "PortFolio/table_portfolios_model.h"
 #include "QTableView"
 #include "QWidget"
 #include "QKeyEvent"
@@ -12,6 +13,17 @@ class table_portfolios_custom :  public QTableView
     Q_OBJECT
 public:
     explicit table_portfolios_custom(QWidget *parent = Q_NULLPTR);
+
+
+    void resizeEvent(QResizeEvent *event) override
+    {
+        QTableView::resizeEvent(event);
+        if (model())
+        {
+           static_cast<Table_Portfolios_Model*>(model())->setColumnWidths(this);
+        }
+    }
+
 
 private:
     int findNextEditableCell(int currentColIdx,nav_direction direction);
