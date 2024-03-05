@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "ui_mainwindow.h"
 
 #include <QEvent>
 #include <QPropertyAnimation>
@@ -11,27 +12,34 @@
 #include <QFontDatabase>
 #include <QTreeView>
 #include <QStandardItemModel>
-
 #include "ContractDetail.h"
 #include "OrderBook/table_orderbook_delegate.h"
 #include "mysql_conn.h"
-#include "ui_mainwindow.h"
 
 static const char stylesheetvis[]= "background: #596167;" "border-radius: 10px;";
+
+extern MainWindow *MainWindowObj;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
 {
+
     QFontDatabase::addApplicationFont(":/WorkSans-Bold.ttf");
     QFontDatabase::addApplicationFont(":/WorkSans-ExtraBold.ttf");
 
     ui->setupUi(this);
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-
-
-
+    connect(this,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
     convertalgo=new ConvertAlgo_Win(this);
+
+    // db_conn =new mysql_conn(this,"main_db_conn");
+    db_conn =new mysql_conn(0,"main_db_conn");
+    connect(db_conn,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
+
+    connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
+
+
 //    QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect(convertalgo);
 //    effect->setBlurRadius(5);
 //    convertalgo->setGraphicsEffect(effect);
@@ -621,9 +629,8 @@ MainWindow::MainWindow(QWidget *parent)
                 lay->addWidget(test, 0, 0);
 
     T_Portfolio_Table = new table_portfolios_custom(T_Portfolio_DockWin);
-
     T_Portfolio_Table->setStyleSheet(scroll_bar_SS);
-    T_Portfolio_Table->viewport()->setFocusPolicy(Qt::NoFocus);
+    // T_Portfolio_Table->viewport()->setFocusPolicy(Qt::NoFocus);
     T_Portfolio_Model = new Table_Portfolios_Model();
     T_Portfolio_Delegate =  new Table_Portfolios_Delegate();
     connect(T_Portfolio_Model,SIGNAL(edit_Started(int,int)),this,SLOT(edit_Started_PortFolio_Table(int,int)));
@@ -632,12 +639,15 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::tabKeyPressed, T_Portfolio_Table, &table_portfolios_custom::handleTabKeyPressFromEditableCell);
     QObject::connect(T_Portfolio_Table, &table_portfolios_custom::spaceKeySignal, this, &MainWindow::updatePortFolioStatus);
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::resizePortFolioTableColWidth, this, &MainWindow::resizePortFolioTableColWidthSlot);
+    QObject::connect(T_Portfolio_Table, &table_portfolios_custom::clicked, T_Portfolio_Model, &Table_Portfolios_Model::onItemChanged);
+    QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::updateDBOnDataChanged, this, &MainWindow::updatePortFolioStatus);
 
     T_Portfolio_Table->setModel(T_Portfolio_Model);
     T_Portfolio_Table->setItemDelegate(T_Portfolio_Delegate);
 
     connect(T_Portfolio_Table->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
             this, SLOT(T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&)));
+
 
     PortfolioHeaderView* headerView = new PortfolioHeaderView(Qt::Horizontal, T_Portfolio_Table);
     headerView->setFixedHeight(32);
@@ -945,9 +955,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     new QShortcut(QKeySequence(Qt::Key_Delete), this,  SLOT(Delete_clicked_slot()));
 
-    db_conn =new mysql_conn(0,"main_db_conn");
-    connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
-    loadContract();
+    // db_conn =new mysql_conn(this,"main_db_conn");
+    // connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
+   //loadContract();
 
 }
 
@@ -1164,42 +1174,46 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
             }
             break;
-        /* case PortfolioData_Idx::_SellPriceDifference:{
-          double val = valStr.toDouble();
-          val=val*devicer;
-          QString Query = "UPDATE Portfolios SET SellPriceDifference="+QString::number(val,'f',decimal_precision)+" where PortfolioNumber="+PortfolioNumber;
-          db_conn->updateDB_Table(Query);
-        }
-        break;
-    case PortfolioData_Idx::_BuyPriceDifference:{
-          double val = valStr.toDouble();
-          val=val*devicer;
-          QString Query = "UPDATE Portfolios SET BuyPriceDifference="+QString::number(val,'f',decimal_precision)+" where PortfolioNumber="+PortfolioNumber;
-          db_conn->updateDB_Table(Query);
-        }
-        break;
-    case PortfolioData_Idx::_SellTotalQuantity:{
-          int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
-          double val = valStr.toDouble();
-          val=val*lotSize;
-          QString Query = "UPDATE Portfolios SET SellTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
-          db_conn->updateDB_Table(Query);
-        }
-        break;
-    case PortfolioData_Idx::_BuyTotalQuantity:{
-        int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
-        double val = valStr.toDouble();
-        val=val*lotSize;
-          QString Query = "UPDATE Portfolios SET BuyTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
-          db_conn->updateDB_Table(Query);
-        }
-        break;
+    //     case PortfolioData_Idx::_SellPriceDifference:{
+    //       double val = valStr.toDouble();
+    //       val=val*devicer;
+    //       QString Query = "UPDATE Portfolios SET SellPriceDifference="+QString::number(val,'f',decimal_precision)+" where PortfolioNumber="+PortfolioNumber;
+    //       db_conn->updateDB_Table(Query);
+    //     }
+    //     break;
+    // case PortfolioData_Idx::_BuyPriceDifference:{
+    //       double val = valStr.toDouble();
+    //       val=val*devicer;
+    //       QString Query = "UPDATE Portfolios SET BuyPriceDifference="+QString::number(val,'f',decimal_precision)+" where PortfolioNumber="+PortfolioNumber;
+    //       db_conn->updateDB_Table(Query);
+    //     }
+    //     break;
+    // case PortfolioData_Idx::_SellTotalQuantity:{
+    //       int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+    //       double val = valStr.toDouble();
+    //       val=val*lotSize;
+    //       QString Query = "UPDATE Portfolios SET SellTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
+    //       db_conn->updateDB_Table(Query);
+    //     }
+    //     break;
+    // case PortfolioData_Idx::_BuyTotalQuantity:{
+    //     int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+    //     double val = valStr.toDouble();
+    //     val=val*lotSize;
+    //       QString Query = "UPDATE Portfolios SET BuyTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
+    //       db_conn->updateDB_Table(Query);
+    //     }
+    //     break;
 
-    case PortfolioData_Idx::_OrderQuantity:{
-          QString Query = "UPDATE Portfolios SET OrderQuantity="+valStr+" where PortfolioNumber="+PortfolioNumber;
-          db_conn->updateDB_Table(Query);
-        }
-        break;*/
+    // case PortfolioData_Idx::_OrderQuantity:{
+    //       QString Query = "UPDATE Portfolios SET OrderQuantity="+valStr+" where PortfolioNumber="+PortfolioNumber;
+    //       db_conn->updateDB_Table(Query);
+    //       bool success = db_conn->updateDB_Table(Query);
+    //       if(success){
+    //           db_conn->logToDB(QString("OrderQuantity ["+valStr+"]"));
+    //       }
+    //     }
+    //     break;
 
             default:{
         QString SellPriceDifference = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->SellPriceDifference*devicer,'f',decimal_precision);
@@ -1218,11 +1232,12 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
         bool success = db_conn->updateDB_Table(Query);
         if(success){
-            db_conn->logToDB(QString("BuyPriceDifference["+BuyPriceDifference+"] "
-                                                                                  "SellPriceDifference["+SellPriceDifference+"] "
-                                                             "BuyTotalQuantity["+BuyTotalQuantity+"] "
-                                                          "SellTotalQuantity["+SellTotalQuantity+"] "
-                                                           "PortfolioNumber["+PortfolioNumber+"]"));
+            db_conn->logToDB(QString("BuyPriceDifference["+BuyPriceDifference+"] " +
+                                     "SellPriceDifference["+SellPriceDifference+"] " +
+                                     "BuyTotalQuantity["+BuyTotalQuantity+"] " +
+                                     "SellTotalQuantity["+SellTotalQuantity+"] " +
+                                     "OrderQuantity["+OrderQuantity+"]"+
+                                     "PortfolioNumber["+PortfolioNumber+"]"));
         }
 
 
@@ -1231,7 +1246,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             }
 
             //send notifcation to backend server
-            quint16 command = 1;
+            quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
             const unsigned char dataBytes[] = { 0xFF, 0xFF };
             QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
             QByteArray msg = backend_comm->createPacket(command, data);
@@ -1243,19 +1258,29 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 void MainWindow::loadContract(){
 
     auto loadContract_BackgroundTask = [this]() {
-        emit display_log_text_signal("Loading contract....");
-        ContractDetail::getInstance().ReloadContractDetails();
+
+        QString  htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QDateTime::currentDateTime().toString("M/d/yyyy h:mm:ss AP")+"</span>"
+                              + "<span style='color: black;'>  Loading contract...</span> </p>";
+
+        emit display_log_text_signal(htmlContent);
+
+        ContractDetail::getInstance().ReloadContractDetails(userData);
         contractDetailsLoaded.storeRelaxed(1);
 
-
         //do the UI thread function inside here
-//        QMetaObject::invokeMethod(this, [this]() {
-//            //ui->stackedWidgetMain->setCurrentIndex(1);
-//            stackViewSwithAnimation(0,1,ui->stackedWidgetMain);
-//        });
+        //        QMetaObject::invokeMethod(this, [this]() {
+        //            //ui->stackedWidgetMain->setCurrentIndex(1);
+        //            stackViewSwithAnimation(0,1,ui->stackedWidgetMain);
+        //        });
         // Rest of your background task code...
         //if not logged in the data loading thread start by login function
-        emit display_log_text_signal("Contract file loaded...");
+
+        htmlContent = "<p><span style='background-color:#B3C1DE;'>" +
+                      QDateTime::currentDateTime().toString("M/d/yyyy h:mm:ss AP") +"</span>"
+                      + "<span style='color: black;'> Contract file loaded...</span> </p>";
+
+        emit display_log_text_signal(htmlContent);
+
         foo_token_number_start_strike = "";
 
         if(loggedInFlg.loadRelaxed()==1){
@@ -1373,6 +1398,22 @@ void MainWindow::start_backend_comm_socket_worker()
     backend_comm_thread->start();
 }
 
+void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
+
+   // ui->textEdit->append(msg);
+    //log_to_file logF(0,logfileName);
+    //logF.log(data);
+    qDebug()<<"Backend  Comm Data: "<<msg;
+
+    if((msgType == SocketDataType::BACKEND_COMM_SOCKET_WARNING)||msgType == SocketDataType::BACKEND_COMM_SOCKET_ERROR){
+        qDebug()<<"Backend Data: Backend Socket Error"<<msg;
+    }
+    //ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(255, 32, 36);border-radius:6px;color:#000;");
+    else if(msgType == SocketDataType::BACKEND_COMM_SOCKET_CONNECTED){
+        qDebug()<<"Backend Data: Backend Socket Connected"<<msg;
+    }
+    // ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(94, 255, 107);border-radius:6px;color:#000;");
+}
 void MainWindow::stop_backend_comm_socket_worker(){
     //delete socket_Conn;
     backend_comm->quitDataFetchThread();
@@ -1399,6 +1440,7 @@ void MainWindow::updatePortFolioStatus(){
         return;
     }
     portfolio_table_updating_db.storeRelaxed(1);
+
     QModelIndexList selection = T_Portfolio_Table->selectionModel()->selectedRows();
     for(int i=0; i< selection.count(); i++)
     {
@@ -1414,6 +1456,11 @@ void MainWindow::updatePortFolioStatus(){
             bool success = db_conn->updateDB_Table(Query);
             if(success){
                 db_conn->logToDB(QString("Activated portfolio ["+PortfolioNumber+"]"));
+                quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+                const unsigned char dataBytes[] = { 0x01};
+                QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
+                QByteArray msg = backend_comm->createPacket(command, data);
+                backend_comm->insertData(msg);
             }
         }
         //status is in check state so make it toggle(uncheck)
@@ -1424,6 +1471,11 @@ void MainWindow::updatePortFolioStatus(){
             bool success = db_conn->updateDB_Table(Query);
             if(success){
                 db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));
+                quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+                const unsigned char dataBytes[] = { 0x00};
+                QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
+                QByteArray msg = backend_comm->createPacket(command, data);
+                backend_comm->insertData(msg);
             }
         }
         T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0);
@@ -1432,7 +1484,8 @@ void MainWindow::updatePortFolioStatus(){
     portfolio_table_updating_db.storeRelaxed(0);
 }
 
-void MainWindow::resizePortFolioTableColWidthSlot(int width){
+void MainWindow::resizePortFolioTableColWidthSlot(int width)
+{
     T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_AlgoName,width);
 }
 
@@ -1455,6 +1508,11 @@ void MainWindow::loggedIn(){
             start_dataLoadingThread();
     });
 
+}
+
+void MainWindow::loggedInSucessful(userInfo userData)
+{
+    loadContract();
 }
 
 void MainWindow::loggedOut(){
@@ -1715,10 +1773,11 @@ void MainWindow::Delete_clicked_slot(){
             msgBox.exec();
             return;
         }
-
-        // Multiple rows can be selected
         mysql_conn *db_conn_delete =new mysql_conn(0,"db_conn_delete");
 
+        // mysql_conn *db_conn_delete =new mysql_conn(this,"db_conn_delete");
+
+        // Multiple rows can be selected
         QStringList logs;
         for(int i=0; i< selection.count(); i++)
         {
@@ -1784,5 +1843,15 @@ void MainWindow::T_Portfolio_Table_cellClicked(const QItemSelection &selected, c
         T_Portfolio_Model->portfolio_data_list[portfolio_table_slected_idx_for_editing.load()]->edting.storeRelaxed(0); // maked the row flg not editing, so the bg data will be updated.
         portfolio_table_slected_idx_for_editing.store(-1);
     }
+
+}
+
+void MainWindow::slotAddLogForAddAlgoRecord(QString str)
+{
+
+    // To show the latest log at top
+    htmlLogsContent.prepend(str);
+
+    ui->textEdit->setText(htmlLogsContent);
 
 }

@@ -60,12 +60,21 @@ void PortfolioHeaderView::paintSection(QPainter* painter, const QRect& rect, int
     // Draw the header text
 
     painter->drawText(rect, align, model()->headerData(logicalIndex, orientation(), Qt::DisplayRole).toString());
+
     // Add a right-side border
 //    painter->setPen(QColor::fromRgba(qRgba(50, 50, 50, 53))); // Set the border color
-    if(logicalIndex == PortfolioData_Idx::_AlgoName ||logicalIndex ==  PortfolioData_Idx:: _BuyRemainingQuantity || logicalIndex == PortfolioData_Idx::_SellRemainingQuantity){
+    if(logicalIndex == PortfolioData_Idx::_AlgoName
+        ||logicalIndex ==  PortfolioData_Idx:: _BuyRemainingQuantity
+        || logicalIndex == PortfolioData_Idx::_SellRemainingQuantity){
+        //painter->setPen(QColor("#6C757D"));
+        painter->drawLine(rect.topRight(), rect.bottomRight());
+    }
+    else
+    {
         painter->setPen(QColor("#6C757D"));
         painter->drawLine(rect.topRight(), rect.bottomRight());
     }
+
 
 }
 

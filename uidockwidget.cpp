@@ -1,14 +1,23 @@
-//#include "uidockwidget.h"
+#include "uidockwidget.h"
 
-//UiDockWidget::UiDockWidget(UiUtils::DockWidgetType p_Type, const QString& p_Title, QWidget* p_Parent)
-//    : QDockWidget(p_Title, p_Parent)
-//    , m_WidgetType(p_Type)
-//{
+DockWidget::DockWidget(const QString &title, QWidget *parent)
+    : QDockWidget(title, parent)
+{
+    setAcceptDrops(true);
+}
 
-//}
+void DockWidget::mousePressEvent(QMouseEvent *event)  {
+    if (event->button() == Qt::LeftButton) {
+        // Create a pixmap of the dock widget's content
+        QPixmap pixmap(size());
+        render(&pixmap);
 
-//void UiDockWidget::closeEvent(QCloseEvent* p_Event)
-//{
-//    emit WidgetClosed(m_WidgetType);
-//    QDockWidget::closeEvent(p_Event);
-//}
+        // Create a drag object and set the pixmap as its visual representation
+        QDrag *drag = new QDrag(this);
+        drag->setPixmap(pixmap);
+
+        // Start the drag operation
+        drag->exec(Qt::MoveAction);
+    }
+    QDockWidget::mousePressEvent(event);
+}

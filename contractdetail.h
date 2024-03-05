@@ -37,11 +37,15 @@ public:
 
     static QStringList F2F_data_list_Sorted_Key;
     static QStringList BFLY_data_list_Sorted_Key;
+    static QStringList BFLY_BID_data_list_Sorted_Key;
 
 //    static QStandardItemModel *model_searchInstrument_BOX_Leg1; // used in add algo window  for BOX startegy
     static QStandardItemModel *model_start_strike_BFLY; // used in add algo window  for BFLY startegy
     static QStandardItemModel* model_searchInstrument_F2F_Leg1;
     static QStandardItemModel* model_FUT_CON_REV;
+    static QStandardItemModel *model_start_strike_BFLY_BID;
+
+
 
 
     static ContractDetail& getInstance()
@@ -103,6 +107,7 @@ public:
         model_start_strike_BFLY = new QStandardItemModel;
         model_searchInstrument_F2F_Leg1 = new QStandardItemModel;
         model_FUT_CON_REV = new QStandardItemModel;
+        model_start_strike_BFLY_BID = new QStandardItemModel;
     }
 
     void StoreData() {
@@ -198,11 +203,12 @@ public:
         return false;
     }
     PortfolioType checkAlogTypeForTheData(QString instrument_type){
+        if(instrument_type=="OPTSTK"||instrument_type=="OPTIDX")
+            return PortfolioType::BFLY_BID;
         if(instrument_type=="OPTSTK"||instrument_type=="OPTIDX"||instrument_type=="OPTCUR"||instrument_type=="OPTIRC")
             return PortfolioType::BY;
         if(instrument_type=="FUTIDX"||instrument_type=="FUTSTK"||instrument_type=="FUTCUR"||instrument_type=="FUTIRC"||instrument_type=="FUTIRT")
             return PortfolioType::F2F;
-
 
         return PortfolioType::INVALID;
 
@@ -214,6 +220,7 @@ public:
         model_start_strike_BFLY->clear();
         model_searchInstrument_F2F_Leg1->clear();
         model_FUT_CON_REV->clear();
+        model_start_strike_BFLY_BID->clear();
 
         QSet<QString> model_data_name_set;
         for(int i=0;i<BFLY_data_list_Sorted_Key.length();i++){
@@ -271,6 +278,62 @@ public:
             /********************************************************************/
 
         }
+        //doubt
+        QSet<QString> model_data_name_set_bfly_bid;
+        for(int i=0;i<BFLY_BID_data_list_Sorted_Key.length();i++){
+
+            /**********Create model for Mainwindow searchbar*************************/
+            const auto& contract = m_ContractDetails[BFLY_BID_data_list_Sorted_Key[i]];
+            QString stock_name=contract.StockName;
+
+            QString name = stock_name;
+            if(!model_data_name_set_bfly_bid.contains(name)){
+               model_data_name_set_bfly_bid.insert(name);
+                QStandardItem *itemBOXL1 = new QStandardItem;
+                itemBOXL1->setText(name);
+                itemBOXL1->setData(contract.StockName, Qt::UserRole + 1);
+                //                model_searchInstrument_BOX_Leg1->appendRow(itemBOXL1);
+            }
+            /********************************************************************/
+        }
+
+        for(int i=0;i<BFLY_BID_data_list_Sorted_Key.length();i++){
+
+            /**********Create model for BOX*************************/
+            const auto& contract = m_ContractDetails[BFLY_BID_data_list_Sorted_Key[i]];
+            unsigned int unix_time= contract.Expiry;
+            QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+            dt = dt.addYears(10);
+            QString Expiry=dt.toString("MMM dd yyyy").toUpper();
+            QString instrument_name = contract.InstrumentName;
+            QString strik_price = QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract);
+
+            QString name = instrument_name+" "+Expiry+" "+strik_price;
+            if(!model_data_name_set_bfly_bid.contains(name)){
+                model_data_name_set_bfly_bid.insert(name);
+                QStandardItem *itemBOXL1 = new QStandardItem;
+                itemBOXL1->setText(name);
+                itemBOXL1->setData(contract.TokenNumber, Qt::UserRole + 1);
+                //                model_searchInstrument_BOX_Leg1->appendRow(itemBOXL1);
+            }
+            /********************************************************************/
+
+            /**********Create model for BFLY*************************/
+
+            unix_time= contract.Expiry;
+            dt = QDateTime::fromSecsSinceEpoch(unix_time);
+            dt = dt.addYears(10);
+            Expiry=dt.toString("MMM dd yyyy").toUpper();
+            QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract)+" "+contract.OptionType;
+            QStandardItem *itemBFLY = new QStandardItem;
+            itemBFLY->setText(algo_combination);
+            itemBFLY->setData(contract.TokenNumber, Qt::UserRole + 1);
+            model_start_strike_BFLY_BID->appendRow(itemBFLY);
+
+            /********************************************************************/
+
+        }
+        //doubt
 
         for(int i=0;i<F2F_data_list_Sorted_Key.length();i++){
 
@@ -336,6 +399,12 @@ public:
         return model_start_strike_BFLY;
     }
 
+    QStandardItemModel* Get_model_start_strike_BFLY_BID()
+    {
+
+        return model_start_strike_BFLY_BID;
+    }
+
     bool LoadData(QHash<QString, QStringList> &_m_ContractDetailsFiltered)
     {
         try
@@ -366,8 +435,10 @@ public:
                     m_ContractDetails.clear();
                     F2F_data_list_Sorted_Key.clear();
                     BFLY_data_list_Sorted_Key.clear();
+                    BFLY_BID_data_list_Sorted_Key.clear();
                     QList <contract_table> BFLY_data_list;
                     QList <contract_table> F2F_data_list;
+                    QList <contract_table> BFLY_BID_data_list;
 
                     long long actualMin = LLONG_MAX ;
 
@@ -381,6 +452,7 @@ public:
                         QString key;
                         contract_table value;
                         in >> key >> value.InstrumentType >> value.InstrumentName >> value.OptionType >> value.StrikePrice >> value.LotSize >> value.Expiry >> value.TokenNumber >> value.StockName >> value.MinimumSpread;
+
                         m_ContractDetails[key] = value;
                         if(value.Expiry>0){
                             if(actualMin>value.Expiry)
@@ -389,17 +461,20 @@ public:
                         _m_ContractDetailsFiltered[value.InstrumentType].append(QString::number(value.TokenNumber));
 
                         PortfolioType algo_type = checkAlogTypeForTheData(value.InstrumentType);
+                        // qDebug() << "---test--- algo type"<<algo_type << value.InstrumentType;
                         switch (algo_type) {
                         case PortfolioType::BY:{
                             BFLY_data_list.append(value);
                             break;
                         }
-
                         case PortfolioType::F2F:{
                             F2F_data_list.append(value);
                             break;
                         }
-
+                        case PortfolioType::BFLY_BID:{
+                            BFLY_BID_data_list.append(value);
+                            break;
+                        }
 
                         default:
                             break;
@@ -416,13 +491,20 @@ public:
                         return  a.StrikePrice < b.StrikePrice; // sort data based  strike price
                     });
 
+                    //sort BFLY_BID_data_list based on strike_price
+                    std::sort(BFLY_BID_data_list.begin(), BFLY_BID_data_list.end(), [](const contract_table& a, const contract_table& b)->bool{
+                        return  a.StrikePrice < b.StrikePrice; // sort data based  strike price
+                    });
+
                     for(int i=0;i<F2F_data_list.length();i++){
                         F2F_data_list_Sorted_Key.append(QString::number(F2F_data_list[i].TokenNumber));
                     }
                     for(int i=0;i<BFLY_data_list.length();i++){
                         BFLY_data_list_Sorted_Key.append(QString::number(BFLY_data_list[i].TokenNumber));
                     }
-
+                    for(int i=0;i<BFLY_BID_data_list.length();i++){
+                        BFLY_BID_data_list_Sorted_Key.append(QString::number(BFLY_BID_data_list[i].TokenNumber));
+                    }
 
                     qDebug()<<"Loaded ContractDetails from "<<fileName<<"  size="<<m_ContractDetails.size();
 
@@ -482,12 +564,12 @@ public:
             }*/
 
             mysql_conn con(0,"contract_conn");
-            m_ContractDetails = con.getContractTable(m_ContractDetailsFiltered,F2F_data_list_Sorted_Key,BFLY_data_list_Sorted_Key);
+            m_ContractDetails = con.getContractTable(m_ContractDetailsFiltered,F2F_data_list_Sorted_Key,BFLY_data_list_Sorted_Key, BFLY_BID_data_list_Sorted_Key);
             qDebug()<<"Loaded ContractDetails from DB size="<<m_ContractDetails.size();
             StoreData();
         }
 
-            create_inputFiledAutoFillModel_For_AddAlgoWindow();
+        create_inputFiledAutoFillModel_For_AddAlgoWindow();
 
         // std::sort(m_ContractDetails.begin(), m_ContractDetails.end(), [](const ContractDetail& a, const ContractDetail& b) { return a.InstrumentName < b.InstrumentName; });
     }
@@ -514,7 +596,12 @@ public:
         return BFLY_data_list_Sorted_Key;
     }
 
+    QStringList Get_BFLY_BID_data_list_Sorted_Key()
+    {
 
+
+        return BFLY_BID_data_list_Sorted_Key;
+    }
 
     QHash<QString, contract_table> GetFutureContracts()
     {

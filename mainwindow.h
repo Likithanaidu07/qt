@@ -32,8 +32,6 @@
 #include "Convert_to_Algo/convert_algo_win.h"
 #include"ui_loginwindow.h"
 
-
-
 class mysql_conn;
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -50,6 +48,7 @@ enum UI_UPDATE_TYPE{
 public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+
     userInfo userData;
     void add_logs(QString str);
     bool pressed;
@@ -60,8 +59,8 @@ public:
 //    QStandardItemModel *model_searchInstrument_BOX_Leg1;
     QString foo_token_number_start_strike;// this for start strike input of F2F
     QString foo_token_number_end_strike;// this for start strike input of F2F
-    QDockWidget *T_Algorithm_DockWin;
-    ContractDetail* contracts;
+    // QDockWidget *T_Algorithm_DockWin;
+    // ContractDetail* contracts;
 signals:
     void data_loded_signal(int table);
     void logoutRequested();
@@ -73,6 +72,8 @@ private:
     void createINIFileIfNotExist();
     void loadSettings();
     mysql_conn * db_conn;
+    QString  htmlLogsContent;
+
     QString base64_encode(QString str);
     QString base64_decode(QString str);
     void generateAlgo();
@@ -130,12 +131,12 @@ private:
     void loadDataAndUpdateTable(int table);
     void searchTradeTable();
 
-    double devicer = 10000000;
+    double devicer = /*10000000*/100/*for bY bid bidding*/;
     double decimal_precision = 4;
     void start_backend_comm_socket_worker();
     void stop_backend_comm_socket_worker();
 
-    ConvertAlgo_Win *convertalgo;
+    class ConvertAlgo_Win *convertalgo;
 
 
 public slots:
@@ -144,13 +145,15 @@ public slots:
 //    void tradeTableSerachNext();
 //    void tradeTableSerachTxtChanged();
     void loggedIn();
+    void loggedInSucessful(userInfo userData);
     void Delete_clicked_slot();
 //    void indicesDataRecv_Slot(Indices_Data_Struct data);
-//    void backend_comm_Data_Slot(QString msg,SocketDataType msgType);
+    void backend_comm_Data_Slot(QString msg,SocketDataType msgType);
 //    void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
     void updatePortFolioStatus();
     void resizePortFolioTableColWidthSlot(int width);
     void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
+    void slotAddLogForAddAlgoRecord(QString str);
 
 private slots:
     void on_close_clicked();

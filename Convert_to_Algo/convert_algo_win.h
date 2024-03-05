@@ -11,6 +11,8 @@
 #include "add_algo_f2f.h"
 #include "add_algo_con_rev.h"
 #include "mysql_conn.h"
+#include "convert_to_algo_bfly_bid.h"
+#include "Common/macros.h"
 
 enum UI_UPDATE_TYPE{
     LOADED_MODEL=0
@@ -64,7 +66,9 @@ private:
     add_algo_btfly *algoBtFly;
     add_algo_f2f *algoF2F;
     add_algo_con_rev *algoConRev;
-    void sort_data_and_populate_model(QHash<QString, contract_table> contract_table_/*,QHash<QString, contract_table> cd_contract_table_*/);
+    add_algo_btfly_bid *algoBtFlyBid;
+
+    void sort_data_and_populate_model(QMap<int, QHash<QString, contract_table>> contract_table_/*,QHash<QString, contract_table> cd_contract_table_*/);
     void resetTableWidget();
     void enable_disable_UIElement(bool enable);
 

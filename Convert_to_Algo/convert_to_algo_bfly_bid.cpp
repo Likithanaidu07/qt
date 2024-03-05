@@ -1,18 +1,15 @@
-#include "Convert_to_Algo/convert_to_algo_bfly.h"
+﻿#include "Convert_to_Algo/convert_to_algo_bfly_bid.h"
 
 #include "QElapsedTimer"
 
-add_algo_btfly::add_algo_btfly(QObject *parent)
+add_algo_btfly_bid::add_algo_btfly_bid(QObject *parent)
     : QObject{parent}
 {
     //  model_start_strike_BFLY = new QStandardItemModel;
     sharedData = &AddAlgoSharedVar::getInstance();
-
-
-
 }
-void add_algo_btfly::copyUIElement(QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_, QListView *sView, QListView *eView)
-{
+
+void add_algo_btfly_bid::copyUIElement(QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_, QListView *sView, QListView *eView){
     lineEdit_Start_strike = lineEdit_Start_strike_;
     lineEdit_EndStrike = lineEdit_EndStrike_;
     lineEdit_StrikeDifference = lineEdit_StrikeDifference_;
@@ -24,40 +21,22 @@ void add_algo_btfly::copyUIElement(QTableWidget *tableWidget_, QLineEdit *lineEd
     endStrikeListView->hide();
 }
 
-void add_algo_btfly::create_AutoFillModel_StartStrike(){
-    /* model_start_strike_BFLY->clear();
-    // create model for BFLY_data_list to autfill
-
-    QElapsedTimer timer;
-     timer.start();
-    for(int i=0;i<sorted_keys_BFLY.length();i++){
-        const auto& contract = sharedData->contract_table_hash[sorted_keys_BFLY[i]];
-
-        unsigned int unix_time= contract.Expiry;
-        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-        dt = dt.addYears(10);
-        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
-        QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" "+contract.OptionType;
-        QStandardItem *itemBFLY = new QStandardItem;
-        itemBFLY->setText(algo_combination);
-        itemBFLY->setData(contract.TokenNumber, Qt::UserRole + 1);
-        model_start_strike_BFLY->appendRow(itemBFLY);
-    }
-    qDebug() << "btfly------" << timer.elapsed()/1000 << " seconds";*/
+void add_algo_btfly_bid::create_AutoFillModel_StartStrike(){
 
 }
-void add_algo_btfly::selectedAction(){
+
+void add_algo_btfly_bid::selectedAction(){
     foo_token_number_start_strike = "";
     foo_token_number_end_strike = "";
 
     //create qcompleter and fill with abovie model
-    CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_BFLY);
+    CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_BFLY_BID);
     connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
     connect(startStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelected(QModelIndex)));
 }
 
 
-void add_algo_btfly::startStrikeEditFinishedAction(){
+void add_algo_btfly_bid::startStrikeEditFinishedAction(){
 
     lineEdit_EndStrike->clear();
     foo_token_number_end_strike = "";
@@ -72,25 +51,29 @@ void add_algo_btfly::startStrikeEditFinishedAction(){
 
 
     model_end_strike = new QStandardItemModel;
+    for(int i=0;i<sorted_keys_BFLY_BID.length();i++) {
 
-    for(int i=0;i<sorted_keys_BFLY.length();i++) {
-        contract_table tmp = sharedData->contract_table_hash[sorted_keys_BFLY[i]];
+        contract_table tmp = sharedData->contract_table_hash[sorted_keys_BFLY_BID[i]];
 
         float end_strike = tmp.StrikePrice;
         if(start_strike>end_strike)
             continue;
+
         if(tmp.InstrumentName==Instr_Name&&tmp.OptionType==Option_Type&&Expiry==tmp.Expiry){
 
             unsigned int unix_time= tmp.Expiry;
             QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
             dt = dt.addYears(10);
             QString ExpiryTmp=dt.toString("MMM dd yyyy").toUpper();
-            QString algo_combination = tmp.InstrumentName+" "+ExpiryTmp+" "+QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" "+tmp.OptionType;
+            QString algo_combination =
+                tmp.InstrumentName+" "+
+                                       ExpiryTmp+" "
+                                       +QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" "+
+                                       tmp.OptionType;
             QStandardItem *item = new QStandardItem;
             item->setText(algo_combination);
             item->setData(tmp.TokenNumber, Qt::UserRole + 1);
             model_end_strike->appendRow(item);
-
 
             if(!strike_priceList.contains(QString::number(tmp.StrikePrice))){
                 strike_priceList.append(QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)); // store in Rs
@@ -107,7 +90,7 @@ void add_algo_btfly::startStrikeEditFinishedAction(){
     connect(endStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
 
 }
-void add_algo_btfly::generateAlgo(){
+void add_algo_btfly_bid::generateAlgo(){
 
     QString Start_strike_combination = lineEdit_Start_strike->text();
     QString end_strike_combination = lineEdit_Start_strike->text();
@@ -120,8 +103,6 @@ void add_algo_btfly::generateAlgo(){
         msgBox.exec();
         return;
     }
-
-
 
     QString keyStart = foo_token_number_start_strike;
     QString keyEnd = foo_token_number_end_strike;
@@ -345,7 +326,7 @@ void add_algo_btfly::generateAlgo(){
 
         algo_data_to_insert data;
         data.Algo_Status = "DisabledByUser";
-        data.algo_type = QString::number(PortfolioType::BY);
+        data.algo_type = QString::number(PortfolioType::BFLY_BID);
         data.exchange = sharedData->exchange;
         data.table_row_unique_id = sharedData->unique_id;
         data.user_id = sharedData->foo_user_id;
@@ -381,7 +362,7 @@ void add_algo_btfly::generateAlgo(){
 
 }
 
-void add_algo_btfly::itemSelected(QModelIndex index)
+void add_algo_btfly_bid::itemSelected(QModelIndex index)
 {
     QSortFilterProxyModel *proxyModel = qobject_cast<QSortFilterProxyModel*>(startStrikeListView->model());
 
@@ -393,14 +374,14 @@ void add_algo_btfly::itemSelected(QModelIndex index)
             QVariant dData = sourceIndex.data(Qt::DisplayRole);
             if (dData.isValid())
             {
-                for (int row = 0; row < model_start_strike_BFLY->rowCount(); ++row)
+                for (int row = 0; row < model_start_strike_BFLY_BID->rowCount(); ++row)
                 {
-                    QModelIndex index = model_start_strike_BFLY->index(row, 0);
+                    QModelIndex index = model_start_strike_BFLY_BID->index(row, 0);
                     // Check if the item's display role value matches
-                    QVariant displayData = model_start_strike_BFLY->data(index, Qt::DisplayRole);
+                    QVariant displayData = model_start_strike_BFLY_BID->data(index, Qt::DisplayRole);
                     if (displayData.isValid() && displayData.toString() == dData)
                     {
-                        QVariant userData = model_start_strike_BFLY->data(index, Qt::UserRole + 1);
+                        QVariant userData = model_start_strike_BFLY_BID->data(index, Qt::UserRole + 1);
                         if (userData.isValid())
                         {
                             foo_token_number_start_strike = userData.toString();
@@ -416,7 +397,7 @@ void add_algo_btfly::itemSelected(QModelIndex index)
     }
 }
 
-void add_algo_btfly::itemSelectedEndStrike(QModelIndex index)
+void add_algo_btfly_bid::itemSelectedEndStrike(QModelIndex index)
 {
     QSortFilterProxyModel *proxyModel = qobject_cast<QSortFilterProxyModel*>(endStrikeListView->model());
 
@@ -452,7 +433,6 @@ void add_algo_btfly::itemSelectedEndStrike(QModelIndex index)
         }
     }
 }
-
 
 
 

@@ -1,13 +1,18 @@
 #include "convert_algo_win.h"
 #include "ContractDetail.h"
 #include "qfuture.h"
+#include "mainwindow.h"
 
+extern MainWindow *MainWindowObj;
 
 ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::ConvertAlgo_Win)
 {
     ui->setupUi(this);
+    MainWindowObj = (MainWindow*) parent;
+
+
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
     QPixmap pixmapclose(":/close_window_icon.png");
@@ -55,9 +60,11 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     sharedData = &AddAlgoSharedVar::getInstance();
     sharedData->ROW_LIMIT =  50;
     dataSorted.storeRelaxed(0);
+   // db_conn =new mysql_conn(MainWindowObj,"add_algo_db_conn");
     db_conn =new mysql_conn(0,"add_algo_db_conn");
+
     connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
-    connect(this,SIGNAL(display_log_text_signal(QString)),this,SLOT(display_log_text_slot(QString)));
+    connect(this,SIGNAL(display_log_text_signal(QString)),MainWindowObj,SLOT(slotAddLogForAddAlgoRecord(QString)));
 
     ui->tableWidget->setShowGrid(false);
     ui->tableWidget->setAlternatingRowColors(true);
@@ -70,7 +77,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
     /*******Class to generate BtFly algos************/
     algoBtFly= new add_algo_btfly();
-    algoBtFly->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference);
+    algoBtFly->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference,ui->listView_startStrike,ui->listViewEndStrike);
     /*******Class to generate BtFly algos************/
 
     /*******Class to generate con_rev algos************/
@@ -78,19 +85,34 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     algoConRev->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_Fut);
     /*******Class to generate con_rev algos************/
 
+    /*******Class to generate BtFly-bid algos************/
+    algoBtFlyBid= new add_algo_btfly_bid();
+    algoBtFlyBid->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference,ui->listView_startStrike, ui->listViewEndStrike);
+    /*******Class to generate BtFly-bid algos************/
+
 
     QDoubleValidator *val = new QDoubleValidator();
     val->setLocale(QLocale::C);
     val->setNotation(QDoubleValidator::StandardNotation);
     ui->lineEdit_StrikeDifference->setValidator(val);
 
-    ui->comboBox_AlgoType->clear();
-    ui->comboBox_AlgoType->addItem("F2F");
-    ui->comboBox_AlgoType->addItem("BFLY");
-    ui->comboBox_AlgoType->addItem("CON-REV");
-    ui->comboBox_AlgoType->addItem("BOX");
-    ui->comboBox_AlgoType->addItem("Open-BFLY");
-    ui->comboBox_AlgoType->addItem("Open-BOX");
+    // ui->comboBox_AlgoType->clear();
+    // ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
+    // ui->comboBox_AlgoType->addItem("F2F");
+    // ui->comboBox_AlgoType->addItem("BFLY");
+    // ui->comboBox_AlgoType->addItem("CON-REV");
+    // ui->comboBox_AlgoType->addItem("BOX");
+    // ui->comboBox_AlgoType->addItem("Open-BFLY");
+    // ui->comboBox_AlgoType->addItem("Open-BOX");
+
+    // // not implemented yet so disabled
+    // ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_F2F, QVariant(0), Qt::UserRole-1);
+    // ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_BFLY, QVariant(0), Qt::UserRole-1);
+    // ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_CON_REV, QVariant(0), Qt::UserRole-1);
+    // ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_Open_BFLY, QVariant(0), Qt::UserRole-1);
+    // ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_BOX, QVariant(0), Qt::UserRole-1);
+    // ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_Open_BOX, QVariant(0), Qt::UserRole-1);
+    // // not implemented yet so disabled
 
     sharedData->unique_id = 0; // this used to identyfy table row and algo_data to upload
 
@@ -98,10 +120,13 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
     QStringList groups = settings.childGroups();
     QString market_type = "fo";
+    QString bidTypeFromSettings{};
     if(groups.contains("GeneralSettings")){
         settings.beginGroup("GeneralSettings");
         if (settings.contains("market_type"))
             market_type = settings.value("market_type").toString();
+        if (settings.contains("enable_bidType"))
+            bidTypeFromSettings = settings.value("enable_bidType").toString();
         settings.endGroup();
     }
     if(market_type=="fo"){
@@ -112,6 +137,27 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
         sharedData->devicer = CDS_DEVICER;
         sharedData->decimal_precision = CDS_DECIMAL_PRECISION;
     }
+
+     ui->comboBox_AlgoType->setItemData(1, QVariant(0), Qt::UserRole-1);
+
+        ui->comboBox_AlgoType->clear();
+        ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
+        ui->comboBox_AlgoType->addItem("F2F");
+        ui->comboBox_AlgoType->addItem("BFLY");
+        ui->comboBox_AlgoType->addItem("CON-REV");
+        ui->comboBox_AlgoType->addItem("BOX");
+        ui->comboBox_AlgoType->addItem("Open-BFLY");
+        ui->comboBox_AlgoType->addItem("Open-BOX");
+
+        // not implemented yet so disabled
+        ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_F2F, QVariant(0), Qt::UserRole-1);
+        ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_CON_REV, QVariant(0), Qt::UserRole-1);
+        ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_Open_BFLY, QVariant(0), Qt::UserRole-1);
+        ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_BOX, QVariant(0), Qt::UserRole-1);
+        ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_Open_BOX, QVariant(0), Qt::UserRole-1);
+        // not implemented yet so disabled
+
+
 
     ui->tableWidget->horizontalHeader()->setStretchLastSection(true);
     ui->tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -150,14 +196,14 @@ void ConvertAlgo_Win::update_ui_slot(int type){
 
 void ConvertAlgo_Win::update_contract_tableData(QString foo_user_id_,int MaxPortfolioCount_){
 
-    QHash<QString, contract_table> contract_table_ = ContractDetail::getInstance().GetContracts();
+    QMap<int, QHash<QString, contract_table>> contract_table_ = ContractDetail::getInstance().GetContracts();
 
     sharedData->foo_user_id = foo_user_id_;
     sharedData->MaxPortfolioCount = MaxPortfolioCount_;
 
     sharedData->FO_F2F_data_list_Sorted_Key = ContractDetail::getInstance().Get_F2F_data_list_Sorted_Key();
     sharedData->FO_BFLY_data_list_Sorted_Key = ContractDetail::getInstance().Get_BFLY_data_list_Sorted_Key();
-
+    sharedData->FO_BFLY_BID_data_list_Sorted_Key = ContractDetail::getInstance().Get_BFLY_BID_data_list_Sorted_Key();
 
     // default oprion will be FO so use the contract table fo and it's sorted key
     algoF2F->sorted_keys_F2F = sharedData->FO_F2F_data_list_Sorted_Key;
@@ -165,6 +211,9 @@ void ConvertAlgo_Win::update_contract_tableData(QString foo_user_id_,int MaxPort
 
     algoBtFly->sorted_keys_BFLY = sharedData->FO_BFLY_data_list_Sorted_Key;
     algoBtFly->model_start_strike_BFLY = ContractDetail::getInstance().Get_model_start_strike_BFLY();  //get the model generated from contract class for start strike
+
+    algoBtFlyBid->sorted_keys_BFLY_BID = sharedData->FO_BFLY_BID_data_list_Sorted_Key;
+    algoBtFlyBid->model_start_strike_BFLY_BID = ContractDetail::getInstance().Get_model_start_strike_BFLY_BID();  //get the model generated from contract class for start strike
 
     algoConRev->sorted_keys_CON_REV = sharedData->FO_BFLY_data_list_Sorted_Key;
     algoConRev->sorted_keys_F2F = sharedData->FO_F2F_data_list_Sorted_Key;
@@ -186,12 +235,19 @@ void ConvertAlgo_Win::update_contract_tableData(QString foo_user_id_,int MaxPort
     QFuture<void> futureBackGroundDBThread = QtConcurrent::run(&ConvertAlgo_Win::sort_data_and_populate_model,this,contract_table_/*,cd_contract_table_hash_*/);
 }
 
-void ConvertAlgo_Win::sort_data_and_populate_model(QHash<QString, contract_table> contract_table_/*,QHash<QString, contract_table> cd_contract_table_*/){
+void ConvertAlgo_Win::sort_data_and_populate_model(QMap<int, QHash<QString, contract_table>> contract_table_/*,QHash<QString, contract_table> cd_contract_table_*/){
     // qDebug()<<"Populating data on inpute file started..";
 
     emit display_log_text_slot("Setting contract data for input field..");
     //filter data based on instrument_type
-    QHashIterator<QString, contract_table> iter1(contract_table_);
+    QHashIterator<QString, contract_table> iter1(contract_table_[PortfolioType::BFLY_BID]);
+
+    while (iter1.hasNext()){
+        iter1.next();
+        sharedData->fo_contract_table_hash[QString::number(iter1.value().TokenNumber)] = iter1.value();
+    }
+
+    QHashIterator<QString, contract_table> iter2(contract_table_[PortfolioType::BY]);
 
     while (iter1.hasNext()){
         iter1.next();
@@ -199,6 +255,12 @@ void ConvertAlgo_Win::sort_data_and_populate_model(QHash<QString, contract_table
     }
 
 
+    QHashIterator<QString, contract_table> iter3(contract_table_[PortfolioType::F2F]);
+
+    while (iter1.hasNext()){
+        iter1.next();
+        sharedData->fo_contract_table_hash[QString::number(iter1.value().TokenNumber)] = iter1.value();
+    }
     // default oprion will be FO so use the contract table  for fo option
     sharedData->contract_table_hash = sharedData->fo_contract_table_hash;
     //algoF2F->sorted_keys_F2F = sharedData->FO_F2F_data_list_Sorted_Key;
@@ -289,6 +351,9 @@ void ConvertAlgo_Win::resetTableWidget(){
     else if(algoType=="Open-BOX"){
         headers = {"Algo Name","Strike/Expiry1","Strike/Expiry2","Market/Skip Leg","Market-Skip/Leg-Ratio","Buy Diff","Sell Diff","Status"};
     }
+    else if(algoType==BFLY_BID_TYPE){
+        headers = {"Algo Name","Option Type ","Expiry","Leg1 Strike","Leg2 Strike","Leg3 Strike","Reserved","Reserved","Status"};
+    }
 
     ui->tableWidget->clear();
     ui->tableWidget->setRowCount(0);
@@ -328,6 +393,7 @@ void ConvertAlgo_Win::enable_disable_UIElement(bool enable)
 void ConvertAlgo_Win::display_log_text_slot(QString msg)
 {
     msg = QDateTime::currentDateTime().toString()+": "+msg;
+
     //log_msgList.append(msg);
 //    ui->label_log_message->setText(msg);
 }
@@ -346,6 +412,9 @@ void ConvertAlgo_Win::on_lineEdit_Start_strike_editingFinished()
     }
     else if(algo_type=="CON-REV"){
         algoConRev->startStrikeEditFinishedAction();
+    }
+    else if(algo_type==BFLY_BID_TYPE){
+        algoBtFlyBid->startStrikeEditFinishedAction();
     }
 //    else if(algo_type=="BOX"){
 //        algoBOX->instrumentEditFinishedAction();
@@ -375,6 +444,9 @@ void ConvertAlgo_Win::on_pushButtonAdd_clicked()
     else if(algo_type=="CON-REV"){
         algoConRev->generateAlgo();
 
+    }
+    else if(algo_type==BFLY_BID_TYPE){
+        algoBtFlyBid->generateAlgo();
     }
 //    if(algo_type=="BOX"){
 //        algoBOX->generateAlgo();
@@ -442,6 +514,14 @@ void ConvertAlgo_Win::on_comboBox_AlgoType_currentTextChanged(const QString algo
 //        ui->qty_widget_parent->setVisible(false);
 //        ui->label_qty_widget_parent->setVisible(false);
         algoConRev->selectedAction();
+    }
+    if(algoType==BFLY_BID_TYPE){
+        ui->lineEdit_StrikeDifference->setVisible(true);
+        ui->lineEdit_EndStrike->setVisible(true);
+        ui->lineEdit_Fut->setVisible(false);
+        //        ui->qty_widget_parent->setVisible(false);
+        //        ui->label_qty_widget_parent->setVisible(false);
+        algoBtFlyBid->selectedAction();
     }
 //    else if(algoType=="2L Straddle"){
 
@@ -531,8 +611,6 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
             // qDebug()<<"selectedId---"<<selectedIds[k];
             // qDebug()<<"tableRowIDx---"<<tableRowIDx;
 
-
-
             QString msg = "";
             algo_data_insert_status status = db_conn->insertToAlgoTable(sharedData->algo_data_list[i],sharedData->MaxPortfolioCount,msg);
             //emit insert_algo_data_signal(algo_data_list);
@@ -542,9 +620,6 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                 //  algo_data_list_added.append(algo_data_list[i]);
                 sharedData->algo_data_list[i].uploaded=true;
                 ui->tableWidget->item(tableRowIDx, ui->tableWidget->columnCount()-1)->setForeground(QBrush(QColor(0, 200, 0)));
-                QStringList logs;
-                logs.append(QDateTime::currentDateTime().toString("hh:mm:ss dd-MM-yyyy"));
-                logs.append(sharedData->foo_user_id);
                 QString algo_type  = sharedData->algo_data_list[i].algo_type;
                 if(algo_type==QString::number(PortfolioType::F2F))
                     algo_type="F2F";
@@ -558,12 +633,18 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                     algo_type="Open-BFLY";
                 else if(algo_type==QString::number(PortfolioType::OPEN_BOX))
                     algo_type="Open-BOX";
+                else if(algo_type==QString::number(PortfolioType::BFLY_BID))
+                    algo_type=BFLY_BID_TYPE;
 
                 double diff = sharedData->algo_data_list[i].Leg2_Strike.toInt()-sharedData->algo_data_list[i].Leg1_Strike.toInt();
                 double strik_pric = sharedData->algo_data_list[i].Leg2_Strike.toInt();
                 QString Algo_Name = algo_type+"-"+sharedData->algo_data_list[i].Algo_Name+"-"+QString::number(strik_pric,'f', sharedData->decimal_precision)+"-"+sharedData->algo_data_list[i].option_type+"-"+QString::number(diff,'f', sharedData->decimal_precision);
-                logs.append("Inserted New Algo: "+Algo_Name);
-//                emit insert_algo_data_signal(logs);
+
+                QString htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QDateTime::currentDateTime().toString("M/d/yyyy h:mm:ss AP") +"</span>"
+                              + "<span style='color: black;'>"+sharedData->foo_user_id +
+                                      " Inserted New Algo: "+ Algo_Name +"</span> </p>";
+
+                emit display_log_text_signal(htmlContent);
             }
             else if(status==algo_data_insert_status::FAILED){
                 ui->tableWidget->item(tableRowIDx, ui->tableWidget->columnCount()-1)->setForeground(QBrush(QColor(200, 0, 0)));
@@ -589,6 +670,8 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
         if (i.next().uploaded == true)
             i.remove();
     }
+
+
 }
 
 
@@ -667,4 +750,6 @@ void ConvertAlgo_Win::on_lineEdit_Fut_editingFinished()
 {
     algoConRev->create_AutoFillModel_StartStrike();
 }
+
+
 
