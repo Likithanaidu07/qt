@@ -30,6 +30,8 @@
         <file>test_min.png</file>
         <file>Frame 398.png</file>
         <file>logo.ico</file>
+        <file>disable.png</file>
+        <file>enable.png</file>
     </qresource>
     <qresource prefix="/style">
         <file>Style_Home.qss</file>
