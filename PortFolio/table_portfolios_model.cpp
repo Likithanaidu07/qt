@@ -46,10 +46,10 @@ void Table_Portfolios_Model::loadSettings(){
 
 void Table_Portfolios_Model::onItemChanged(const QModelIndex &index)
 {
-    if (index.column() == PortfolioData_Idx::_Status)
-    {
-        setData(index, data(index, Qt::ItemIsUserCheckable).value<Qt::CheckState>(), Qt::ItemIsUserCheckable);
-    }
+    // if (index.column() == PortfolioData_Idx::_Status)
+    // {
+    //     setData(index, data(index, Qt::ItemIsUserCheckable).value<Qt::CheckState>(), Qt::ItemIsUserCheckable);
+    // }
 }
 
 int Table_Portfolios_Model::rowCount(const QModelIndex & /*parent*/) const
@@ -97,10 +97,10 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
 
     case Qt::ForegroundRole: {
         if (c == PortfolioData_Idx::_BuyMarketRate){
-                return QVariant::fromValue(QColor(0,122,0));
+            return QVariant::fromValue(QColor(0,122,0));
         }
         else if (c == PortfolioData_Idx::_SellMarketRate){
-                return QVariant::fromValue(QColor(203,5,5));
+            return QVariant::fromValue(QColor(203,5,5));
         }
         else
             return QVariant();
@@ -113,30 +113,30 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
             return font;
         }
         else if(c == PortfolioData_Idx::_Status ||
-                c == PortfolioData_Idx::_PortfolioNumber ||
-                c == PortfolioData_Idx::_BuyMarketRate ||
-                c == PortfolioData_Idx::_BuyAveragePrice ||
-                c == PortfolioData_Idx::_BuyPriceDifference ||
-                c == PortfolioData_Idx::_BuyTotalQuantity ||
-                c == PortfolioData_Idx::_BuyTradedQuantity ||
-                c == PortfolioData_Idx::_BuyRemainingQuantity ||
-                c == PortfolioData_Idx::_SellMarketRate ||
-                c == PortfolioData_Idx::_SellAveragePrice ||
-                c == PortfolioData_Idx::_SellPriceDifference ||
-                c == PortfolioData_Idx::_SellTotalQuantity ||
-                c == PortfolioData_Idx::_SellTradedQuantity ||
-                c == PortfolioData_Idx::_SellRemainingQuantity ||
-                c == PortfolioData_Idx::_ExpiryDateTime ||
-                c == PortfolioData_Idx::_Leg1 ||
-                c == PortfolioData_Idx::_Cost ||
-                c == PortfolioData_Idx::_OrderQuantity ||
-                c == PortfolioData_Idx::_InstrumentName ||
-                c == PortfolioData_Idx::_Leg2 ||
-                c == PortfolioData_Idx::_Leg3 ||
-                c == PortfolioData_Idx::_AdditionalData1 ||
-                c == PortfolioData_Idx::_PortfolioType ||
-                c == PortfolioData_Idx::_Price ||
-                c == PortfolioData_Idx::_FuturePrice){
+                 c == PortfolioData_Idx::_PortfolioNumber ||
+                 c == PortfolioData_Idx::_BuyMarketRate ||
+                 c == PortfolioData_Idx::_BuyAveragePrice ||
+                 c == PortfolioData_Idx::_BuyPriceDifference ||
+                 c == PortfolioData_Idx::_BuyTotalQuantity ||
+                 c == PortfolioData_Idx::_BuyTradedQuantity ||
+                 c == PortfolioData_Idx::_BuyRemainingQuantity ||
+                 c == PortfolioData_Idx::_SellMarketRate ||
+                 c == PortfolioData_Idx::_SellAveragePrice ||
+                 c == PortfolioData_Idx::_SellPriceDifference ||
+                 c == PortfolioData_Idx::_SellTotalQuantity ||
+                 c == PortfolioData_Idx::_SellTradedQuantity ||
+                 c == PortfolioData_Idx::_SellRemainingQuantity ||
+                 c == PortfolioData_Idx::_ExpiryDateTime ||
+                 c == PortfolioData_Idx::_Leg1 ||
+                 c == PortfolioData_Idx::_Cost ||
+                 c == PortfolioData_Idx::_OrderQuantity ||
+                 c == PortfolioData_Idx::_InstrumentName ||
+                 c == PortfolioData_Idx::_Leg2 ||
+                 c == PortfolioData_Idx::_Leg3 ||
+                 c == PortfolioData_Idx::_AdditionalData1 ||
+                 c == PortfolioData_Idx::_PortfolioType ||
+                 c == PortfolioData_Idx::_Price ||
+                 c == PortfolioData_Idx::_FuturePrice){
 
             return font;
         }
@@ -182,9 +182,9 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
                      else
                          return "-NA-";
 
-                 }
-                 else */
-        if (index.column() == PortfolioData_Idx::_PortfolioNumber) {
+    }
+        else */
+            if (index.column() == PortfolioData_Idx::_PortfolioNumber) {
             return portfolio->PortfolioNumber;
         }
         else if(index.column() == PortfolioData_Idx::_AlgoName){
@@ -242,8 +242,8 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
             return portfolio->Cost;
         }
         else if (index.column() == PortfolioData_Idx::_OrderQuantity) {
-                     return portfolio->OrderQuantity;
-                 }
+            return portfolio->OrderQuantity;
+        }
         /*else if (index.column() == PortfolioData_Idx::_InstrumentName) {
                      return portfolio->InstrumentName;
                  }*/
@@ -270,41 +270,41 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         else
             return QVariant();
     }
-    case Qt::EditRole:{
-        PortfolioObject *portfolio = portfolio_data_list.at(index.row());
-        portfolio->edting.storeRelaxed(1);
+case Qt::EditRole:{
+    PortfolioObject *portfolio = portfolio_data_list.at(index.row());
+    portfolio->edting.storeRelaxed(1);
+    qDebug()<<"editStarted";
+    if(c==PortfolioData_Idx::_SellPriceDifference){
+        emit edit_Started(r,c);
+        return double_to_Human_Readable(portfolio->SellPriceDifference,decimal_precision);
+    }
+    else if(c==PortfolioData_Idx::_BuyPriceDifference){
+        emit edit_Started(r,c);
+        return double_to_Human_Readable(portfolio->BuyPriceDifference,decimal_precision);
+    }
+    else if(c==PortfolioData_Idx::_SellTotalQuantity){
+        emit edit_Started(r,c);
+        return portfolio->SellTotalQuantity;
+    }
+    else if(c==PortfolioData_Idx::_BuyTotalQuantity){
         qDebug()<<"editStarted";
-        if(c==PortfolioData_Idx::_SellPriceDifference){
-            emit edit_Started(r,c);
-            return double_to_Human_Readable(portfolio->SellPriceDifference,decimal_precision);
-        }
-        else if(c==PortfolioData_Idx::_BuyPriceDifference){
-            emit edit_Started(r,c);
-            return double_to_Human_Readable(portfolio->BuyPriceDifference,decimal_precision);
-        }
-        else if(c==PortfolioData_Idx::_SellTotalQuantity){
-            emit edit_Started(r,c);
-            return portfolio->SellTotalQuantity;
-        }
-        else if(c==PortfolioData_Idx::_BuyTotalQuantity){
-            qDebug()<<"editStarted";
-            emit edit_Started(r,c);
-            return portfolio->BuyTotalQuantity;
-        }
-        else if(c==PortfolioData_Idx::_OrderQuantity){
-            emit edit_Started(r,c);
-            return portfolio->OrderQuantity;
-        }
-        else
-            return QVariant();
+        emit edit_Started(r,c);
+        return portfolio->BuyTotalQuantity;
     }
-
-    default:
+    else if(c==PortfolioData_Idx::_OrderQuantity){
+        emit edit_Started(r,c);
+        return portfolio->OrderQuantity;
+    }
+    else
         return QVariant();
-    }
+}
 
-
+default:
     return QVariant();
+}
+
+
+return QVariant();
 
 }
 
@@ -399,85 +399,85 @@ bool Table_Portfolios_Model::storeToken(PortfolioObject* p){
 /*
 void Table_Portfolios_Model::setDataList(QList <PortfolioObject*> portfolio_data_list_new){
 
-    QMutexLocker locker(&mutex); // Lock the mutex automatically
-    //new data so insert all to the list
-    bool newTokenFound = false;
-    if(portfolio_data_list.length()==0){
-        for(int i=0;i<portfolio_data_list_new.length();i++){
-            beginInsertRows(QModelIndex(), i, i);
-            portfolio_data_list.insert(i,portfolio_data_list_new[i]);
+QMutexLocker locker(&mutex); // Lock the mutex automatically
+//new data so insert all to the list
+bool newTokenFound = false;
+if(portfolio_data_list.length()==0){
+    for(int i=0;i<portfolio_data_list_new.length();i++){
+        beginInsertRows(QModelIndex(), i, i);
+        portfolio_data_list.insert(i,portfolio_data_list_new[i]);
+        endInsertRows();
+        if(storeToken(portfolio_data_list_new[i]))
+            newTokenFound= true;
+    }
+}
+//check the data is new else skip
+else{
+    for(int row_new=0;row_new<portfolio_data_list_new.length();row_new++){
+        bool newData = true;
+
+        for(int row_existing=0;row_existing<portfolio_data_list.length();row_existing++){
+            if(portfolio_data_list_new[row_new]->PortfolioNumber==portfolio_data_list[row_existing]->PortfolioNumber){
+                newData = false;
+                if(portfolio_data_list_new[row_new]==portfolio_data_list[row_existing]){
+                    continue;
+                }
+                else{
+                    // update only if the current row is not editing
+                    if(portfolio_data_list[row_existing]->edting.loadRelaxed()==0){
+                        portfolio_data_list[row_existing] = portfolio_data_list_new[row_new];
+                        int col = 17;// this need to be updated according to the changed column, if needed in future
+                        emit dataChanged(index(row_existing,0), index(row_existing, col));
+                    }
+                }
+            }
+
+
+        }
+        if(newData){
+            beginInsertRows(QModelIndex(), row_new, row_new);
+            portfolio_data_list.insert(row_new,portfolio_data_list_new[row_new]);
             endInsertRows();
-            if(storeToken(portfolio_data_list_new[i]))
+            if(storeToken(portfolio_data_list_new[row_new]))
                 newTokenFound= true;
         }
     }
-    //check the data is new else skip
-    else{
-        for(int row_new=0;row_new<portfolio_data_list_new.length();row_new++){
-            bool newData = true;
+}
 
-            for(int row_existing=0;row_existing<portfolio_data_list.length();row_existing++){
-                if(portfolio_data_list_new[row_new]->PortfolioNumber==portfolio_data_list[row_existing]->PortfolioNumber){
-                   newData = false;
-                  if(portfolio_data_list_new[row_new]==portfolio_data_list[row_existing]){
-                      continue;
-                  }
-                  else{
-                      // update only if the current row is not editing
-                      if(portfolio_data_list[row_existing]->edting.loadRelaxed()==0){
-                          portfolio_data_list[row_existing] = portfolio_data_list_new[row_new];
-                          int col = 17;// this need to be updated according to the changed column, if needed in future
-                          emit dataChanged(index(row_existing,0), index(row_existing, col));
-                      }
-                  }
-                }
+//save token to slow data object
+if(newTokenFound){
+    QStringList list;
+    for(int i=0;i<portfolio_tokens.length();i++)
+        list.append(QString::number(portfolio_tokens[i]));
+    SlowData slowData;
+    slowData.setLeg_n_token(list);
+}
 
 
-            }
-            if(newData){
-                beginInsertRows(QModelIndex(), row_new, row_new);
-                portfolio_data_list.insert(row_new,portfolio_data_list_new[row_new]);
-                endInsertRows();
-                if(storeToken(portfolio_data_list_new[row_new]))
-                    newTokenFound= true;
-            }
-        }
-    }
-
-    //save token to slow data object
-    if(newTokenFound){
-        QStringList list;
-        for(int i=0;i<portfolio_tokens.length();i++)
-            list.append(QString::number(portfolio_tokens[i]));
-        SlowData slowData;
-        slowData.setLeg_n_token(list);
-    }
-
-
-    //check some row is removed
-   // QList <PortfolioObject*> portfolio_ids_ToRemove;
-    QList <int> portfolio_ids_ToRemove;
-    for(int i=0;i<portfolio_data_list.length();i++){
-      bool deletRow = true;
-      for(int j=0;j<portfolio_data_list_new.length();j++){
+//check some row is removed
+// QList <PortfolioObject*> portfolio_ids_ToRemove;
+QList <int> portfolio_ids_ToRemove;
+for(int i=0;i<portfolio_data_list.length();i++){
+    bool deletRow = true;
+    for(int j=0;j<portfolio_data_list_new.length();j++){
         if(portfolio_data_list[i]->PortfolioNumber==portfolio_data_list_new[j]->PortfolioNumber){ // PortfolioNumber---this will be unique for row
             deletRow=false; //the id is there in new and old data so do not remove this row.
         }
-      }
-      if(deletRow)
-         portfolio_ids_ToRemove.append(i);
     }
+    if(deletRow)
+        portfolio_ids_ToRemove.append(i);
+}
 
-    //remove rows
-   for(int i = 0;i<portfolio_ids_ToRemove.length();i++){
-        beginRemoveRows(QModelIndex(), portfolio_ids_ToRemove[i]-i, portfolio_ids_ToRemove[i]-i); //substract i means each time one item removed the index need to be decrement by 1
-        PortfolioObject* portfolio = portfolio_data_list[portfolio_ids_ToRemove[i]-i];
-        portfolio_data_list.removeOne(portfolio);//substract i means each time one item removed the index need to be decrement by 1
-        delete portfolio;
-        endRemoveRows();
-    }
+//remove rows
+for(int i = 0;i<portfolio_ids_ToRemove.length();i++){
+    beginRemoveRows(QModelIndex(), portfolio_ids_ToRemove[i]-i, portfolio_ids_ToRemove[i]-i); //substract i means each time one item removed the index need to be decrement by 1
+    PortfolioObject* portfolio = portfolio_data_list[portfolio_ids_ToRemove[i]-i];
+    portfolio_data_list.removeOne(portfolio);//substract i means each time one item removed the index need to be decrement by 1
+    delete portfolio;
+    endRemoveRows();
+}
 
-   /* for (PortfolioObject* portfolio : portfolio_ids_ToRemove)
+/* for (PortfolioObject* portfolio : portfolio_ids_ToRemove)
     {
         delete portfolio;
     }*/
@@ -684,4 +684,3 @@ void Table_Portfolios_Model::setColumnWidths(QTableView *tableView) const {
         tableView->setColumnWidth(col, maxWidth);
     }
 }
-
