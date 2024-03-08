@@ -59,6 +59,8 @@ private slots:
     void on_lineEdit_Fut_editingFinished();
 
 private:
+
+
     Ui::ConvertAlgo_Win *ui;
     AddAlgoSharedVar *sharedData;
     QAtomicInt dataSorted;
