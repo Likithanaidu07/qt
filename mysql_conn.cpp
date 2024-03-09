@@ -915,7 +915,8 @@ QMap <int, QHash<QString, contract_table>> mysql_conn::getContractTable(
     return contractTableData;
 }
 
-bool mysql_conn::deleteAlgo(QString PortfolioNumber,QString &msg){
+bool mysql_conn::deleteAlgo(QString PortfolioNumber,QString &msg)
+{
     QMutexLocker lock(&mutex);
 
     bool ret = false;
@@ -923,44 +924,8 @@ bool mysql_conn::deleteAlgo(QString PortfolioNumber,QString &msg){
         bool ok = checkDBOpened(msg);
         if(ok){
             QSqlQuery query(db);
-            //QString str = "DELETE FROM portfolios WHERE PortfolioNumber='"+PortfolioNumber+"'";
-
-            /*QString str ="DELETE FROM portfolios "
-                 "WHERE PortfolioNumber = "+PortfolioNumber+
-                   " AND ("
-                     "EXISTS ("
-                       "SELECT 1 "
-                       "FROM Trades"
-                   " WHERE PortfolioNumber = "+PortfolioNumber+
-                     ")"
-                     " OR "
-                     "EXISTS ("
-                       "SELECT 1 "
-                       "FROM Trades "
-                 "WHERE PortfolioNumber = "+QString::number(PortfolioNumber.toInt() + 1500000)+
-                     ")"
-                   ");";*/
-
-            /* QString str = "DELETE FROM portfolios "
-                               "WHERE PortfolioNumber = " + PortfolioNumber +
-                               " AND ("
-                               "   EXISTS ("
-                               "     SELECT 1 "
-                               "     FROM Trades "
-                               "     WHERE PortfolioNumber = "+PortfolioNumber+
-                               "   ) "
-                               "   OR "
-                               "   EXISTS ("
-                               "     SELECT 1 "
-                               "     FROM Trades "
-                               "     WHERE PortfolioNumber = " + QString::number(PortfolioNumber.toInt() + 1500000) +
-                               "   ) "
-                               ");";*/
-            //QString str = "SELECT COUNT(*) FROM Trades WHERE PortfolioNumber = "+PortfolioNumber+" OR PortfolioNumber = "+QString::number(PortfolioNumber.toInt() + 1500000);
             QString str = "SELECT Id FROM Trades WHERE PortfolioNumber='"+PortfolioNumber+"' OR PortfolioNumber='"+QString::number(PortfolioNumber.toInt() + 1500000)+"'";
             qDebug()<<"Delete Check records in Trades Query: " <<str;
-
-            //QString str = "select * from Trades where PortfolioNumber='"+PortfolioNumber+"'";
             query.prepare(str);
             if(!query.exec())
             {
@@ -974,7 +939,7 @@ bool mysql_conn::deleteAlgo(QString PortfolioNumber,QString &msg){
                     msg = "Delete skipped, Record exist in Trades table.";
                 }
                 else {
-                    str = "DELETE FROM Portfolios WHERE PortfolioNumber='"+PortfolioNumber+"'";
+                    str = "DELETE FROM Portfolios WHERE PortfolioNumber='"+PortfolioNumber+"'" +  " AND SellTradedQuantity = 0 AND BuyTradedQuantity = 0";
                     qDebug()<<"Delete Query: " <<str;
                     query.prepare(str);
                     if( !query.exec() )
