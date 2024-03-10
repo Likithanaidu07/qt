@@ -30,10 +30,29 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
+    // to make floating window
+    listViewStartStrike = new QListView(this);
+    QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    listViewStartStrike->setSizePolicy(sizePolicy);
+    listViewStartStrike->setFixedSize(230, 200);
+    listViewStartStrike->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    // Get the geometry of lineEdit_EndStrike
+    QPoint lineEditPosSS = ui->lineEdit_Start_strike->mapToGlobal(ui->lineEdit_Start_strike->geometry().bottomRight());
+    // Set the position of the QListView just below lineEdit_EndStrike
+    listViewStartStrike->move(lineEditPosSS.x()+20, lineEditPosSS.y()+55);
+
+    // to make floating window
+    listViewEndStrike = new QListView(this);
+    QPoint lineEditPosES = ui->lineEdit_EndStrike->mapToGlobal(ui->lineEdit_EndStrike->geometry().bottomRight());
+    listViewEndStrike->setSizePolicy(sizePolicy);
+    listViewEndStrike->setFixedSize(230, 200);
+    listViewEndStrike->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    // Set the position of the QListView just below lineEdit_EndStrike
+    listViewEndStrike->move(lineEditPosES.x()+270, lineEditPosSS.y()+55);
+    // to make floating window
+
     QPixmap pixmapclose(":/close_window_icon.png");
     ui->Close->setIcon(pixmapclose);
-
-
 
     const char LineEdit_SS[]="border-radius: 6px;""border: 0.5px solid #343A40;""background: #FFF;""color: #6C757D;""font-size: 12px;""font-style: normal;""font-weight: 400;""line-height: normal;" "padding: 4px 10px 4px 10px;";
     for(auto w: {ui->lineEdit_StrikeDifference, ui->lineEdit_EndStrike, ui->lineEdit_Start_strike,ui->lineEdit_Fut}){
@@ -88,11 +107,11 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     /*******Class to generate F2F algos************/
     algoF2F = new add_algo_f2f();
     algoF2F->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike);
-    /*******Class to generate F2F algos************/
+    // /*******Class to generate F2F algos************/
 
     /*******Class to generate BtFly algos************/
     algoBtFly= new add_algo_btfly();
-    algoBtFly->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference,ui->listView_startStrike,ui->listViewEndStrike);
+    algoBtFly->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference,listViewStartStrike,listViewEndStrike);
     /*******Class to generate BtFly algos************/
 
     /*******Class to generate con_rev algos************/
@@ -102,9 +121,8 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
     /*******Class to generate BtFly-bid algos************/
     algoBtFlyBid= new add_algo_btfly_bid();
-    algoBtFlyBid->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference,ui->listView_startStrike, ui->listViewEndStrike);
+    algoBtFlyBid->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference,listViewStartStrike,listViewEndStrike);
     /*******Class to generate BtFly-bid algos************/
-
 
     QDoubleValidator *val = new QDoubleValidator();
     val->setLocale(QLocale::C);

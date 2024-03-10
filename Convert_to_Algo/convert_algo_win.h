@@ -73,6 +73,10 @@ private:
     void sort_data_and_populate_model(QMap<int, QHash<QString, contract_table>> contract_table_/*,QHash<QString, contract_table> cd_contract_table_*/);
     void resetTableWidget();
     void enable_disable_UIElement(bool enable);
+    QWidget *floatingWidgetES;
+    QWidget *floatingWidgetSS;
+    QListView *listViewStartStrike;
+    QListView *listViewEndStrike;
 
 
 signals:

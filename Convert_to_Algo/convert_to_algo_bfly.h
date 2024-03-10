@@ -34,7 +34,6 @@ signals:
 public slots:
     void itemSelected(QModelIndex);
     void itemSelectedEndStrike(QModelIndex index);
-
 private:
     QLineEdit *lineEdit_Start_strike;
     QLineEdit *lineEdit_EndStrike;

@@ -57,7 +57,8 @@ void add_algo_btfly::selectedAction(){
 }
 
 
-void add_algo_btfly::startStrikeEditFinishedAction(){
+void add_algo_btfly::startStrikeEditFinishedAction()
+{
 
     lineEdit_EndStrike->clear();
     foo_token_number_end_strike = "";
