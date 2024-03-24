@@ -11,6 +11,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 {
     ui->setupUi(this);
     MainWindowObj = (MainWindow*) parent;
+    setWindowModality(Qt::ApplicationModal);
 
 
     ui->tableWidget->setFocusPolicy(Qt::NoFocus);
@@ -211,6 +212,13 @@ void ConvertAlgo_Win::on_Close_clicked()
     close();
 }
 
+void ConvertAlgo_Win::keyPressEvent(QKeyEvent *event) {
+    if (event->key() == Qt::Key_Escape) {
+        event->ignore(); // This line ignores the key press event
+    } else {
+        QWidget::keyPressEvent(event); // Pass other key events to the base class
+    }
+}
 
 void ConvertAlgo_Win::update_ui_slot(int type){
 

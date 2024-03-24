@@ -78,7 +78,8 @@ private:
     QListView *listViewStartStrike;
     QListView *listViewEndStrike;
 
-
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
 signals:
     void update_ui_signal(int);
     void display_log_text_signal(QString);
