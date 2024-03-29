@@ -1778,6 +1778,7 @@ void MainWindow::Delete_clicked_slot()
 
         // Multiple rows can be selected
         QString logs;
+        QStringList activeAlgoList;
         for(int i=0; i< selection.count(); i++)
         {
             QModelIndex index = selection.at(i);
@@ -1786,6 +1787,7 @@ void MainWindow::Delete_clicked_slot()
             if( T_Portfolio_Model->portfolio_data_list[index.row()]->Status == true)
             {
                 logs = "PortfolioNumber '"+PortfolioNumber+"' is Active, cannot delete.";
+                activeAlgoList.append(PortfolioNumber);
                 db_conn->logToDB(logs);
                 continue;
             }
@@ -1806,6 +1808,13 @@ void MainWindow::Delete_clicked_slot()
 
         }
 
+        if(!activeAlgoList.empty())
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Active algo cannot be deleted,\n disable the algo No. " + activeAlgoList.join(",") +" and then try again.\n");
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.exec();
+        }
     }
 }
 
