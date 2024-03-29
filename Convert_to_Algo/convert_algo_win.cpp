@@ -649,16 +649,11 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                 continue;
 
             int tableRowIDx = selectedrowsIDx[k];
-            // qDebug()<<"selectedId---"<<selectedIds[k];
-            // qDebug()<<"tableRowIDx---"<<tableRowIDx;
-
             QString msg = "";
             algo_data_insert_status status = db_conn->insertToAlgoTable(sharedData->algo_data_list[i],sharedData->MaxPortfolioCount,msg);
             //emit insert_algo_data_signal(algo_data_list);
             if(status==algo_data_insert_status::INSERTED){
                 db_conn->logToDB(QString("Portfolio Added"));
-                //addedIdx.append(QString::number(i));
-                //  algo_data_list_added.append(algo_data_list[i]);
                 sharedData->algo_data_list[i].uploaded=true;
                 ui->tableWidget->item(tableRowIDx, ui->tableWidget->columnCount()-1)->setForeground(QBrush(QColor(0, 200, 0)));
                 QString algo_type  = sharedData->algo_data_list[i].algo_type;
@@ -677,10 +672,7 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                 else if(algo_type==QString::number(PortfolioType::BFLY_BID))
                     algo_type=BFLY_BID_TYPE;
 
-                double diff = sharedData->algo_data_list[i].Leg2_Strike.toInt()-sharedData->algo_data_list[i].Leg1_Strike.toInt();
-                double strik_pric = sharedData->algo_data_list[i].Leg2_Strike.toInt();
-                QString Algo_Name = algo_type+"-"+sharedData->algo_data_list[i].Algo_Name+"-"+QString::number(strik_pric,'f', sharedData->decimal_precision)+"-"+sharedData->algo_data_list[i].option_type+"-"+QString::number(diff,'f', sharedData->decimal_precision);
-
+                QString Algo_Name = algo_type+"-"+sharedData->algo_data_list[i].Algo_Name;
                 QString htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QTime::currentTime().toString(LOG_TIME_FORMAT) +"</span>"
                               + "<span style='color: black;'>"+sharedData->foo_user_id +
                                       " Inserted New Algo: "+ Algo_Name +"</span> </p>";
@@ -695,9 +687,6 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                 db_conn->logToDB("Exceeds the  limit of maximum allowed Algo count "+QString::number(sharedData->MaxPortfolioCount));
             }
             else if(status==algo_data_insert_status::EXIST){
-                // addedIdx.append(QString::number(i));
-                // algo_data_list_added.append(algo_data_list[i]);
-
                 sharedData->algo_data_list[i].uploaded=true;
                 ui->tableWidget->item(tableRowIDx, ui->tableWidget->columnCount()-1)->setForeground(QBrush(QColor(255, 191, 0)));
             }
