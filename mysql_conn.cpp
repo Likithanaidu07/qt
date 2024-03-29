@@ -22,8 +22,8 @@ extern MainWindow *MainWindowObj;
 mysql_conn::mysql_conn(QObject *parent,QString conne_name):
     QObject(parent)
 {
-    // MainWindowObj = (MainWindow*)parent;
-    // connect(this,SIGNAL(display_log_text_signal(QString)),MainWindowObj,SLOT(slotAddLogForAddAlgoRecord(QString)));
+   // MainWindowObj = (MainWindow*)parent;
+    //connect(this,SIGNAL(display_log_text_signal(QString)),MainWindowObj,SLOT(slotAddLogForAddAlgoRecord(QString)));
 
 
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
