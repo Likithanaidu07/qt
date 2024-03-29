@@ -540,8 +540,8 @@ qint64 ContractDetail::GetExpiry(int token,int type)
 //         {
 //             QFileInfo fileInfo(fileName);
 //             QDateTime lastModified = fileInfo.lastModified();
-//             QDateTime currentDateTime = QDateTime::currentDateTime();
-//             if (currentDateTime.date() != lastModified.date())
+//             QDateTime currentTime = QDateTime::currentDateTime();
+//             if (currentTime.date() != lastModified.date())
 //             {
 //                 if (!QFile::remove(fileName))
 //                 {

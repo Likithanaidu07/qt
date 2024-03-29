@@ -681,7 +681,7 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                 double strik_pric = sharedData->algo_data_list[i].Leg2_Strike.toInt();
                 QString Algo_Name = algo_type+"-"+sharedData->algo_data_list[i].Algo_Name+"-"+QString::number(strik_pric,'f', sharedData->decimal_precision)+"-"+sharedData->algo_data_list[i].option_type+"-"+QString::number(diff,'f', sharedData->decimal_precision);
 
-                QString htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QDateTime::currentDateTime().toString("M/d/yyyy h:mm:ss AP") +"</span>"
+                QString htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QTime::currentTime().toString(LOG_TIME_FORMAT) +"</span>"
                               + "<span style='color: black;'>"+sharedData->foo_user_id +
                                       " Inserted New Algo: "+ Algo_Name +"</span> </p>";
 

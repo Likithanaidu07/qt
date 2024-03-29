@@ -152,23 +152,22 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                         }
                     }
 
-                    QDateTime currentDateTime = QDateTime::currentDateTime();
-                    QString formattedDateTime = currentDateTime.toString("M/d/yyyy h:mm:ss AP");
-                    QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedDateTime)";
+                    QTime currentTime = QTime::currentTime();
+                    QString formattedTime = currentTime.toString(LOG_TIME_FORMAT);
+                    QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedTime)";
                     QSqlQuery query1(db);
                     query1.prepare(qryStr);
-                    QString str="User:" + UserName_ + " logged in from [" + localIP + "]";
-//                    UiUtils::GetMainWindow()->add_logs(str);
                     query1.bindValue(":logMessage", "User:" + UserName_ + " logged in from [" + localIP + "]");
                     query1.bindValue(":userName", UserName_);
-                    query1.bindValue(":formattedDateTime", formattedDateTime);
-
-                    if (!query1.exec()) {
+                    query1.bindValue(":formattedTime", formattedTime);
+                    if (!query1.exec())
+                    {
                         qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
                         qDebug() << "Query Str: " << qryStr;
                     }
                 }
-                else {
+                else
+                {
                     userLoginInfo.loginResponse = "Wrong password";
                     userLoginInfo.errorCode = T_LoginErroCode::PASSWORD_WRONG;
 
@@ -181,15 +180,15 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                         }
                     }
 
-                    QDateTime currentDateTime = QDateTime::currentDateTime();
-                    QString formattedDateTime = currentDateTime.toString("M/d/yyyy h:mm:ss AP");
-                    QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedDateTime)";
+                    QTime currentTime = QTime::currentTime();
+                    QString formattedTime = currentTime.toString(LOG_TIME_FORMAT);
+                    QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedTime)";
                     QString LogMessage = "Invalid login attempt from "+localIP+" for user ["+UserName_+"] with wrong password ["+password+"]";
                     QSqlQuery query1(db);
                     query1.prepare(qryStr);
                     query1.bindValue(":logMessage", LogMessage);
                     query1.bindValue(":userName", UserName_);
-                    query1.bindValue(":formattedDateTime", formattedDateTime);
+                    query1.bindValue(":formattedTime", formattedTime);
 
                     if (!query1.exec()) {
                         qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
@@ -209,15 +208,15 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                     }
                 }
 
-                QDateTime currentDateTime = QDateTime::currentDateTime();
-                QString formattedDateTime = currentDateTime.toString("M/d/yyyy h:mm:ss AP");
-                QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedDateTime)";
+                QTime currentTime = QTime::currentTime();
+                QString formattedTime = currentTime.toString(LOG_TIME_FORMAT);
+                QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedTime)";
                 QString LogMessage = "Invalid login attempt from "+localIP+" with wrong username ["+UserName_+"]";
                 QSqlQuery query1(db);
                 query1.prepare(qryStr);
                 query1.bindValue(":logMessage", LogMessage);
                 query1.bindValue(":userName", UserName_);
-                query1.bindValue(":formattedDateTime", formattedDateTime);
+                query1.bindValue(":formattedTime", formattedTime);
 
                 if (!query1.exec()) {
                     qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
@@ -360,20 +359,20 @@ void mysql_conn::logToDB(QString logMessage)
     QString msg;
     bool ok = checkDBOpened(msg);
     if(ok){
-        QDateTime currentDateTime = QDateTime::currentDateTime();
-        QString formattedDateTime = currentDateTime.toString("M/d/yyyy h:mm:ss AP");
-        QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedDateTime)";
+        QTime currentTime = QTime::currentTime();
+        QString formattedTime = currentTime.toString(LOG_TIME_FORMAT);
+        QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedTime)";
         QSqlQuery query1(db);
         query1.prepare(qryStr);
         query1.bindValue(":logMessage", logMessage);
         query1.bindValue(":userName", userNameLogged);
-        query1.bindValue(":formattedDateTime", formattedDateTime);
+        query1.bindValue(":formattedTime", formattedTime);
 
         if (!query1.exec()) {
             qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
             qDebug() << "Query Str: " << qryStr;
         }
-        QString  htmlContent = "<p><span style='background-color:#B3C1DE;'>" + currentDateTime.toString("M/d/yyyy h:mm:ss AP")+"</span>"
+        QString  htmlContent = "<p><span style='background-color:#B3C1DE;'>" + currentTime.toString(LOG_TIME_FORMAT)+"</span>"
                               + "<span style='color: black;'>"+ logMessage +"</span> </p>";
 
         emit display_log_text_signal(htmlContent);

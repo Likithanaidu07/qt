@@ -1259,7 +1259,7 @@ void MainWindow::loadContract(){
 
     auto loadContract_BackgroundTask = [this]() {
 
-        QString  htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QDateTime::currentDateTime().toString("M/d/yyyy h:mm:ss AP")+"</span>"
+        QString  htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QTime::currentTime().toString(LOG_TIME_FORMAT)+"</span>"
                               + "<span style='color: black;'>  Loading contract...</span> </p>";
 
         emit display_log_text_signal(htmlContent);
@@ -1276,7 +1276,7 @@ void MainWindow::loadContract(){
         //if not logged in the data loading thread start by login function
 
         htmlContent = "<p><span style='background-color:#B3C1DE;'>" +
-                      QDateTime::currentDateTime().toString("M/d/yyyy h:mm:ss AP") +"</span>"
+                      QTime::currentTime().toString(LOG_TIME_FORMAT) +"</span>"
                       + "<span style='color: black;'> Contract file loaded...</span> </p>";
 
         emit display_log_text_signal(htmlContent);
