@@ -42,15 +42,20 @@ bool Table_Portfolios_Delegate::editorEvent(QEvent *event, QAbstractItemModel *m
     {
         QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
         QRect imageRect = option.rect;
-        imageRect.setWidth(30);
-        imageRect.setHeight(25);
-        int topPadding = 5;
-        int padding = 0;
+        imageRect.setWidth(option.rect.width());
+        imageRect.setHeight(option.rect.height());
+        int topPadding = 2;
+        int padding = 10;
         imageRect.adjust(padding, topPadding, -padding, padding);
+
+        // Check if the mouse press occurred within the image rectangle
         if (imageRect.contains(mouseEvent->pos()))
         {
+            // Handle the click on the image
             qDebug() << "Image Clicked!";
-            model->setData(index,index.data(Qt::ItemIsUserCheckable).value<Qt::CheckState>(),Qt::ItemIsUserCheckable);
+            model->setData(index, index.data(Qt::ItemIsUserCheckable).value<Qt::CheckState>(), Qt::ItemIsUserCheckable);
+            // If you need to stop further processing of the event, you can use event->accept();
+            // event->accept();
         }
         return true;  // Consume the event
     }
@@ -339,10 +344,12 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
             // Load an example image (replace with your logic to get the image)
             QPixmap imagePixmap(":/enable.png");
-            if (!imagePixmap.isNull()) {
-                // Draw the image next to the checkbox
-                painter->drawPixmap(rect, imagePixmap);
-            }
+            // Assuming 'rect' represents the bounding rectangle of the checkbox
+            int middleColumnX = option.rect.left() + (option.rect.width() - imagePixmap.width()) / 2;
+            int middleColumnY = option.rect.top() + (option.rect.height() - imagePixmap.height()) / 2;
+            QRect imageRect(QPoint(middleColumnX, middleColumnY), imagePixmap.size());
+            painter->drawPixmap(imageRect, imagePixmap);
+
         }
         else if(portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser)
         {
@@ -357,10 +364,10 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
             // Load an example image (replace with your logic to get the image)
             QPixmap imagePixmap(":/disable.png");
-            if (!imagePixmap.isNull()) {
-                // Draw the image next to the checkbox
-                painter->drawPixmap(rect, imagePixmap);
-            }
+            int middleColumnX = option.rect.left() + (option.rect.width() - imagePixmap.width()) / 2;
+            int middleColumnY = option.rect.top() + (option.rect.height() - imagePixmap.height()) / 2;
+            QRect imageRect(QPoint(middleColumnX, middleColumnY), imagePixmap.size());
+            painter->drawPixmap(imageRect, imagePixmap);
 
         }
 
