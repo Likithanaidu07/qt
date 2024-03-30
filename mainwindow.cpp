@@ -1510,8 +1510,14 @@ void MainWindow::loggedIn(){
 
 }
 
+void MainWindow::loadCurrentDayLogs()
+{
+    db_conn->loadCurrentDayLogs();
+}
+
 void MainWindow::loggedInSucessful(userInfo userData)
 {
+    loadCurrentDayLogs();
     loadContract();
 }
 

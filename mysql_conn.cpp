@@ -159,7 +159,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                     query1.prepare(qryStr);
                     query1.bindValue(":logMessage", "User:" + UserName_ + " logged in from [" + localIP + "]");
                     query1.bindValue(":userName", UserName_);
-                    query1.bindValue(":formattedTime", formattedTime);
+                    query1.bindValue(":formattedTime", QDateTime::currentDateTime().toSecsSinceEpoch());
                     if (!query1.exec())
                     {
                         qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
@@ -188,7 +188,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                     query1.prepare(qryStr);
                     query1.bindValue(":logMessage", LogMessage);
                     query1.bindValue(":userName", UserName_);
-                    query1.bindValue(":formattedTime", formattedTime);
+                    query1.bindValue(":formattedTime", QDateTime::currentDateTime().toSecsSinceEpoch());
 
                     if (!query1.exec()) {
                         qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
@@ -216,7 +216,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                 query1.prepare(qryStr);
                 query1.bindValue(":logMessage", LogMessage);
                 query1.bindValue(":userName", UserName_);
-                query1.bindValue(":formattedTime", formattedTime);
+                query1.bindValue(":formattedTime", QDateTime::currentDateTime().toSecsSinceEpoch());
 
                 if (!query1.exec()) {
                     qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
@@ -360,13 +360,12 @@ void mysql_conn::logToDB(QString logMessage)
     bool ok = checkDBOpened(msg);
     if(ok){
         QTime currentTime = QTime::currentTime();
-        QString formattedTime = currentTime.toString(LOG_TIME_FORMAT);
         QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedTime)";
         QSqlQuery query1(db);
         query1.prepare(qryStr);
         query1.bindValue(":logMessage", logMessage);
         query1.bindValue(":userName", userNameLogged);
-        query1.bindValue(":formattedTime", formattedTime);
+        query1.bindValue(":formattedTime", QDateTime::currentDateTime().toSecsSinceEpoch());
 
         if (!query1.exec()) {
             qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
@@ -383,6 +382,48 @@ void mysql_conn::logToDB(QString logMessage)
 
     }
 
+}
+
+void mysql_conn::loadCurrentDayLogs()
+{
+    QMutexLocker lock(&mutex);
+    QString msg;
+    bool ok = checkDBOpened(msg);
+    if(ok)
+    {
+        QSqlQuery selQry(db);
+
+        auto currentTime = std::chrono::system_clock::now();
+
+        //to get midnight time
+        auto midnight = std::chrono::time_point_cast<std::chrono::hours>(std::chrono::system_clock::from_time_t(std::chrono::system_clock::to_time_t(currentTime)));
+
+        //to get duration of hours from midnight to now
+        auto duration = currentTime - midnight;
+        auto totalHours = std::chrono::duration_cast<std::chrono::hours>(duration).count();
+        QString queryStr = "SELECT * FROM logs WHERE Time BETWEEN UNIX_TIMESTAMP(CURDATE()) AND UNIX_TIMESTAMP(NOW() - INTERVAL " +
+                           QString::number(totalHours) + " HOUR)";
+
+        selQry.prepare(queryStr);
+        if (!selQry.exec())
+        {
+            qDebug() << "Select Query failed: " << selQry.lastError().text();
+            qDebug() << "Query : " << queryStr;
+        }
+        QSqlRecord rec = selQry.record();
+        while (selQry.next())
+        {
+            QString logMessage = selQry.value(rec.indexOf("LogMessage")).toString();
+            QString timeString = selQry.value(rec.indexOf("Time")).toString();
+            qint64 epochTime = timeString.toLongLong();
+            QDateTime dateTime = QDateTime::fromSecsSinceEpoch(epochTime);
+            QString  htmlContent = "<p><span style='background-color:#B3C1DE;'>" + dateTime.time().toString(LOG_TIME_FORMAT) +"</span>"
+                                  + "<span style='color: black;'>"+ logMessage.prepend("  ") +"</span> </p>";
+
+            emit display_log_text_signal(htmlContent);
+        }
+
+    }
 }
 
 QHash<QString, contract_table> mysql_conn::prpareContractDataFromDB(QString queryStr, QSqlDatabase *db, QStringList &tokenData)
