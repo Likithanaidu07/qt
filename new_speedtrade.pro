@@ -18,6 +18,7 @@ SOURCES += \
     Convert_to_Algo/convert_algo_win.cpp \
     Convert_to_Algo/convert_to_algo_bfly.cpp \
     Convert_to_Algo/convert_to_algo_bfly_bid.cpp \
+    Convert_to_Algo/eventfilterlistview.cpp \
     Liners/liners_model.cpp \
     NetPosition/net_position_table_model.cpp \
     OrderBook/table_orderbook_delegate.cpp \
@@ -58,6 +59,7 @@ HEADERS += \
     Convert_to_Algo/convert_algo_win.h \
     Convert_to_Algo/convert_to_algo_bfly.h \
     Convert_to_Algo/convert_to_algo_bfly_bid.h \
+    Convert_to_Algo/eventfilterlistview.h \
     Liners/liners_model.h \
     NetPosition/net_position_table_model.h \
     OrderBook/table_orderbook_delegate.h \

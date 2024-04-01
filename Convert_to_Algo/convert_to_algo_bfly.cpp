@@ -1,4 +1,5 @@
 #include "Convert_to_Algo/convert_to_algo_bfly.h"
+#include "custom_q_completer.h"
 
 #include "QElapsedTimer"
 
@@ -8,9 +9,8 @@ add_algo_btfly::add_algo_btfly(QObject *parent)
     //  model_start_strike_BFLY = new QStandardItemModel;
     sharedData = &AddAlgoSharedVar::getInstance();
 
-
-
 }
+
 void add_algo_btfly::copyUIElement(QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_, QListView *sView, QListView *eView)
 {
     lineEdit_Start_strike = lineEdit_Start_strike_;
@@ -22,6 +22,7 @@ void add_algo_btfly::copyUIElement(QTableWidget *tableWidget_, QLineEdit *lineEd
 
     startStrikeListView->hide();
     endStrikeListView->hide();
+
 }
 
 void add_algo_btfly::create_AutoFillModel_StartStrike(){
@@ -50,10 +51,33 @@ void add_algo_btfly::selectedAction(){
     foo_token_number_start_strike = "";
     foo_token_number_end_strike = "";
 
+    // Install event filter on the QLineEdit and QListView
+    eventFilterStart = new EventFilter(lineEdit_Start_strike, startStrikeListView);
+    connect(eventFilterStart, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelected(QModelIndex)));
+    lineEdit_Start_strike->installEventFilter(eventFilterStart);
+    startStrikeListView->installEventFilter(eventFilterStart);
+
+    eventFilterEnd = new EventFilter(lineEdit_EndStrike, endStrikeListView);
+    connect(eventFilterEnd, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
+    lineEdit_EndStrike->installEventFilter(eventFilterEnd);
+    endStrikeListView->installEventFilter(eventFilterEnd);
+
+
     //create qcompleter and fill with abovie model
     CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_BFLY);
     connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
-    connect(startStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelected(QModelIndex)));
+    connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),this, SLOT(slotStartHide(QString)));
+    connect(lineEdit_EndStrike, SIGNAL(textChanged(QString)),this, SLOT(slotEndHide(QString)));
+}
+
+void add_algo_btfly::slotStartHide(QString)
+{
+    endStrikeListView->hide();
+}
+
+void add_algo_btfly::slotEndHide(QString)
+{
+    startStrikeListView->hide();
 }
 
 
@@ -105,16 +129,13 @@ void add_algo_btfly::startStrikeEditFinishedAction()
     // create qcompleter and fill with abovie model
     CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike);
     connect(lineEdit_EndStrike, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
-    connect(endStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
 
 }
-void add_algo_btfly::generateAlgo(){
 
-    QString Start_strike_combination = lineEdit_Start_strike->text();
-    QString end_strike_combination = lineEdit_Start_strike->text();
-
-
-    if(foo_token_number_start_strike=="" || foo_token_number_end_strike==""){
+void add_algo_btfly::generateAlgo()
+{
+    if(foo_token_number_start_strike=="" && foo_token_number_end_strike=="")
+    {
         QMessageBox msgBox;
         msgBox.setText("Cannot Use current Algo combination.");
         msgBox.setIcon(QMessageBox::Warning);
@@ -201,9 +222,9 @@ void add_algo_btfly::generateAlgo(){
             Leg3_token_number_list.append(Leg3_token_number);
             //(Instrument name, expiry year and month, middle strike and strike difference     eg.  Bfly - EURUSD 24 JUN 1.005 CE - 0.005
 
-//            Algo_Name = "Bfly-";
-//            double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number).toDouble());
-//            Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM")+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number) +"-"+QString::number(diff)+ContractDetail::getInstance().GetOptionType(leg1_token_number);
+            //            Algo_Name = "Bfly-";
+            //            double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number).toDouble());
+            //            Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM")+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number) +"-"+QString::number(diff)+ContractDetail::getInstance().GetOptionType(leg1_token_number);
 
             QString Instr_Name = "Bfly-" + sharedData->contract_table_hash[keyStart].InstrumentName+"-"+dt.toString("ddMMM").toUpper()+"-"+QString::number(leg2)+"-"+QString::number(StrikeDifference)+"-"+Option_Type;
             Algo_Name_list.append(Instr_Name);
@@ -384,75 +405,77 @@ void add_algo_btfly::generateAlgo(){
 
 void add_algo_btfly::itemSelected(QModelIndex index)
 {
-    QSortFilterProxyModel *proxyModel = qobject_cast<QSortFilterProxyModel*>(startStrikeListView->model());
-
-    if (proxyModel) {
-        QModelIndex proxyIndex = startStrikeListView->currentIndex();
-        if (proxyIndex.isValid()) {
-            // Map the index from the proxy model to the source model
-            QModelIndex sourceIndex = proxyModel->mapToSource(proxyIndex);
-            QVariant dData = sourceIndex.data(Qt::DisplayRole);
-            if (dData.isValid())
+    if(index.isValid())
+    {
+        QVariant dData = index.data(Qt::DisplayRole);
+        if (dData.isValid())
+        {
+            for (int row = 0; row < model_start_strike_BFLY->rowCount(); ++row)
             {
-                for (int row = 0; row < model_start_strike_BFLY->rowCount(); ++row)
+                QModelIndex index = model_start_strike_BFLY->index(row, 0);
+                // Check if the item's display role value matches
+                QVariant displayData = model_start_strike_BFLY->data(index, Qt::DisplayRole);
+                if (displayData.isValid() && displayData.toString() == dData)
                 {
-                    QModelIndex index = model_start_strike_BFLY->index(row, 0);
-                    // Check if the item's display role value matches
-                    QVariant displayData = model_start_strike_BFLY->data(index, Qt::DisplayRole);
-                    if (displayData.isValid() && displayData.toString() == dData)
+                    QVariant userData = model_start_strike_BFLY->data(index, Qt::UserRole + 1);
+                    if (userData.isValid())
                     {
-                        QVariant userData = model_start_strike_BFLY->data(index, Qt::UserRole + 1);
-                        if (userData.isValid())
-                        {
-                            foo_token_number_start_strike = userData.toString();
-                            startStrikeEditFinishedAction();
-                            lineEdit_Start_strike->setText(sourceIndex.data(Qt::DisplayRole).toString());
-                            startStrikeListView->hide();
-                            break;
-                        }
+
+                        foo_token_number_start_strike = userData.toString();
+
+                        lineEdit_Start_strike->setText(index.data(Qt::DisplayRole).toString());
+
+                        startStrikeEditFinishedAction();
+
+                        startStrikeListView->hide();
+                        break;
                     }
                 }
             }
         }
+    }
+    else
+    {
+        qInfo() << "Not a start strike vaild index";
     }
 }
 
 void add_algo_btfly::itemSelectedEndStrike(QModelIndex index)
 {
-    QSortFilterProxyModel *proxyModel = qobject_cast<QSortFilterProxyModel*>(endStrikeListView->model());
-
-    if (proxyModel) {
-        QModelIndex proxyIndex = endStrikeListView->currentIndex();
-        if (proxyIndex.isValid()) {
-            // Map the index from the proxy model to the source model
-            QModelIndex sourceIndex = proxyModel->mapToSource(proxyIndex);
-            QVariant dData = sourceIndex.data(Qt::DisplayRole);
-            if (dData.isValid())
+    if(index.isValid())
+    {
+        QVariant dData = index.data(Qt::DisplayRole);
+        if (dData.isValid())
+        {
+            for (int row = 0; row < model_end_strike->rowCount(); ++row)
             {
-                for (int row = 0; row < model_end_strike->rowCount(); ++row)
+                QModelIndex index = model_end_strike->index(row, 0);
+                // Check if the item's display role value matches
+                QVariant displayData = model_end_strike->data(index, Qt::DisplayRole);
+                if (displayData.isValid() && displayData.toString() == dData)
                 {
-                    QModelIndex index = model_end_strike->index(row, 0);
-                    // Check if the item's display role value matches
-                    QVariant displayData = model_end_strike->data(index, Qt::DisplayRole);
-                    if (displayData.isValid() && displayData.toString() == dData)
+                    QVariant userData = model_end_strike->data(index, Qt::UserRole + 1);
+                    if (userData.isValid())
                     {
-                        QVariant userData = model_end_strike->data(index, Qt::UserRole + 1);
-                        if (userData.isValid())
-                        {
-                            foo_token_number_end_strike = userData.toString();
-                            lineEdit_EndStrike->setText(sourceIndex.data(Qt::DisplayRole).toString());
-                            startStrikeListView->hide();
-                            endStrikeListView->hide();
-                            qDebug() << "User Role Value: end" << foo_token_number_end_strike;
-                            break;
-                        }
+                        foo_token_number_end_strike = userData.toString();
+                        lineEdit_EndStrike->setText(index.data(Qt::DisplayRole).toString());
+                        startStrikeListView->hide();
+                        endStrikeListView->hide();
+
+                        break;
                     }
                 }
-
             }
+
         }
     }
+    else
+    {
+        qInfo() << "Not an end strike vaild index";
+    }
+
 }
+
 
 
 
