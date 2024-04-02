@@ -19,6 +19,8 @@ void add_algo_btfly::copyUIElement(QTableWidget *tableWidget_, QLineEdit *lineEd
     tableWidget = tableWidget_;
     startStrikeListView = sView;
     endStrikeListView = eView;
+    lineEdit_Start_strike->setCursorPosition(0);
+    lineEdit_EndStrike->setCursorPosition(0);
 
     startStrikeListView->hide();
     endStrikeListView->hide();
@@ -102,7 +104,7 @@ void add_algo_btfly::startStrikeEditFinishedAction()
         contract_table tmp = sharedData->contract_table_hash[sorted_keys_BFLY[i]];
 
         float end_strike = tmp.StrikePrice;
-        if(start_strike>end_strike)
+        if(start_strike>=end_strike)
             continue;
         if(tmp.InstrumentName==Instr_Name&&tmp.OptionType==Option_Type&&Expiry==tmp.Expiry){
 
@@ -424,6 +426,7 @@ void add_algo_btfly::itemSelected(QModelIndex index)
                         foo_token_number_start_strike = userData.toString();
 
                         lineEdit_Start_strike->setText(index.data(Qt::DisplayRole).toString());
+                        lineEdit_Start_strike->setCursorPosition(0);
 
                         startStrikeEditFinishedAction();
 
@@ -459,6 +462,8 @@ void add_algo_btfly::itemSelectedEndStrike(QModelIndex index)
                     {
                         foo_token_number_end_strike = userData.toString();
                         lineEdit_EndStrike->setText(index.data(Qt::DisplayRole).toString());
+                        lineEdit_EndStrike->setCursorPosition(0);
+
                         startStrikeListView->hide();
                         endStrikeListView->hide();
 

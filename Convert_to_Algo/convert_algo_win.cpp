@@ -212,11 +212,18 @@ void ConvertAlgo_Win::on_Close_clicked()
     close();
 }
 
-void ConvertAlgo_Win::keyPressEvent(QKeyEvent *event) {
-    if (event->key() == Qt::Key_Escape) {
+void ConvertAlgo_Win::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+    {
         event->ignore(); // This line ignores the key press event
-    } else {
+        ui->lineEdit_Start_strike->hide();
+        ui->lineEdit_EndStrike->hide();
+    }
+    else
+    {
         QWidget::keyPressEvent(event); // Pass other key events to the base class
+
     }
 }
 
