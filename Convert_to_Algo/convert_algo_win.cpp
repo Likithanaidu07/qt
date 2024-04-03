@@ -33,6 +33,9 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
     // to make floating window
     listViewStartStrike = new QListView(this);
+    connect(listViewStartStrike, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelected(QModelIndex)));
+
+
     QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     listViewStartStrike->setSizePolicy(sizePolicy);
     listViewStartStrike->setFixedSize(230, 200);
@@ -41,15 +44,21 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     QPoint lineEditPosSS = ui->lineEdit_Start_strike->mapToGlobal(ui->lineEdit_Start_strike->geometry().bottomRight());
     // Set the position of the QListView just below lineEdit_EndStrike
     listViewStartStrike->move(lineEditPosSS.x()+20, lineEditPosSS.y()+55);
+    listViewStartStrike->hide();
 
     // to make floating window
     listViewEndStrike = new QListView(this);
+    connect(listViewEndStrike, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
     QPoint lineEditPosES = ui->lineEdit_EndStrike->mapToGlobal(ui->lineEdit_EndStrike->geometry().bottomRight());
     listViewEndStrike->setSizePolicy(sizePolicy);
     listViewEndStrike->setFixedSize(230, 200);
     listViewEndStrike->setEditTriggers(QAbstractItemView::NoEditTriggers);
     // Set the position of the QListView just below lineEdit_EndStrike
     listViewEndStrike->move(lineEditPosES.x()+270, lineEditPosSS.y()+55);
+    listViewEndStrike->hide();
+
+
+
     // to make floating window
 
     QPixmap pixmapclose(":/close_window_icon.png");
@@ -112,6 +121,8 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
     /*******Class to generate BtFly algos************/
     algoBtFly= new add_algo_btfly();
+    connect(this, &ConvertAlgo_Win::signalStartItemClickedBFLY,algoBtFly, &add_algo_btfly::itemSelected);
+    connect(this, &ConvertAlgo_Win::signalEndItemClickedBFLY,algoBtFly, &add_algo_btfly::itemSelectedEndStrike);
     algoBtFly->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference,listViewStartStrike,listViewEndStrike);
     /*******Class to generate BtFly algos************/
 
@@ -122,6 +133,8 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
     /*******Class to generate BtFly-bid algos************/
     algoBtFlyBid= new add_algo_btfly_bid();
+    connect(this, &ConvertAlgo_Win::signalStartItemClickedBFLYBID,algoBtFlyBid, &add_algo_btfly_bid::itemSelected);
+    connect(this, &ConvertAlgo_Win::signalEndItemClickedBFLYBID,algoBtFlyBid, &add_algo_btfly_bid::itemSelectedEndStrike);
     algoBtFlyBid->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference,listViewStartStrike,listViewEndStrike);
     /*******Class to generate BtFly-bid algos************/
 
@@ -239,6 +252,36 @@ void ConvertAlgo_Win::update_ui_slot(int type){
         break;
     }
 
+}
+
+
+void ConvertAlgo_Win::itemSelected(QModelIndex index)
+{
+    QString algo_type  = ui->comboBox_AlgoType->currentText();
+
+    if(algo_type==BFLY_BID_TYPE)
+    {
+        emit signalStartItemClickedBFLYBID(index);
+    }
+    else if(algo_type=="BFLY")
+    {
+        signalStartItemClickedBFLY(index);
+    }
+}
+
+void ConvertAlgo_Win::itemSelectedEndStrike(QModelIndex index)
+{
+    QString algo_type  = ui->comboBox_AlgoType->currentText();
+    if(algo_type==BFLY_BID_TYPE)
+    {
+        emit signalEndItemClickedBFLYBID(index);
+
+    }
+    else if(algo_type=="BFLY")
+    {
+        emit signalEndItemClickedBFLY(index);
+
+    }
 }
 
 
