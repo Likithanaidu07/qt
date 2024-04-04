@@ -265,7 +265,7 @@ void ConvertAlgo_Win::itemSelected(QModelIndex index)
     }
     else if(algo_type=="BFLY")
     {
-        signalStartItemClickedBFLY(index);
+        emit signalStartItemClickedBFLY(index);
     }
 }
 
