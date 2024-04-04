@@ -142,7 +142,7 @@ QString SlowDataSocket::fixDecimal(double num,double decimal_precision){
 void SlowDataSocket::run()
 {
     mc_port     = 34330;
-    const char* mc_addr_str = "233.1.2.5";
+    const char* mc_addr_str = "233.1.2.6";
     std::string ipStdString;
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);

@@ -110,7 +110,7 @@ Slowdata_Indices_Socket::Slowdata_Indices_Socket(QObject *parent)
 void Slowdata_Indices_Socket::run()
 {
     mc_port     = 34330;
-    const char* mc_addr_str = "233.1.2.5";
+    const char* mc_addr_str = "233.1.2.6";
     std::string ipStdString;
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);

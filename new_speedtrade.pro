@@ -46,7 +46,8 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     mysql_conn.cpp \
-    uidockwidget.cpp
+    uidockwidget.cpp \
+    watch_data_list_item.cpp
 
 HEADERS += \
     CombinedTracker/combined_tracker_table_model.h \
@@ -88,12 +89,14 @@ HEADERS += \
     loginwindow.h \
     mainwindow.h \
     mysql_conn.h \
-    uidockwidget.h
+    uidockwidget.h \
+    watch_data_list_item.h
 
 FORMS += \
     convert_algo_win.ui \
     loginwindow.ui \
-    mainwindow.ui
+    mainwindow.ui \
+    watch_data_list_item.ui
 
 
 # Default rules for deployment.

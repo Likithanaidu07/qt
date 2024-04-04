@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QStackedWidget>
 #include <QtConcurrent/QtConcurrent>
+#include "QListWidgetItem"
 
 #include <QTableView>
 #include <QDockWidget>
@@ -138,6 +139,15 @@ private:
 
     class ConvertAlgo_Win *convertalgo;
 
+    QHash<QString, Indices_Data_Struct> indicesDataList;//hash to store indices data for watch
+
+    QMutex indicesDataMutex; //list to store indices data for watch
+
+    QStringList savedWatchItems; // saved watch item to display on watch
+    void showSaveWatchOnListView();
+    void initWatchWindow();
+
+
 
 public slots:
     void profolioTableEditFinshedSlot(QString val,QModelIndex);
@@ -147,7 +157,7 @@ public slots:
     void loggedIn();
     void loggedInSucessful(userInfo userData);
     void Delete_clicked_slot();
-//    void indicesDataRecv_Slot(Indices_Data_Struct data);
+    void indicesDataRecv_Slot(Indices_Data_Struct data);
     void backend_comm_Data_Slot(QString msg,SocketDataType msgType);
 //    void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
     void updatePortFolioStatus();
@@ -177,7 +187,6 @@ private slots:
     void mouseDoubleClickEvent(QMouseEvent *event) override;
 
     void update_ui_slot(int type);
-    void on_Buy_Button_clicked();
 
 //    void OnDockWidgetClose(UiUtils::DockWidgetType p_Type);
     void OnAlgorithmDockWidgetVisiblityChanged(bool p_Visible);
@@ -188,5 +197,9 @@ private slots:
     void on_Algorithms_Close_clicked();
 
     void on_ConvertAlgo_button_clicked();
+    void on_lineEditWatchSearch_textChanged(const QString &arg1);
+    void on_listWidgetWatch_itemClicked(QListWidgetItem *item);
+    void on_Add_Watch_Button_clicked();
+    void on_Subtract_Watch_Button_clicked();
 };
 #endif // MAINWINDOW_H

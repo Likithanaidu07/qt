@@ -15,7 +15,7 @@
 #include "ContractDetail.h"
 #include "OrderBook/table_orderbook_delegate.h"
 #include "mysql_conn.h"
-
+#include "watch_data_list_item.h"
 static const char stylesheetvis[]= "background: #596167;" "border-radius: 10px;";
 
 extern MainWindow *MainWindowObj;
@@ -908,7 +908,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->HP_Close->setVisible(false);
     ui->Templates_Close->setVisible(false);
 
-    ui->lineEdit->setPlaceholderText("Search...");
+    ui->lineEditWatchSearch->setPlaceholderText("Search...");
 
     QPixmap pixmapmenu(":/menu.png");
     ui->close->setIcon(pixmapclose);
@@ -941,13 +941,19 @@ MainWindow::MainWindow(QWidget *parent)
         w->setFont(font);
     }
 
-    QFont fontbuy=ui->Buy_Button->font();
-    QFont fontsell=ui->Sell_Button->font();
+    QFont fontbuy=ui->Add_Watch_Button->font();
+    QFont fontsell=ui->Subtract_Watch_Button->font();
     fontbuy.setFamily("Work Sans");
     fontsell.setFamily("Work Sans");
-    ui->Buy_Button->setFont(fontbuy);
-    ui->Sell_Button->setFont(fontsell);
+    ui->Add_Watch_Button->setFont(fontbuy);
+    ui->Subtract_Watch_Button->setFont(fontsell);
 
+    ui->listWidgetWatch->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Hides vertical scroll bar
+    ui->listWidgetWatch->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Hides horizontal scroll bar
+
+
+
+    // Apply the shadow effect to the widget
 //    QSettings settings;
 //    settings.setValue("DOCK_LOCATIONS",this->saveState(1));
 
@@ -958,7 +964,7 @@ MainWindow::MainWindow(QWidget *parent)
     // db_conn =new mysql_conn(this,"main_db_conn");
     // connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
    //loadContract();
-
+    initWatchWindow();
 }
 
 MainWindow::~MainWindow()
@@ -1054,6 +1060,7 @@ void MainWindow::createINIFileIfNotExist(){
         settings.setValue("algo_table_quantity_incrementer",1);*/
         settings.setValue("market_type","fo"); // or cds
         settings.setValue("InstrumentTypeFilter","");
+        settings.setValue("Watch_InstrumentNames","");
         settings.endGroup();
     }
     else{
@@ -1071,6 +1078,8 @@ void MainWindow::createINIFileIfNotExist(){
             settings.setValue("market_type","fo");
         if (!settings.contains("InstrumentTypeFilter"))
             settings.setValue("InstrumentTypeFilter","");
+        if (!settings.contains("Watch_InstrumentNames"))
+            settings.setValue("Watch_InstrumentNames","");
         settings.endGroup();
     }
     if(!groups.contains("BackendServerDetails")){
@@ -1117,6 +1126,13 @@ void MainWindow::loadSettings(){
         settings.beginGroup("GeneralSettings");
         if (settings.contains("market_type"))
             market_type = settings.value("market_type").toString();
+        if(settings.contains("Watch_InstrumentNames")){
+           QString watch=  settings.value("Watch_InstrumentNames").toString();
+            if(watch=="")
+               savedWatchItems.clear();
+            else
+                savedWatchItems = watch.split(";");
+        }
         settings.endGroup();
     }
 //    if(market_type=="fo"){
@@ -1694,11 +1710,6 @@ void MainWindow::on_toggle_Button_clicked()
 
 
 
-void MainWindow::on_Buy_Button_clicked()
-{
-//     searchbar();
-}
-
 
 void MainWindow::OnAlgorithmDockWidgetVisiblityChanged(bool p_Visible)
 {
@@ -1848,10 +1859,273 @@ void MainWindow::T_Portfolio_Table_cellClicked(const QItemSelection &selected, c
 
 void MainWindow::slotAddLogForAddAlgoRecord(QString str)
 {
-
     // To show the latest log at top
     htmlLogsContent.prepend(str);
-
     ui->textEdit->setText(htmlLogsContent);
+}
+
+/*********************Watch data section*************************/
+void MainWindow::initWatchWindow(){
+    ui->Add_Watch_Button->setEnabled(false);
+    ui->Subtract_Watch_Button->setEnabled(false);
+}
+
+
+void MainWindow::indicesDataRecv_Slot(Indices_Data_Struct data){
+    bool newIndicesData = false;
+    indicesDataMutex.lock();
+    if(!indicesDataList.contains(data.indexName)){
+        indicesDataList.insert(data.indexName,data);
+        newIndicesData = true;
+    }
+    indicesDataMutex.unlock();
+   // qDebug()<<"indicesDataRecv_Slot: " <<data.indexName;
+
+    if(newIndicesData==true&&ui->lineEditWatchSearch->text()=="")
+        showSaveWatchOnListView();
 
 }
+void MainWindow::on_lineEditWatchSearch_textChanged(const QString &text)
+{
+    if(text==""){
+        showSaveWatchOnListView();
+        return;
+    }
+
+    indicesDataMutex.lock();
+
+    QHash<QString, Indices_Data_Struct> indicesDataListTmp = indicesDataList;
+    indicesDataListTmp.detach();
+    indicesDataMutex.unlock();
+
+
+    /*QStringList nameList;
+    nameList.append("Nifty50");
+    nameList.append("BankNifty");
+    nameList.append("FinNifty");
+    nameList.append("SmallCap");
+    nameList.append("ABC");
+    nameList.append("DDD");
+    nameList.append("ee");
+    nameList.append("dd");
+    nameList.append("ABC");
+    nameList.append("de");
+    nameList.append("ddd");
+    nameList.append("wsd");
+    nameList.append("dfe");
+    nameList.append("fg");
+    nameList.append("gf");
+    nameList.append("rt");
+    nameList.append("fg");*/
+
+
+    QRegularExpression regex(text, QRegularExpression::CaseInsensitiveOption);
+    QStringList filteredList;
+
+    for (auto it = indicesDataListTmp.constBegin(); it != indicesDataListTmp.constEnd(); ++it) {
+        const QString &key = it.key();
+        if (regex.match(key).hasMatch()) {
+            filteredList.append(key);
+        }
+       // const Indices_Data_Struct &value = it.value();
+    }
+
+    /*for(const QString &name : nameList) {
+        if (regex.match(name).hasMatch()) {
+            filteredList.append(name);
+        }
+    }*/
+
+    ui->listWidgetWatch->clear();
+    for(int i=0;i<filteredList.size();i++){
+        auto item = new QListWidgetItem();
+        auto widget1 = new watch_Data_List_Item(this);
+        Indices_Data_Struct data = indicesDataListTmp[filteredList[i]];        
+        widget1->setData(data);
+        item->setSizeHint(widget1->sizeHint());
+
+        ui->listWidgetWatch->addItem(item);
+        ui->listWidgetWatch->setItemWidget(item, widget1);
+    }
+
+
+}
+void MainWindow::showSaveWatchOnListView(){
+    ui->listWidgetWatch->clear();
+    if(savedWatchItems.size()==0){
+        return;
+    }
+    indicesDataMutex.lock();
+    QHash<QString, Indices_Data_Struct> indicesDataListTmp = indicesDataList;
+    indicesDataListTmp.detach();
+    indicesDataMutex.unlock();
+
+    for(int i=0;i<savedWatchItems.length();i++){
+        auto item = new QListWidgetItem();
+        auto widget1 = new watch_Data_List_Item(this);
+        Indices_Data_Struct data = indicesDataListTmp[savedWatchItems[i]];
+        widget1->setData(data);
+        item->setSizeHint(widget1->sizeHint());
+
+        ui->listWidgetWatch->addItem(item);
+        ui->listWidgetWatch->setItemWidget(item, widget1);
+    }
+}
+
+void MainWindow::on_listWidgetWatch_itemClicked(QListWidgetItem *item)
+{
+    if (!item) {
+        return; // Handle no item clicked scenario (optional)
+    }
+
+    watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(item));
+    if (!widget) {
+        return; // Handle case where no widget is associated with the item (optional)
+    }
+
+    bool redArrow = true;
+    //if(data.netChangeIndicator=="+")
+    // redArrow = false;
+    if(widget->data.change.toDouble()>=0)
+        redArrow = false;
+
+    if(redArrow){
+        QPixmap pixmap(":/arrow_red.png");
+        pixmap = pixmap.scaled(ui->watch_indicator->width(),ui->watch_indicator->height(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        ui->watch_indicator->setPixmap(pixmap);
+        ui->watch_indicator->setMask(pixmap.mask());
+        ui->watch_indicator->setStyleSheet("font-family: 'Work Sans';"
+                                  "font-size: 10px;"
+                                  "font-weight: 500;"
+                                  "color:#CC3437"
+                                  );
+    }
+    else{
+        QPixmap pixmap(":/arrow_green.png");
+        pixmap = pixmap.scaled(ui->watch_indicator->width(),ui->watch_indicator->height(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        ui->watch_indicator->setPixmap(pixmap);
+        ui->watch_indicator->setMask(pixmap.mask());
+
+        ui->watch_val1->setStyleSheet("font-family: 'Work Sans';"
+                                  "font-size: 10px;"
+                                  "font-weight: 500;"
+                                  "color:#008000"
+                                  );
+    }
+
+    QString percent = (widget->data.change+"("+widget->data.percentagechange+"%)");
+    ui->Index_Name->setText(widget->data.indexName);
+    ui->watch_val1->setText(widget->data.indexName);
+    ui->watch_val2->setText(percent);
+
+    if(savedWatchItems.contains(widget->data.indexName)){
+        ui->Add_Watch_Button->setEnabled(false);
+        ui->Subtract_Watch_Button->setEnabled(true);
+    }
+    else{
+        ui->Add_Watch_Button->setEnabled(true);
+        ui->Subtract_Watch_Button->setEnabled(false);
+    }
+
+
+
+
+}
+
+
+void MainWindow::on_Add_Watch_Button_clicked()
+{
+    QListWidgetItem *selectedItem = ui->listWidgetWatch->currentItem();
+    if (selectedItem) {
+        watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(selectedItem));
+        if(!savedWatchItems.contains(widget->data.indexName)){
+            savedWatchItems.append(widget->data.indexName);
+            QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+            QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
+            settings.beginGroup("GeneralSettings");
+            if(savedWatchItems.length()==1)
+                settings.setValue("Watch_InstrumentNames",savedWatchItems[0]);
+            else
+                settings.setValue("Watch_InstrumentNames",savedWatchItems.join(";"));
+            settings.endGroup();
+
+            if(ui->lineEditWatchSearch->text()=="")
+                showSaveWatchOnListView();
+
+            if(savedWatchItems.contains(widget->data.indexName)){
+                ui->Add_Watch_Button->setEnabled(false);
+                ui->Subtract_Watch_Button->setEnabled(true);
+            }
+            else{
+                ui->Add_Watch_Button->setEnabled(true);
+                ui->Subtract_Watch_Button->setEnabled(false);
+            }
+        }
+        else{
+            QMessageBox msgBox;
+            msgBox.setText("IndexName already added.");
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.exec();
+        }
+    }
+    else {
+        QMessageBox msgBox;
+        msgBox.setText("Please select an item from Watch.");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
+    }
+}
+
+void MainWindow::on_Subtract_Watch_Button_clicked()
+{
+    QListWidgetItem *selectedItem = ui->listWidgetWatch->currentItem();
+    if (selectedItem) {
+        watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(selectedItem));
+        if(savedWatchItems.contains(widget->data.indexName)){
+            savedWatchItems.removeOne(widget->data.indexName);
+            QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+            QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
+            settings.beginGroup("GeneralSettings");
+            if(savedWatchItems.length()==1)
+                settings.setValue("Watch_InstrumentNames",savedWatchItems[0]);
+            else
+                settings.setValue("Watch_InstrumentNames",savedWatchItems.join(";"));
+            settings.endGroup();
+            if(ui->lineEditWatchSearch->text()=="")
+                showSaveWatchOnListView();
+
+            if(savedWatchItems.contains(widget->data.indexName)){
+                ui->Add_Watch_Button->setEnabled(false);
+                ui->Subtract_Watch_Button->setEnabled(true);
+            }
+            else{
+                ui->Add_Watch_Button->setEnabled(true);
+                ui->Subtract_Watch_Button->setEnabled(false);
+            }
+        }
+        else{
+            QMessageBox msgBox;
+            msgBox.setText("IndexName not exist in Saved List.");
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.exec();
+        }
+    }
+    else {
+        QMessageBox msgBox;
+        msgBox.setText("Please select an item from Watch.");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
+    }
+}
+
+
+/****************************************************************/
+
+
+
+
+
+
+
+
+

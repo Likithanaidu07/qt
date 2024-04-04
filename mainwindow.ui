@@ -694,12 +694,15 @@ background: #ACD5DA;
          <property name="styleSheet">
           <string notr="true">#widget_13{
 border-radius: 12px;
-border: 3px solid #B9D4CE;
-background: #C4DCD7;
+border: 0px solid #B9D4CE;
+background: #F3FEFF;
 box-shadow: 0px 1px 3px 0px #92B2B7;
 }</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_8">
+          <property name="spacing">
+           <number>0</number>
+          </property>
           <property name="leftMargin">
            <number>3</number>
           </property>
@@ -717,11 +720,12 @@ box-shadow: 0px 1px 3px 0px #92B2B7;
             <property name="maximumSize">
              <size>
               <width>16777215</width>
-              <height>25</height>
+              <height>30</height>
              </size>
             </property>
             <property name="styleSheet">
-             <string notr="true"/>
+             <string notr="true">background-color: rgb(23, 165, 174);
+</string>
             </property>
             <layout class="QHBoxLayout" name="horizontalLayout_11">
              <property name="topMargin">
@@ -747,7 +751,7 @@ box-shadow: 0px 1px 3px 0px #92B2B7;
               <widget class="QLabel" name="label_18">
                <property name="styleSheet">
                 <string notr="true">#label_18{
-color: #16594B;
+color: #ffffff;
 text-align: center;
 font-family: Work Sans;
 font-size: 16px;
@@ -779,14 +783,79 @@ line-height: normal;
           </item>
           <item>
            <layout class="QVBoxLayout" name="verticalLayout_12">
+            <property name="spacing">
+             <number>5</number>
+            </property>
             <property name="leftMargin">
-             <number>6</number>
+             <number>0</number>
+            </property>
+            <property name="topMargin">
+             <number>10</number>
             </property>
             <property name="rightMargin">
-             <number>6</number>
+             <number>0</number>
             </property>
             <item>
-             <widget class="QLineEdit" name="lineEdit"/>
+             <widget class="QLineEdit" name="lineEditWatchSearch">
+              <property name="minimumSize">
+               <size>
+                <width>0</width>
+                <height>30</height>
+               </size>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">   background-image: url(:/search.png);
+    background-repeat: no-repeat;
+    background-position: right center;
+	background-origin: content;
+    padding-right: 20px; 
+    padding-left: 6px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    border: 1px solid #C2CCC5;
+    color: #3D3D3D;
+    font-size: 12px;
+    border-radius: 14px; /* Adjust this value for your desired border radius */
+
+</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QListWidget" name="listWidgetWatch">
+              <property name="styleSheet">
+               <string notr="true">#listWidgetWatch{
+background: #F3FEFF;
+border-bottom: 21px solid gray; /* Adjust border width for desired shadow size */
+
+  border-bottom-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, /* Gradient from top to bottom */
+                                    stop: 0 rgba(0, 0, 0, 0), /* Black with some transparency at top */
+                                    stop: 1 rgba(0, 0, 0,.2) /* Fades to transparent at bottom */
+                                   );
+}
+#listWidgetWatch::item:selected { 
+background-color: #A1E3E7; 
+}</string>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::NoFrame</enum>
+              </property>
+              <property name="lineWidth">
+               <number>1</number>
+              </property>
+              <property name="movement">
+               <enum>QListView::Free</enum>
+              </property>
+              <property name="isWrapping" stdset="0">
+               <bool>false</bool>
+              </property>
+              <property name="resizeMode">
+               <enum>QListView::Fixed</enum>
+              </property>
+              <property name="layoutMode">
+               <enum>QListView::SinglePass</enum>
+              </property>
+             </widget>
             </item>
            </layout>
           </item>
@@ -807,12 +876,15 @@ line-height: normal;
            <widget class="QWidget" name="widget_17" native="true">
             <property name="styleSheet">
              <string notr="true">#widget_17{
-border-top-left-radius: 0px;
+	border-top-left-radius: 0px;
     border-top-right-radius: 0px;
     border-bottom-right-radius: 7px;
     border-bottom-left-radius: 7px;
-background: #90C3B8;
-backdrop-filter: blur(4.5px);
+	background: #F7FCFC;
+	backdrop-filter: blur(4.5px);
+	background-color: rgb(255, 255, 255);
+
+
 }</string>
             </property>
             <layout class="QVBoxLayout" name="verticalLayout_23">
@@ -820,41 +892,56 @@ backdrop-filter: blur(4.5px);
               <number>12</number>
              </property>
              <property name="topMargin">
-              <number>3</number>
+              <number>8</number>
+             </property>
+             <property name="rightMargin">
+              <number>9</number>
              </property>
              <property name="bottomMargin">
-              <number>0</number>
+              <number>9</number>
              </property>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_13">
                <property name="spacing">
-                <number>10</number>
+                <number>3</number>
                </property>
                <item>
                 <widget class="QLabel" name="Index_Name">
                  <property name="text">
-                  <string>TextLabel</string>
+                  <string/>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="label_40">
+                <widget class="QLabel" name="watch_val1">
                  <property name="text">
-                  <string>TextLabel</string>
+                  <string/>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="label_4">
+                <widget class="QLabel" name="watch_indicator">
+                 <property name="minimumSize">
+                  <size>
+                   <width>6</width>
+                   <height>10</height>
+                  </size>
+                 </property>
+                 <property name="maximumSize">
+                  <size>
+                   <width>6</width>
+                   <height>10</height>
+                  </size>
+                 </property>
                  <property name="text">
-                  <string>TextLabel</string>
+                  <string/>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QLabel" name="label_41">
+                <widget class="QLabel" name="watch_val2">
                  <property name="text">
-                  <string>TextLabel</string>
+                  <string/>
                  </property>
                 </widget>
                </item>
@@ -871,12 +958,88 @@ backdrop-filter: blur(4.5px);
                  </property>
                 </spacer>
                </item>
+               <item>
+                <widget class="QPushButton" name="Add_Watch_Button">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>26</width>
+                   <height>26</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">#Add_Watch_Button{
+border-radius: 2px;
+background: #197CB1;
+box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
+color: #FFF;
+font-size: 12px;
+font-style: normal;
+font-weight: 700;
+line-height: normal;
+}
+
+#Add_Watch_Button:hover {
+    background: #156693; /* Change color on hover */
+}
+
+#Add_Watch_Button:disabled {
+    background: #CCC; /* Change color when disabled */
+    color: #666; /* Change text color when disabled */
+}</string>
+                 </property>
+                 <property name="text">
+                  <string>+</string>
+                 </property>
+                </widget>
+               </item>
+               <item>
+                <widget class="QPushButton" name="Subtract_Watch_Button">
+                 <property name="enabled">
+                  <bool>true</bool>
+                 </property>
+                 <property name="minimumSize">
+                  <size>
+                   <width>26</width>
+                   <height>26</height>
+                  </size>
+                 </property>
+                 <property name="styleSheet">
+                  <string notr="true">#Subtract_Watch_Button{
+border-radius: 2px;
+background: #CC3437;
+box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
+color: #FFF;
+font-size: 12px;
+font-style: normal;
+font-weight: 700;
+line-height: normal;
+}
+#Subtract_Watch_Button:hover {
+    background: #B92E31; /* Change color on hover */
+}
+
+#Subtract_Watch_Button:disabled {
+    background: #CCC; /* Change color when disabled */
+    color: #666; /* Change text color when disabled */
+}</string>
+                 </property>
+                 <property name="text">
+                  <string>-</string>
+                 </property>
+                 <property name="icon">
+                  <iconset theme="edit-delete"/>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </item>
              <item>
               <layout class="QHBoxLayout" name="horizontalLayout_16">
                <property name="spacing">
-                <number>20</number>
+                <number>9</number>
                </property>
                <item>
                 <layout class="QVBoxLayout" name="verticalLayout_24">
@@ -885,6 +1048,14 @@ backdrop-filter: blur(4.5px);
                  </property>
                  <item>
                   <widget class="QLabel" name="Open_Label">
+                   <property name="font">
+                    <font>
+                     <pointsize>10</pointsize>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">color: #848484;</string>
+                   </property>
                    <property name="text">
                     <string>Open</string>
                    </property>
@@ -892,8 +1063,16 @@ backdrop-filter: blur(4.5px);
                  </item>
                  <item>
                   <widget class="QLabel" name="Open_Num">
+                   <property name="font">
+                    <font>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="text">
-                    <string>TextLabel</string>
+                    <string>0.00</string>
+                   </property>
+                   <property name="alignment">
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -906,21 +1085,34 @@ backdrop-filter: blur(4.5px);
                  </property>
                  <item>
                   <widget class="QLabel" name="High_Label">
+                   <property name="font">
+                    <font>
+                     <pointsize>10</pointsize>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">color: #848484;</string>
+                   </property>
                    <property name="text">
                     <string>High</string>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                    </property>
                   </widget>
                  </item>
                  <item>
                   <widget class="QLabel" name="High_Num">
+                   <property name="font">
+                    <font>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="text">
-                    <string>TextLabel</string>
+                    <string>0.00</string>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -933,21 +1125,34 @@ backdrop-filter: blur(4.5px);
                  </property>
                  <item>
                   <widget class="QLabel" name="Low_Label">
+                   <property name="font">
+                    <font>
+                     <pointsize>10</pointsize>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">color: #848484;</string>
+                   </property>
                    <property name="text">
                     <string>Low</string>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                    </property>
                   </widget>
                  </item>
                  <item>
                   <widget class="QLabel" name="Low_Num">
+                   <property name="font">
+                    <font>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="text">
-                    <string>TextLabel</string>
+                    <string>0.00</string>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignCenter</set>
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                    </property>
                   </widget>
                  </item>
@@ -960,85 +1165,38 @@ backdrop-filter: blur(4.5px);
                  </property>
                  <item>
                   <widget class="QLabel" name="Volume_Label">
+                   <property name="font">
+                    <font>
+                     <pointsize>10</pointsize>
+                    </font>
+                   </property>
+                   <property name="styleSheet">
+                    <string notr="true">color: #848484;</string>
+                   </property>
                    <property name="text">
                     <string>Volume</string>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                    </property>
                   </widget>
                  </item>
                  <item>
                   <widget class="QLabel" name="Volume_Num">
+                   <property name="font">
+                    <font>
+                     <pointsize>11</pointsize>
+                    </font>
+                   </property>
                    <property name="text">
-                    <string>TextLabel</string>
+                    <string>0.00</string>
                    </property>
                    <property name="alignment">
-                    <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                    <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
                    </property>
                   </widget>
                  </item>
                 </layout>
-               </item>
-              </layout>
-             </item>
-             <item>
-              <layout class="QHBoxLayout" name="horizontalLayout_14">
-               <property name="spacing">
-                <number>40</number>
-               </property>
-               <property name="bottomMargin">
-                <number>9</number>
-               </property>
-               <item>
-                <widget class="QPushButton" name="Buy_Button">
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>26</height>
-                  </size>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">#Buy_Button{
-border-radius: 2px;
-background: #197CB1;
-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
-color: #FFF;
-font-size: 12px;
-font-style: normal;
-font-weight: 700;
-line-height: normal;
-}</string>
-                 </property>
-                 <property name="text">
-                  <string>Buy</string>
-                 </property>
-                </widget>
-               </item>
-               <item>
-                <widget class="QPushButton" name="Sell_Button">
-                 <property name="minimumSize">
-                  <size>
-                   <width>0</width>
-                   <height>26</height>
-                  </size>
-                 </property>
-                 <property name="styleSheet">
-                  <string notr="true">#Sell_Button{
-border-radius: 2px;
-background: #CC3437;
-box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);
-color: #FFF;
-font-size: 12px;
-font-style: normal;
-font-weight: 700;
-line-height: normal;
-}</string>
-                 </property>
-                 <property name="text">
-                  <string>Sell</string>
-                 </property>
-                </widget>
                </item>
               </layout>
              </item>
