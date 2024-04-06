@@ -6,10 +6,10 @@
 #include "QTableWidget"
 #include "QStandardItemModel"
 #include "Convert_to_Algo/convert_algo_shared_var.h"
-#include "custom_q_completer.h"
 #include <QListView>
 #include "QMessageBox"
 #include "QDateTime"
+#include "eventfilterlistview.h"
 
 class add_algo_btfly_bid : public QObject
 {
@@ -28,11 +28,15 @@ public:
     void startStrikeEditFinishedAction();
     void generateAlgo();
 
-signals:
+private slots:
+    void slotStartHide(QString);
+    void slotEndHide(QString);
+
 public slots:
     void itemSelected(QModelIndex);
     void itemSelectedEndStrike(QModelIndex index);
 private:
+
     QLineEdit *lineEdit_Start_strike;
     QLineEdit *lineEdit_EndStrike;
     QLineEdit *lineEdit_StrikeDifference;
@@ -45,6 +49,9 @@ private:
     QStringList token_numebrList;
     AddAlgoSharedVar *sharedData;
     QStringList strike_priceList;
+
+    EventFilter *eventFilterStart;
+    EventFilter *eventFilterEnd;
 };
 
 

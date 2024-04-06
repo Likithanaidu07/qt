@@ -1275,7 +1275,7 @@ void MainWindow::loadContract(){
 
     auto loadContract_BackgroundTask = [this]() {
 
-        QString  htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QDateTime::currentDateTime().toString("M/d/yyyy h:mm:ss AP")+"</span>"
+        QString  htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QTime::currentTime().toString(LOG_TIME_FORMAT)+"</span>"
                               + "<span style='color: black;'>  Loading contract...</span> </p>";
 
         emit display_log_text_signal(htmlContent);
@@ -1292,7 +1292,7 @@ void MainWindow::loadContract(){
         //if not logged in the data loading thread start by login function
 
         htmlContent = "<p><span style='background-color:#B3C1DE;'>" +
-                      QDateTime::currentDateTime().toString("M/d/yyyy h:mm:ss AP") +"</span>"
+                      QTime::currentTime().toString(LOG_TIME_FORMAT) +"</span>"
                       + "<span style='color: black;'> Contract file loaded...</span> </p>";
 
         emit display_log_text_signal(htmlContent);
@@ -1526,8 +1526,14 @@ void MainWindow::loggedIn(){
 
 }
 
+void MainWindow::loadCurrentDayLogs()
+{
+    db_conn->loadCurrentDayLogs();
+}
+
 void MainWindow::loggedInSucessful(userInfo userData)
 {
+    loadCurrentDayLogs();
     loadContract();
 }
 
@@ -1771,61 +1777,61 @@ void MainWindow::on_ConvertAlgo_button_clicked(){
     convertalgo->show();
 }
 
-void MainWindow::Delete_clicked_slot(){
-    // QItemSelectionModel *select = algo_table->selectionModel();
+void MainWindow::Delete_clicked_slot()
+{
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Delete Portfolio From Database?", "Click Yes to Continue.",  QMessageBox::Yes|QMessageBox::No);
-    if (reply == QMessageBox::Yes) {
+    if (reply == QMessageBox::Yes)
+    {
         QModelIndexList selection = T_Portfolio_Table->selectionModel()->selectedRows();
-        if(selection.count()==0){
+        if(selection.count()==0)
+        {
             QMessageBox msgBox;
             msgBox.setText("Please select a Portfolio from Portfolio Table.");
             msgBox.setIcon(QMessageBox::Warning);
             msgBox.exec();
             return;
         }
-        mysql_conn *db_conn_delete =new mysql_conn(0,"db_conn_delete");
-
-        // mysql_conn *db_conn_delete =new mysql_conn(this,"db_conn_delete");
 
         // Multiple rows can be selected
-        QStringList logs;
+        QString logs;
+        QStringList activeAlgoList;
         for(int i=0; i< selection.count(); i++)
         {
             QModelIndex index = selection.at(i);
             QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
 
-            //QString status = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_Status).data().toString();
-            if( T_Portfolio_Model->portfolio_data_list[index.row()]->Status==true){
-                logs.append("PortfolioNumber '"+PortfolioNumber+"' is Active, cannot delete.");
+            if( T_Portfolio_Model->portfolio_data_list[index.row()]->Status == true)
+            {
+                logs = "PortfolioNumber '"+PortfolioNumber+"' is Active, cannot delete.";
+                activeAlgoList.append(PortfolioNumber);
+                db_conn->logToDB(logs);
                 continue;
             }
 
-
             QString msg;
-            bool ret = db_conn_delete->deleteAlgo(PortfolioNumber,msg);
-            if(ret==true){
-                logs.append("PortfolioNumber '"+PortfolioNumber+"' deleted successfully.");
-                db_conn_delete->logToDB(QString("Deleted portfolio ["+PortfolioNumber+"] from system"));
-                //  qDebug()<<"Deleted PortfolioNumber: "<<PortfolioNumber;
-                // QStringList logData={QDateTime::currentDateTime().toString("hh:mm:ss dd-MM-yyyy"),QString::number(userData.foo_user_id),"Deleted algo from algo table successfully, AlogID="+Algo_ID};
-                //  log_to_ui(logData);
-                // socket_Conn->insertData("D"+Algo_ID);
+            bool ret = db_conn->deleteAlgo(PortfolioNumber, msg);
+            if(ret==true)
+            {
+                logs = "PortfolioNumber '"+PortfolioNumber+"' deleted successfully.";
+                db_conn->logToDB(logs);
             }
-            else{
-                //QStringList logData={QDateTime::currentDateTime().toString("hh:mm:ss dd-MM-yyyy"),QString::number(userData.foo_user_id),msg};
-                //log_to_ui(logData);
-                logs.append("PortfolioNumber '"+PortfolioNumber+"' not Deleted, "+msg);
+            else
+            {
+                logs = "PortfolioNumber '"+PortfolioNumber+"' not Deleted, "+msg;
+                db_conn->logToDB(logs);
                 qDebug()<<"PortfolioNumber: "<<PortfolioNumber<<" not Deleted, Info:"<<msg;
             }
 
         }
-        delete db_conn_delete;
-        QString formattedString = logs.join("\n"); // Join items with newline separator
-//        MessageDialog msgBox;
-//        msgBox.setMessage("Delete Action Compleated",formattedString);
-//        msgBox.exec();
 
+        if(!activeAlgoList.empty())
+        {
+            QMessageBox msgBox;
+            msgBox.setText("Active algo cannot be deleted,\n disable the algo No. " + activeAlgoList.join(",") +" and then try again.\n");
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.exec();
+        }
     }
 }
 

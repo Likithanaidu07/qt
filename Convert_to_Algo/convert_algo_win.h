@@ -32,6 +32,11 @@ public:
     void update_contract_tableData(QString foo_user_id_,int MaxPortfolioCount_);
     ~ConvertAlgo_Win();
 
+signals:
+    void signalStartItemClickedBFLY(QModelIndex);
+    void signalStartItemClickedBFLYBID(QModelIndex);
+    void signalEndItemClickedBFLY(QModelIndex);
+    void signalEndItemClickedBFLYBID(QModelIndex);
 
 private slots:
     void on_Close_clicked();
@@ -59,6 +64,8 @@ private slots:
     void on_lineEdit_Fut_editingFinished();
 
 private:
+
+
     Ui::ConvertAlgo_Win *ui;
     AddAlgoSharedVar *sharedData;
     QAtomicInt dataSorted;
@@ -71,11 +78,19 @@ private:
     void sort_data_and_populate_model(QMap<int, QHash<QString, contract_table>> contract_table_/*,QHash<QString, contract_table> cd_contract_table_*/);
     void resetTableWidget();
     void enable_disable_UIElement(bool enable);
-
-
+    QWidget *floatingWidgetES;
+    QWidget *floatingWidgetSS;
+    QListView *listViewStartStrike;
+    QListView *listViewEndStrike;
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
 signals:
     void update_ui_signal(int);
     void display_log_text_signal(QString);
+
+private slots:
+    void itemSelected(QModelIndex);
+    void itemSelectedEndStrike(QModelIndex index);
 
 };
 

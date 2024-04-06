@@ -155,6 +155,7 @@ public slots:
 //    void tradeTableSerachNext();
 //    void tradeTableSerachTxtChanged();
     void loggedIn();
+    void loadCurrentDayLogs();
     void loggedInSucessful(userInfo userData);
     void Delete_clicked_slot();
     void indicesDataRecv_Slot(Indices_Data_Struct data);

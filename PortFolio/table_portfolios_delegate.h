@@ -84,6 +84,8 @@ public:
 
     mutable QModelIndex currentIndex;
     mutable QAbstractItemModel *mutableModel;
+
+    bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override;
 signals:
     void editFinished(QString text, QModelIndex idx) const;
     void tabKeyPressed(nav_direction);
@@ -101,7 +103,6 @@ private:
 };
 
 #endif // TABLE_PORTFOLIOS_DELEGATE_H
-
 
 
 

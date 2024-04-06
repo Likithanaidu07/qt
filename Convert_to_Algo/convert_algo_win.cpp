@@ -11,14 +11,58 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 {
     ui->setupUi(this);
     MainWindowObj = (MainWindow*) parent;
+    setWindowModality(Qt::ApplicationModal);
 
+
+    ui->tableWidget->setFocusPolicy(Qt::NoFocus);
+
+    // setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Start_strike);
+    setTabOrder(ui->lineEdit_Start_strike, ui->lineEdit_EndStrike);
+    setTabOrder(ui->lineEdit_EndStrike, ui->lineEdit_StrikeDifference);
+    setTabOrder(ui->lineEdit_StrikeDifference, ui->pushButtonAdd);
+    setTabOrder(ui->pushButtonAdd, ui->pushButtonSelectAll);
+    setTabOrder(ui->pushButtonSelectAll, ui->pushButton_Reset);
+    setTabOrder(ui->pushButton_Reset, ui->pushButtonDelete);
+    // setTabOrder(ui->pushButtonDelete, ui->tableWidget);
+    // setTabOrder(ui->tableWidget, ui->pushButtonUpload);
+    setTabOrder(ui->pushButtonDelete, ui->pushButtonUpload);
+    setTabOrder(ui->pushButtonUpload, ui->pushButtonUpload);
+    setTabOrder(ui->pushButton_Cancel, ui->lineEdit_Start_strike);
 
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
+    // to make floating window
+    listViewStartStrike = new QListView(this);
+    connect(listViewStartStrike, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelected(QModelIndex)));
+
+
+    QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    listViewStartStrike->setSizePolicy(sizePolicy);
+    listViewStartStrike->setFixedSize(230, 200);
+    listViewStartStrike->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    // Get the geometry of lineEdit_EndStrike
+    QPoint lineEditPosSS = ui->lineEdit_Start_strike->mapToGlobal(ui->lineEdit_Start_strike->geometry().bottomRight());
+    // Set the position of the QListView just below lineEdit_EndStrike
+    listViewStartStrike->move(lineEditPosSS.x()+20, lineEditPosSS.y()+55);
+    listViewStartStrike->hide();
+
+    // to make floating window
+    listViewEndStrike = new QListView(this);
+    connect(listViewEndStrike, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
+    QPoint lineEditPosES = ui->lineEdit_EndStrike->mapToGlobal(ui->lineEdit_EndStrike->geometry().bottomRight());
+    listViewEndStrike->setSizePolicy(sizePolicy);
+    listViewEndStrike->setFixedSize(230, 200);
+    listViewEndStrike->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    // Set the position of the QListView just below lineEdit_EndStrike
+    listViewEndStrike->move(lineEditPosES.x()+270, lineEditPosSS.y()+55);
+    listViewEndStrike->hide();
+
+
+
+    // to make floating window
+
     QPixmap pixmapclose(":/close_window_icon.png");
     ui->Close->setIcon(pixmapclose);
-
-
 
     const char LineEdit_SS[]="border-radius: 6px;""border: 0.5px solid #343A40;""background: #FFF;""color: #6C757D;""font-size: 12px;""font-style: normal;""font-weight: 400;""line-height: normal;" "padding: 4px 10px 4px 10px;";
     for(auto w: {ui->lineEdit_StrikeDifference, ui->lineEdit_EndStrike, ui->lineEdit_Start_strike,ui->lineEdit_Fut}){
@@ -73,11 +117,13 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     /*******Class to generate F2F algos************/
     algoF2F = new add_algo_f2f();
     algoF2F->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike);
-    /*******Class to generate F2F algos************/
+    // /*******Class to generate F2F algos************/
 
     /*******Class to generate BtFly algos************/
     algoBtFly= new add_algo_btfly();
-    algoBtFly->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference,ui->listView_startStrike,ui->listViewEndStrike);
+    connect(this, &ConvertAlgo_Win::signalStartItemClickedBFLY,algoBtFly, &add_algo_btfly::itemSelected);
+    connect(this, &ConvertAlgo_Win::signalEndItemClickedBFLY,algoBtFly, &add_algo_btfly::itemSelectedEndStrike);
+    algoBtFly->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference,listViewStartStrike,listViewEndStrike);
     /*******Class to generate BtFly algos************/
 
     /*******Class to generate con_rev algos************/
@@ -87,9 +133,10 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
     /*******Class to generate BtFly-bid algos************/
     algoBtFlyBid= new add_algo_btfly_bid();
-    algoBtFlyBid->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference,ui->listView_startStrike, ui->listViewEndStrike);
+    connect(this, &ConvertAlgo_Win::signalStartItemClickedBFLYBID,algoBtFlyBid, &add_algo_btfly_bid::itemSelected);
+    connect(this, &ConvertAlgo_Win::signalEndItemClickedBFLYBID,algoBtFlyBid, &add_algo_btfly_bid::itemSelectedEndStrike);
+    algoBtFlyBid->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference,listViewStartStrike,listViewEndStrike);
     /*******Class to generate BtFly-bid algos************/
-
 
     QDoubleValidator *val = new QDoubleValidator();
     val->setLocale(QLocale::C);
@@ -178,6 +225,20 @@ void ConvertAlgo_Win::on_Close_clicked()
     close();
 }
 
+void ConvertAlgo_Win::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+    {
+        event->ignore(); // This line ignores the key press event
+        ui->lineEdit_Start_strike->hide();
+        ui->lineEdit_EndStrike->hide();
+    }
+    else
+    {
+        QWidget::keyPressEvent(event); // Pass other key events to the base class
+
+    }
+}
 
 void ConvertAlgo_Win::update_ui_slot(int type){
 
@@ -191,6 +252,36 @@ void ConvertAlgo_Win::update_ui_slot(int type){
         break;
     }
 
+}
+
+
+void ConvertAlgo_Win::itemSelected(QModelIndex index)
+{
+    QString algo_type  = ui->comboBox_AlgoType->currentText();
+
+    if(algo_type==BFLY_BID_TYPE)
+    {
+        emit signalStartItemClickedBFLYBID(index);
+    }
+    else if(algo_type=="BFLY")
+    {
+        emit signalStartItemClickedBFLY(index);
+    }
+}
+
+void ConvertAlgo_Win::itemSelectedEndStrike(QModelIndex index)
+{
+    QString algo_type  = ui->comboBox_AlgoType->currentText();
+    if(algo_type==BFLY_BID_TYPE)
+    {
+        emit signalEndItemClickedBFLYBID(index);
+
+    }
+    else if(algo_type=="BFLY")
+    {
+        emit signalEndItemClickedBFLY(index);
+
+    }
 }
 
 
@@ -608,16 +699,11 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                 continue;
 
             int tableRowIDx = selectedrowsIDx[k];
-            // qDebug()<<"selectedId---"<<selectedIds[k];
-            // qDebug()<<"tableRowIDx---"<<tableRowIDx;
-
             QString msg = "";
             algo_data_insert_status status = db_conn->insertToAlgoTable(sharedData->algo_data_list[i],sharedData->MaxPortfolioCount,msg);
             //emit insert_algo_data_signal(algo_data_list);
             if(status==algo_data_insert_status::INSERTED){
                 db_conn->logToDB(QString("Portfolio Added"));
-                //addedIdx.append(QString::number(i));
-                //  algo_data_list_added.append(algo_data_list[i]);
                 sharedData->algo_data_list[i].uploaded=true;
                 ui->tableWidget->item(tableRowIDx, ui->tableWidget->columnCount()-1)->setForeground(QBrush(QColor(0, 200, 0)));
                 QString algo_type  = sharedData->algo_data_list[i].algo_type;
@@ -636,11 +722,8 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                 else if(algo_type==QString::number(PortfolioType::BFLY_BID))
                     algo_type=BFLY_BID_TYPE;
 
-                double diff = sharedData->algo_data_list[i].Leg2_Strike.toInt()-sharedData->algo_data_list[i].Leg1_Strike.toInt();
-                double strik_pric = sharedData->algo_data_list[i].Leg2_Strike.toInt();
-                QString Algo_Name = algo_type+"-"+sharedData->algo_data_list[i].Algo_Name+"-"+QString::number(strik_pric,'f', sharedData->decimal_precision)+"-"+sharedData->algo_data_list[i].option_type+"-"+QString::number(diff,'f', sharedData->decimal_precision);
-
-                QString htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QDateTime::currentDateTime().toString("M/d/yyyy h:mm:ss AP") +"</span>"
+                QString Algo_Name = algo_type+"-"+sharedData->algo_data_list[i].Algo_Name;
+                QString htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QTime::currentTime().toString(LOG_TIME_FORMAT) +"</span>"
                               + "<span style='color: black;'>"+sharedData->foo_user_id +
                                       " Inserted New Algo: "+ Algo_Name +"</span> </p>";
 
@@ -654,9 +737,6 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                 db_conn->logToDB("Exceeds the  limit of maximum allowed Algo count "+QString::number(sharedData->MaxPortfolioCount));
             }
             else if(status==algo_data_insert_status::EXIST){
-                // addedIdx.append(QString::number(i));
-                // algo_data_list_added.append(algo_data_list[i]);
-
                 sharedData->algo_data_list[i].uploaded=true;
                 ui->tableWidget->item(tableRowIDx, ui->tableWidget->columnCount()-1)->setForeground(QBrush(QColor(255, 191, 0)));
             }
@@ -750,6 +830,7 @@ void ConvertAlgo_Win::on_lineEdit_Fut_editingFinished()
 {
     algoConRev->create_AutoFillModel_StartStrike();
 }
+
 
 
 

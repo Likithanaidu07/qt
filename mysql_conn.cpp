@@ -22,8 +22,8 @@ extern MainWindow *MainWindowObj;
 mysql_conn::mysql_conn(QObject *parent,QString conne_name):
     QObject(parent)
 {
-    // MainWindowObj = (MainWindow*)parent;
-    // connect(this,SIGNAL(display_log_text_signal(QString)),MainWindowObj,SLOT(slotAddLogForAddAlgoRecord(QString)));
+   // MainWindowObj = (MainWindow*)parent;
+    //connect(this,SIGNAL(display_log_text_signal(QString)),MainWindowObj,SLOT(slotAddLogForAddAlgoRecord(QString)));
 
 
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -152,23 +152,22 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                         }
                     }
 
-                    QDateTime currentDateTime = QDateTime::currentDateTime();
-                    QString formattedDateTime = currentDateTime.toString("M/d/yyyy h:mm:ss AP");
-                    QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedDateTime)";
+                    QTime currentTime = QTime::currentTime();
+                    QString formattedTime = currentTime.toString(LOG_TIME_FORMAT);
+                    QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedTime)";
                     QSqlQuery query1(db);
                     query1.prepare(qryStr);
-                    QString str="User:" + UserName_ + " logged in from [" + localIP + "]";
-//                    UiUtils::GetMainWindow()->add_logs(str);
                     query1.bindValue(":logMessage", "User:" + UserName_ + " logged in from [" + localIP + "]");
                     query1.bindValue(":userName", UserName_);
-                    query1.bindValue(":formattedDateTime", formattedDateTime);
-
-                    if (!query1.exec()) {
+                    query1.bindValue(":formattedTime", QDateTime::currentDateTime().toSecsSinceEpoch());
+                    if (!query1.exec())
+                    {
                         qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
                         qDebug() << "Query Str: " << qryStr;
                     }
                 }
-                else {
+                else
+                {
                     userLoginInfo.loginResponse = "Wrong password";
                     userLoginInfo.errorCode = T_LoginErroCode::PASSWORD_WRONG;
 
@@ -181,15 +180,15 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                         }
                     }
 
-                    QDateTime currentDateTime = QDateTime::currentDateTime();
-                    QString formattedDateTime = currentDateTime.toString("M/d/yyyy h:mm:ss AP");
-                    QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedDateTime)";
+                    QTime currentTime = QTime::currentTime();
+                    QString formattedTime = currentTime.toString(LOG_TIME_FORMAT);
+                    QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedTime)";
                     QString LogMessage = "Invalid login attempt from "+localIP+" for user ["+UserName_+"] with wrong password ["+password+"]";
                     QSqlQuery query1(db);
                     query1.prepare(qryStr);
                     query1.bindValue(":logMessage", LogMessage);
                     query1.bindValue(":userName", UserName_);
-                    query1.bindValue(":formattedDateTime", formattedDateTime);
+                    query1.bindValue(":formattedTime", QDateTime::currentDateTime().toSecsSinceEpoch());
 
                     if (!query1.exec()) {
                         qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
@@ -209,15 +208,15 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                     }
                 }
 
-                QDateTime currentDateTime = QDateTime::currentDateTime();
-                QString formattedDateTime = currentDateTime.toString("M/d/yyyy h:mm:ss AP");
-                QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedDateTime)";
+                QTime currentTime = QTime::currentTime();
+                QString formattedTime = currentTime.toString(LOG_TIME_FORMAT);
+                QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedTime)";
                 QString LogMessage = "Invalid login attempt from "+localIP+" with wrong username ["+UserName_+"]";
                 QSqlQuery query1(db);
                 query1.prepare(qryStr);
                 query1.bindValue(":logMessage", LogMessage);
                 query1.bindValue(":userName", UserName_);
-                query1.bindValue(":formattedDateTime", formattedDateTime);
+                query1.bindValue(":formattedTime", QDateTime::currentDateTime().toSecsSinceEpoch());
 
                 if (!query1.exec()) {
                     qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
@@ -360,20 +359,19 @@ void mysql_conn::logToDB(QString logMessage)
     QString msg;
     bool ok = checkDBOpened(msg);
     if(ok){
-        QDateTime currentDateTime = QDateTime::currentDateTime();
-        QString formattedDateTime = currentDateTime.toString("M/d/yyyy h:mm:ss AP");
-        QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedDateTime)";
+        QTime currentTime = QTime::currentTime();
+        QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedTime)";
         QSqlQuery query1(db);
         query1.prepare(qryStr);
         query1.bindValue(":logMessage", logMessage);
         query1.bindValue(":userName", userNameLogged);
-        query1.bindValue(":formattedDateTime", formattedDateTime);
+        query1.bindValue(":formattedTime", QDateTime::currentDateTime().toSecsSinceEpoch());
 
         if (!query1.exec()) {
             qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
             qDebug() << "Query Str: " << qryStr;
         }
-        QString  htmlContent = "<p><span style='background-color:#B3C1DE;'>" + currentDateTime.toString("M/d/yyyy h:mm:ss AP")+"</span>"
+        QString  htmlContent = "<p><span style='background-color:#B3C1DE;'>" + currentTime.toString(LOG_TIME_FORMAT)+"</span>"
                               + "<span style='color: black;'>"+ logMessage +"</span> </p>";
 
         emit display_log_text_signal(htmlContent);
@@ -384,6 +382,48 @@ void mysql_conn::logToDB(QString logMessage)
 
     }
 
+}
+
+void mysql_conn::loadCurrentDayLogs()
+{
+    QMutexLocker lock(&mutex);
+    QString msg;
+    bool ok = checkDBOpened(msg);
+    if(ok)
+    {
+        QSqlQuery selQry(db);
+
+        auto currentTime = std::chrono::system_clock::now();
+
+        //to get midnight time
+        auto midnight = std::chrono::time_point_cast<std::chrono::hours>(std::chrono::system_clock::from_time_t(std::chrono::system_clock::to_time_t(currentTime)));
+
+        //to get duration of hours from midnight to now
+        auto duration = currentTime - midnight;
+        auto totalHours = std::chrono::duration_cast<std::chrono::hours>(duration).count();
+        QString queryStr = "SELECT * FROM logs WHERE Time BETWEEN UNIX_TIMESTAMP(CURDATE()) AND UNIX_TIMESTAMP(NOW() - INTERVAL " +
+                           QString::number(totalHours) + " HOUR)";
+
+        selQry.prepare(queryStr);
+        if (!selQry.exec())
+        {
+            qDebug() << "Select Query failed: " << selQry.lastError().text();
+            qDebug() << "Query : " << queryStr;
+        }
+        QSqlRecord rec = selQry.record();
+        while (selQry.next())
+        {
+            QString logMessage = selQry.value(rec.indexOf("LogMessage")).toString();
+            QString timeString = selQry.value(rec.indexOf("Time")).toString();
+            qint64 epochTime = timeString.toLongLong();
+            QDateTime dateTime = QDateTime::fromSecsSinceEpoch(epochTime);
+            QString  htmlContent = "<p><span style='background-color:#B3C1DE;'>" + dateTime.time().toString(LOG_TIME_FORMAT) +"</span>"
+                                  + "<span style='color: black;'>"+ logMessage.prepend("  ") +"</span> </p>";
+
+            emit display_log_text_signal(htmlContent);
+        }
+
+    }
 }
 
 QHash<QString, contract_table> mysql_conn::prpareContractDataFromDB(QString queryStr, QSqlDatabase *db, QStringList &tokenData)
@@ -915,7 +955,8 @@ QMap <int, QHash<QString, contract_table>> mysql_conn::getContractTable(
     return contractTableData;
 }
 
-bool mysql_conn::deleteAlgo(QString PortfolioNumber,QString &msg){
+bool mysql_conn::deleteAlgo(QString PortfolioNumber,QString &msg)
+{
     QMutexLocker lock(&mutex);
 
     bool ret = false;
@@ -923,44 +964,8 @@ bool mysql_conn::deleteAlgo(QString PortfolioNumber,QString &msg){
         bool ok = checkDBOpened(msg);
         if(ok){
             QSqlQuery query(db);
-            //QString str = "DELETE FROM portfolios WHERE PortfolioNumber='"+PortfolioNumber+"'";
-
-            /*QString str ="DELETE FROM portfolios "
-                 "WHERE PortfolioNumber = "+PortfolioNumber+
-                   " AND ("
-                     "EXISTS ("
-                       "SELECT 1 "
-                       "FROM Trades"
-                   " WHERE PortfolioNumber = "+PortfolioNumber+
-                     ")"
-                     " OR "
-                     "EXISTS ("
-                       "SELECT 1 "
-                       "FROM Trades "
-                 "WHERE PortfolioNumber = "+QString::number(PortfolioNumber.toInt() + 1500000)+
-                     ")"
-                   ");";*/
-
-            /* QString str = "DELETE FROM portfolios "
-                               "WHERE PortfolioNumber = " + PortfolioNumber +
-                               " AND ("
-                               "   EXISTS ("
-                               "     SELECT 1 "
-                               "     FROM Trades "
-                               "     WHERE PortfolioNumber = "+PortfolioNumber+
-                               "   ) "
-                               "   OR "
-                               "   EXISTS ("
-                               "     SELECT 1 "
-                               "     FROM Trades "
-                               "     WHERE PortfolioNumber = " + QString::number(PortfolioNumber.toInt() + 1500000) +
-                               "   ) "
-                               ");";*/
-            //QString str = "SELECT COUNT(*) FROM Trades WHERE PortfolioNumber = "+PortfolioNumber+" OR PortfolioNumber = "+QString::number(PortfolioNumber.toInt() + 1500000);
             QString str = "SELECT Id FROM Trades WHERE PortfolioNumber='"+PortfolioNumber+"' OR PortfolioNumber='"+QString::number(PortfolioNumber.toInt() + 1500000)+"'";
             qDebug()<<"Delete Check records in Trades Query: " <<str;
-
-            //QString str = "select * from Trades where PortfolioNumber='"+PortfolioNumber+"'";
             query.prepare(str);
             if(!query.exec())
             {
@@ -974,7 +979,7 @@ bool mysql_conn::deleteAlgo(QString PortfolioNumber,QString &msg){
                     msg = "Delete skipped, Record exist in Trades table.";
                 }
                 else {
-                    str = "DELETE FROM Portfolios WHERE PortfolioNumber='"+PortfolioNumber+"'";
+                    str = "DELETE FROM Portfolios WHERE PortfolioNumber='"+PortfolioNumber+"'" +  " AND SellTradedQuantity = 0 AND BuyTradedQuantity = 0";
                     qDebug()<<"Delete Query: " <<str;
                     query.prepare(str);
                     if( !query.exec() )

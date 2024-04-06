@@ -36,6 +36,31 @@ Table_Portfolios_Delegate::Table_Portfolios_Delegate(QObject *parent)  : QStyled
 
 }
 
+bool Table_Portfolios_Delegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
+{
+    if (event->type() == QEvent::MouseButtonRelease && index.column() == PortfolioData_Idx::_Status)
+    {
+        QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
+        QRect imageRect = option.rect;
+        imageRect.setWidth(option.rect.width());
+        imageRect.setHeight(option.rect.height());
+        int topPadding = 2;
+        int padding = 10;
+        imageRect.adjust(padding, topPadding, -padding, padding);
+
+        // Check if the mouse press occurred within the image rectangle
+        if (imageRect.contains(mouseEvent->pos()))
+        {
+            // Handle the click on the image
+            qDebug() << "Image Clicked!";
+            model->setData(index, index.data(Qt::ItemIsUserCheckable).value<Qt::CheckState>(), Qt::ItemIsUserCheckable);
+            // If you need to stop further processing of the event, you can use event->accept();
+            // event->accept();
+        }
+        return true;  // Consume the event
+    }
+    return QStyledItemDelegate::editorEvent(event, model, option, index);
+}
 
 QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOptionViewItem & option , const QModelIndex & index ) const
 {
@@ -96,27 +121,24 @@ void Table_Portfolios_Delegate::setEditorData(QWidget *editor, const QModelIndex
 
     }
 
-
-
 }
-
-
 
 void Table_Portfolios_Delegate::setModelData(QWidget *editor, QAbstractItemModel *model,  const QModelIndex &index) const
 {
     int c= index.column();
-    if(c == PortfolioData_Idx::_Status ){
-       QCheckBox* check = static_cast<QCheckBox*>(editor);
-       int value =check->isChecked();
+    //clean-code remove code once status coulmn stable
+    // if(c == PortfolioData_Idx::_Status ){
+    //    QCheckBox* check = static_cast<QCheckBox*>(editor);
+    //    int value =check->isChecked();
 
-        if(value==SwitchState::Checked)
-            value = SwitchState::Unchecked;
-        else if (value==SwitchState::Unchecked)
-            value = SwitchState::Checked;
+    //     if(value==SwitchState::Checked)
+    //         value = SwitchState::Unchecked;
+    //     else if (value==SwitchState::Unchecked)
+    //         value = SwitchState::Checked;
 
-        model->setData(index, value, Qt::EditRole);
+    //     model->setData(index, value, Qt::EditRole);
 
-    }
+    // }
     if(c==PortfolioData_Idx::_SellPriceDifference ||
         c==PortfolioData_Idx::_BuyPriceDifference ||
         c==PortfolioData_Idx::_SellTotalQuantity ||
@@ -277,7 +299,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
     if(option.state & QStyle::State_MouseOver) {
         if(c==PortfolioData_Idx::_AlgoName)
-        painter->fillRect(option.rect, Qt::black);
+            painter->fillRect(option.rect, Qt::black);
         QStyledItemDelegate::paint(painter, op, index);
     }
 
@@ -322,10 +344,11 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
             // Load an example image (replace with your logic to get the image)
             QPixmap imagePixmap(":/enable.png");
-            if (!imagePixmap.isNull()) {
-                // Draw the image next to the checkbox
-                painter->drawPixmap(rect, imagePixmap);
-            }
+            // Assuming 'rect' represents the bounding rectangle of the checkbox
+            int middleColumnX = option.rect.left() + (option.rect.width() - imagePixmap.width()) / 2;
+            int middleColumnY = option.rect.top() + (option.rect.height() - imagePixmap.height()) / 2;
+            QRect imageRect(QPoint(middleColumnX, middleColumnY), imagePixmap.size());
+            painter->drawPixmap(imageRect, imagePixmap);
 
         }
         else if(portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser)
@@ -341,10 +364,10 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
             // Load an example image (replace with your logic to get the image)
             QPixmap imagePixmap(":/disable.png");
-            if (!imagePixmap.isNull()) {
-                // Draw the image next to the checkbox
-                painter->drawPixmap(rect, imagePixmap);
-            }
+            int middleColumnX = option.rect.left() + (option.rect.width() - imagePixmap.width()) / 2;
+            int middleColumnY = option.rect.top() + (option.rect.height() - imagePixmap.height()) / 2;
+            QRect imageRect(QPoint(middleColumnX, middleColumnY), imagePixmap.size());
+            painter->drawPixmap(imageRect, imagePixmap);
 
         }
 
@@ -516,16 +539,16 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         QStyledItemDelegate::paint(painter, op, index);
     }
     else if(c==PortfolioData_Idx::_Leg1
-               || c==PortfolioData_Idx::_ExpiryDateTime
-               || c==PortfolioData_Idx::_Cost
-               || c == PortfolioData_Idx::_OrderQuantity
-               || c==PortfolioData_Idx::_InstrumentName
-               || c==PortfolioData_Idx::_Leg2
-               || c==PortfolioData_Idx::_Leg3
-               || c==PortfolioData_Idx::_AdditionalData1
-               || c==PortfolioData_Idx::_PortfolioType
-               || c==PortfolioData_Idx::_Price
-              || c==PortfolioData_Idx:: _FuturePrice)
+             || c==PortfolioData_Idx::_ExpiryDateTime
+             || c==PortfolioData_Idx::_Cost
+             || c == PortfolioData_Idx::_OrderQuantity
+             || c==PortfolioData_Idx::_InstrumentName
+             || c==PortfolioData_Idx::_Leg2
+             || c==PortfolioData_Idx::_Leg3
+             || c==PortfolioData_Idx::_AdditionalData1
+             || c==PortfolioData_Idx::_PortfolioType
+             || c==PortfolioData_Idx::_Price
+             || c==PortfolioData_Idx:: _FuturePrice)
     {
         QStyleOptionViewItem op(option);
         QColor color("#42A5F5");

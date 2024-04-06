@@ -73,6 +73,10 @@ public:
     bool deleteAlgo(QString PortfolioNumber,QString &msg);
     void logToDB(QString logMessage);
 
+    ///
+    /// \brief loadCurrentDayLogs to load logs of one day
+    ///
+    void loadCurrentDayLogs();
     QHash<QString, contract_table> prpareContractDataFromDB(QString queryStr, QSqlDatabase *db,QStringList &tokenData);
 
 private:
