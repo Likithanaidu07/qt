@@ -142,10 +142,11 @@ private:
     QHash<QString, Indices_Data_Struct> indicesDataList;//hash to store indices data for watch
 
     QMutex indicesDataMutex; //list to store indices data for watch
-
+    QString watchItemSelectedindexName;
     QStringList savedWatchItems; // saved watch item to display on watch
     void showSaveWatchOnListView();
     void initWatchWindow();
+    void updateSelecteWatch_UI( Indices_Data_Struct data);
 
 
 

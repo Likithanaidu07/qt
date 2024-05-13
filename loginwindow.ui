@@ -170,7 +170,7 @@ padding: 4px 10px 4px 10px;
 }</string>
      </property>
      <property name="text">
-      <string>123</string>
+      <string/>
      </property>
      <property name="echoMode">
       <enum>QLineEdit::Password</enum>
@@ -341,7 +341,7 @@ padding: 4px 10px 4px 10px;
 }</string>
      </property>
      <property name="text">
-      <string>bid1</string>
+      <string/>
      </property>
      <property name="placeholderText">
       <string>Username</string>

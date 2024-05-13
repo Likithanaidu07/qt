@@ -1884,11 +1884,29 @@ void MainWindow::indicesDataRecv_Slot(Indices_Data_Struct data){
         indicesDataList.insert(data.indexName,data);
         newIndicesData = true;
     }
+    //check any of the value changed
+    else if((indicesDataList[data.indexName].indexValue!=data.indexValue) || (indicesDataList[data.indexName].change!=data.change) || (indicesDataList[data.indexName].percentagechange!=data.percentagechange)){
+        indicesDataList[data.indexName]=data;
+        newIndicesData = true;
+    }
+
     indicesDataMutex.unlock();
    // qDebug()<<"indicesDataRecv_Slot: " <<data.indexName;
 
     if(newIndicesData==true&&ui->lineEditWatchSearch->text()=="")
         showSaveWatchOnListView();
+
+    if(newIndicesData==true){
+
+        QListWidgetItem *item = ui->listWidgetWatch->currentItem();
+        if (item) {
+            watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(item));
+            if (widget) {
+                updateSelecteWatch_UI( widget->data);
+            }
+        }
+
+    }
 
 }
 void MainWindow::on_lineEditWatchSearch_textChanged(const QString &text)
@@ -1943,6 +1961,7 @@ void MainWindow::on_lineEditWatchSearch_textChanged(const QString &text)
     }*/
 
     ui->listWidgetWatch->clear();
+    int selecteIDx = -1;
     for(int i=0;i<filteredList.size();i++){
         auto item = new QListWidgetItem();
         auto widget1 = new watch_Data_List_Item(this);
@@ -1952,6 +1971,11 @@ void MainWindow::on_lineEditWatchSearch_textChanged(const QString &text)
 
         ui->listWidgetWatch->addItem(item);
         ui->listWidgetWatch->setItemWidget(item, widget1);
+        if(data.indexName==watchItemSelectedindexName)
+            selecteIDx = ui->listWidgetWatch->count()-1;
+    }
+    if(selecteIDx>-1){
+        ui->listWidgetWatch->setCurrentRow(selecteIDx);
     }
 
 
@@ -1965,34 +1989,47 @@ void MainWindow::showSaveWatchOnListView(){
     QHash<QString, Indices_Data_Struct> indicesDataListTmp = indicesDataList;
     indicesDataListTmp.detach();
     indicesDataMutex.unlock();
-
+    int selecteIDx = -1;
     for(int i=0;i<savedWatchItems.length();i++){
-        auto item = new QListWidgetItem();
-        auto widget1 = new watch_Data_List_Item(this);
-        Indices_Data_Struct data = indicesDataListTmp[savedWatchItems[i]];
-        widget1->setData(data);
-        item->setSizeHint(widget1->sizeHint());
-
-        ui->listWidgetWatch->addItem(item);
-        ui->listWidgetWatch->setItemWidget(item, widget1);
+        if(indicesDataListTmp.contains(savedWatchItems[i])){
+            auto item = new QListWidgetItem();
+            auto widget1 = new watch_Data_List_Item(this);
+            Indices_Data_Struct data = indicesDataListTmp[savedWatchItems[i]];
+            widget1->setData(data);
+            item->setSizeHint(widget1->sizeHint());
+            ui->listWidgetWatch->addItem(item);
+            ui->listWidgetWatch->setItemWidget(item, widget1);
+            if(data.indexName==watchItemSelectedindexName)
+                selecteIDx = ui->listWidgetWatch->count()-1;
+        }
+    }
+    if(selecteIDx>-1){
+        ui->listWidgetWatch->setCurrentRow(selecteIDx);
     }
 }
 
 void MainWindow::on_listWidgetWatch_itemClicked(QListWidgetItem *item)
 {
     if (!item) {
-        return; // Handle no item clicked scenario (optional)
+        return; // Handle no item clicked scenario
     }
 
     watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(item));
     if (!widget) {
-        return; // Handle case where no widget is associated with the item (optional)
+        return; // Handle case where no widget is associated with the item
     }
 
+    watchItemSelectedindexName = widget->data.indexName;
+
+    updateSelecteWatch_UI(widget->data);
+
+}
+
+void MainWindow::updateSelecteWatch_UI( Indices_Data_Struct data){
     bool redArrow = true;
     //if(data.netChangeIndicator=="+")
     // redArrow = false;
-    if(widget->data.change.toDouble()>=0)
+    if(data.change.toDouble()>=0)
         redArrow = false;
 
     if(redArrow){
@@ -2001,10 +2038,10 @@ void MainWindow::on_listWidgetWatch_itemClicked(QListWidgetItem *item)
         ui->watch_indicator->setPixmap(pixmap);
         ui->watch_indicator->setMask(pixmap.mask());
         ui->watch_indicator->setStyleSheet("font-family: 'Work Sans';"
-                                  "font-size: 10px;"
-                                  "font-weight: 500;"
-                                  "color:#CC3437"
-                                  );
+                                           "font-size: 10px;"
+                                           "font-weight: 500;"
+                                           "color:#CC3437"
+                                           );
     }
     else{
         QPixmap pixmap(":/arrow_green.png");
@@ -2013,27 +2050,20 @@ void MainWindow::on_listWidgetWatch_itemClicked(QListWidgetItem *item)
         ui->watch_indicator->setMask(pixmap.mask());
 
         ui->watch_val1->setStyleSheet("font-family: 'Work Sans';"
-                                  "font-size: 10px;"
-                                  "font-weight: 500;"
-                                  "color:#008000"
-                                  );
+                                      "font-size: 10px;"
+                                      "font-weight: 500;"
+                                      "color:#008000"
+                                      );
     }
 
-    QString percent = (widget->data.change+"("+widget->data.percentagechange+"%)");
-    ui->Index_Name->setText(widget->data.indexName);
-    ui->watch_val1->setText(widget->data.indexName);
+    QString percent = (data.change+"("+data.percentagechange+"%)");
+    ui->Index_Name->setText(data.indexName);
+    ui->watch_val1->setText(data.indexValue);
     ui->watch_val2->setText(percent);
-
-    if(savedWatchItems.contains(widget->data.indexName)){
-        ui->Add_Watch_Button->setEnabled(false);
-        ui->Subtract_Watch_Button->setEnabled(true);
-    }
-    else{
-        ui->Add_Watch_Button->setEnabled(true);
-        ui->Subtract_Watch_Button->setEnabled(false);
-    }
-
-
+    ui->Open_Num->setText(data.openingIdx);
+    ui->High_Num->setText(data.highIndexValue);
+    ui->Low_Num->setText(data.lowIndexValue);
+    ui->Volume_Num->setText(data.marketCapitialisation);
 
 
 }

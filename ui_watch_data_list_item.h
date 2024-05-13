@@ -32,7 +32,7 @@ public:
     {
         if (watch_Data_List_Item->objectName().isEmpty())
             watch_Data_List_Item->setObjectName(QString::fromUtf8("watch_Data_List_Item"));
-        watch_Data_List_Item->resize(306, 53);
+        watch_Data_List_Item->resize(310, 53);
         horizontalLayout = new QHBoxLayout(watch_Data_List_Item);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         name = new QLabel(watch_Data_List_Item);

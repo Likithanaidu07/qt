@@ -287,6 +287,11 @@ struct Indices_Data_Struct{
     QString change;
     QString percentagechange;
     QString netChangeIndicator;
+    QString openingIdx;
+    QString closingIdx;
+    QString highIndexValue;
+    QString lowIndexValue;
+    QString marketCapitialisation;
     int display_widget_idx;
 };
 
