@@ -113,8 +113,8 @@ public:
     QLabel *watch_indicator;
     QLabel *watch_val2;
     QSpacerItem *horizontalSpacer_11;
-    QPushButton *Add_Watch_Button;
-    QPushButton *Subtract_Watch_Button;
+    QPushButton *Buy_Watch_Button;
+    QPushButton *Sell_Watch_Button;
     QHBoxLayout *horizontalLayout_16;
     QVBoxLayout *verticalLayout_24;
     QLabel *Open_Label;
@@ -680,11 +680,11 @@ public:
 
         horizontalLayout_13->addItem(horizontalSpacer_11);
 
-        Add_Watch_Button = new QPushButton(widget_17);
-        Add_Watch_Button->setObjectName(QString::fromUtf8("Add_Watch_Button"));
-        Add_Watch_Button->setEnabled(true);
-        Add_Watch_Button->setMinimumSize(QSize(26, 26));
-        Add_Watch_Button->setStyleSheet(QString::fromUtf8("#Add_Watch_Button{\n"
+        Buy_Watch_Button = new QPushButton(widget_17);
+        Buy_Watch_Button->setObjectName(QString::fromUtf8("Buy_Watch_Button"));
+        Buy_Watch_Button->setEnabled(true);
+        Buy_Watch_Button->setMinimumSize(QSize(26, 26));
+        Buy_Watch_Button->setStyleSheet(QString::fromUtf8("#Add_Watch_Button{\n"
 "border-radius: 2px;\n"
 "background: #197CB1;\n"
 "box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);\n"
@@ -704,13 +704,13 @@ public:
 "    color: #666; /* Change text color when disabled */\n"
 "}"));
 
-        horizontalLayout_13->addWidget(Add_Watch_Button);
+        horizontalLayout_13->addWidget(Buy_Watch_Button);
 
-        Subtract_Watch_Button = new QPushButton(widget_17);
-        Subtract_Watch_Button->setObjectName(QString::fromUtf8("Subtract_Watch_Button"));
-        Subtract_Watch_Button->setEnabled(true);
-        Subtract_Watch_Button->setMinimumSize(QSize(26, 26));
-        Subtract_Watch_Button->setStyleSheet(QString::fromUtf8("#Subtract_Watch_Button{\n"
+        Sell_Watch_Button = new QPushButton(widget_17);
+        Sell_Watch_Button->setObjectName(QString::fromUtf8("Sell_Watch_Button"));
+        Sell_Watch_Button->setEnabled(true);
+        Sell_Watch_Button->setMinimumSize(QSize(26, 26));
+        Sell_Watch_Button->setStyleSheet(QString::fromUtf8("#Subtract_Watch_Button{\n"
 "border-radius: 2px;\n"
 "background: #CC3437;\n"
 "box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25);\n"
@@ -729,9 +729,9 @@ public:
 "    color: #666; /* Change text color when disabled */\n"
 "}"));
         QIcon icon(QIcon::fromTheme(QString::fromUtf8("edit-delete")));
-        Subtract_Watch_Button->setIcon(icon);
+        Sell_Watch_Button->setIcon(icon);
 
-        horizontalLayout_13->addWidget(Subtract_Watch_Button);
+        horizontalLayout_13->addWidget(Sell_Watch_Button);
 
 
         verticalLayout_23->addLayout(horizontalLayout_13);
@@ -1248,8 +1248,8 @@ public:
         watch_val1->setText(QString());
         watch_indicator->setText(QString());
         watch_val2->setText(QString());
-        Add_Watch_Button->setText(QCoreApplication::translate("MainWindow", "+", nullptr));
-        Subtract_Watch_Button->setText(QCoreApplication::translate("MainWindow", "-", nullptr));
+        Buy_Watch_Button->setText(QCoreApplication::translate("MainWindow", "B", nullptr));
+        Sell_Watch_Button->setText(QCoreApplication::translate("MainWindow", "S", nullptr));
         Open_Label->setText(QCoreApplication::translate("MainWindow", "Open", nullptr));
         Open_Num->setText(QCoreApplication::translate("MainWindow", "0.00", nullptr));
         High_Label->setText(QCoreApplication::translate("MainWindow", "High", nullptr));

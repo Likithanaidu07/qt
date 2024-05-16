@@ -369,11 +369,11 @@ public:
     {
         loginwindow->setWindowTitle(QCoreApplication::translate("loginwindow", "Login", nullptr));
         footer->setText(QCoreApplication::translate("loginwindow", "ALGO METHODS SOFTWARE & SERVICES PVT LTD", nullptr));
-        lineEdit_Password->setText(QString());
+        lineEdit_Password->setText(QCoreApplication::translate("loginwindow", "123", nullptr));
         lineEdit_Password->setPlaceholderText(QCoreApplication::translate("loginwindow", "Password", nullptr));
         logo->setText(QString());
         name->setText(QString());
-        lineEditUsername->setText(QString());
+        lineEditUsername->setText(QCoreApplication::translate("loginwindow", "bid1", nullptr));
         lineEditUsername->setPlaceholderText(QCoreApplication::translate("loginwindow", "Username", nullptr));
         label_wron_input->setText(QString());
         label_forgot->setText(QCoreApplication::translate("loginwindow", "Forgot Password?", nullptr));

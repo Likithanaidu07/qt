@@ -147,7 +147,8 @@ private:
     void showSaveWatchOnListView();
     void initWatchWindow();
     void updateSelecteWatch_UI( Indices_Data_Struct data);
-
+    void addToSavedWatchItems(Indices_Data_Struct data);
+    void removeFromSavedWatchItems(Indices_Data_Struct data);
 
 
 public slots:
@@ -201,7 +202,7 @@ private slots:
     void on_ConvertAlgo_button_clicked();
     void on_lineEditWatchSearch_textChanged(const QString &arg1);
     void on_listWidgetWatch_itemClicked(QListWidgetItem *item);
-    void on_Add_Watch_Button_clicked();
-    void on_Subtract_Watch_Button_clicked();
+
+    void on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item);
 };
 #endif // MAINWINDOW_H

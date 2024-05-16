@@ -959,7 +959,7 @@ background-color: #A1E3E7;
                 </spacer>
                </item>
                <item>
-                <widget class="QPushButton" name="Add_Watch_Button">
+                <widget class="QPushButton" name="Buy_Watch_Button">
                  <property name="enabled">
                   <bool>true</bool>
                  </property>
@@ -991,12 +991,12 @@ line-height: normal;
 }</string>
                  </property>
                  <property name="text">
-                  <string>+</string>
+                  <string>B</string>
                  </property>
                 </widget>
                </item>
                <item>
-                <widget class="QPushButton" name="Subtract_Watch_Button">
+                <widget class="QPushButton" name="Sell_Watch_Button">
                  <property name="enabled">
                   <bool>true</bool>
                  </property>
@@ -1027,7 +1027,7 @@ line-height: normal;
 }</string>
                  </property>
                  <property name="text">
-                  <string>-</string>
+                  <string>S</string>
                  </property>
                  <property name="icon">
                   <iconset theme="edit-delete"/>

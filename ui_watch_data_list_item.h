@@ -50,6 +50,8 @@ public:
 
         value1 = new QLabel(watch_Data_List_Item);
         value1->setObjectName(QString::fromUtf8("value1"));
+        value1->setMinimumSize(QSize(60, 0));
+        value1->setMaximumSize(QSize(60, 16777215));
         value1->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         horizontalLayout->addWidget(value1);
@@ -63,6 +65,8 @@ public:
 
         value2 = new QLabel(watch_Data_List_Item);
         value2->setObjectName(QString::fromUtf8("value2"));
+        value2->setMinimumSize(QSize(80, 0));
+        value2->setMaximumSize(QSize(80, 16777215));
 
         horizontalLayout->addWidget(value2);
 

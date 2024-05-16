@@ -941,12 +941,12 @@ MainWindow::MainWindow(QWidget *parent)
         w->setFont(font);
     }
 
-    QFont fontbuy=ui->Add_Watch_Button->font();
-    QFont fontsell=ui->Subtract_Watch_Button->font();
+    QFont fontbuy=ui->Buy_Watch_Button->font();
+    QFont fontsell=ui->Sell_Watch_Button->font();
     fontbuy.setFamily("Work Sans");
     fontsell.setFamily("Work Sans");
-    ui->Add_Watch_Button->setFont(fontbuy);
-    ui->Subtract_Watch_Button->setFont(fontsell);
+    ui->Buy_Watch_Button->setFont(fontbuy);
+    ui->Sell_Watch_Button->setFont(fontsell);
 
     ui->listWidgetWatch->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Hides vertical scroll bar
     ui->listWidgetWatch->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Hides horizontal scroll bar
@@ -1872,8 +1872,7 @@ void MainWindow::slotAddLogForAddAlgoRecord(QString str)
 
 /*********************Watch data section*************************/
 void MainWindow::initWatchWindow(){
-    ui->Add_Watch_Button->setEnabled(false);
-    ui->Subtract_Watch_Button->setEnabled(false);
+
 }
 
 
@@ -2066,16 +2065,36 @@ void MainWindow::updateSelecteWatch_UI( Indices_Data_Struct data){
     ui->Volume_Num->setText(data.marketCapitialisation);
 
 
+
 }
 
-
-void MainWindow::on_Add_Watch_Button_clicked()
+void MainWindow::on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item)
 {
     QListWidgetItem *selectedItem = ui->listWidgetWatch->currentItem();
     if (selectedItem) {
         watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(selectedItem));
-        if(!savedWatchItems.contains(widget->data.indexName)){
-            savedWatchItems.append(widget->data.indexName);
+
+        //if selected item already in saved item list remove from else or add it
+        if(savedWatchItems.contains(widget->data.indexName)){
+            removeFromSavedWatchItems(widget->data);
+        }
+        else{
+            addToSavedWatchItems(widget->data);
+        }
+    }
+    else {
+        QMessageBox msgBox;
+        msgBox.setText("Please select an item from Watch.");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
+    }
+
+}
+
+void MainWindow::addToSavedWatchItems(Indices_Data_Struct data)
+{
+        if(!savedWatchItems.contains(data.indexName)){
+            savedWatchItems.append(data.indexName);
             QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
             QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
             settings.beginGroup("GeneralSettings");
@@ -2088,14 +2107,6 @@ void MainWindow::on_Add_Watch_Button_clicked()
             if(ui->lineEditWatchSearch->text()=="")
                 showSaveWatchOnListView();
 
-            if(savedWatchItems.contains(widget->data.indexName)){
-                ui->Add_Watch_Button->setEnabled(false);
-                ui->Subtract_Watch_Button->setEnabled(true);
-            }
-            else{
-                ui->Add_Watch_Button->setEnabled(true);
-                ui->Subtract_Watch_Button->setEnabled(false);
-            }
         }
         else{
             QMessageBox msgBox;
@@ -2103,22 +2114,12 @@ void MainWindow::on_Add_Watch_Button_clicked()
             msgBox.setIcon(QMessageBox::Warning);
             msgBox.exec();
         }
-    }
-    else {
-        QMessageBox msgBox;
-        msgBox.setText("Please select an item from Watch.");
-        msgBox.setIcon(QMessageBox::Warning);
-        msgBox.exec();
-    }
 }
 
-void MainWindow::on_Subtract_Watch_Button_clicked()
+void MainWindow::removeFromSavedWatchItems( Indices_Data_Struct data)
 {
-    QListWidgetItem *selectedItem = ui->listWidgetWatch->currentItem();
-    if (selectedItem) {
-        watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(selectedItem));
-        if(savedWatchItems.contains(widget->data.indexName)){
-            savedWatchItems.removeOne(widget->data.indexName);
+        if(savedWatchItems.contains(data.indexName)){
+            savedWatchItems.removeOne(data.indexName);
             QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
             QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
             settings.beginGroup("GeneralSettings");
@@ -2130,14 +2131,7 @@ void MainWindow::on_Subtract_Watch_Button_clicked()
             if(ui->lineEditWatchSearch->text()=="")
                 showSaveWatchOnListView();
 
-            if(savedWatchItems.contains(widget->data.indexName)){
-                ui->Add_Watch_Button->setEnabled(false);
-                ui->Subtract_Watch_Button->setEnabled(true);
-            }
-            else{
-                ui->Add_Watch_Button->setEnabled(true);
-                ui->Subtract_Watch_Button->setEnabled(false);
-            }
+
         }
         else{
             QMessageBox msgBox;
@@ -2145,17 +2139,13 @@ void MainWindow::on_Subtract_Watch_Button_clicked()
             msgBox.setIcon(QMessageBox::Warning);
             msgBox.exec();
         }
-    }
-    else {
-        QMessageBox msgBox;
-        msgBox.setText("Please select an item from Watch.");
-        msgBox.setIcon(QMessageBox::Warning);
-        msgBox.exec();
-    }
+
 }
 
 
 /****************************************************************/
+
+
 
 
 
