@@ -19,127 +19,77 @@ QString custom_q_completer::get_foo_token_number_for_selected(const QModelIndex 
     return code;
 }
 
+
+CustomSearchWidget::CustomSearchWidget(QListView *customListView, QStandardItemModel *_model, QWidget *parent):
+    QWidget(parent), listView(customListView),model(_model)
+{
+    // ... rest of the constructor remains unchanged
+    for (int row = 0; row < model->rowCount(); ++row) {
+        for (int column = 0; column < model->columnCount(); ++column) {
+            QModelIndex index = model->index(row, column);
+            QVariant data = index.data(Qt::DisplayRole);
+            if (data.isValid()) {
+                completionData << data.toString();
+            }
+        }
+    }
+
+    stringListModel = new QStringListModel(completionData, this);
+
+    QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
+    proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);  // Set case insensitivity
+    proxyModel->setSourceModel(stringListModel);
+
+    // proxyModel->setSourceModel(model);
+    listView->setModel(proxyModel);
+    listView->hide();
+
+}
+
 void CustomSearchWidget::filterItems(const QString &text)
 {
     QSortFilterProxyModel *proxyModel = qobject_cast<QSortFilterProxyModel*>(listView->model());
-    if (proxyModel)
+    if (!proxyModel)
+        return;
+
+    if (text.isEmpty()) {
+        // If the search text is empty, clear the filter and hide the list view
+        proxyModel->setFilterWildcard("");
+        listView->hide();
+        return;
+    }
+
+    QStringList searchTerms = text.split(" ", Qt::SkipEmptyParts);
+
+    // Construct a regular expression pattern for each search term
+    QString pattern;
+
+    int index = 0;
+    for (const QString &term : searchTerms)
     {
-
-        if (!text.isEmpty())
+        if (index == 0)
         {
-            if (text.contains(" "))
-            {
-                stringListModel->setStringList(filteredData1);
-
-                // Split the text by spaces
-                QStringList parts = text.split(" ", Qt::SkipEmptyParts);
-                // Handle each part separately
-
-                qDebug() << " text "<< parts;
-
-                for (const QString &part : parts)
-                {
-                    proxyModel->setFilterRegularExpression(QRegularExpression(".*" + QRegularExpression::escape(part) + ".*", QRegularExpression::CaseInsensitiveOption));
-
-                    // proxyModel->setFilterRegularExpression(QRegularExpression(".*" + QRegularExpression::escape(text) + ".*", QRegularExpression::CaseInsensitiveOption));
-                    // if (proxyModel->rowCount() != 0) {
-                    //     filteredData.clear();
-                    // }
-                    // Update filteredData with new items
-                    qDebug() << " row count "<< proxyModel->rowCount() ;
-
-                    if (proxyModel->rowCount() != 0)
-                    {
-                        filteredData.clear();
-                    }
-
-
-                    for (int row = 0; row < proxyModel->rowCount(); ++row)
-                    {
-                        QModelIndex index = proxyModel->index(row, 0);
-                        QVariant data = index.data(Qt::DisplayRole);
-                        if (data.isValid())
-                        {
-                            filteredData.append(data.toString());
-                        }
-                    }
-                }
-            }
-            else
-            {
-                stringListModel->setStringList(completionData);
-
-                // If no spaces, use the original logic
-                proxyModel->setFilterRegularExpression(QRegularExpression("^" + QRegularExpression::escape(text), QRegularExpression::CaseInsensitiveOption));
-                if (proxyModel->rowCount() == 0)
-                {
-                    proxyModel->setFilterWildcard(text);
-                }
-
-                if (proxyModel->rowCount() != 0)
-                {
-                    filteredData.clear();
-                    filteredData1.clear();
-                }
-
-                for (int row = 0; row < proxyModel->rowCount(); ++row)
-                {
-                    QModelIndex index = proxyModel->index(row, 0);
-                    QVariant data = index.data(Qt::DisplayRole);
-                    if (data.isValid()) {
-                        filteredData.append(data.toString());
-                        filteredData1.append(data.toString());
-
-                    }
-                }
-            }
+            // For the first term, require that it starts with the search text
+            pattern += "^" + QRegularExpression::escape(term);
         }
         else
         {
-            // If text is empty, clear the filter
-            proxyModel->setFilterWildcard("");
-            // Reset filteredData to the original list
-            filteredData = completionData;
+            pattern += "(?=.*" + QRegularExpression::escape(term) + ")";
         }
+        index++;
     }
+    // Combine the patterns with the logical AND operator
+    pattern = "^" + pattern;
 
-    // Update the underlying model with filteredData
-    stringListModel->setStringList(filteredData);
-
-    // Show or hide the list view based on the filter result
-    if (text.trimmed().isEmpty()) {
-        listView->hide();
-    } else {
-        listView->show();
-    }
-}
-
-void CustomSearchWidget::newfilterItems()
-{
-    QString text = "";
-
-    // e.g. casting to the class you know its connected with
-    QLineEdit* lineEdit_1 = qobject_cast<QLineEdit*>(sender());
-    if( lineEdit_1 != NULL )
+    // Create a regular expression for the pattern
+    QRegularExpression regex(pattern, QRegularExpression::CaseInsensitiveOption);
+    proxyModel->setFilterRegularExpression(regex);
+    if (proxyModel->rowCount() > 0)
     {
-        text = lineEdit_1->text();
-    }
-
-
-    QSortFilterProxyModel *proxyModel = qobject_cast<QSortFilterProxyModel*>(listView->model());
-    if (proxyModel) {
-        if (!text.isEmpty()) {
-            proxyModel->setFilterRegularExpression(QRegularExpression("^" + QRegularExpression::escape(text), QRegularExpression::CaseInsensitiveOption));
-            if (proxyModel->rowCount() == 0) {
-                proxyModel->setFilterWildcard(text);
-            }
-        } else {
-            proxyModel->setFilterWildcard("");
-        }
-    }
-    if (!text.isEmpty()) {
         listView->show();
-    } else {
+    }
+    else
+    {
         listView->hide();
     }
 }
