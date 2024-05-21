@@ -20,6 +20,10 @@ static const char stylesheetvis[]= "background: #596167;" "border-radius: 10px;"
 
 extern MainWindow *MainWindowObj;
 
+
+
+
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -46,6 +50,15 @@ MainWindow::MainWindow(QWidget *parent)
 //    convertalgo->update_contract_tableData(QString::number(userData.UserId),userData.MaxPortfolioCount);
 
     createINIFileIfNotExist();
+    QDir dir;
+    QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
+    if (!dir.exists(path)) {
+        if (dir.mkpath(path)) {
+        }
+        else{
+            qDebug() << "Failed to create directory! "+path;
+        }
+    }
     loadSettings();
 
     contractDetailsLoaded.storeRelaxed(0);
@@ -1871,8 +1884,53 @@ void MainWindow::slotAddLogForAddAlgoRecord(QString str)
 }
 
 /*********************Watch data section*************************/
-void MainWindow::initWatchWindow(){
 
+QDataStream &operator<<(QDataStream &out, const Indices_Data_Struct &data) {
+    out << data.indexName << data.indexValue << data.change << data.percentagechange
+        << data.netChangeIndicator << data.openingIdx << data.closingIdx
+        << data.highIndexValue << data.lowIndexValue << data.marketCapitialisation
+        << data.display_widget_idx;
+    return out;
+}
+
+QDataStream &operator>>(QDataStream &in, Indices_Data_Struct &data) {
+    in >> data.indexName >> data.indexValue >> data.change >> data.percentagechange
+        >> data.netChangeIndicator >> data.openingIdx >> data.closingIdx
+        >> data.highIndexValue >> data.lowIndexValue >> data.marketCapitialisation
+        >> data.display_widget_idx;
+    return in;
+}
+void MainWindow::initWatchWindow(){
+    loadIndicesDataListFromFile(indicesDataList);
+    showSaveWatchOnListView();
+
+}
+
+
+void MainWindow::saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList) {
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString fileName = appDataPath+"/Data/watch_cache.bin";
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning("Could not open file for writing.");
+        return;
+    }
+    QDataStream out(&file);
+    out << indicesDataList;
+    file.close();
+}
+
+void MainWindow::loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList) {
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString fileName = appDataPath+"/Data/watch_cache.bin";
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning("Could not open file for reading.");
+        return;
+    }
+    QDataStream in(&file);
+    in >> indicesDataList;
+    file.close();
 }
 
 
@@ -1904,6 +1962,8 @@ void MainWindow::indicesDataRecv_Slot(Indices_Data_Struct data){
                 updateSelecteWatch_UI( widget->data);
             }
         }
+
+        saveIndicesDataListToFile(indicesDataList);
 
     }
 

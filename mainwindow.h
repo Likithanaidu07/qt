@@ -33,6 +33,7 @@
 #include "Convert_to_Algo/convert_algo_win.h"
 #include"ui_loginwindow.h"
 
+
 class mysql_conn;
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -149,7 +150,8 @@ private:
     void updateSelecteWatch_UI( Indices_Data_Struct data);
     void addToSavedWatchItems(Indices_Data_Struct data);
     void removeFromSavedWatchItems(Indices_Data_Struct data);
-
+    void saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList);
+    void loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList);
 
 public slots:
     void profolioTableEditFinshedSlot(QString val,QModelIndex);
