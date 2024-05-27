@@ -207,5 +207,6 @@ private slots:
     void on_listWidgetWatch_itemClicked(QListWidgetItem *item);
 
     void on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item);
+    void on_listWidgetWatch_itemSelectionChanged();
 };
 #endif // MAINWINDOW_H

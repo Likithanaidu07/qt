@@ -2121,8 +2121,10 @@ void MainWindow::on_lineEditWatchSearch_textChanged(const QString &text)
 
 }
 void MainWindow::showSaveWatchOnListView(){
+
     ui->listWidgetWatch->clear();
     if(savedWatchItems.size()==0){
+        ui->watchListSelectedDetails_Parent->setVisible(false);
         return;
     }
     indicesDataMutex.lock();
@@ -2146,16 +2148,21 @@ void MainWindow::showSaveWatchOnListView(){
     if(selecteIDx>-1){
         ui->listWidgetWatch->setCurrentRow(selecteIDx);
     }
+    if(ui->listWidgetWatch->selectedItems().count()==0){
+        ui->watchListSelectedDetails_Parent->setVisible(false);
+    }
 }
 
 void MainWindow::on_listWidgetWatch_itemClicked(QListWidgetItem *item)
 {
     if (!item) {
+        ui->watchListSelectedDetails_Parent->setHidden(true);
         return; // Handle no item clicked scenario
     }
 
     watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(item));
     if (!widget) {
+        ui->watchListSelectedDetails_Parent->setHidden(true);
         return; // Handle case where no widget is associated with the item
     }
 
@@ -2166,6 +2173,8 @@ void MainWindow::on_listWidgetWatch_itemClicked(QListWidgetItem *item)
 }
 
 void MainWindow::updateSelecteWatch_UI( Indices_Data_Struct data){
+    ui->watchListSelectedDetails_Parent->setVisible(true);
+
     bool redArrow = true;
     //if(data.netChangeIndicator=="+")
     // redArrow = false;
@@ -2222,6 +2231,8 @@ void MainWindow::on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item)
         else{
             addToSavedWatchItems(widget->data);
         }
+
+        ui->lineEditWatchSearch->clear();
     }
     else {
         QMessageBox msgBox;
@@ -2282,9 +2293,17 @@ void MainWindow::removeFromSavedWatchItems( Indices_Data_Struct data)
         }
 
 }
+void MainWindow::on_listWidgetWatch_itemSelectionChanged()
+{
+    if(ui->listWidgetWatch->selectedItems().count()==0){
+        ui->watchListSelectedDetails_Parent->setVisible(false);
+    }
+}
 
 
 /****************************************************************/
+
+
 
 
 
