@@ -32,7 +32,7 @@
 #include "SlowDataIndices/slowdataindices.h"
 #include "Convert_to_Algo/convert_algo_win.h"
 #include"ui_loginwindow.h"
-
+#include "order_detail_popup.h"
 
 class mysql_conn;
 QT_BEGIN_NAMESPACE
@@ -168,6 +168,7 @@ public slots:
     void updatePortFolioStatus();
     void resizePortFolioTableColWidthSlot(int width);
     void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
+    void T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index);
     void slotAddLogForAddAlgoRecord(QString str);
 
 private slots:

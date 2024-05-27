@@ -73,12 +73,6 @@ MainWindow::MainWindow(QWidget *parent)
     QPixmap pixmapmaximize(":/maximize_window_icon.png");
 
 
-    QPixmap a1(":/done_all.png");
-    QPixmap a2(":/do_disturb.png");
-    QPixmap a3(":/arrow_downward.png");
-    QPixmap a4(":/arrow_upward.png");
-    QPixmap a5(":/replay.png");
-    QPixmap a6(":/format_color_fill.png");
 
     QFont headerfont("Work Sans");
 
@@ -580,28 +574,28 @@ MainWindow::MainWindow(QWidget *parent)
             QSpacerItem* spc = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
             QToolButton* button1=new QToolButton();
             button1->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            button1->setIcon(QIcon(a1));
+            //button1->setIcon(QIcon(a1));
             button1->setText("Start All");
             QToolButton* button2=new QToolButton();
             button2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            button2->setIcon(QIcon(a2));
+            //button2->setIcon(QIcon(a2));
             button2->setText("Stop All");
             QToolButton* button3=new QToolButton();
             button3->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            button3->setIcon(QIcon(a3));
+            //button3->setIcon(QIcon(a3));
             button3->setText("Import");
             QToolButton* button6=new QToolButton();
             button6->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            button6->setIcon(QIcon(a4));
+            //button6->setIcon(QIcon(a4));
             button6->setText("Export");
             QToolButton* button4=new QToolButton();
             button4->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            button4->setIcon(QIcon(a5));
+            //button4->setIcon(QIcon(a5));
             button4->setText("Reset Sorting");
             QToolButton* button5=new QToolButton();
             button5->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            button5->setIcon(QIcon(a6));
-            button5->setText("Portfolio Colour");
+            //button5->setIcon(QIcon(a6));
+           // button5->setText("Portfolio Colour");
             const char stylesheet_tb[] ="QToolButton {"
                                         "border-radius: 4px;"
                                         "border: 1px solid #4F5D75;"
@@ -630,15 +624,15 @@ MainWindow::MainWindow(QWidget *parent)
                 w->setFont(font);
             }
 
+                internalLayout->addWidget(ConvertAlgo_button);
                 internalLayout->addWidget(button1);
                 internalLayout->addWidget(button2);
                 internalLayout->addWidget(button3);
                 internalLayout->addWidget(button6);
                 internalLayout->addWidget(button4);
-                internalLayout->addWidget(button5);
+                //internalLayout->addWidget(button5);
                 internalLayout->addSpacerItem(spc);
                 internalLayout->addWidget(line_edit_trade_search);
-                internalLayout->addWidget(ConvertAlgo_button);
                 lay->addWidget(test, 0, 0);
 
     T_Portfolio_Table = new table_portfolios_custom(T_Portfolio_DockWin);
@@ -660,6 +654,10 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(T_Portfolio_Table->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
             this, SLOT(T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&)));
+
+
+    connect(T_Portfolio_Table, &QTableView::doubleClicked, this, &MainWindow::T_Portfolio_Table_cellDoubleClicked);
+
 
 
     PortfolioHeaderView* headerView = new PortfolioHeaderView(Qt::Horizontal, T_Portfolio_Table);
@@ -707,12 +705,12 @@ MainWindow::MainWindow(QWidget *parent)
     trade_titlebar->setStyleSheet(DockTitleBar_Style);
     QHBoxLayout *trade_title_layout=new QHBoxLayout(trade_titlebar);
     trade_title_layout->setSpacing(10);
-    trade_title_layout->setContentsMargins(10,8,10,6);
+    trade_title_layout->setContentsMargins(17,8,10,6);
     QLabel *trade_label=new QLabel("Order Book");
     QFont font_trade_label=trade_label->font();
     font_trade_label.setFamily("Work Sans");
     trade_label->setFont(font_trade_label);
-    trade_label->setStyleSheet("color: #495057;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal;");
+    trade_label->setStyleSheet("color: #495057;font-size: 16px;font-style: normal;font-weight: 700;line-height: normal;");
     QSpacerItem* trade_spacer=new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
     QLineEdit* line_edit_trade = new QLineEdit;
     line_edit_trade->setMaximumWidth(160);
@@ -789,12 +787,12 @@ MainWindow::MainWindow(QWidget *parent)
     position_titlebar->setStyleSheet(DockTitleBar_Style);
     QHBoxLayout *position_title_layout=new QHBoxLayout(position_titlebar);
     position_title_layout->setSpacing(10);
-    position_title_layout->setContentsMargins(10,8,10,6);
+    position_title_layout->setContentsMargins(17,8,10,6);
     QLabel *position_label=new QLabel("Positions");
     QFont font_position_label=position_label->font();
     font_position_label.setFamily("Work Sans");
     position_label->setFont(font_position_label);
-    position_label->setStyleSheet("color: #495057;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal;");
+    position_label->setStyleSheet("color: #495057;font-size: 16px;font-style: normal;font-weight: 700;line-height: normal;");
     QSpacerItem* position_spacer=new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
     QLineEdit* line_edit_position = new QLineEdit;
     line_edit_position->setMaximumWidth(160);
@@ -847,12 +845,12 @@ MainWindow::MainWindow(QWidget *parent)
     hp_titlebar->setStyleSheet(DockTitleBar_Style);
     QHBoxLayout *position_hp_layout=new QHBoxLayout(hp_titlebar);
     position_hp_layout->setSpacing(10);
-    position_hp_layout->setContentsMargins(10,8,10,6);
+    position_hp_layout->setContentsMargins(17,8,10,6);
     QLabel *hp_label=new QLabel("Historical Positions");
     QFont font_hp_label=hp_label->font();
     font_hp_label.setFamily("Work Sans");
     hp_label->setFont(font_hp_label);
-    hp_label->setStyleSheet("color: #495057;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal;");
+    hp_label->setStyleSheet("color: #495057;font-size: 16px;font-style: normal;font-weight: 700;line-height: normal;");
     QSpacerItem* hp_spacer=new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
     QLineEdit* line_edit_hp = new QLineEdit;
     line_edit_hp->setMaximumWidth(160);
@@ -906,12 +904,13 @@ MainWindow::MainWindow(QWidget *parent)
     ui->toggle_Button->setIcon(pixmapright);
 
     //stylesheet for summary window title labels
-    const char stylesheet_userinfo[] = "color: #2F3339;" "text-align: center;""font-size: 11px;""font-style: normal;""font-weight: 500;""line-height: normal;";
-    for (auto w : {ui->label_7, ui->label_9,ui->label_10,ui->label_8,ui->label_2,ui->label_20,ui->label_6,ui->label_16,ui->label_15,ui->label_14,ui->label_12}){
+    const char stylesheet_userinfo[] = "color: #2F3339;" "text-align: center;""font-size: 12px;""font-style: normal;""font-weight: bold;""line-height: normal;";
+    for (auto w : {ui->label_7, ui->label_9,ui->label_10,ui->label_8,ui->label_2,ui->label_20,ui->label_6,ui->label_16,ui->label_15,ui->label_14,ui->m2mlabel,ui->label_13}){
         w->setStyleSheet(stylesheet_userinfo);
-    QFont font=w->font();
-    font.setFamily("Work Sans");
-    w->setFont(font);
+        QFont font=w->font();
+        font.setFamily("Work Sans");
+        w->setFont(font);
+        w->setWordWrap(true);
     }
 
     ui->Algorithms_Close->setVisible(false);
@@ -922,7 +921,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Templates_Close->setVisible(false);
 
     ui->lineEditWatchSearch->setPlaceholderText("Search...");
-
+    ui->lineEditWatchSearch->setStyleSheet("font-family: 'Work Sans';"
+                                           "font-size: 12px;"
+                                           "font-weight: 400;"
+                                           );
     QPixmap pixmapmenu(":/menu.png");
     ui->close->setIcon(pixmapclose);
     ui->minimize->setIcon(pixmapminimize);
@@ -938,7 +940,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->HP_Close->setIcon(pixmapbuttonclose);
     ui->Templates_Close->setIcon(pixmapbuttonclose);
 
-    const char stylesheet_params[] = "color: #848484;""font-size: 8px;""font-style: normal;""font-weight: 500;""line-height: normal;";
+    const char stylesheet_params[] = "color: #000000 ;""font-size: 12px;""font-style: normal;""font-weight: bold;""line-height: normal;";
     for (auto w : {ui->Open_Label, ui->High_Label,ui->Low_Label,ui->Volume_Label}){
         w->setStyleSheet(stylesheet_params);
         QFont font=w->font();
@@ -946,7 +948,7 @@ MainWindow::MainWindow(QWidget *parent)
         w->setFont(font);
     }
 
-    const char stylesheet_params_nos[] = "color: #495057;""font-family: Work Sans;" "font-size: 10px;" "font-style: normal;" "font-weight: 500;""line-height: normal;";
+    const char stylesheet_params_nos[] = "color: #4f3c7f ;""font-family: Work Sans;" "font-size: 14px;" "font-style: normal;" "font-weight: bold;""line-height: normal;";
     for (auto w : {ui->Open_Num, ui->High_Num,ui->Low_Num,ui->Volume_Num}){
         w->setStyleSheet(stylesheet_params_nos);
         QFont font=w->font();
@@ -1177,8 +1179,8 @@ void MainWindow::searchbar(){
 void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
             if(portfolio_table_updating_db.loadRelaxed()==1){
-        qDebug()<<"portfolio_table_updating_db----- in progress.";
-        return;
+                qDebug()<<"portfolio_table_updating_db----- in progress.";
+                return;
             }
             portfolio_table_updating_db.storeRelaxed(1);
 
@@ -1201,50 +1203,94 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             }
         }
 
+    }
+    break;
+        //     case PortfolioData_Idx::_SellPriceDifference:{
+        //       double val = valStr.toDouble();
+        //       val=val*devicer;
+        //       QString Query = "UPDATE Portfolios SET SellPriceDifference="+QString::number(val,'f',decimal_precision)+" where PortfolioNumber="+PortfolioNumber;
+        //       db_conn->updateDB_Table(Query);
+        //     }
+        //     break;
+        // case PortfolioData_Idx::_BuyPriceDifference:{
+        //       double val = valStr.toDouble();
+        //       val=val*devicer;
+        //       QString Query = "UPDATE Portfolios SET BuyPriceDifference="+QString::number(val,'f',decimal_precision)+" where PortfolioNumber="+PortfolioNumber;
+        //       db_conn->updateDB_Table(Query);
+        //     }
+        //     break;
+        // case PortfolioData_Idx::_SellTotalQuantity:{
+        //       int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+        //       double val = valStr.toDouble();
+        //       val=val*lotSize;
+        //       QString Query = "UPDATE Portfolios SET SellTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
+        //       db_conn->updateDB_Table(Query);
+        //     }
+        //     break;
+        // case PortfolioData_Idx::_BuyTotalQuantity:{
+        //     int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+        //     double val = valStr.toDouble();
+        //     val=val*lotSize;
+        //       QString Query = "UPDATE Portfolios SET BuyTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
+        //       db_conn->updateDB_Table(Query);
+        //     }
+        //     break;
+
+        // case PortfolioData_Idx::_OrderQuantity:{
+        //       QString Query = "UPDATE Portfolios SET OrderQuantity="+valStr+" where PortfolioNumber="+PortfolioNumber;
+        //       db_conn->updateDB_Table(Query);
+        //       bool success = db_conn->updateDB_Table(Query);
+        //       if(success){
+        //           db_conn->logToDB(QString("OrderQuantity ["+valStr+"]"));
+        //       }
+        //     }
+        //     break;
+    case PortfolioData_Idx::_OrderQuantity:{
+              int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+              double val = valStr.toDouble();
+              val=val*lotSize;
+              QString Query = "UPDATE Portfolios SET OrderQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
+
+              db_conn->updateDB_Table(Query);
+              bool success = db_conn->updateDB_Table(Query);
+            if(success){
+                db_conn->logToDB(QString("OrderQuantity ["+valStr+"]"));
+             }
+          }
+           break;
+    case PortfolioData_Idx::_BuyTotalQuantity:{
+             int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+             double val = valStr.toDouble();
+             val=val*lotSize;
+             if(val< userData.IDXOpenLimit ) {
+                QString Query = "UPDATE Portfolios SET BuyTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
+                db_conn->updateDB_Table(Query);
+                bool success = db_conn->updateDB_Table(Query);
+                if(success){
+                  db_conn->logToDB(QString("BuyTotalQuantity ["+valStr+"]"));
+                }
             }
+    }
+             break;
+
+    case PortfolioData_Idx::_SellTotalQuantity:{
+            int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+            double val = valStr.toDouble();
+            val=val*lotSize;
+            if(val<  userData.IDXOpenLimit) {
+                QString Query = "UPDATE Portfolios SET SellTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
+                db_conn->updateDB_Table(Query);
+                bool success = db_conn->updateDB_Table(Query);
+                if(success){
+                  db_conn->logToDB(QString("SellTotalQuantity ["+valStr+"]"));
+                }
+            }
+    }
             break;
-    //     case PortfolioData_Idx::_SellPriceDifference:{
-    //       double val = valStr.toDouble();
-    //       val=val*devicer;
-    //       QString Query = "UPDATE Portfolios SET SellPriceDifference="+QString::number(val,'f',decimal_precision)+" where PortfolioNumber="+PortfolioNumber;
-    //       db_conn->updateDB_Table(Query);
-    //     }
-    //     break;
-    // case PortfolioData_Idx::_BuyPriceDifference:{
-    //       double val = valStr.toDouble();
-    //       val=val*devicer;
-    //       QString Query = "UPDATE Portfolios SET BuyPriceDifference="+QString::number(val,'f',decimal_precision)+" where PortfolioNumber="+PortfolioNumber;
-    //       db_conn->updateDB_Table(Query);
-    //     }
-    //     break;
-    // case PortfolioData_Idx::_SellTotalQuantity:{
-    //       int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
-    //       double val = valStr.toDouble();
-    //       val=val*lotSize;
-    //       QString Query = "UPDATE Portfolios SET SellTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
-    //       db_conn->updateDB_Table(Query);
-    //     }
-    //     break;
-    // case PortfolioData_Idx::_BuyTotalQuantity:{
-    //     int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
-    //     double val = valStr.toDouble();
-    //     val=val*lotSize;
-    //       QString Query = "UPDATE Portfolios SET BuyTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
-    //       db_conn->updateDB_Table(Query);
-    //     }
-    //     break;
 
-    // case PortfolioData_Idx::_OrderQuantity:{
-    //       QString Query = "UPDATE Portfolios SET OrderQuantity="+valStr+" where PortfolioNumber="+PortfolioNumber;
-    //       db_conn->updateDB_Table(Query);
-    //       bool success = db_conn->updateDB_Table(Query);
-    //       if(success){
-    //           db_conn->logToDB(QString("OrderQuantity ["+valStr+"]"));
-    //       }
-    //     }
-    //     break;
 
-            default:{
+
+    default:{
         QString SellPriceDifference = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->SellPriceDifference*devicer,'f',decimal_precision);
         QString BuyPriceDifference = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->BuyPriceDifference*devicer,'f',decimal_precision);
         QString SellTotalQuantity = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity*T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize());
@@ -1270,9 +1316,9 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
         }
 
 
-            }
-            break;
-            }
+    }
+    break;
+    }
 
             //send notifcation to backend server
             quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
@@ -1288,8 +1334,11 @@ void MainWindow::loadContract(){
 
     auto loadContract_BackgroundTask = [this]() {
 
-        QString  htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QTime::currentTime().toString(LOG_TIME_FORMAT)+"</span>"
-                              + "<span style='color: black;'>  Loading contract...</span> </p>";
+        QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:0.4;'>"
+                              "<span>" + QTime::currentTime().toString("hh:mm:ss")
+                              + "</span><span style='font-weight:400;color: black;'> file loading... </span></p>";
+
+
 
         emit display_log_text_signal(htmlContent);
 
@@ -1304,9 +1353,10 @@ void MainWindow::loadContract(){
         // Rest of your background task code...
         //if not logged in the data loading thread start by login function
 
-        htmlContent = "<p><span style='background-color:#B3C1DE;'>" +
-                      QTime::currentTime().toString(LOG_TIME_FORMAT) +"</span>"
-                      + "<span style='color: black;'> Contract file loaded...</span> </p>";
+        htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:0.4;'>"
+                      "<span>" + QTime::currentTime().toString("hh:mm:ss")
+                      + "</span><span style='font-weight:400;color: black;'> file loaded </span></p>";
+
 
         emit display_log_text_signal(htmlContent);
 
@@ -1412,6 +1462,13 @@ void MainWindow::loadDataAndUpdateTable(int table){
         db_conn->getNetPosTableData(net_pos_model,QString::number(userData.UserId));
         emit data_loded_signal(T_Table::NET_POS);
         break;
+
+    case T_Table::SUMMARY: {
+        db_conn->getSummaryTableData();  // Correctly get the count
+        emit data_loded_signal(T_Table::SUMMARY);
+        break;
+    }
+
     default:
         break;
     }
@@ -1484,7 +1541,12 @@ void MainWindow::updatePortFolioStatus(){
             QString Query = "UPDATE Portfolios SET Status='Active' where PortfolioNumber="+PortfolioNumber;
             bool success = db_conn->updateDB_Table(Query);
             if(success){
+                  QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:0.4;'>"
+                                        "<span style='background-color: transparent;'>" + QTime::currentTime().toString("hh:mm:ss")
+                                        + "</span><span style='font-weight:400;color: black;'> Activated portfolio [" + PortfolioNumber + "] </span></p>";
+                  emit display_log_text_signal(htmlContent);
                 db_conn->logToDB(QString("Activated portfolio ["+PortfolioNumber+"]"));
+
                 quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
                 const unsigned char dataBytes[] = { 0x01};
                 QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
@@ -1499,7 +1561,12 @@ void MainWindow::updatePortFolioStatus(){
             QString Query = "UPDATE Portfolios SET Status='DisabledByUser' where PortfolioNumber="+PortfolioNumber;
             bool success = db_conn->updateDB_Table(Query);
             if(success){
+                QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:0.4;'>"
+                                      "<span style='background-color: transparent;'>" + QTime::currentTime().toString("hh:mm:ss")
+                                      + "</span><span style='font-weight:400;color: black;'> Disabled portfolio [" + PortfolioNumber + "] </span></p>";
+                emit display_log_text_signal(htmlContent);
                 db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));
+
                 quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
                 const unsigned char dataBytes[] = { 0x00};
                 QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
@@ -1846,6 +1913,20 @@ void MainWindow::Delete_clicked_slot()
             msgBox.exec();
         }
     }
+}
+
+void MainWindow::T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index){
+    //int row = index.row();
+    int col = index.column();
+    if(col==PortfolioData_Idx::_AlgoName){
+        OrderDetail_Popup *orderWin = new OrderDetail_Popup();
+        orderWin->show();
+       // QString Expiry = T_Portfolio_Model->portfolio_data_list[index.row()]->Expiry;
+        QString PortfolioType =T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioType;
+        QString PortfolioNumber = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioNumber);
+        orderWin->getData(QString::number(userData.UserId), PortfolioNumber,PortfolioType);
+    }
+
 }
 
 void MainWindow::T_Portfolio_Table_cellClicked(const QItemSelection &selected, const QItemSelection &deselected){

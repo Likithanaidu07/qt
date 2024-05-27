@@ -117,7 +117,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
         bool ok = checkDBOpened(msg);
         userLoginInfo.loginResponse = msg;
         if(ok){
-            QSqlQuery query("SELECT UserId, UserName,Password,MaxPortfolioCount,BFLY_BIDInFilter,BYInFilter,F2FInFilter FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
+            QSqlQuery query("SELECT UserId, UserName,Password,STKOpenLimit,IDXOpenLimit,MaxPortfolioCount,BFLY_BIDInFilter,BYInFilter,F2FInFilter FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
             if(!query.exec())
             {
                 // Error Handling, check query.lastError(), probably return
@@ -140,6 +140,8 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                     userLoginInfo.loggedIn = true;
                     userLoginInfo.loginResponse = "Login Sucess";
                     userLoginInfo.errorCode = T_LoginErroCode::OK;
+                    userLoginInfo.IDXOpenLimit = query.value(rec.indexOf("IDXOpenLimit")).toInt();
+                    userLoginInfo.STKOpenLimit = query.value(rec.indexOf("STKOpenLimit")).toInt();
 
                     //make the entry to logs table
 
@@ -235,7 +237,32 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
     // QSqlDatabase::removeDatabase("login_conn");
     return userLoginInfo;
 }
+void  mysql_conn::getSummaryTableData()
+{
+    QMutexLocker lock(&mutex);
+    QString msg;
 
+    bool ok = checkDBOpened(msg);
+    if(ok){
+         QString sqlquery ="SELECT COUNT(*) FROM Order_Table_Bid WHERE Order_Table_Bid.Trader_ID=1";
+         QSqlQuery query(sqlquery, db);
+        if(!query.exec())
+        {
+            // Error Handling, check query.lastError(), probably return
+            qDebug()<<"getSummaryTableData: "<<query.lastError().text();
+        }
+        else{
+            if (!query.next()) {
+                qDebug() << "getBidCount: No results found";
+                return; // Handle empty result set gracefully (optional)
+            }
+
+            int bidCount = query.value(0).toInt(); // Assuming the count is in the first column
+
+
+        }
+    }
+}
 void mysql_conn::getPortfoliosTableData(Table_Portfolios_Model *model, Combined_Tracker_Table_Model *comb_tracker_model, QHash<QString, PortfolioAvgPrice> &averagePriceList, QString user_id)
 {
     QMutexLocker lock(&mutex);
@@ -320,9 +347,10 @@ void mysql_conn::getPortfoliosTableData(Table_Portfolios_Model *model, Combined_
                     combineTrackerDataTmp[CombinedTrackerData_Idx::CT_Ask_Lots] = QString::number(o->SellTradedQuantity);
                     combineTrackerDataTmp[CombinedTrackerData_Idx::CT_Ask_Avg_Price] = o->SellAveragePrice;
 
-                    int profit = 0;
+                    int profit = 1;
                     int BuyQuantity = o->BuyTradedQuantity * lotSize;
                     int SellQuantity = o->BuyTradedQuantity * lotSize;
+                    int OrderQuantity = o->OrderQuantity * lotSize;
                     int qty = SellQuantity > BuyQuantity ? BuyQuantity : SellQuantity;
                     if (qty > 0)
                         profit = (o->SellAveragePrice.toDouble() - o->BuyAveragePrice.toDouble())* qty;
@@ -371,9 +399,10 @@ void mysql_conn::logToDB(QString logMessage)
             qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
             qDebug() << "Query Str: " << qryStr;
         }
-        QString  htmlContent = "<p><span style='background-color:#B3C1DE;'>" + currentTime.toString(LOG_TIME_FORMAT)+"</span>"
-                              + "<span style='color: black;'>"+ logMessage +"</span> </p>";
 
+        QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:0.4;'>"
+                              "<span>" + QTime::currentTime().toString("hh:mm:ss")
+                              + "</span><span style='font-weight:400;color: black;'>"+ logMessage + "</span></p>";
         emit display_log_text_signal(htmlContent);
 
     }
@@ -417,9 +446,9 @@ void mysql_conn::loadCurrentDayLogs()
             QString timeString = selQry.value(rec.indexOf("Time")).toString();
             qint64 epochTime = timeString.toLongLong();
             QDateTime dateTime = QDateTime::fromSecsSinceEpoch(epochTime);
-            QString  htmlContent = "<p><span style='background-color:#B3C1DE;'>" + dateTime.time().toString(LOG_TIME_FORMAT) +"</span>"
-                                  + "<span style='color: black;'>"+ logMessage.prepend("  ") +"</span> </p>";
-
+            QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;'>"
+                                  "<span>" + QTime::currentTime().toString("hh:mm:ss")
+                                  + "</span><span style='font-weight:400;color: black;'>"+ logMessage.prepend("  ") + "</span></p>";
             emit display_log_text_signal(htmlContent);
         }
 
@@ -451,7 +480,6 @@ QHash<QString, contract_table> mysql_conn::prpareContractDataFromDB(QString quer
             contractTableTmp.StockName = query.value(rec.indexOf("StockName")).toString();
             contractTableTmp.MinimumSpread = query.value(rec.indexOf("MinSpread")).toInt();
             tokenData.append(QString::number(contractTableTmp.TokenNumber));
-
             contract_table_hash.insert( query.value(rec.indexOf("Token")).toString(), contractTableTmp);
 
         }
@@ -555,6 +583,158 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
     }return Algo_Name.toUpper();
 }
 
+  QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QString portfolioNumber,QString PortfolioType){
+
+    QList<QHash<QString,QString>> tradeData;
+    QMutexLocker lock(&mutex);
+
+    QList <QStringList> trade_data_listTmp;
+    QString msg;
+
+    bool ok = checkDBOpened(msg);
+    if(ok)
+    {
+       // QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and OrderState=7 and PortfolioNumber="+portfolioNumber+" ORDER BY Trader_Data DESC";
+        QString query_str = QString("SELECT * FROM Order_Table_Bid WHERE Trader_ID='%1' "
+                                    "AND OrderState=7 AND (PortfolioNumber=%2 OR PortfolioNumber=%3) "
+                                    "ORDER BY Trader_Data DESC")
+                                .arg(user_id)
+                                .arg(portfolioNumber)
+                               .arg(portfolioNumber.toInt() + 1500000);
+
+        QSqlQuery query(query_str,db);
+        if( !query.exec() )
+        {
+            // Error Handling, check query.lastError(), probably return
+            qDebug()<<query.lastError().text();
+        }
+        else{
+            QSqlRecord rec = query.record();
+            while (query.next()) {
+
+                QString Algo_ID = ""; // same as PortfolioNumber
+                QString Buy_Sell = "";
+
+
+                int Algo_ID_Int = query.value(rec.indexOf("PortfolioNumber")).toInt();
+
+                if(Algo_ID_Int>1500000){
+                    Buy_Sell = "Buy";
+                    Algo_ID = QString::number(Algo_ID_Int - 1500000);
+                }
+                else{
+                    Buy_Sell = "Sell";
+                    Algo_ID = QString::number(Algo_ID_Int);
+                }
+
+                QString Volant_No = query.value(rec.indexOf("Trader_Data")).toString();
+                int leg1_token_number = query.value(rec.indexOf("Leg1_Tok_No")).toInt();
+                int leg2_token_number = query.value(rec.indexOf("Leg2_Tok_No")).toInt();
+                int leg3_token_number = query.value(rec.indexOf("Leg3_Tok_No")).toInt();
+
+                int portfolio_type = PortfolioType.toInt();
+                QString Algo_Name = "";
+
+
+                 Algo_Name =get_Algo_Name(portfolio_type,leg1_token_number,leg2_token_number,leg3_token_number,devicer,decimal_precision);
+
+
+                int qty = query.value(rec.indexOf("Leg1_Total_Volume")).toInt();
+                //int leg2qty = query.value(rec.indexOf("Leg2_Total_Volume")).toInt();
+                int leg1Price = query.value(rec.indexOf("Leg1_Price")).toInt();
+                int leg2Price = query.value(rec.indexOf("Leg2_Price")).toInt();
+                int leg3Price = query.value(rec.indexOf("Leg3_Price")).toInt();
+                int Leg1BuySellIndicator = query.value(rec.indexOf("Leg1_Buy/Sell")).toInt();
+
+                QString Exch_Price = "0";
+                double Exch_Price_val  = 0;
+
+                switch (portfolio_type) {
+                case PortfolioType::F2F:{
+                    if(Leg1BuySellIndicator==1){
+                        Exch_Price_val = static_cast<double>((leg2Price - leg1Price) * 1.0) / devicer;
+                    }
+                    else{
+                        Exch_Price_val = static_cast<double>((leg1Price - leg2Price) * 1.0) / devicer;
+                    }
+
+                    break;
+
+                }
+                case PortfolioType::BY:{
+                    if(Leg1BuySellIndicator==1){
+                        Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
+                    }
+                    else{
+                        Exch_Price_val = static_cast<double>((leg3Price + leg1Price) * 1.0 - (2.0 * leg2Price)) / devicer;
+                    }
+
+                    break;
+                }
+                case PortfolioType::CR:{
+                    int strikePrice = ContractDetail::getInstance().GetStrikePrice(leg2_token_number,portfolio_type).toInt();
+                    if(Leg1BuySellIndicator==1){
+                        float diff = -leg1Price - leg3Price + leg2Price + strikePrice;
+                        Exch_Price_val = static_cast<double>(diff) / devicer;
+                    }
+                    else{
+                        float diff = -leg2Price - strikePrice + leg3Price + leg1Price;
+                        Exch_Price_val = static_cast<double>(diff) / devicer;
+                    }
+
+
+                    break;
+                }
+                case PortfolioType::BFLY_BID:{
+                    if(Leg1BuySellIndicator==1){
+                        Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
+                    }
+                    else{
+                        Exch_Price_val = static_cast<double>((leg3Price + leg1Price) * 1.0 - (2.0 * leg2Price)) / devicer;
+                    }
+
+                    break;
+                }
+
+                default:
+                    break;
+                }
+
+                Exch_Price = QString::number(Exch_Price_val,'f',decimal_precision);
+                QString User_Price = fixDecimal(((query.value(rec.indexOf("DesiredRate")).toDouble()) / devicer),decimal_precision);//QString::number(static_cast<double>(query.value(rec.indexOf("DesiredRate")).toDouble()) / devicer, 'f', decimal_precision+1);
+
+                double userPriceVal = query.value(rec.indexOf("DesiredRate")).toDouble() / devicer;
+                double JackpotVal =(Exch_Price_val-userPriceVal);
+                QString Jackpot = QString::number(JackpotVal,'f',decimal_precision);
+
+                int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
+
+                if(qty>0&&lotSize>0) // to prevent crash
+                    qty = qty / lotSize;
+                QString Traded_Lot = QString::number(qty);
+
+                QString Remaining_Lot = QString::number(static_cast<double>(query.value(rec.indexOf("RemainingQty")).toDouble()) / lotSize);
+                long long Trade_Time = query.value(rec.indexOf("TimeOrderEnteredHost")).toLongLong();
+                QDateTime dt = QDateTime::fromSecsSinceEpoch(Trade_Time);
+
+                QHash<QString,QString> tmp;
+                tmp.insert("Algo_ID",Algo_ID);
+                tmp.insert("Algo_Name",Algo_Name);
+                tmp.insert("Exch_Price",Exch_Price);
+                tmp.insert("User_Price",User_Price);
+                tmp.insert("Jackpot",Jackpot);
+                tmp.insert("Traded_Lot",Traded_Lot);
+                tmp.insert("Remaining_Lot",Remaining_Lot);
+                tmp.insert("Buy_Sell",Buy_Sell);
+                tmp.insert("Time",dt.toString("hh:mm:ss"));
+                tradeData.append(tmp);
+            }
+
+        }
+    }
+    return tradeData;
+}
+
 void mysql_conn::getTradeTableData(Trade_Table_Model *model, QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash)
 {
     QMutexLocker lock(&mutex);
@@ -568,7 +748,7 @@ void mysql_conn::getTradeTableData(Trade_Table_Model *model, QString user_id, QH
     bool ok = checkDBOpened(msg);
     if(ok)
     {
-        QString query_str = "SELECT * FROM Order_Table WHERE Trader_ID='"+user_id+"' and OrderState=7  ORDER BY Trader_Data DESC";
+        QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and OrderState=7  ORDER BY Trader_Data DESC";
         QSqlQuery query(query_str,db);
         if( !query.exec() )
         {

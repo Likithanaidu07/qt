@@ -538,17 +538,20 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         }
         QStyledItemDelegate::paint(painter, op, index);
     }
-    else if(c==PortfolioData_Idx::_Leg1
-             || c==PortfolioData_Idx::_ExpiryDateTime
-             || c==PortfolioData_Idx::_Cost
-             || c == PortfolioData_Idx::_OrderQuantity
-             || c==PortfolioData_Idx::_InstrumentName
-             || c==PortfolioData_Idx::_Leg2
-             || c==PortfolioData_Idx::_Leg3
-             || c==PortfolioData_Idx::_AdditionalData1
-             || c==PortfolioData_Idx::_PortfolioType
-             || c==PortfolioData_Idx::_Price
-             || c==PortfolioData_Idx:: _FuturePrice)
+    else if(c==PortfolioData_Idx::_OrderQuantity
+               || c == PortfolioData_Idx::_Leg1
+               || c==PortfolioData_Idx::_ExpiryDateTime
+               || c==PortfolioData_Idx::_Cost
+               || c==PortfolioData_Idx::_InstrumentName
+               || c==PortfolioData_Idx::_Leg2
+               || c==PortfolioData_Idx::_Leg3
+               || c==PortfolioData_Idx::_AdditionalData1
+               || c==PortfolioData_Idx::_PortfolioType
+               || c==PortfolioData_Idx::_Price
+               || c==PortfolioData_Idx::_SkipMarketStrike
+               || c==PortfolioData_Idx::_QuantityRatio
+               || c==PortfolioData_Idx::_BidLeg
+               || c==PortfolioData_Idx:: _FuturePrice)
     {
         QStyleOptionViewItem op(option);
         QColor color("#42A5F5");
@@ -595,6 +598,61 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
         }
+        QStyledItemDelegate::paint(painter, op, index);
+    }
+    if (/*c == PortfolioData_Idx::_Status ||*/ c==PortfolioData_Idx::_OrderQuantity)
+    {
+        Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+        PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+
+        //42A5F5
+        QColor color("#42A5F5");
+        op.palette.setColor(QPalette::Highlight , color);
+
+        if(portfolio->StatusVal.toInt()==portfolio_status::Active){
+            QColor color("#d7cfe8");
+            op.palette.setColor(QPalette::Highlight , Qt::transparent);
+            op.palette.setColor(QPalette::HighlightedText , Qt::black);
+            painter->fillRect(option.rect, color);
+
+            double borderWidth = 0.5;
+            QColor myColor(108, 117, 125);
+            QPen pen(myColor);
+            pen.setWidthF(borderWidth);
+            painter->setPen(pen);
+            QPoint p1= option.rect.bottomLeft();
+            QPoint p2= option.rect.bottomRight();
+            p1.setX(p1.x()-5);
+            p2.setX(p2.x()+5);
+            painter->drawLine(p1,p2);
+        }
+        else if(portfolio->StatusVal.toInt()==portfolio_status::Filled)
+        {
+            QColor color("#E0F1FF");
+            op.palette.setColor(QPalette::Highlight , Qt::transparent);
+            op.palette.setColor(QPalette::HighlightedText , Qt::black);
+            painter->fillRect(option.rect, color);
+
+            double borderWidth = 0.5;
+            QColor myColor(108, 117, 125);
+            QPen pen(myColor);
+            pen.setWidthF(borderWidth);
+            painter->setPen(pen);
+            painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
+        }
+        else if(portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser){
+            QColor color("#e5e0f0");
+            op.palette.setColor(QPalette::Highlight , Qt::transparent);
+            op.palette.setColor(QPalette::HighlightedText , Qt::black);
+            painter->fillRect(option.rect, color);
+            double borderWidth = 0.5;
+            QColor myColor(108, 117, 125);
+            QPen pen(myColor);
+            pen.setWidthF(borderWidth);
+            painter->setPen(pen);
+            painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
+        }
+
         QStyledItemDelegate::paint(painter, op, index);
     }
 }

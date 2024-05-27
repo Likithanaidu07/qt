@@ -80,7 +80,7 @@ public:
     QVBoxLayout *verticalLayout_5;
     QGroupBox *groupBox_16;
     QVBoxLayout *verticalLayout_18;
-    QLabel *label_12;
+    QLabel *m2mlabel;
     QLabel *label_30;
     QGroupBox *groupBox_15;
     QVBoxLayout *verticalLayout_19;
@@ -240,7 +240,8 @@ public:
         widget_14->setSizePolicy(sizePolicy);
         widget_14->setMinimumSize(QSize(0, 0));
         widget_14->setMaximumSize(QSize(16777215, 25));
-        widget_14->setStyleSheet(QString::fromUtf8(""));
+        widget_14->setStyleSheet(QString::fromUtf8("background-color: rgba(49, 86, 118, 1);\n"
+""));
         horizontalLayout_8 = new QHBoxLayout(widget_14);
         horizontalLayout_8->setObjectName(QString::fromUtf8("horizontalLayout_8"));
         horizontalLayout_8->setContentsMargins(-1, 2, -1, 5);
@@ -251,7 +252,7 @@ public:
         label_17 = new QLabel(widget_14);
         label_17->setObjectName(QString::fromUtf8("label_17"));
         label_17->setStyleSheet(QString::fromUtf8("#label_17{\n"
-"color: #275962;\n"
+"color: #FFFFFF;\n"
 "text-align: center;\n"
 "font-family: Work Sans;\n"
 "font-size: 16px;\n"
@@ -277,10 +278,7 @@ public:
         verticalLayout_4->setObjectName(QString::fromUtf8("verticalLayout_4"));
         groupBox = new QGroupBox(summary_widget);
         groupBox->setObjectName(QString::fromUtf8("groupBox"));
-        groupBox->setStyleSheet(QString::fromUtf8("/*#groupBox{\n"
-"border-radius: 6px;\n"
-"background: #ACD5DA;\n"
-"}"));
+        groupBox->setStyleSheet(QString::fromUtf8(""));
         verticalLayout_10 = new QVBoxLayout(groupBox);
         verticalLayout_10->setObjectName(QString::fromUtf8("verticalLayout_10"));
         verticalLayout_10->setContentsMargins(3, 2, 3, 2);
@@ -292,6 +290,12 @@ public:
 
         label_3 = new QLabel(groupBox);
         label_3->setObjectName(QString::fromUtf8("label_3"));
+        label_3->setLayoutDirection(Qt::LeftToRight);
+        label_3->setStyleSheet(QString::fromUtf8(" border-radius: 6px;\n"
+"    background: #ACD5DA;\n"
+"    display: flex; /* Use flexbox for centering */\n"
+"    justify-content: center; /* Center horizontally */\n"
+"    align-items: center;"));
 
         verticalLayout_10->addWidget(label_3);
 
@@ -450,11 +454,11 @@ public:
         verticalLayout_18 = new QVBoxLayout(groupBox_16);
         verticalLayout_18->setObjectName(QString::fromUtf8("verticalLayout_18"));
         verticalLayout_18->setContentsMargins(-1, 2, -1, 2);
-        label_12 = new QLabel(groupBox_16);
-        label_12->setObjectName(QString::fromUtf8("label_12"));
-        label_12->setAlignment(Qt::AlignCenter);
+        m2mlabel = new QLabel(groupBox_16);
+        m2mlabel->setObjectName(QString::fromUtf8("m2mlabel"));
+        m2mlabel->setAlignment(Qt::AlignCenter);
 
-        verticalLayout_18->addWidget(label_12);
+        verticalLayout_18->addWidget(m2mlabel);
 
         label_30 = new QLabel(groupBox_16);
         label_30->setObjectName(QString::fromUtf8("label_30"));
@@ -550,7 +554,7 @@ public:
         widget_15 = new QWidget(widget_13);
         widget_15->setObjectName(QString::fromUtf8("widget_15"));
         widget_15->setMaximumSize(QSize(16777215, 30));
-        widget_15->setStyleSheet(QString::fromUtf8("background-color: rgb(23, 165, 174);\n"
+        widget_15->setStyleSheet(QString::fromUtf8("background-color: rgba(43, 107, 111, 1);\n"
 ""));
         horizontalLayout_11 = new QHBoxLayout(widget_15);
         horizontalLayout_11->setObjectName(QString::fromUtf8("horizontalLayout_11"));
@@ -562,7 +566,7 @@ public:
         label_18 = new QLabel(widget_15);
         label_18->setObjectName(QString::fromUtf8("label_18"));
         label_18->setStyleSheet(QString::fromUtf8("#label_18{\n"
-"color: #ffffff;\n"
+"color: #FFFFFF;\n"
 "text-align: center;\n"
 "font-family: Work Sans;\n"
 "font-size: 16px;\n"
@@ -854,7 +858,10 @@ public:
         widget_16 = new QWidget(Logs_Widget);
         widget_16->setObjectName(QString::fromUtf8("widget_16"));
         widget_16->setMaximumSize(QSize(16777215, 25));
-        widget_16->setStyleSheet(QString::fromUtf8(""));
+        widget_16->setLayoutDirection(Qt::LeftToRight);
+        widget_16->setAutoFillBackground(false);
+        widget_16->setStyleSheet(QString::fromUtf8("background-color: rgb(77, 77, 115);\n"
+""));
         horizontalLayout_12 = new QHBoxLayout(widget_16);
         horizontalLayout_12->setObjectName(QString::fromUtf8("horizontalLayout_12"));
         horizontalLayout_12->setContentsMargins(-1, 2, -1, 5);
@@ -865,7 +872,7 @@ public:
         label_19 = new QLabel(widget_16);
         label_19->setObjectName(QString::fromUtf8("label_19"));
         label_19->setStyleSheet(QString::fromUtf8("#label_19{\n"
-"color: #104359;\n"
+"color: #FFFFFF;\n"
 "text-align: center;\n"
 "font-family: Work Sans;\n"
 "font-size: 16px;\n"
@@ -891,8 +898,10 @@ public:
 "    border-bottom-right-radius: 8px;\n"
 "    border-bottom-left-radius: 8px;\n"
 "background: #FFFFFF;\n"
+"line-height:1;\n"
 "}"));
-        textEdit->setReadOnly(true);
+        textEdit->setReadOnly(false);
+        textEdit->setCursorWidth(1);
 
         verticalLayout_9->addWidget(textEdit);
 
@@ -1209,40 +1218,160 @@ public:
         label_17->setText(QCoreApplication::translate("MainWindow", "Summary", nullptr));
         groupBox->setTitle(QString());
         label_2->setText(QCoreApplication::translate("MainWindow", "Margin Allocated", nullptr));
-        label_3->setText(QString());
+        label_3->setText(QCoreApplication::translate("MainWindow", "<html>\n"
+"<head/>\n"
+"<body>\n"
+"    <p style=\"text-align: center;\">\n"
+"        <span style=\"font-size: 11pt; font-weight: 700;\">\n"
+"            -\n"
+"        </span>\n"
+"    </p>\n"
+"</body>\n"
+"</html>\n"
+"", nullptr));
         groupBox_4->setTitle(QString());
         label_6->setText(QCoreApplication::translate("MainWindow", "Profit", nullptr));
-        label_23->setText(QString());
+        label_23->setText(QCoreApplication::translate("MainWindow", "<html>\n"
+"<head/>\n"
+"<body>\n"
+"    <p style=\"text-align: center;\">\n"
+"        <span style=\"font-size: 11pt; font-weight: 700;\">\n"
+"            -\n"
+"        </span>\n"
+"    </p>\n"
+"</body>\n"
+"</html>\n"
+"", nullptr));
         groupBox_2->setTitle(QString());
         label_20->setText(QCoreApplication::translate("MainWindow", "Blank Trade", nullptr));
-        label_24->setText(QString());
+        label_24->setText(QCoreApplication::translate("MainWindow", "<html>\n"
+"<head/>\n"
+"<body>\n"
+"    <p style=\"text-align: center;\">\n"
+"        <span style=\"font-size: 11pt; font-weight: 700;\">\n"
+"            -\n"
+"        </span>\n"
+"    </p>\n"
+"</body>\n"
+"</html>\n"
+"", nullptr));
         groupBox_12->setTitle(QString());
         label_15->setText(QCoreApplication::translate("MainWindow", "Market Protection", nullptr));
-        label_33->setText(QString());
+        label_33->setText(QCoreApplication::translate("MainWindow", "<html>\n"
+"<head/>\n"
+"<body>\n"
+"    <p style=\"text-align: center;\">\n"
+"        <span style=\"font-size: 11pt; font-weight: 700;\">\n"
+"            -\n"
+"        </span>\n"
+"    </p>\n"
+"</body>\n"
+"</html>\n"
+"", nullptr));
         groupBox_10->setTitle(QString());
         label_7->setText(QCoreApplication::translate("MainWindow", "Margin Used", nullptr));
-        label_25->setText(QString());
+        label_25->setText(QCoreApplication::translate("MainWindow", "<html>\n"
+"<head/>\n"
+"<body>\n"
+"    <p style=\"text-align: center;\">\n"
+"        <span style=\"font-size: 11pt; font-weight: 700;\">\n"
+"            -\n"
+"        </span>\n"
+"    </p>\n"
+"</body>\n"
+"</html>\n"
+"", nullptr));
         groupBox_9->setTitle(QString());
         label_8->setText(QCoreApplication::translate("MainWindow", "Total Order", nullptr));
-        label_26->setText(QString());
+        label_26->setText(QCoreApplication::translate("MainWindow", "<html>\n"
+"<head/>\n"
+"<body>\n"
+"    <p style=\"text-align: center;\">\n"
+"        <span style=\"font-size: 11pt; font-weight: 700;\">\n"
+"            -\n"
+"        </span>\n"
+"    </p>\n"
+"</body>\n"
+"</html>\n"
+"", nullptr));
         groupBox_6->setTitle(QString());
         label_9->setText(QCoreApplication::translate("MainWindow", "Active Strategies", nullptr));
-        label_27->setText(QString());
+        label_27->setText(QCoreApplication::translate("MainWindow", "<html>\n"
+"<head/>\n"
+"<body>\n"
+"    <p style=\"text-align: center;\">\n"
+"        <span style=\"font-size: 11pt; font-weight: 700;\">\n"
+"            -\n"
+"        </span>\n"
+"    </p>\n"
+"</body>\n"
+"</html>\n"
+"", nullptr));
         groupBox_7->setTitle(QString());
         label_10->setText(QCoreApplication::translate("MainWindow", "Enabled Strategy", nullptr));
-        label_28->setText(QString());
+        label_28->setText(QCoreApplication::translate("MainWindow", "<html>\n"
+"<head/>\n"
+"<body>\n"
+"    <p style=\"text-align: center;\">\n"
+"        <span style=\"font-size: 11pt; font-weight: 700;\">\n"
+"            -\n"
+"        </span>\n"
+"    </p>\n"
+"</body>\n"
+"</html>\n"
+"", nullptr));
         groupBox_16->setTitle(QString());
-        label_12->setText(QCoreApplication::translate("MainWindow", "M2M", nullptr));
-        label_30->setText(QString());
+        m2mlabel->setText(QCoreApplication::translate("MainWindow", "M2M", nullptr));
+        label_30->setText(QCoreApplication::translate("MainWindow", "<html>\n"
+"<head/>\n"
+"<body>\n"
+"    <p style=\"text-align: center;\">\n"
+"        <span style=\"font-size: 11pt; font-weight: 700;\">\n"
+"            -\n"
+"        </span>\n"
+"    </p>\n"
+"</body>\n"
+"</html>\n"
+"", nullptr));
         groupBox_15->setTitle(QString());
         label_13->setText(QCoreApplication::translate("MainWindow", "Total Trades", nullptr));
-        label_31->setText(QString());
+        label_31->setText(QCoreApplication::translate("MainWindow", "<html>\n"
+"<head/>\n"
+"<body>\n"
+"    <p style=\"text-align: center;\">\n"
+"        <span style=\"font-size: 11pt; font-weight: 700;\">\n"
+"            -\n"
+"        </span>\n"
+"    </p>\n"
+"</body>\n"
+"</html>\n"
+"", nullptr));
         groupBox_14->setTitle(QString());
         label_14->setText(QCoreApplication::translate("MainWindow", "Rejected Orders", nullptr));
-        label_32->setText(QString());
+        label_32->setText(QCoreApplication::translate("MainWindow", "<html>\n"
+"<head/>\n"
+"<body>\n"
+"    <p style=\"text-align: center;\">\n"
+"        <span style=\"font-size: 11pt; font-weight: 700;\">\n"
+"            -\n"
+"        </span>\n"
+"    </p>\n"
+"</body>\n"
+"</html>\n"
+"", nullptr));
         groupBox_11->setTitle(QString());
         label_16->setText(QCoreApplication::translate("MainWindow", "Span Margin", nullptr));
-        label_34->setText(QString());
+        label_34->setText(QCoreApplication::translate("MainWindow", "<html>\n"
+"<head/>\n"
+"<body>\n"
+"    <p style=\"text-align: center;\">\n"
+"        <span style=\"font-size: 11pt; font-weight: 700;\">\n"
+"            -\n"
+"        </span>\n"
+"    </p>\n"
+"</body>\n"
+"</html>\n"
+"", nullptr));
         label_18->setText(QCoreApplication::translate("MainWindow", "Watch", nullptr));
         Index_Name->setText(QString());
         watch_val1->setText(QString());
@@ -1259,6 +1388,9 @@ public:
         Volume_Label->setText(QCoreApplication::translate("MainWindow", "Volume", nullptr));
         Volume_Num->setText(QCoreApplication::translate("MainWindow", "0.00", nullptr));
         label_19->setText(QCoreApplication::translate("MainWindow", "Logs", nullptr));
+        textEdit->setMarkdown(QCoreApplication::translate("MainWindow", "line 1\n"
+"\n"
+"", nullptr));
         textEdit->setHtml(QCoreApplication::translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
@@ -1266,7 +1398,7 @@ public:
 "li.unchecked::marker { content: \"\\2610\"; }\n"
 "li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
-"<p style=\"-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><br /></p></body></html>", nullptr));
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">line 1</p></body></html>", nullptr));
         label->setText(QCoreApplication::translate("MainWindow", "Logo", nullptr));
         menu->setText(QString());
         minimize->setText(QString());

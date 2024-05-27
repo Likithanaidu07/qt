@@ -67,12 +67,14 @@ public:
     QString get_Algo_Name(int algo_type,int leg1_token_number,int leg2_token_number,int leg3_token_number,double devicer,int decimal_precision);
     void  getTradeTableData(Trade_Table_Model* model,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
     void  getNetPosTableData(Net_Position_Table_Model* model,QString user_id);
+    void getSummaryTableData();
     void getLinersTableData(QString user_id);
     QString fixDecimal(double num,int decimal_precision);
     algo_data_insert_status insertToAlgoTable(algo_data_to_insert data,int MaxPortfolioCount,QString &msg);
     bool deleteAlgo(QString PortfolioNumber,QString &msg);
     void logToDB(QString logMessage);
 
+      QList<QHash<QString,QString>>  getTradePopUPData(QString user_id, QString portfolioNumber,QString PortfolioType);
     ///
     /// \brief loadCurrentDayLogs to load logs of one day
     ///

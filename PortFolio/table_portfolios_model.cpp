@@ -136,7 +136,10 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
                  c == PortfolioData_Idx::_AdditionalData1 ||
                  c == PortfolioData_Idx::_PortfolioType ||
                  c == PortfolioData_Idx::_Price ||
-                 c == PortfolioData_Idx::_FuturePrice){
+                 c == PortfolioData_Idx::_FuturePrice||
+                 c == PortfolioData_Idx::_QuantityRatio ||
+                 c == PortfolioData_Idx::_SkipMarketStrike||
+                 c == PortfolioData_Idx::_BidLeg){
 
             return font;
         }
@@ -166,6 +169,22 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
             return Qt::AlignCenter;
         }
         else if(index.column()==PortfolioData_Idx::_ExpiryDateTime || index.column()==PortfolioData_Idx::_Leg1){
+            return Qt::AlignCenter;
+        }
+        else if(index.column()==PortfolioData_Idx::_SkipMarketStrike){
+            return Qt::AlignCenter;
+        }
+        else if(index.column()==PortfolioData_Idx::_FuturePrice){
+            return Qt::AlignCenter;
+        }
+        else if(index.column()==PortfolioData_Idx::_BidLeg){
+            return Qt::AlignCenter;
+        }
+        else if(index.column()==PortfolioData_Idx::_QuantityRatio){
+            return Qt::AlignCenter;
+
+        }
+        else if(index.column()==PortfolioData_Idx::_Cost){
             return Qt::AlignCenter;
         }
     }
@@ -243,6 +262,22 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         }
         else if (index.column() == PortfolioData_Idx::_OrderQuantity) {
             return portfolio->OrderQuantity;
+        }
+        else if (index.column() == PortfolioData_Idx::_QuantityRatio) {
+            return portfolio->QuantityRatio;
+
+        }
+        else if (index.column() == PortfolioData_Idx::_SkipMarketStrike) {
+            return portfolio->SkipMarketStrike;
+
+        }
+        else if (index.column() == PortfolioData_Idx::_BidLeg) {
+            return portfolio->BidLeg;
+
+        }
+        else if (index.column() == PortfolioData_Idx::_FuturePrice) {
+            return portfolio->FuturePrice;
+
         }
         /*else if (index.column() == PortfolioData_Idx::_InstrumentName) {
                      return portfolio->InstrumentName;

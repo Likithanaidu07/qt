@@ -13,6 +13,12 @@
 #include "QSettings"
 #include "QStandardItemModel"
 #include <QStandardPaths>
+#define STORE_CONTRACT_LOCALLY// Enabling this will store contract.bin locally by fetching it from the DB on each new day when logging in for the first time,
+                              //and on subsequent logins, the contract will load from the local file.
+
+
+
+
 
 class ContractDetail
 {
@@ -67,6 +73,15 @@ public:
     QStandardItemModel *Get_model_FUT_CON_REV();
     QStandardItemModel *Get_model_start_strike_BFLY();
     QStandardItemModel *Get_model_start_strike_BFLY_BID();
+
+#ifdef STORE_CONTRACT_LOCALLY
+    PortfolioType checkAlogTypeForTheData(QString instrument_type);
+    void StoreContractToLocalFile();
+    bool LoadContractLocal(QHash<QString, QStringList> &_m_ContractDetailsFiltered,
+                      QStringList &F2F_data_list_Sorted_Key,
+                      QStringList &BFLY_data_list_Sorted_Key,
+                           QStringList &BFLY_BID_data_list_Sorted_Key);
+#endif
 };
 
 

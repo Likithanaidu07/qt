@@ -373,7 +373,7 @@ public:
         lineEdit_Password->setPlaceholderText(QCoreApplication::translate("loginwindow", "Password", nullptr));
         logo->setText(QString());
         name->setText(QString());
-        lineEditUsername->setText(QCoreApplication::translate("loginwindow", "bid1", nullptr));
+        lineEditUsername->setText(QCoreApplication::translate("loginwindow", "STM101", nullptr));
         lineEditUsername->setPlaceholderText(QCoreApplication::translate("loginwindow", "Username", nullptr));
         label_wron_input->setText(QString());
         label_forgot->setText(QCoreApplication::translate("loginwindow", "Forgot Password?", nullptr));

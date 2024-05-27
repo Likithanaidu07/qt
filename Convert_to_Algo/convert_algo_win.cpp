@@ -720,11 +720,12 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                 else if(algo_type==QString::number(PortfolioType::OPEN_BOX))
                     algo_type="Open-BOX";
                 else if(algo_type==QString::number(PortfolioType::BFLY_BID))
-                    algo_type=BFLY_BID_TYPE;
+                    algo_type="BFLY_BID_TYPE";
 
                 QString Algo_Name = algo_type+"-"+sharedData->algo_data_list[i].Algo_Name;
-                QString htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QTime::currentTime().toString(LOG_TIME_FORMAT) +"</span>"
-                              + "<span style='color: black;'>"+sharedData->foo_user_id +
+                QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:0.4;'>"
+                                      "<span>" + QTime::currentTime().toString("hh:mm:ss") +"</span>"
+                              + "<span style='font-weight:400;color: black;'>"+sharedData->foo_user_id +
                                       " Inserted New Algo: "+ Algo_Name +"</span> </p>";
 
                 emit display_log_text_signal(htmlContent);
