@@ -136,7 +136,6 @@ void loginwindow::on_pushButtonlogin_clicked()
 ////                    settings.endGroup();
 ////                }
 //            }
-            emit loginStatus(userData);
             QMetaObject::invokeMethod(this, [this,userData]() {
                 ui->pushButtonlogin->setEnabled(true);
                 if(userData.loggedIn==false&&userData.dbError==false){
@@ -148,6 +147,10 @@ void loginwindow::on_pushButtonlogin_clicked()
                         ui->label_wron_input->setVisible(true);
                         ui->label_wron_input->setText("Wrong Password !");
                     }
+                }
+                else
+                {
+                    emit loginStatus(userData);
                 }
             });
         };

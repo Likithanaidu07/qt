@@ -48,6 +48,7 @@ SOURCES += \
     custom_grid_table/gridtableview.cpp \
     custom_grid_table/tableheaderitem.cpp \
     custom_q_completer.cpp \
+    loadingdatawindow.cpp \
     logger/logger.cpp \
     loginwindow.cpp \
     main.cpp \
@@ -94,6 +95,7 @@ HEADERS += \
     custom_grid_table/tableheaderitem.h \
     custom_q_completer.h \
     defines.h \
+    loadingdatawindow.h \
     logger/logger.h \
     loginwindow.h \
     mainwindow.h \
@@ -103,6 +105,7 @@ HEADERS += \
 
 FORMS += \
     convert_algo_win.ui \
+    loadingdatawindow.ui \
     loginwindow.ui \
     mainwindow.ui \
     watch_data_list_item.ui

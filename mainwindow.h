@@ -32,6 +32,7 @@
 #include "SlowDataIndices/slowdataindices.h"
 #include "Convert_to_Algo/convert_algo_win.h"
 #include"ui_loginwindow.h"
+#include "loadingdatawindow.h"
 
 class mysql_conn;
 QT_BEGIN_NAMESPACE
@@ -67,9 +68,12 @@ signals:
     void logoutRequested();
     void display_log_text_signal(QString);
     void update_ui_signal(int);
-
+    void signalHideProgressBar();
 private:
     Ui::MainWindow *ui;
+
+    loadingdatawindow *loadingDataWinodw;
+
     void createINIFileIfNotExist();
     void loadSettings();
     mysql_conn * db_conn;
@@ -165,6 +169,7 @@ public slots:
     void resizePortFolioTableColWidthSlot(int width);
     void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
     void slotAddLogForAddAlgoRecord(QString str);
+    void slotHideProgressBar();
 
 private slots:
     void on_close_clicked();
