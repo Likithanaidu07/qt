@@ -568,7 +568,7 @@ void mysql_conn::getTradeTableData(Trade_Table_Model *model, QString user_id, QH
     bool ok = checkDBOpened(msg);
     if(ok)
     {
-        QString query_str = "SELECT * FROM Order_Table WHERE Trader_ID='"+user_id+"' and OrderState=7  ORDER BY Trader_Data DESC";
+        QString query_str = "SELECT * FROM Order_Table_bid WHERE Trader_ID='"+user_id+"' and OrderState=7  ORDER BY Trader_Data DESC";
         QSqlQuery query(query_str,db);
         if( !query.exec() )
         {
