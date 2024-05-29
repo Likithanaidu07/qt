@@ -1093,7 +1093,7 @@ void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user
                 net_pos_dataList[TokenNo].Buy_Price =net_pos_dataList[TokenNo].Buy_Avg_Price*net_pos_dataList[TokenNo].Buy_Total_Lot;
                 net_pos_dataList[TokenNo].Sell_Price = net_pos_dataList[TokenNo].Sell_Total_Lot*net_pos_dataList[TokenNo].Sell_Avg_Price;
 
-                double Profit = net_pos_dataList[TokenNo].Sell_Price-net_pos_dataList[TokenNo].Buy_Price;
+                double Profit = net_pos_dataList[TokenNo].Buy_Price-net_pos_dataList[TokenNo].Sell_Price;
                 QStringList rowList;
                 rowList.append(net_pos_dataList[TokenNo].Stock_Name);
                 rowList.append(fixDecimal(net_pos_dataList[TokenNo].Buy_Total_Lot,decimal_precision));
