@@ -55,6 +55,9 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
         return  trade_data_list[r][c];
     default:
         return QVariant();
+    case Qt::TextAlignmentRole:{
+        return Qt::AlignCenter;
+    }
 
     case Qt::FontRole: {
         QFont font("Work Sans");

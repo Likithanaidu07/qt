@@ -6,16 +6,72 @@ OrderDetail_Popup::OrderDetail_Popup(QWidget *parent)
     , ui(new Ui::OrderDetail_Popup)
 {
     ui->setupUi(this);
+ QString styleSheet = R"(
+    QTableWidget {
+        background-color: transparent;
+        alternate-background-color: #F0FFFA; /* light green with transparency */
+        gridline-color: #FFF;
+        font: bold;
+    }
+    QHeaderView::section {
+        background-color: #505050; /* dark grey */
+        color: white;
+        padding: 4px;
+        border: 1px solid #FFF;
+    }
+    QTableWidget::item {
+        background-color: rgba(0, 255, 0, 0.1); /* light green with transparency */
+        border: 1px solid #D6FCF0;
+    }
+    QTableWidget::item:selected {
+        background-color: #D6FCF0; /* selected color, slightly darker */
+        color: black; /* black text color when selected */
+    }
 
+    )";
+
+    ui->tableWidget_Buy->setStyleSheet(styleSheet);
+
+ QString styleSheet1 = R"(
+    QTableWidget {
+        background-color: transparent;
+        alternate-background-color: #FED9D9;
+        gridline-color: #FFF;
+        font: bold;
+    }
+    QHeaderView::section {
+        background-color: #505050;
+        color: white;
+        padding: 4px;
+        border: 1px solid #FFF;
+    }
+    QTableWidget::item {
+        background-color:#FED9D9 ;
+        border: 1px solid #FED9D9;
+    }
+    QTableWidget::item:selected {
+        background-color: #FED9D9;
+        color: black;
+    }
+
+    )";
+
+ui->tableWidget_Sell->setStyleSheet(styleSheet1);
 
 
 }
+
 void OrderDetail_Popup::getData(QString user_id, QString portfolioNumber,QString PortfolioType){
     mysql_conn *db_conn = new mysql_conn(0,"login_conn");
 
     QList<QHash<QString,QString>> data =  db_conn->getTradePopUPData(user_id, portfolioNumber,PortfolioType);
+    ui->tableWidget_Buy->clear();
+    ui->tableWidget_Sell->clear();
+
     for(int i=0;i<data.length();i++){
         if(data[i]["Buy_Sell"]=="Buy"){
+            QColor color("#D6FCF0");
+
             ui->tableWidget_Buy->insertRow( ui->tableWidget_Buy->rowCount());
             QTableWidgetItem *c0 = new QTableWidgetItem();
             //c0->setData(Qt::UserRole + 1,data[i]["Exch_Price"]);

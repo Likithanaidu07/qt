@@ -22,16 +22,16 @@
 
 
 struct net_pos_data_{
-    // QString  token_number;
-    //QString  Stock_Name;
+    QString  token_number;
+    QString  Stock_Name;
     //QString  Expiry;
     double Buy_Total_Lot;
     double Sell_Total_Lot;
-    // double Buy_Price;
-    // double Sell_Price;
+    double Buy_Price;
+    double Sell_Price;
     double Buy_Avg_Price;
     double Sell_Avg_Price;
-    //double Net_Qty;
+    double Net_Qty;
     //QString MTM;
 };
 
