@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 6.3.1
+** Created by: Qt User Interface Compiler version 6.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -161,10 +161,6 @@ public:
     QHBoxLayout *horizontalLayout_6;
     QPushButton *Positions_Button;
     QToolButton *Positions_Close;
-    QWidget *Liners_Widget;
-    QHBoxLayout *horizontalLayout_7;
-    QPushButton *Liners_Button;
-    QToolButton *Liners_Close;
     QWidget *HP_Widget;
     QHBoxLayout *horizontalLayout_9;
     QPushButton *HP_Button;
@@ -732,7 +728,13 @@ public:
 "    background: #CCC; /* Change color when disabled */\n"
 "    color: #666; /* Change text color when disabled */\n"
 "}"));
-        QIcon icon(QIcon::fromTheme(QString::fromUtf8("edit-delete")));
+        QIcon icon;
+        QString iconThemeName = QString::fromUtf8("edit-delete");
+        if (QIcon::hasThemeIcon(iconThemeName)) {
+            icon = QIcon::fromTheme(iconThemeName);
+        } else {
+            icon.addFile(QString::fromUtf8("."), QSize(), QIcon::Normal, QIcon::Off);
+        }
         Sell_Watch_Button->setIcon(icon);
 
         horizontalLayout_13->addWidget(Sell_Watch_Button);
@@ -1080,29 +1082,6 @@ public:
 
         horizontalLayout_2->addWidget(Positions_Widget);
 
-        Liners_Widget = new QWidget(widget_5);
-        Liners_Widget->setObjectName(QString::fromUtf8("Liners_Widget"));
-        horizontalLayout_7 = new QHBoxLayout(Liners_Widget);
-        horizontalLayout_7->setSpacing(4);
-        horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
-        horizontalLayout_7->setContentsMargins(8, 0, 8, 0);
-        Liners_Button = new QPushButton(Liners_Widget);
-        Liners_Button->setObjectName(QString::fromUtf8("Liners_Button"));
-        sizePolicy3.setHeightForWidth(Liners_Button->sizePolicy().hasHeightForWidth());
-        Liners_Button->setSizePolicy(sizePolicy3);
-        Liners_Button->setMaximumSize(QSize(40, 14));
-
-        horizontalLayout_7->addWidget(Liners_Button);
-
-        Liners_Close = new QToolButton(Liners_Widget);
-        Liners_Close->setObjectName(QString::fromUtf8("Liners_Close"));
-        Liners_Close->setMaximumSize(QSize(8, 8));
-
-        horizontalLayout_7->addWidget(Liners_Close);
-
-
-        horizontalLayout_2->addWidget(Liners_Widget);
-
         HP_Widget = new QWidget(widget_5);
         HP_Widget->setObjectName(QString::fromUtf8("HP_Widget"));
         sizePolicy1.setHeightForWidth(HP_Widget->sizePolicy().hasHeightForWidth());
@@ -1410,8 +1389,6 @@ public:
         OrderBook_Close->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         Positions_Button->setText(QCoreApplication::translate("MainWindow", "Positions", nullptr));
         Positions_Close->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
-        Liners_Button->setText(QCoreApplication::translate("MainWindow", "Liners", nullptr));
-        Liners_Close->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         HP_Button->setText(QCoreApplication::translate("MainWindow", "Historical Positions", nullptr));
         HP_Close->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         Templates_Button->setText(QCoreApplication::translate("MainWindow", "Templates", nullptr));

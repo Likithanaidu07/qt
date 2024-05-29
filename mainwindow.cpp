@@ -509,7 +509,7 @@ MainWindow::MainWindow(QWidget *parent)
         titlecontainer->setStyleSheet(DockTitleBar_Style);
         QHBoxLayout *titleinternalLayout = new QHBoxLayout(titlecontainer);
         titleinternalLayout->setSpacing(10);
-        titleinternalLayout->setContentsMargins(10,8,10,6);
+        titleinternalLayout->setContentsMargins(17,8,10,6);
         QLabel *label = new QLabel("Algorithms");
         QFont fontlabel=label->font();
         QSpacerItem* titlespc = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -519,7 +519,7 @@ MainWindow::MainWindow(QWidget *parent)
         dockclose->setIconSize(QSize(14, 14));
         fontlabel.setFamily("Work Sans");
         label->setFont(fontlabel);
-        label->setStyleSheet("color: #495057;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal;");
+        label->setStyleSheet("color: #495057;font-size: 16px;font-style: normal;font-weight: 700;line-height: normal;");
         titleinternalLayout->addWidget(label);
         titleinternalLayout->addSpacerItem(titlespc);
         titleinternalLayout->addWidget(dockclose);
@@ -530,7 +530,7 @@ MainWindow::MainWindow(QWidget *parent)
             T_Portfolio_DockWin->setWidget(container);
             QGridLayout *lay = new QGridLayout(container);
             container->setLayout(lay);
-            lay->setContentsMargins(0, 0, 0, 0);
+            lay->setContentsMargins(5, 0, 0, 0);
             lay->setSpacing(0);
             lay->setRowStretch(0, 0); //set minimum hieght for first row
             lay->setRowStretch(1, 1);//set maximum hieght for second row table
@@ -542,27 +542,28 @@ MainWindow::MainWindow(QWidget *parent)
 
             QToolButton *ConvertAlgo_button = new QToolButton();
             connect(ConvertAlgo_button, SIGNAL(clicked()), this, SLOT(on_ConvertAlgo_button_clicked()));
-            ConvertAlgo_button->setFixedSize(125,24);
             //Frame 364.png
             ConvertAlgo_button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            ConvertAlgo_button->setIcon(QIcon(":/Convert to Algo.png"));
-            ConvertAlgo_button->setText("Convert to Algo");
-            ConvertAlgo_button->setLayoutDirection(Qt::LeftToRight);
+
+            ConvertAlgo_button->setText("Build Algo");
+            ConvertAlgo_button->setStyleSheet("text-align: center;");
+
             const char convert_to_algo_button[]="QToolButton {"
-                                                "border-radius: 4px;" "border: 1px solid #188CCA;"
-                                                "background: #1585C0;"
-                                                "color: #FFF;"
-                                                "font-size: 12px;"
-                                                "font-style: normal;"
-                                                "font-weight: 500;"
-                                                "line-height: normal;"
-                                                "}"
-                                                "QToolButton:hover{"
-                                                "border-radius: 4px;"
-                                                "border: 1px solid #106B9A;"
-                                                "background: #106B9A;"
-                                                "}";
+                                                  "border-radius: 4px;" "border: 1px solid #188CCA;"
+                                                  "background: #1585C0;"
+                                                  "color: #FFF;"
+                                                  "font-size: 12px;"
+                                                  "font-style: normal;"
+                                                  "font-weight: 500;"
+                                                  "line-height: normal;"
+                                                  "}"
+                                                  "QToolButton:hover{"
+                                                  "border-radius: 4px;"
+                                                  "border: 1px solid #106B9A;"
+                                                  "background: #106B9A;"
+                                                  "}";
             ConvertAlgo_button->setStyleSheet(convert_to_algo_button);
+            ConvertAlgo_button->setContentsMargins(10,-1,-1,-1);
             ConvertAlgo_button->setFont(headerfont);
 
             QWidget *test=new QWidget;
@@ -602,7 +603,7 @@ MainWindow::MainWindow(QWidget *parent)
                                         "background: #F7F7FF;"
                                         "color: #4F5D75;"
                                         "font-style: normal;"
-                                        "font-size: 10px;"
+                                        "font-size: 12px;"
                                         "font-weight: 500;"
                                         "line-height: normal;"
                                         "}"
@@ -612,7 +613,7 @@ MainWindow::MainWindow(QWidget *parent)
                                         "background: #4F5D75;"
                                         "color: #FFF; "
                                         "font-family: Work Sans;"
-                                        "font-size: 10px;"
+                                        "font-size: 12px;"
                                         "font-style: normal;"
                                         "font-weight: 500;"
                                         "line-height: normal;"
@@ -836,12 +837,12 @@ MainWindow::MainWindow(QWidget *parent)
     /************Historical Positions Window********************************/
     QPixmap pixmapdock_hp_close(":/dock_close.png");
 
-    dock_win_combined_tracker =  new QDockWidget(tr("Historical Positions"), this);
-    connect(dock_win_combined_tracker, SIGNAL(visibilityChanged(bool)), this, SLOT(OnHPDockWidgetVisiblityChanged(bool)));
-    dock_win_combined_tracker->setAllowedAreas(Qt::AllDockWidgetAreas );
+ dock_win_combined_tracker =  new QDockWidget(tr("Historical Positions"), this);
+ connect(dock_win_combined_tracker, SIGNAL(visibilityChanged(bool)), this, SLOT(OnHPDockWidgetVisiblityChanged(bool)));
+ dock_win_combined_tracker->setAllowedAreas(Qt::AllDockWidgetAreas );
 
     //create a titlebar
-    QWidget *hp_titlebar=new QWidget;
+   QWidget *hp_titlebar=new QWidget;
     hp_titlebar->setStyleSheet(DockTitleBar_Style);
     QHBoxLayout *position_hp_layout=new QHBoxLayout(hp_titlebar);
     position_hp_layout->setSpacing(10);
@@ -916,7 +917,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Algorithms_Close->setVisible(false);
     ui->OrderBook_Close->setVisible(false);
     ui->Positions_Close->setVisible(false);
-    ui->Liners_Close->setVisible(false);
     ui->HP_Close->setVisible(false);
     ui->Templates_Close->setVisible(false);
 
@@ -936,7 +936,6 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Algorithms_Close->setIcon(pixmapbuttonclose);
     ui->OrderBook_Close->setIcon(pixmapbuttonclose);
     ui->Positions_Close->setIcon(pixmapbuttonclose);
-    ui->Liners_Close->setIcon(pixmapbuttonclose);
     ui->HP_Close->setIcon(pixmapbuttonclose);
     ui->Templates_Close->setIcon(pixmapbuttonclose);
 
@@ -1336,7 +1335,7 @@ void MainWindow::loadContract(){
 
         QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:0.4;'>"
                               "<span>" + QTime::currentTime().toString("hh:mm:ss")
-                              + "</span><span style='font-weight:400;color: black;'> file loading... </span></p>";
+                              + "&nbsp;</span><span style='font-weight:400;color: black;'> file loading... </span></p>";
 
 
 
@@ -1355,7 +1354,7 @@ void MainWindow::loadContract(){
 
         htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:0.4;'>"
                       "<span>" + QTime::currentTime().toString("hh:mm:ss")
-                      + "</span><span style='font-weight:400;color: black;'> file loaded </span></p>";
+                      + "&nbsp;</span><span style='font-weight:400;color: black;'> file loaded </span></p>";
 
 
         emit display_log_text_signal(htmlContent);
@@ -1458,11 +1457,11 @@ void MainWindow::loadDataAndUpdateTable(int table){
         break;
     }
 
-    case T_Table::NET_POS:
+    case T_Table::NET_POS:{
         db_conn->getNetPosTableData(net_pos_model,QString::number(userData.UserId));
         emit data_loded_signal(T_Table::NET_POS);
         break;
-
+    }
     case T_Table::SUMMARY: {
         db_conn->getSummaryTableData();  // Correctly get the count
         emit data_loded_signal(T_Table::SUMMARY);
@@ -1541,10 +1540,7 @@ void MainWindow::updatePortFolioStatus(){
             QString Query = "UPDATE Portfolios SET Status='Active' where PortfolioNumber="+PortfolioNumber;
             bool success = db_conn->updateDB_Table(Query);
             if(success){
-                  QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:0.4;'>"
-                                        "<span style='background-color: transparent;'>" + QTime::currentTime().toString("hh:mm:ss")
-                                        + "</span><span style='font-weight:400;color: black;'> Activated portfolio [" + PortfolioNumber + "] </span></p>";
-                  emit display_log_text_signal(htmlContent);
+
                 db_conn->logToDB(QString("Activated portfolio ["+PortfolioNumber+"]"));
 
                 quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
@@ -1561,10 +1557,7 @@ void MainWindow::updatePortFolioStatus(){
             QString Query = "UPDATE Portfolios SET Status='DisabledByUser' where PortfolioNumber="+PortfolioNumber;
             bool success = db_conn->updateDB_Table(Query);
             if(success){
-                QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:0.4;'>"
-                                      "<span style='background-color: transparent;'>" + QTime::currentTime().toString("hh:mm:ss")
-                                      + "</span><span style='font-weight:400;color: black;'> Disabled portfolio [" + PortfolioNumber + "] </span></p>";
-                emit display_log_text_signal(htmlContent);
+
                 db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));
 
                 quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
@@ -1665,22 +1658,6 @@ void MainWindow::on_Positions_Close_clicked()
     dock_win_net_pos->close();
     ui->Positions_Widget->setStyleSheet("");
     ui->Positions_Close->setVisible(false);
-}
-
-
-void MainWindow::on_Liners_Button_clicked()
-{
-    //10
-    ui->Liners_Widget->setStyleSheet(stylesheetvis);
-    ui->Liners_Close->setVisible(true);
-}
-
-
-void MainWindow::on_Liners_Close_clicked()
-{
-    //10
-    ui->Liners_Widget->setStyleSheet("");
-    ui->Liners_Close->setVisible(false);
 }
 
 

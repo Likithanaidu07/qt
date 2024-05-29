@@ -178,8 +178,6 @@ private slots:
     void on_OrderBook_Close_clicked();
     void on_Positions_Button_clicked();
     void on_Positions_Close_clicked();
-    void on_Liners_Button_clicked();
-    void on_Liners_Close_clicked();
     void on_HP_Button_clicked();
     void on_HP_Close_clicked();
     void on_Templates_Button_clicked();
