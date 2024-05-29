@@ -44,6 +44,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
 
 
+    orderWin = new OrderDetail_Popup();
+
+
 //    QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect(convertalgo);
 //    effect->setBlurRadius(5);
 //    convertalgo->setGraphicsEffect(effect);
@@ -509,7 +512,7 @@ MainWindow::MainWindow(QWidget *parent)
         titlecontainer->setStyleSheet(DockTitleBar_Style);
         QHBoxLayout *titleinternalLayout = new QHBoxLayout(titlecontainer);
         titleinternalLayout->setSpacing(10);
-        titleinternalLayout->setContentsMargins(17,8,10,6);
+        titleinternalLayout->setContentsMargins(10,8,10,6);
         QLabel *label = new QLabel("Algorithms");
         QFont fontlabel=label->font();
         QSpacerItem* titlespc = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -519,7 +522,7 @@ MainWindow::MainWindow(QWidget *parent)
         dockclose->setIconSize(QSize(14, 14));
         fontlabel.setFamily("Work Sans");
         label->setFont(fontlabel);
-        label->setStyleSheet("color: #495057;font-size: 16px;font-style: normal;font-weight: 700;line-height: normal;");
+        label->setStyleSheet("color: #495057;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal;");
         titleinternalLayout->addWidget(label);
         titleinternalLayout->addSpacerItem(titlespc);
         titleinternalLayout->addWidget(dockclose);
@@ -530,7 +533,7 @@ MainWindow::MainWindow(QWidget *parent)
             T_Portfolio_DockWin->setWidget(container);
             QGridLayout *lay = new QGridLayout(container);
             container->setLayout(lay);
-            lay->setContentsMargins(5, 0, 0, 0);
+            lay->setContentsMargins(0, 0, 0, 0);
             lay->setSpacing(0);
             lay->setRowStretch(0, 0); //set minimum hieght for first row
             lay->setRowStretch(1, 1);//set maximum hieght for second row table
@@ -542,28 +545,27 @@ MainWindow::MainWindow(QWidget *parent)
 
             QToolButton *ConvertAlgo_button = new QToolButton();
             connect(ConvertAlgo_button, SIGNAL(clicked()), this, SLOT(on_ConvertAlgo_button_clicked()));
+            ConvertAlgo_button->setFixedSize(125,24);
             //Frame 364.png
             ConvertAlgo_button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-
-            ConvertAlgo_button->setText("Build Algo");
-            ConvertAlgo_button->setStyleSheet("text-align: center;");
-
+            ConvertAlgo_button->setIcon(QIcon(":/Convert to Algo.png"));
+            ConvertAlgo_button->setText("Convert to Algo");
+            ConvertAlgo_button->setLayoutDirection(Qt::LeftToRight);
             const char convert_to_algo_button[]="QToolButton {"
-                                                  "border-radius: 4px;" "border: 1px solid #188CCA;"
-                                                  "background: #1585C0;"
-                                                  "color: #FFF;"
-                                                  "font-size: 12px;"
-                                                  "font-style: normal;"
-                                                  "font-weight: 500;"
-                                                  "line-height: normal;"
-                                                  "}"
-                                                  "QToolButton:hover{"
-                                                  "border-radius: 4px;"
-                                                  "border: 1px solid #106B9A;"
-                                                  "background: #106B9A;"
-                                                  "}";
+                                                "border-radius: 4px;" "border: 1px solid #188CCA;"
+                                                "background: #1585C0;"
+                                                "color: #FFF;"
+                                                "font-size: 12px;"
+                                                "font-style: normal;"
+                                                "font-weight: 500;"
+                                                "line-height: normal;"
+                                                "}"
+                                                "QToolButton:hover{"
+                                                "border-radius: 4px;"
+                                                "border: 1px solid #106B9A;"
+                                                "background: #106B9A;"
+                                                "}";
             ConvertAlgo_button->setStyleSheet(convert_to_algo_button);
-            ConvertAlgo_button->setContentsMargins(10,-1,-1,-1);
             ConvertAlgo_button->setFont(headerfont);
 
             QWidget *test=new QWidget;
@@ -603,7 +605,7 @@ MainWindow::MainWindow(QWidget *parent)
                                         "background: #F7F7FF;"
                                         "color: #4F5D75;"
                                         "font-style: normal;"
-                                        "font-size: 12px;"
+                                        "font-size: 10px;"
                                         "font-weight: 500;"
                                         "line-height: normal;"
                                         "}"
@@ -613,7 +615,7 @@ MainWindow::MainWindow(QWidget *parent)
                                         "background: #4F5D75;"
                                         "color: #FFF; "
                                         "font-family: Work Sans;"
-                                        "font-size: 12px;"
+                                        "font-size: 10px;"
                                         "font-style: normal;"
                                         "font-weight: 500;"
                                         "line-height: normal;"
@@ -837,12 +839,12 @@ MainWindow::MainWindow(QWidget *parent)
     /************Historical Positions Window********************************/
     QPixmap pixmapdock_hp_close(":/dock_close.png");
 
- dock_win_combined_tracker =  new QDockWidget(tr("Historical Positions"), this);
- connect(dock_win_combined_tracker, SIGNAL(visibilityChanged(bool)), this, SLOT(OnHPDockWidgetVisiblityChanged(bool)));
- dock_win_combined_tracker->setAllowedAreas(Qt::AllDockWidgetAreas );
+    dock_win_combined_tracker =  new QDockWidget(tr("Historical Positions"), this);
+    connect(dock_win_combined_tracker, SIGNAL(visibilityChanged(bool)), this, SLOT(OnHPDockWidgetVisiblityChanged(bool)));
+    dock_win_combined_tracker->setAllowedAreas(Qt::AllDockWidgetAreas );
 
     //create a titlebar
-   QWidget *hp_titlebar=new QWidget;
+    QWidget *hp_titlebar=new QWidget;
     hp_titlebar->setStyleSheet(DockTitleBar_Style);
     QHBoxLayout *position_hp_layout=new QHBoxLayout(hp_titlebar);
     position_hp_layout->setSpacing(10);
@@ -1149,6 +1151,9 @@ void MainWindow::loadSettings(){
         }
         settings.endGroup();
     }
+    //currently hardcoded for FO
+    devicer = FO_DEVICER;
+    decimal_precision = FO_DECIMAL_PRECISION;
 //    if(market_type=="fo"){
 //        devicer = FO_DEVICER;
 //        decimal_precision = FO_DECIMAL_PRECISION;
@@ -1261,14 +1266,14 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
              int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
              double val = valStr.toDouble();
              val=val*lotSize;
-             if(val< userData.IDXOpenLimit ) {
+             //if(val< userData.IDXOpenLimit ) {
                 QString Query = "UPDATE Portfolios SET BuyTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
                 db_conn->updateDB_Table(Query);
                 bool success = db_conn->updateDB_Table(Query);
                 if(success){
                   db_conn->logToDB(QString("BuyTotalQuantity ["+valStr+"]"));
                 }
-            }
+           // }
     }
              break;
 
@@ -1276,14 +1281,14 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
             double val = valStr.toDouble();
             val=val*lotSize;
-            if(val<  userData.IDXOpenLimit) {
+           // if(val<  userData.IDXOpenLimit) {
                 QString Query = "UPDATE Portfolios SET SellTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
                 db_conn->updateDB_Table(Query);
                 bool success = db_conn->updateDB_Table(Query);
                 if(success){
                   db_conn->logToDB(QString("SellTotalQuantity ["+valStr+"]"));
                 }
-            }
+           // }
     }
             break;
 
@@ -1896,12 +1901,13 @@ void MainWindow::T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index){
     //int row = index.row();
     int col = index.column();
     if(col==PortfolioData_Idx::_AlgoName){
-        OrderDetail_Popup *orderWin = new OrderDetail_Popup();
-        orderWin->show();
+        if(orderWin->isHidden())
+            orderWin->show();
        // QString Expiry = T_Portfolio_Model->portfolio_data_list[index.row()]->Expiry;
         QString PortfolioType =T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioType;
         QString PortfolioNumber = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioNumber);
         orderWin->getData(QString::number(userData.UserId), PortfolioNumber,PortfolioType);
+        orderWin->activateWindow();
     }
 
 }

@@ -13,7 +13,9 @@ AddAlgoSharedVar::AddAlgoSharedVar() {
     unique_id = 0;
     ROW_LIMIT = 100;
 
-    QString market_type = "fo";
+    //currenntly hardcoded for FO
+    strike_price_devider = FO_DEVICER;
+    /*QString market_type = "fo";
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
     QStringList groups = settings.childGroups();
@@ -28,7 +30,7 @@ AddAlgoSharedVar::AddAlgoSharedVar() {
     }
     else{
         strike_price_devider = CDS_DEVICER;
-    }
+    }*/
 
 
 }

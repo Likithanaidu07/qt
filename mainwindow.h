@@ -56,6 +56,8 @@ public:
     bool pressed;
     QPoint position;
     QStandardItemModel model;
+    OrderDetail_Popup *orderWin;
+
 
 
 //    QStandardItemModel *model_searchInstrument_BOX_Leg1;
