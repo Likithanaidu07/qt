@@ -51,8 +51,8 @@ mysql_conn::mysql_conn(QObject *parent,QString conne_name):
     db.setUserName(DB_UserName);
     db.setPassword(Password);
 
-//    devicer = FO_DEVICER;
-//    decimal_precision = FO_DECIMAL_PRECISION;
+    devicer = FO_DEVICER;
+    decimal_precision = FO_DECIMAL_PRECISION;
 
     loadSettings();
 }
@@ -594,9 +594,9 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
     bool ok = checkDBOpened(msg);
     if(ok)
     {
-       // QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and OrderState=7 and PortfolioNumber="+portfolioNumber+" ORDER BY Trader_Data DESC";
+       // QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and Leg2_OrderState=7 and PortfolioNumber="+portfolioNumber+" ORDER BY Trader_Data DESC";
         QString query_str = QString("SELECT * FROM Order_Table_Bid WHERE Trader_ID='%1' "
-                                    "AND OrderState=7 AND (PortfolioNumber=%2 OR PortfolioNumber=%3) "
+                                    "AND Leg2_OrderState=7 AND (PortfolioNumber=%2 OR PortfolioNumber=%3) "
                                     "ORDER BY Trader_Data DESC")
                                 .arg(user_id)
                                 .arg(portfolioNumber)
@@ -748,7 +748,7 @@ void mysql_conn::getTradeTableData(Trade_Table_Model *model, QString user_id, QH
     bool ok = checkDBOpened(msg);
     if(ok)
     {
-        QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and OrderState=7  ORDER BY Trader_Data DESC";
+        QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and Leg2_OrderState=7  ORDER BY Trader_Data DESC";
         QSqlQuery query(query_str,db);
         if( !query.exec() )
         {
@@ -796,6 +796,62 @@ void mysql_conn::getTradeTableData(Trade_Table_Model *model, QString user_id, QH
                 int leg2Price = query.value(rec.indexOf("Leg2_Price")).toInt();
                 int leg3Price = query.value(rec.indexOf("Leg3_Price")).toInt();
                 int Leg1BuySellIndicator = query.value(rec.indexOf("Leg1_Buy/Sell")).toInt();
+                int Leg1_OrderState = query.value(rec.indexOf("Leg1_OrderState")).toInt();
+                int Leg3_OrderState = query.value(rec.indexOf("Leg3_OrderState")).toInt();
+                QString Leg1_OrderStateStr = "-";
+                QString Leg3_OrderStateStr = "-";
+
+                if(Leg1_OrderState==1){
+                    Leg1_OrderStateStr = "Sent to Exachange";
+                }
+                else if(Leg1_OrderState==5){
+                    Leg1_OrderStateStr = "Cancelled";
+                }
+                else if(Leg1_OrderState==6){
+                    Leg1_OrderStateStr = "Rejected";
+                }
+                else if(Leg1_OrderState==7){
+                    Leg1_OrderStateStr = "Traded";
+                }
+                else if(Leg1_OrderState==9){
+                    Leg1_OrderStateStr = "Open";
+                }
+                else if(Leg1_OrderState==10){
+                    Leg1_OrderStateStr = "ModifyPending";
+                }
+                else if(Leg1_OrderState==12){
+                    Leg1_OrderStateStr = "CancelPending";
+                }
+
+                if(Leg3_OrderState==1){
+                    Leg3_OrderStateStr = "Sent to Exachange";
+                }
+                else if(Leg3_OrderState==5){
+                    Leg3_OrderStateStr = "Cancelled";
+                }
+                else if(Leg3_OrderState==6){
+                    Leg3_OrderStateStr = "Rejected";
+                }
+                else if(Leg3_OrderState==7){
+                    Leg3_OrderStateStr = "Traded";
+                }
+                else if(Leg3_OrderState==9){
+                    Leg3_OrderStateStr = "Open";
+                }
+                else if(Leg3_OrderState==10){
+                    Leg3_OrderStateStr = "ModifyPending";
+                }
+                else if(Leg3_OrderState==12){
+                    Leg3_OrderStateStr = "CancelPending";
+                }
+
+
+
+
+
+                Leg1_OrderStateStr = Leg1_OrderStateStr+" ("+(QString::number(Leg1_OrderState))+")";
+                Leg3_OrderStateStr = Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")";
+
 
                 QString Exch_Price = "0";
                 double Exch_Price_val  = 0;
@@ -881,7 +937,11 @@ void mysql_conn::getTradeTableData(Trade_Table_Model *model, QString user_id, QH
                 rowList.append(Remaining_Lot);
                 rowList.append(Buy_Sell);
                 rowList.append(dt.toString("hh:mm:ss"));
-//                rowList.append(Expiry);
+                rowList.append(Leg1_OrderStateStr);
+                rowList.append(Leg3_OrderStateStr);
+                rowList.append(Expiry);
+
+
                 trade_data_listTmp.append(rowList);
 
             }

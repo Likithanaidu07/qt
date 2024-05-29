@@ -33,7 +33,10 @@ ContractDetail::ContractDetail() noexcept
 ContractDetail &ContractDetail::getInstance()
 {
     if(!settingLoaded){
-        QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        //currently hardcoded for FO
+        devicer_contract = FO_DEVICER;
+        decimal_precision_contract = FO_DECIMAL_PRECISION;
+        /*QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
         QStringList groups = settings.childGroups();
         QString market_type = "fo";
@@ -52,7 +55,7 @@ ContractDetail &ContractDetail::getInstance()
         else{
             devicer_contract = CDS_DEVICER;
             decimal_precision_contract = CDS_DECIMAL_PRECISION;
-        }
+        }*/
 
         settingLoaded = true;
     }

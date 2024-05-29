@@ -17,6 +17,12 @@ loginwindow::loginwindow(QWidget *parent) :
 {
     ui->setupUi(this);
 
+#ifdef QT_DEBUG
+    ui->lineEditUsername->setText("STM101");
+    ui->lineEdit_Password->setText("123");
+#endif
+
+
     MainWindowObj = (MainWindow*) parent;
     QFontDatabase::addApplicationFont(":/RacingSansOne-Regular.ttf");
     QFontDatabase::addApplicationFont(":/WorkSans-Bold.ttf");
@@ -25,6 +31,8 @@ loginwindow::loginwindow(QWidget *parent) :
                                     "background: #D9D9D9;");
 
     ui->progressBar->setVisible(false);
+
+
 
     ui->lineEditUsername->setFocus();
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'loginwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 6.3.2
+** Created by: Qt User Interface Compiler version 6.3.1
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -369,11 +369,11 @@ public:
     {
         loginwindow->setWindowTitle(QCoreApplication::translate("loginwindow", "Login", nullptr));
         footer->setText(QCoreApplication::translate("loginwindow", "ALGO METHODS SOFTWARE & SERVICES PVT LTD", nullptr));
-        lineEdit_Password->setText(QCoreApplication::translate("loginwindow", "123", nullptr));
+        lineEdit_Password->setText(QString());
         lineEdit_Password->setPlaceholderText(QCoreApplication::translate("loginwindow", "Password", nullptr));
         logo->setText(QString());
         name->setText(QString());
-        lineEditUsername->setText(QCoreApplication::translate("loginwindow", "STM101", nullptr));
+        lineEditUsername->setText(QString());
         lineEditUsername->setPlaceholderText(QCoreApplication::translate("loginwindow", "Username", nullptr));
         label_wron_input->setText(QString());
         label_forgot->setText(QCoreApplication::translate("loginwindow", "Forgot Password?", nullptr));

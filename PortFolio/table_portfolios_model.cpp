@@ -19,11 +19,11 @@ Table_Portfolios_Model::Table_Portfolios_Model(QObject *parent) : QAbstractTable
 {
     devicer = FO_DEVICER;
     decimal_precision = FO_DECIMAL_PRECISION;
-    loadSettings();
+   // loadSettings();
 }
 
 void Table_Portfolios_Model::loadSettings(){
-    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+   /* QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
     QStringList groups = settings.childGroups();
     QString market_type = "fo";
@@ -40,7 +40,7 @@ void Table_Portfolios_Model::loadSettings(){
     else{
         devicer = CDS_DEVICER;
         decimal_precision = CDS_DECIMAL_PRECISION;
-    }
+    }*/
 
 }
 

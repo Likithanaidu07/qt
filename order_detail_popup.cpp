@@ -6,6 +6,9 @@ OrderDetail_Popup::OrderDetail_Popup(QWidget *parent)
     , ui(new Ui::OrderDetail_Popup)
 {
     ui->setupUi(this);
+    setWindowState( (windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+    QObject::connect(this, SIGNAL(dataLoaded(QList<QHash<QString, QString>>)), this, SLOT(updateUI(QList<QHash<QString, QString>>)));
+
  QString styleSheet = R"(
     QTableWidget {
         background-color: transparent;
@@ -62,16 +65,29 @@ ui->tableWidget_Sell->setStyleSheet(styleSheet1);
 }
 
 void OrderDetail_Popup::getData(QString user_id, QString portfolioNumber,QString PortfolioType){
-    mysql_conn *db_conn = new mysql_conn(0,"login_conn");
+      ui->tableWidget_Buy->setRowCount(0);
+    ui->tableWidget_Sell->setRowCount(0);
 
-    QList<QHash<QString,QString>> data =  db_conn->getTradePopUPData(user_id, portfolioNumber,PortfolioType);
-    ui->tableWidget_Buy->clear();
-    ui->tableWidget_Sell->clear();
+
+    auto loadDataFromDB_BackgroundTask = [this, user_id, portfolioNumber, PortfolioType]() {
+        // Capture captured variables by value to ensure thread safety
+        mysql_conn *db_conn = new mysql_conn(0, "get_popup_data_conn");
+        QList<QHash<QString, QString>> data = db_conn->getTradePopUPData(user_id, portfolioNumber, PortfolioType);
+        delete db_conn; // Release memory after use
+        emit dataLoaded(data);
+
+    };
+
+    QFuture<void> future = QtConcurrent::run(loadDataFromDB_BackgroundTask);
+
+}
+
+
+void OrderDetail_Popup::updateUI(const QList<QHash<QString, QString>>& data){
+
 
     for(int i=0;i<data.length();i++){
         if(data[i]["Buy_Sell"]=="Buy"){
-            QColor color("#D6FCF0");
-
             ui->tableWidget_Buy->insertRow( ui->tableWidget_Buy->rowCount());
             QTableWidgetItem *c0 = new QTableWidgetItem();
             //c0->setData(Qt::UserRole + 1,data[i]["Exch_Price"]);
@@ -138,8 +154,6 @@ void OrderDetail_Popup::getData(QString user_id, QString portfolioNumber,QString
             ui->tableWidget_Sell->setItem(ui->tableWidget_Sell->rowCount()-1, 5, c5);
         }
     }
-
-    delete db_conn;
 }
 
 OrderDetail_Popup::~OrderDetail_Popup()

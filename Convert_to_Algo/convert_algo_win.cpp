@@ -166,24 +166,27 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
     QStringList groups = settings.childGroups();
-    QString market_type = "fo";
+  //  QString market_type = "fo";
     QString bidTypeFromSettings{};
     if(groups.contains("GeneralSettings")){
         settings.beginGroup("GeneralSettings");
-        if (settings.contains("market_type"))
-            market_type = settings.value("market_type").toString();
+       // if (settings.contains("market_type"))
+          //  market_type = settings.value("market_type").toString();
         if (settings.contains("enable_bidType"))
             bidTypeFromSettings = settings.value("enable_bidType").toString();
         settings.endGroup();
     }
-    if(market_type=="fo"){
+    //currently hardcoded for FO
+    sharedData->devicer = FO_DEVICER;
+    sharedData->decimal_precision = FO_DECIMAL_PRECISION;
+    /*if(market_type=="fo"){
         sharedData->devicer = FO_DEVICER;
         sharedData->decimal_precision = FO_DECIMAL_PRECISION;
     }
     else{
         sharedData->devicer = CDS_DEVICER;
         sharedData->decimal_precision = CDS_DECIMAL_PRECISION;
-    }
+    }*/
 
      ui->comboBox_AlgoType->setItemData(1, QVariant(0), Qt::UserRole-1);
 
