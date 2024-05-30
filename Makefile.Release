@@ -14,11 +14,11 @@ EQ            = =
 CC            = cl
 CXX           = cl
 DEFINES       = -DUNICODE -D_UNICODE -DWIN32 -D_ENABLE_EXTENDED_ALIGNED_STORAGE -DWIN64 -DNDEBUG -DQT_QML_DEBUG -DQT_NO_DEBUG -DQT_WIDGETS_LIB -DQT_GUI_LIB -DQT_SQL_LIB -DQT_NETWORK_LIB -DQT_CORE_LIB
-CFLAGS        = -nologo -Zc:wchar_t -FS -Zc:strictStrings -O2 -MD -utf-8 -W3 -w44456 -w44457 -w44458 $(DEFINES)
-CXXFLAGS      = -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -permissive- -Zc:__cplusplus -Zc:externConstexpr -O2 -MD -std:c++17 -utf-8 -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -EHsc $(DEFINES)
+CFLAGS        = -nologo -Zc:wchar_t -FS -Zc:strictStrings -O2 -Zi -MD -utf-8 -W3 -w44456 -w44457 -w44458 /Fdrelease\new_speedtrade.vc.pdb $(DEFINES)
+CXXFLAGS      = -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -permissive- -Zc:__cplusplus -Zc:externConstexpr -O2 -Zi -MD -std:c++17 -utf-8 -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -EHsc /Fdrelease\new_speedtrade.vc.pdb $(DEFINES)
 INCPATH       = -I. -Ilzo-2.10\include -Ilzo-2.10 -IC:\Qt\6.3.1\msvc2019_64\include -IC:\Qt\6.3.1\msvc2019_64\include\QtWidgets -IC:\Qt\6.3.1\msvc2019_64\include\QtGui -IC:\Qt\6.3.1\msvc2019_64\include\QtSql -IC:\Qt\6.3.1\msvc2019_64\include\QtNetwork -IC:\Qt\6.3.1\msvc2019_64\include\QtCore -Irelease -I. -I/include -IC:\Qt\6.3.1\msvc2019_64\mkspecs\win32-msvc 
 LINKER        = link
-LFLAGS        = /NOLOGO /DYNAMICBASE /NXCOMPAT /OPT:REF /OPT:ICF /INCREMENTAL:NO /SUBSYSTEM:WINDOWS "/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'"
+LFLAGS        = /NOLOGO /DYNAMICBASE /NXCOMPAT /OPT:REF /OPT:ICF /INCREMENTAL:NO /DEBUG /SUBSYSTEM:WINDOWS "/MANIFESTDEPENDENCY:type='win32' name='Microsoft.Windows.Common-Controls' version='6.0.0.0' publicKeyToken='6595b64144ccf1df' language='*' processorArchitecture='*'"
 LIBS          = ws2_32.lib /LIBPATH:F:\FreeLance\TradingApp-Rajesh\new_speedtrade\lzo-2.10 F:\FreeLance\TradingApp-Rajesh\new_speedtrade\lzo-2.10\lzo2.lib C:\Qt\6.3.1\msvc2019_64\lib\Qt6Widgets.lib C:\Qt\6.3.1\msvc2019_64\lib\Qt6Gui.lib C:\Qt\6.3.1\msvc2019_64\lib\Qt6Sql.lib C:\Qt\6.3.1\msvc2019_64\lib\Qt6Network.lib C:\Qt\6.3.1\msvc2019_64\lib\Qt6Core.lib release\new_speedtrade_resource.res C:\Qt\6.3.1\msvc2019_64\lib\Qt6EntryPoint.lib shell32.lib  
 QMAKE         = C:\Qt\6.3.1\msvc2019_64\bin\qmake.exe
 DEL_FILE      = del
@@ -603,20 +603,21 @@ release\new_speedtrade_resource.res: new_speedtrade_resource.rc
 	rc /NOLOGO $(DEFINES) -fo release\new_speedtrade_resource.res new_speedtrade_resource.rc
 
 qmake: FORCE
-	@$(QMAKE) -o Makefile.Release new_speedtrade.pro -spec win32-msvc "CONFIG+=debug" "CONFIG+=qml_debug"
+	@$(QMAKE) -o Makefile.Release new_speedtrade.pro -spec win32-msvc "CONFIG+=qml_debug" "CONFIG+=qtquickcompiler" "CONFIG+=force_debug_info" "CONFIG+=separate_debug_info"
 
 qmake_all: FORCE
 
 dist:
-	$(ZIP) new_speedtrade.zip $(SOURCES) $(DIST) new_speedtrade.pro C:\Qt\6.3.1\msvc2019_64\mkspecs\features\spec_pre.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\common\windows-desktop.conf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\win32\windows_vulkan_sdk.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\common\windows-vulkan.conf C:\Qt\6.3.1\msvc2019_64\mkspecs\common\msvc-desktop.conf C:\Qt\6.3.1\msvc2019_64\mkspecs\qconfig.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_ext_freetype.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_ext_libjpeg.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_ext_libpng.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_concurrent.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_concurrent_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_core.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_core_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_dbus.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_dbus_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_designer.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_designer_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_designercomponents_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_devicediscovery_support_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_entrypoint_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_fb_support_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_freetype_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_gui.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_gui_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_harfbuzz_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_help.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_help_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_jpeg_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labsanimation.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labsanimation_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labsfolderlistmodel.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labsfolderlistmodel_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labsqmlmodels.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labsqmlmodels_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labssettings.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labssettings_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labssharedimage.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labssharedimage_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labswavefrontmesh.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labswavefrontmesh_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_linguist.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_linguist_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_network.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_network_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_opengl.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_opengl_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_openglwidgets.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_openglwidgets_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_packetprotocol_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_pdf.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_pdf_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_pdfquick.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_pdfquick_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_pdfwidgets.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_pdfwidgets_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_png_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_positioning.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_positioning_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_positioningquick.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_positioningquick_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_printsupport.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_printsupport_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qml.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qml_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlcompiler_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlcore.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlcore_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmldebug_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmldom_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlintegration.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlintegration_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmllint_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmllocalstorage.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmllocalstorage_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlmodels.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlmodels_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmltest.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmltest_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlworkerscript.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlworkerscript_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlxmllistmodel.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlxmllistmodel_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quick.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quick_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickcontrols2.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickcontrols2_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickcontrols2impl.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickcontrols2impl_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickcontrolstestutilsprivate_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickdialogs2.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickdialogs2_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickdialogs2quickimpl.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickdialogs2quickimpl_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickdialogs2utils.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickdialogs2utils_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quicklayouts.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quicklayouts_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickparticles_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickshapes_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quicktemplates2.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quicktemplates2_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quicktestutilsprivate_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickwidgets.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickwidgets_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_sql.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_sql_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_svg.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_svg_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_svgwidgets.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_svgwidgets_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_testlib.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_testlib_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_tools_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_uiplugin.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_uitools.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_uitools_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webchannel.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webchannel_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginecore.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginecore_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginequick.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginequick_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginequickdelegatesqml.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginequickdelegatesqml_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginewidgets.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginewidgets_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_websockets.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_websockets_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webview.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webview_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webviewquick.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webviewquick_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_widgets.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_widgets_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_xml.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_xml_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_zlib_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\features\qt_functions.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\qt_config.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\win32-msvc\qmake.conf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\spec_post.prf .qmake.stash C:\Qt\6.3.1\msvc2019_64\mkspecs\features\exclusive_builds.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\common\msvc-version.conf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\toolchain.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\default_pre.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\win32\default_pre.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\resolve_config.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\exclusive_builds_post.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\default_post.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\build_pass.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\qml_debug.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\entrypoint.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\precompile_header.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\warn_on.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\qt.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\resources_functions.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\resources.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\moc.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\win32\opengl.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\uic.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\qmake_use.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\file_copies.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\win32\windows.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\testcase_targets.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\exceptions.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\yacc.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\lex.prf new_speedtrade.pro Resources\Res.qrc C:\Qt\6.3.1\msvc2019_64\lib\Qt6Widgets.prl C:\Qt\6.3.1\msvc2019_64\lib\Qt6Gui.prl C:\Qt\6.3.1\msvc2019_64\lib\Qt6Sql.prl C:\Qt\6.3.1\msvc2019_64\lib\Qt6Network.prl C:\Qt\6.3.1\msvc2019_64\lib\Qt6Core.prl C:\Qt\6.3.1\msvc2019_64\lib\Qt6EntryPoint.prl   Resources\Res.qrc C:\Qt\6.3.1\msvc2019_64\mkspecs\features\data\dummy.cpp CombinedTracker\combined_tracker_table_model.h Common\macros.h Conversions.h Convert_to_Algo\add_algo_con_rev.h Convert_to_Algo\add_algo_f2f.h Convert_to_Algo\convert_algo_shared_var.h Convert_to_Algo\convert_algo_win.h Convert_to_Algo\convert_to_algo_bfly.h Convert_to_Algo\convert_to_algo_bfly_bid.h Convert_to_Algo\eventfilterlistview.h Liners\liners_model.h NetPosition\net_position_table_model.h OrderBook\table_orderbook_delegate.h PortFolio\PortfolioParser.h PortFolio\portfolio_Object.h PortFolio\portfolioheaderdelegate.h PortFolio\portfolioheaderview.h PortFolio\table_portfolios_custom.h PortFolio\table_portfolios_delegate.h PortFolio\table_portfolios_model.h SlowData\Indices.h SlowData\slowdata.h SlowData\slowdatasocket.h SlowDataIndices\slowdata_indices_socket.h SlowDataIndices\slowdataindices.h SwitchButton\switchbutton.h TradePosition\OrderBook_Object.h TradePosition\trade_table_model.h backendcomm\backendcomm.h contractdetail.h customDelegate.h custom_grid_table\gridtableheadermodel.h custom_grid_table\gridtableheaderview.h custom_grid_table\gridtableview.h custom_grid_table\tableheaderitem.h custom_q_completer.h defines.h loginwindow.h mainwindow.h mysql_conn.h order_detail_popup.h uidockwidget.h watch_data_list_item.h  CombinedTracker\combined_tracker_table_model.cpp Conversions.cpp Convert_to_Algo\add_algo_con_rev.cpp Convert_to_Algo\add_algo_f2f.cpp Convert_to_Algo\convert_algo_shared_var.cpp Convert_to_Algo\convert_algo_win.cpp Convert_to_Algo\convert_to_algo_bfly.cpp Convert_to_Algo\convert_to_algo_bfly_bid.cpp Convert_to_Algo\eventfilterlistview.cpp Liners\liners_model.cpp NetPosition\net_position_table_model.cpp OrderBook\table_orderbook_delegate.cpp PortFolio\PortfolioParser.cpp PortFolio\portfolio_Object.cpp PortFolio\portfolioheaderdelegate.cpp PortFolio\portfolioheaderview.cpp PortFolio\table_portfolios_custom.cpp PortFolio\table_portfolios_delegate.cpp PortFolio\table_portfolios_model.cpp SlowData\slowdata.cpp SlowData\slowdatasocket.cpp SlowDataIndices\slowdata_indices_socket.cpp SlowDataIndices\slowdataindices.cpp SwitchButton\switchbutton.cpp TradePosition\trade_table_model.cpp backendcomm\backendcomm.cpp contractdetail.cpp customDelegate.cpp custom_grid_table\gridtableheadermodel.cpp custom_grid_table\gridtableheaderview.cpp custom_grid_table\gridtableview.cpp custom_grid_table\tableheaderitem.cpp custom_q_completer.cpp loginwindow.cpp main.cpp mainwindow.cpp mysql_conn.cpp order_detail_popup.cpp uidockwidget.cpp watch_data_list_item.cpp convert_algo_win.ui loginwindow.ui mainwindow.ui order_detail_popup.ui watch_data_list_item.ui    
+	$(ZIP) new_speedtrade.zip $(SOURCES) $(DIST) new_speedtrade.pro C:\Qt\6.3.1\msvc2019_64\mkspecs\features\spec_pre.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\common\windows-desktop.conf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\win32\windows_vulkan_sdk.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\common\windows-vulkan.conf C:\Qt\6.3.1\msvc2019_64\mkspecs\common\msvc-desktop.conf C:\Qt\6.3.1\msvc2019_64\mkspecs\qconfig.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_ext_freetype.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_ext_libjpeg.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_ext_libpng.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_concurrent.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_concurrent_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_core.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_core_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_dbus.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_dbus_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_designer.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_designer_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_designercomponents_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_devicediscovery_support_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_entrypoint_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_fb_support_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_freetype_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_gui.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_gui_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_harfbuzz_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_help.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_help_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_jpeg_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labsanimation.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labsanimation_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labsfolderlistmodel.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labsfolderlistmodel_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labsqmlmodels.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labsqmlmodels_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labssettings.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labssettings_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labssharedimage.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labssharedimage_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labswavefrontmesh.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_labswavefrontmesh_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_linguist.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_linguist_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_network.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_network_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_opengl.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_opengl_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_openglwidgets.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_openglwidgets_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_packetprotocol_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_pdf.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_pdf_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_pdfquick.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_pdfquick_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_pdfwidgets.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_pdfwidgets_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_png_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_positioning.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_positioning_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_positioningquick.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_positioningquick_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_printsupport.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_printsupport_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qml.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qml_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlcompiler_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlcore.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlcore_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmldebug_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmldom_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlintegration.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlintegration_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmllint_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmllocalstorage.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmllocalstorage_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlmodels.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlmodels_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmltest.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmltest_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlworkerscript.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlworkerscript_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlxmllistmodel.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_qmlxmllistmodel_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quick.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quick_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickcontrols2.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickcontrols2_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickcontrols2impl.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickcontrols2impl_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickcontrolstestutilsprivate_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickdialogs2.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickdialogs2_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickdialogs2quickimpl.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickdialogs2quickimpl_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickdialogs2utils.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickdialogs2utils_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quicklayouts.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quicklayouts_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickparticles_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickshapes_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quicktemplates2.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quicktemplates2_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quicktestutilsprivate_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickwidgets.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_quickwidgets_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_sql.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_sql_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_svg.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_svg_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_svgwidgets.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_svgwidgets_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_testlib.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_testlib_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_tools_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_uiplugin.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_uitools.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_uitools_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webchannel.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webchannel_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginecore.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginecore_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginequick.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginequick_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginequickdelegatesqml.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginequickdelegatesqml_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginewidgets.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webenginewidgets_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_websockets.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_websockets_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webview.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webview_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webviewquick.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_webviewquick_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_widgets.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_widgets_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_xml.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_xml_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\modules\qt_lib_zlib_private.pri C:\Qt\6.3.1\msvc2019_64\mkspecs\features\qt_functions.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\qt_config.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\win32-msvc\qmake.conf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\spec_post.prf .qmake.stash C:\Qt\6.3.1\msvc2019_64\mkspecs\features\exclusive_builds.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\common\msvc-version.conf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\toolchain.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\default_pre.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\win32\default_pre.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\resolve_config.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\exclusive_builds_post.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\default_post.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\build_pass.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\win32\separate_debug_info.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\qtquickcompiler.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\qml_debug.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\entrypoint.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\precompile_header.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\warn_on.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\qt.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\resources_functions.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\resources.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\moc.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\win32\opengl.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\uic.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\qmake_use.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\file_copies.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\win32\windows.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\testcase_targets.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\exceptions.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\yacc.prf C:\Qt\6.3.1\msvc2019_64\mkspecs\features\lex.prf new_speedtrade.pro Resources\Res.qrc C:\Qt\6.3.1\msvc2019_64\lib\Qt6Widgets.prl C:\Qt\6.3.1\msvc2019_64\lib\Qt6Gui.prl C:\Qt\6.3.1\msvc2019_64\lib\Qt6Sql.prl C:\Qt\6.3.1\msvc2019_64\lib\Qt6Network.prl C:\Qt\6.3.1\msvc2019_64\lib\Qt6Core.prl C:\Qt\6.3.1\msvc2019_64\lib\Qt6EntryPoint.prl   Resources\Res.qrc C:\Qt\6.3.1\msvc2019_64\mkspecs\features\data\dummy.cpp CombinedTracker\combined_tracker_table_model.h Common\macros.h Conversions.h Convert_to_Algo\add_algo_con_rev.h Convert_to_Algo\add_algo_f2f.h Convert_to_Algo\convert_algo_shared_var.h Convert_to_Algo\convert_algo_win.h Convert_to_Algo\convert_to_algo_bfly.h Convert_to_Algo\convert_to_algo_bfly_bid.h Convert_to_Algo\eventfilterlistview.h Liners\liners_model.h NetPosition\net_position_table_model.h OrderBook\table_orderbook_delegate.h PortFolio\PortfolioParser.h PortFolio\portfolio_Object.h PortFolio\portfolioheaderdelegate.h PortFolio\portfolioheaderview.h PortFolio\table_portfolios_custom.h PortFolio\table_portfolios_delegate.h PortFolio\table_portfolios_model.h SlowData\Indices.h SlowData\slowdata.h SlowData\slowdatasocket.h SlowDataIndices\slowdata_indices_socket.h SlowDataIndices\slowdataindices.h SwitchButton\switchbutton.h TradePosition\OrderBook_Object.h TradePosition\trade_table_model.h backendcomm\backendcomm.h contractdetail.h customDelegate.h custom_grid_table\gridtableheadermodel.h custom_grid_table\gridtableheaderview.h custom_grid_table\gridtableview.h custom_grid_table\tableheaderitem.h custom_q_completer.h defines.h loginwindow.h mainwindow.h mysql_conn.h order_detail_popup.h uidockwidget.h watch_data_list_item.h  CombinedTracker\combined_tracker_table_model.cpp Conversions.cpp Convert_to_Algo\add_algo_con_rev.cpp Convert_to_Algo\add_algo_f2f.cpp Convert_to_Algo\convert_algo_shared_var.cpp Convert_to_Algo\convert_algo_win.cpp Convert_to_Algo\convert_to_algo_bfly.cpp Convert_to_Algo\convert_to_algo_bfly_bid.cpp Convert_to_Algo\eventfilterlistview.cpp Liners\liners_model.cpp NetPosition\net_position_table_model.cpp OrderBook\table_orderbook_delegate.cpp PortFolio\PortfolioParser.cpp PortFolio\portfolio_Object.cpp PortFolio\portfolioheaderdelegate.cpp PortFolio\portfolioheaderview.cpp PortFolio\table_portfolios_custom.cpp PortFolio\table_portfolios_delegate.cpp PortFolio\table_portfolios_model.cpp SlowData\slowdata.cpp SlowData\slowdatasocket.cpp SlowDataIndices\slowdata_indices_socket.cpp SlowDataIndices\slowdataindices.cpp SwitchButton\switchbutton.cpp TradePosition\trade_table_model.cpp backendcomm\backendcomm.cpp contractdetail.cpp customDelegate.cpp custom_grid_table\gridtableheadermodel.cpp custom_grid_table\gridtableheaderview.cpp custom_grid_table\gridtableview.cpp custom_grid_table\tableheaderitem.cpp custom_q_completer.cpp loginwindow.cpp main.cpp mainwindow.cpp mysql_conn.cpp order_detail_popup.cpp uidockwidget.cpp watch_data_list_item.cpp convert_algo_win.ui loginwindow.ui mainwindow.ui order_detail_popup.ui watch_data_list_item.ui    
 
 clean: compiler_clean 
 	-$(DEL_FILE) release\combined_tracker_table_model.obj release\Conversions.obj release\add_algo_con_rev.obj release\add_algo_f2f.obj release\convert_algo_shared_var.obj release\convert_algo_win.obj release\convert_to_algo_bfly.obj release\convert_to_algo_bfly_bid.obj release\eventfilterlistview.obj release\liners_model.obj release\net_position_table_model.obj release\table_orderbook_delegate.obj release\PortfolioParser.obj release\portfolio_Object.obj release\portfolioheaderdelegate.obj release\portfolioheaderview.obj release\table_portfolios_custom.obj release\table_portfolios_delegate.obj release\table_portfolios_model.obj release\slowdata.obj release\slowdatasocket.obj release\slowdata_indices_socket.obj release\slowdataindices.obj release\switchbutton.obj release\trade_table_model.obj release\backendcomm.obj release\contractdetail.obj release\customDelegate.obj release\gridtableheadermodel.obj release\gridtableheaderview.obj release\gridtableview.obj release\tableheaderitem.obj release\custom_q_completer.obj release\loginwindow.obj release\main.obj release\mainwindow.obj release\mysql_conn.obj release\order_detail_popup.obj release\uidockwidget.obj release\watch_data_list_item.obj release\qrc_Res.obj release\moc_combined_tracker_table_model.obj release\moc_add_algo_con_rev.obj release\moc_add_algo_f2f.obj release\moc_convert_algo_win.obj release\moc_convert_to_algo_bfly.obj release\moc_convert_to_algo_bfly_bid.obj release\moc_eventfilterlistview.obj release\moc_liners_model.obj release\moc_net_position_table_model.obj release\moc_table_orderbook_delegate.obj release\moc_portfolioheaderview.obj release\moc_table_portfolios_custom.obj release\moc_table_portfolios_delegate.obj release\moc_table_portfolios_model.obj release\moc_slowdata.obj release\moc_slowdatasocket.obj release\moc_slowdata_indices_socket.obj release\moc_slowdataindices.obj release\moc_switchbutton.obj release\moc_trade_table_model.obj release\moc_backendcomm.obj release\moc_gridtableheadermodel.obj release\moc_gridtableheaderview.obj
 	-$(DEL_FILE) release\moc_gridtableview.obj release\moc_custom_q_completer.obj release\moc_loginwindow.obj release\moc_mainwindow.obj release\moc_mysql_conn.obj release\moc_order_detail_popup.obj release\moc_watch_data_list_item.obj
+	-$(DEL_FILE) release\new_speedtrade.vc.pdb
 	-$(DEL_FILE) release\new_speedtrade_resource.res
 
 distclean: clean 
-	-$(DEL_FILE) .qmake.stash
+	-$(DEL_FILE) .qmake.stash release\new_speedtrade.pdb
 	-$(DEL_FILE) $(DESTDIR_TARGET)
 	-$(DEL_FILE) Makefile.Release
 
@@ -679,7 +680,7 @@ compiler_moc_predefs_make_all: release\moc_predefs.h
 compiler_moc_predefs_clean:
 	-$(DEL_FILE) release\moc_predefs.h
 release\moc_predefs.h: C:\Qt\6.3.1\msvc2019_64\mkspecs\features\data\dummy.cpp
-	cl -BxC:\Qt\6.3.1\msvc2019_64\bin\qmake.exe -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -permissive- -Zc:__cplusplus -Zc:externConstexpr -O2 -MD -std:c++17 -utf-8 -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E C:\Qt\6.3.1\msvc2019_64\mkspecs\features\data\dummy.cpp 2>NUL >release\moc_predefs.h
+	cl -BxC:\Qt\6.3.1\msvc2019_64\bin\qmake.exe -nologo -Zc:wchar_t -FS -Zc:rvalueCast -Zc:inline -Zc:strictStrings -Zc:throwingNew -permissive- -Zc:__cplusplus -Zc:externConstexpr -O2 -Zi -MD -std:c++17 -utf-8 -W3 -w34100 -w34189 -w44996 -w44456 -w44457 -w44458 -wd4577 -wd4467 -E C:\Qt\6.3.1\msvc2019_64\mkspecs\features\data\dummy.cpp 2>NUL >release\moc_predefs.h
 
 compiler_moc_header_make_all: release\moc_combined_tracker_table_model.cpp release\moc_add_algo_con_rev.cpp release\moc_add_algo_f2f.cpp release\moc_convert_algo_win.cpp release\moc_convert_to_algo_bfly.cpp release\moc_convert_to_algo_bfly_bid.cpp release\moc_eventfilterlistview.cpp release\moc_liners_model.cpp release\moc_net_position_table_model.cpp release\moc_table_orderbook_delegate.cpp release\moc_portfolioheaderview.cpp release\moc_table_portfolios_custom.cpp release\moc_table_portfolios_delegate.cpp release\moc_table_portfolios_model.cpp release\moc_slowdata.cpp release\moc_slowdatasocket.cpp release\moc_slowdata_indices_socket.cpp release\moc_slowdataindices.cpp release\moc_switchbutton.cpp release\moc_trade_table_model.cpp release\moc_backendcomm.cpp release\moc_gridtableheadermodel.cpp release\moc_gridtableheaderview.cpp release\moc_gridtableview.cpp release\moc_custom_q_completer.cpp release\moc_loginwindow.cpp release\moc_mainwindow.cpp release\moc_mysql_conn.cpp release\moc_order_detail_popup.cpp release\moc_watch_data_list_item.cpp
 compiler_moc_header_clean:
@@ -961,9 +962,51 @@ release\moc_add_algo_con_rev.cpp: Convert_to_Algo\add_algo_con_rev.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qsortfilterproxymodel.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qabstractproxymodel.h \
 		ui_convert_algo_win.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qeventloop.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfuture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfutureinterface.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qmutex.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qresultstore.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfuture_impl.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qthreadpool.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qthread.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qdeadlinetimer.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qelapsedtimer.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qrunnable.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qexception.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qpromise.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QComboBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcombobox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qdialog.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgridlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayoutitem.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qboxlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QPushButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qpushbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QToolButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtoolbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QMessageBox \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qmessagebox.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qdialog.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QDateTime \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qdatetime.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcalendar.h \
@@ -1147,9 +1190,51 @@ release\moc_add_algo_f2f.cpp: Convert_to_Algo\add_algo_f2f.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qsortfilterproxymodel.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qabstractproxymodel.h \
 		ui_convert_algo_win.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qeventloop.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfuture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfutureinterface.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qmutex.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qresultstore.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfuture_impl.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qthreadpool.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qthread.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qdeadlinetimer.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qelapsedtimer.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qrunnable.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qexception.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qpromise.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QComboBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcombobox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qdialog.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgridlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayoutitem.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qboxlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QPushButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qpushbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QToolButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtoolbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QMessageBox \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qmessagebox.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qdialog.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QDateTime \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qdatetime.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcalendar.h \
@@ -1444,24 +1529,14 @@ release\moc_convert_algo_win.cpp: Convert_to_Algo\convert_algo_win.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtConcurrent\qtconcurrenttask.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtConcurrent\qtconcurrentversion.h \
 		ui_convert_algo_win.h \
-		Convert_to_Algo\convert_algo_shared_var.h \
-		defines.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QVariant \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QString \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QHash \
-		Convert_to_Algo\convert_to_algo_bfly.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLineEdit \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlineedit.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qframe.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextcursor.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextformat.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpen.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextoption.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtableview.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractitemview.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractscrollarea.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QComboBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcombobox.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractitemdelegate.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qstyleoption.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractspinbox.h \
@@ -1472,6 +1547,42 @@ release\moc_convert_algo_win.cpp: Convert_to_Algo\convert_algo_win.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtabbar.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtabwidget.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qrubberband.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qframe.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgridlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayoutitem.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qboxlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractitemview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractscrollarea.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLineEdit \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlineedit.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextcursor.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextformat.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpen.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextoption.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QPushButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qpushbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtableview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QToolButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtoolbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
+		Convert_to_Algo\convert_algo_shared_var.h \
+		defines.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QString \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QHash \
+		Convert_to_Algo\convert_to_algo_bfly.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QStandardItemModel \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qstandarditemmodel.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QListView \
@@ -1499,10 +1610,6 @@ release\moc_convert_algo_win.cpp: Convert_to_Algo\convert_algo_win.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtSql\qsqlquerymodel.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QHashIterator \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QVBoxLayout \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qboxlayout.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayout.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayoutitem.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgridlayout.h \
 		PortFolio\table_portfolios_model.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QAbstractTableModel \
 		PortFolio\portfolio_Object.h \
@@ -4884,6 +4991,59 @@ release\moc_custom_q_completer.cpp: custom_q_completer.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qsortfilterproxymodel.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qabstractproxymodel.h \
 		ui_convert_algo_win.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QVariant \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qeventloop.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfuture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfutureinterface.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qmutex.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qresultstore.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfuture_impl.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qthreadpool.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qthread.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qdeadlinetimer.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qelapsedtimer.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qrunnable.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qexception.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qpromise.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QComboBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcombobox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qdialog.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgridlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayoutitem.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qboxlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLineEdit \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlineedit.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextcursor.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextformat.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpen.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextoption.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QPushButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qpushbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtableview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QToolButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtoolbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QStandardItemModel \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qstandarditemmodel.h \
 		release\moc_predefs.h \
@@ -5412,6 +5572,28 @@ release\moc_mainwindow.cpp: mainwindow.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcompleter.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QSortFilterProxyModel \
 		ui_convert_algo_win.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QComboBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcombobox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QToolButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtoolbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		PortFolio\table_portfolios_delegate.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QPalette \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QStyleOptionViewItem \
@@ -5421,26 +5603,22 @@ release\moc_mainwindow.cpp: mainwindow.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QMenu \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qmenu.h \
 		PortFolio\table_portfolios_custom.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QKeyEvent \
 		PortFolio\portfolioheaderview.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
 		SlowDataIndices\slowdataindices.h \
 		SlowDataIndices\slowdata_indices_socket.h \
 		Convert_to_Algo\convert_algo_win.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QMouseEvent \
 		Convert_to_Algo\convert_algo_shared_var.h \
 		Convert_to_Algo\convert_to_algo_bfly.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
 		Convert_to_Algo\eventfilterlistview.h \
 		Convert_to_Algo\add_algo_f2f.h \
 		Convert_to_Algo\add_algo_con_rev.h \
 		Convert_to_Algo\convert_to_algo_bfly_bid.h \
 		Common\macros.h \
 		ui_loginwindow.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QProgressBar \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qprogressbar.h \
 		order_detail_popup.h \
 		release\moc_predefs.h \
 		C:\Qt\6.3.1\msvc2019_64\bin\moc.exe
@@ -6601,9 +6779,51 @@ release\add_algo_con_rev.obj: Convert_to_Algo\add_algo_con_rev.cpp Convert_to_Al
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qsortfilterproxymodel.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qabstractproxymodel.h \
 		ui_convert_algo_win.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qeventloop.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfuture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfutureinterface.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qmutex.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qresultstore.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfuture_impl.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qthreadpool.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qthread.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qdeadlinetimer.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qelapsedtimer.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qrunnable.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qexception.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qpromise.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QComboBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcombobox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qdialog.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgridlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayoutitem.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qboxlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QPushButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qpushbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QToolButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtoolbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QMessageBox \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qmessagebox.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qdialog.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QDateTime \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qdatetime.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcalendar.h
@@ -6784,22 +7004,8 @@ release\add_algo_f2f.obj: Convert_to_Algo\add_algo_f2f.cpp Convert_to_Algo\add_a
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qsortfilterproxymodel.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qabstractproxymodel.h \
 		ui_convert_algo_win.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QMessageBox \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qmessagebox.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qdialog.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QDateTime \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qdatetime.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcalendar.h \
-		ContractDetail.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QDir \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qdir.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfile.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfiledevice.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfileinfo.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QXmlStreamWriter \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qxmlstream.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QXmlStreamReader \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QCoreApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qeventloop.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication_platform.h \
@@ -6815,6 +7021,47 @@ release\add_algo_f2f.obj: Convert_to_Algo\add_algo_f2f.cpp Convert_to_Algo\add_a
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qrunnable.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qexception.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qpromise.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QComboBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcombobox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qdialog.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgridlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayoutitem.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qboxlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QPushButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qpushbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QToolButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtoolbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QMessageBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qmessagebox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QDateTime \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qdatetime.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcalendar.h \
+		ContractDetail.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QDir \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qdir.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfile.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfiledevice.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfileinfo.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QXmlStreamWriter \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qxmlstream.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QXmlStreamReader \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QCoreApplication \
 		C:\Qt\6.3.1\msvc2019_64\include\QtSql\QSqlDatabase \
 		C:\Qt\6.3.1\msvc2019_64\include\QtSql\qsqldatabase.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtSql\qtsqlglobal.h \
@@ -7215,24 +7462,14 @@ release\convert_algo_win.obj: Convert_to_Algo\convert_algo_win.cpp Convert_to_Al
 		C:\Qt\6.3.1\msvc2019_64\include\QtConcurrent\qtconcurrenttask.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtConcurrent\qtconcurrentversion.h \
 		ui_convert_algo_win.h \
-		Convert_to_Algo\convert_algo_shared_var.h \
-		defines.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QVariant \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QString \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QHash \
-		Convert_to_Algo\convert_to_algo_bfly.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLineEdit \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlineedit.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qframe.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextcursor.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextformat.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpen.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextoption.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtableview.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractitemview.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractscrollarea.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QComboBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcombobox.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractitemdelegate.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qstyleoption.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractspinbox.h \
@@ -7243,6 +7480,42 @@ release\convert_algo_win.obj: Convert_to_Algo\convert_algo_win.cpp Convert_to_Al
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtabbar.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtabwidget.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qrubberband.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qframe.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgridlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayoutitem.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qboxlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractitemview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractscrollarea.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLineEdit \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlineedit.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextcursor.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextformat.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpen.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextoption.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QPushButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qpushbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtableview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QToolButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtoolbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
+		Convert_to_Algo\convert_algo_shared_var.h \
+		defines.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QString \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QHash \
+		Convert_to_Algo\convert_to_algo_bfly.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QStandardItemModel \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qstandarditemmodel.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QListView \
@@ -7270,10 +7543,6 @@ release\convert_algo_win.obj: Convert_to_Algo\convert_algo_win.cpp Convert_to_Al
 		C:\Qt\6.3.1\msvc2019_64\include\QtSql\qsqlquerymodel.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QHashIterator \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QVBoxLayout \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qboxlayout.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayout.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayoutitem.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgridlayout.h \
 		PortFolio\table_portfolios_model.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QAbstractTableModel \
 		PortFolio\portfolio_Object.h \
@@ -7303,9 +7572,6 @@ release\convert_algo_win.obj: Convert_to_Algo\convert_algo_win.cpp Convert_to_Al
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableView \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDockWidget \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qdockwidget.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QPushButton \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qpushbutton.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractbutton.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QStyledItemDelegate \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qstyleditemdelegate.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QBoxLayout \
@@ -7331,14 +7597,13 @@ release\convert_algo_win.obj: Convert_to_Algo\convert_algo_win.cpp Convert_to_Al
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QMenu \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qmenu.h \
 		PortFolio\table_portfolios_custom.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QKeyEvent \
 		PortFolio\portfolioheaderview.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
 		SlowDataIndices\slowdataindices.h \
 		SlowDataIndices\slowdata_indices_socket.h \
 		ui_loginwindow.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QProgressBar \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qprogressbar.h \
 		order_detail_popup.h
 
 release\convert_to_algo_bfly.obj: Convert_to_Algo\convert_to_algo_bfly.cpp Convert_to_Algo\convert_to_algo_bfly.h \
@@ -7646,6 +7911,33 @@ release\convert_to_algo_bfly.obj: Convert_to_Algo\convert_to_algo_bfly.cpp Conve
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcompleter.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QSortFilterProxyModel \
 		ui_convert_algo_win.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QComboBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcombobox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgridlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayoutitem.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qboxlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QPushButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qpushbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QToolButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtoolbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QElapsedTimer
 
 release\convert_to_algo_bfly_bid.obj: Convert_to_Algo\convert_to_algo_bfly_bid.cpp Convert_to_Algo\convert_to_algo_bfly_bid.h \
@@ -7953,6 +8245,33 @@ release\convert_to_algo_bfly_bid.obj: Convert_to_Algo\convert_to_algo_bfly_bid.c
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcompleter.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QSortFilterProxyModel \
 		ui_convert_algo_win.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QComboBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcombobox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgridlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayoutitem.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qboxlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QPushButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qpushbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QToolButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtoolbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QElapsedTimer
 
 release\eventfilterlistview.obj: Convert_to_Algo\eventfilterlistview.cpp Convert_to_Algo\eventfilterlistview.h \
@@ -11856,6 +12175,59 @@ release\custom_q_completer.obj: custom_q_completer.cpp custom_q_completer.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qsortfilterproxymodel.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qabstractproxymodel.h \
 		ui_convert_algo_win.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QVariant \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qeventloop.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfuture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfutureinterface.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qmutex.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qresultstore.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfuture_impl.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qthreadpool.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qthread.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qdeadlinetimer.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qelapsedtimer.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qrunnable.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qexception.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qpromise.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QComboBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcombobox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qdialog.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgridlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayoutitem.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qboxlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLineEdit \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlineedit.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextcursor.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextformat.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpen.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextoption.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QPushButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qpushbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtableview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QToolButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtoolbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QStandardItemModel \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qstandarditemmodel.h
 
@@ -12049,21 +12421,10 @@ release\loginwindow.obj: loginwindow.cpp loginwindow.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QFont \
 		CombinedTracker\combined_tracker_table_model.h \
 		ui_loginwindow.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtConcurrent\QtConcurrent \
-		C:\Qt\6.3.1\msvc2019_64\include\QtConcurrent\QtConcurrentDepends \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QtCore \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QtCoreDepends \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\q20algorithm.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\q20functional.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\q20iterator.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qabstractanimation.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qabstracteventdispatcher.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qeventloop.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qabstractnativeeventfilter.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qabstractproxymodel.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qanimationgroup.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qapplicationstatic.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qeventloop.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication_platform.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfuture.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfutureinterface.h \
@@ -12076,6 +12437,42 @@ release\loginwindow.obj: loginwindow.cpp loginwindow.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qrunnable.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qexception.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qpromise.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLineEdit \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlineedit.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextcursor.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextformat.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpen.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextoption.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QProgressBar \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qprogressbar.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QPushButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qpushbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QToolButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtoolbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtConcurrent\QtConcurrent \
+		C:\Qt\6.3.1\msvc2019_64\include\QtConcurrent\QtConcurrentDepends \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QtCore \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QtCoreDepends \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\q20algorithm.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\q20functional.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\q20iterator.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qabstractanimation.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qabstracteventdispatcher.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qabstractnativeeventfilter.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qabstractproxymodel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qanimationgroup.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qapplicationstatic.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qassociativeiterable.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qbasictimer.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qbitarray.h \
@@ -12195,8 +12592,6 @@ release\loginwindow.obj: loginwindow.cpp loginwindow.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QFontDatabase \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qfontdatabase.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpainter.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextoption.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpen.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QMouseEvent \
 		sql_conn_utils.h \
 		mainwindow.h \
@@ -12210,13 +12605,6 @@ release\loginwindow.obj: loginwindow.cpp loginwindow.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableView \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDockWidget \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qdockwidget.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLineEdit \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlineedit.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextcursor.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextformat.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QPushButton \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qpushbutton.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractbutton.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QStyledItemDelegate \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qstyleditemdelegate.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QBoxLayout \
@@ -12249,6 +12637,13 @@ release\loginwindow.obj: loginwindow.cpp loginwindow.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcompleter.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QSortFilterProxyModel \
 		ui_convert_algo_win.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QComboBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcombobox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
 		PortFolio\table_portfolios_delegate.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QPalette \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QStyleOptionViewItem \
@@ -12260,16 +12655,11 @@ release\loginwindow.obj: loginwindow.cpp loginwindow.h \
 		PortFolio\table_portfolios_custom.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QKeyEvent \
 		PortFolio\portfolioheaderview.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
 		SlowDataIndices\slowdataindices.h \
 		SlowDataIndices\slowdata_indices_socket.h \
 		Convert_to_Algo\convert_algo_win.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
 		Convert_to_Algo\convert_algo_shared_var.h \
 		Convert_to_Algo\convert_to_algo_bfly.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
 		Convert_to_Algo\eventfilterlistview.h \
 		Convert_to_Algo\add_algo_f2f.h \
 		Convert_to_Algo\add_algo_con_rev.h \
@@ -12659,6 +13049,28 @@ release\main.obj: main.cpp mainwindow.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcompleter.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QSortFilterProxyModel \
 		ui_convert_algo_win.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QComboBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcombobox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QToolButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtoolbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		PortFolio\table_portfolios_delegate.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QPalette \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QStyleOptionViewItem \
@@ -12668,35 +13080,26 @@ release\main.obj: main.cpp mainwindow.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QMenu \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qmenu.h \
 		PortFolio\table_portfolios_custom.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QKeyEvent \
 		PortFolio\portfolioheaderview.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
 		SlowDataIndices\slowdataindices.h \
 		SlowDataIndices\slowdata_indices_socket.h \
 		Convert_to_Algo\convert_algo_win.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QMouseEvent \
 		Convert_to_Algo\convert_algo_shared_var.h \
 		Convert_to_Algo\convert_to_algo_bfly.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
 		Convert_to_Algo\eventfilterlistview.h \
 		Convert_to_Algo\add_algo_f2f.h \
 		Convert_to_Algo\add_algo_con_rev.h \
 		Convert_to_Algo\convert_to_algo_bfly_bid.h \
 		Common\macros.h \
 		ui_loginwindow.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QProgressBar \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qprogressbar.h \
 		order_detail_popup.h \
 		loginwindow.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QFontDatabase \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qfontdatabase.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qfontdatabase.h
 
 release\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QMainWindow \
@@ -13080,6 +13483,28 @@ release\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcompleter.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QSortFilterProxyModel \
 		ui_convert_algo_win.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QComboBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcombobox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QToolButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtoolbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		PortFolio\table_portfolios_delegate.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QPalette \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QStyleOptionViewItem \
@@ -13089,28 +13514,30 @@ release\mainwindow.obj: mainwindow.cpp mainwindow.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QMenu \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qmenu.h \
 		PortFolio\table_portfolios_custom.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QKeyEvent \
 		PortFolio\portfolioheaderview.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
 		SlowDataIndices\slowdataindices.h \
 		SlowDataIndices\slowdata_indices_socket.h \
 		Convert_to_Algo\convert_algo_win.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QMouseEvent \
 		Convert_to_Algo\convert_algo_shared_var.h \
 		Convert_to_Algo\convert_to_algo_bfly.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
 		Convert_to_Algo\eventfilterlistview.h \
 		Convert_to_Algo\add_algo_f2f.h \
 		Convert_to_Algo\add_algo_con_rev.h \
 		Convert_to_Algo\convert_to_algo_bfly_bid.h \
 		Common\macros.h \
 		ui_loginwindow.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QProgressBar \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qprogressbar.h \
 		order_detail_popup.h \
 		ui_mainwindow.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QIcon \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGroupBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgroupbox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QListWidget \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTextEdit \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtextedit.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QEvent \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QPropertyAnimation \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QParallelAnimationGroup \
@@ -13522,6 +13949,28 @@ release\mysql_conn.obj: mysql_conn.cpp mysql_conn.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcompleter.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QSortFilterProxyModel \
 		ui_convert_algo_win.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QComboBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qcombobox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QToolButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtoolbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		PortFolio\table_portfolios_delegate.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QPalette \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QStyleOptionViewItem \
@@ -13531,26 +13980,22 @@ release\mysql_conn.obj: mysql_conn.cpp mysql_conn.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QMenu \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qmenu.h \
 		PortFolio\table_portfolios_custom.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QKeyEvent \
 		PortFolio\portfolioheaderview.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
 		SlowDataIndices\slowdataindices.h \
 		SlowDataIndices\slowdata_indices_socket.h \
 		Convert_to_Algo\convert_algo_win.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialog \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QMouseEvent \
 		Convert_to_Algo\convert_algo_shared_var.h \
 		Convert_to_Algo\convert_to_algo_bfly.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
 		Convert_to_Algo\eventfilterlistview.h \
 		Convert_to_Algo\add_algo_f2f.h \
 		Convert_to_Algo\add_algo_con_rev.h \
 		Convert_to_Algo\convert_to_algo_bfly_bid.h \
 		Common\macros.h \
 		ui_loginwindow.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QProgressBar \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qprogressbar.h \
 		order_detail_popup.h
 
 release\order_detail_popup.obj: order_detail_popup.cpp order_detail_popup.h \
@@ -13839,6 +14284,45 @@ release\order_detail_popup.obj: order_detail_popup.cpp order_detail_popup.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtConcurrent\qtconcurrenttask.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtConcurrent\qtconcurrentversion.h \
 		ui_order_detail_popup.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QVariant \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QAbstractButton \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractbutton.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QDialogButtonBox \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qdialogbuttonbox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QGridLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgridlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayoutitem.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qboxlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHeaderView \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qheaderview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractitemview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractscrollarea.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qframe.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractitemdelegate.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qstyleoption.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractspinbox.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qvalidator.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qslider.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractslider.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qstyle.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtabbar.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtabwidget.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qrubberband.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QTableWidget \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtablewidget.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtableview.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QWidget \
 		mysql_conn.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtSql\QSqlDatabase \
 		C:\Qt\6.3.1\msvc2019_64\include\QtSql\qsqldatabase.h \
@@ -13853,34 +14337,15 @@ release\order_detail_popup.obj: order_detail_popup.cpp order_detail_popup.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qmessagebox.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QDateTime \
 		defines.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QVariant \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QString \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QHashIterator \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QHash \
 		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QVBoxLayout \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qboxlayout.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayout.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayoutitem.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgridlayout.h \
 		PortFolio\table_portfolios_model.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QAbstractTableModel \
 		PortFolio\portfolio_Object.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QAtomicInt \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QRegularExpression \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtableview.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractitemview.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractscrollarea.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qframe.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractitemdelegate.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qstyleoption.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractspinbox.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qvalidator.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qslider.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qabstractslider.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qstyle.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtabbar.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qtabwidget.h \
-		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qrubberband.h \
 		TradePosition\trade_table_model.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtGui\QColor \
 		NetPosition\net_position_table_model.h \
@@ -14161,7 +14626,39 @@ release\watch_data_list_item.obj: watch_data_list_item.cpp watch_data_list_item.
 		defines.h \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QVariant \
 		C:\Qt\6.3.1\msvc2019_64\include\QtCore\QString \
-		ui_watch_data_list_item.h
+		ui_watch_data_list_item.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QApplication \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qeventloop.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qcoreapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfuture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfutureinterface.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qmutex.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qresultstore.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qfuture_impl.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qthreadpool.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qthread.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qdeadlinetimer.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qelapsedtimer.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qrunnable.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qexception.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qpromise.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qinputmethod.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtCore\qlocale.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qguiapplication_platform.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QHBoxLayout \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qboxlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlayoutitem.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qgridlayout.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QLabel \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qlabel.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\qframe.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qpicture.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtGui\qtextdocument.h \
+		C:\Qt\6.3.1\msvc2019_64\include\QtWidgets\QSpacerItem
 
 release\qrc_Res.obj: release\qrc_Res.cpp 
 

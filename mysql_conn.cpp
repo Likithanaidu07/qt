@@ -577,7 +577,7 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
         Algo_Name = Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg1_token_number,"ddMMM",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type);
     }
     else if(algo_type==PortfolioType::BFLY_BID){
-        Algo_Name = "BflyBid-";//Nifty-18000-CE-200";
+        Algo_Name = "Bfly-";//Nifty-18000-CE-200";
         double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
     }return Algo_Name.toUpper();
@@ -762,7 +762,7 @@ void mysql_conn::getTradeTableData(Trade_Table_Model *model, QString user_id, QH
                 QString Algo_ID = ""; // same as PortfolioNumber
                 QString Buy_Sell = "";
 
-
+                QString traderData =  query.value(rec.indexOf("Trader_Data")).toString();
                 int Algo_ID_Int = query.value(rec.indexOf("PortfolioNumber")).toInt();
 
                 if(Algo_ID_Int>1500000){
@@ -921,10 +921,10 @@ void mysql_conn::getTradeTableData(Trade_Table_Model *model, QString user_id, QH
                 QString Traded_Lot = QString::number(qty);
 
                 QString Remaining_Lot = QString::number(static_cast<double>(query.value(rec.indexOf("RemainingQty")).toDouble()) / lotSize);
-                long long Trade_Time = query.value(rec.indexOf("TimeOrderEnteredHost")).toLongLong();
+                long long Trade_Time = query.value(rec.indexOf("Leg2_TimeOrderEnteredHost")).toLongLong();
                 QDateTime dt = QDateTime::fromSecsSinceEpoch(Trade_Time);
 
-
+                dt = dt.toUTC();
 
                 QStringList rowList;
                 rowList.append(Algo_ID);
@@ -940,6 +940,7 @@ void mysql_conn::getTradeTableData(Trade_Table_Model *model, QString user_id, QH
                 rowList.append(Leg1_OrderStateStr);
                 rowList.append(Leg3_OrderStateStr);
                 rowList.append(Expiry);
+                rowList.append(traderData); // this should be the last data inserted to the row
 
 
                 trade_data_listTmp.append(rowList);
