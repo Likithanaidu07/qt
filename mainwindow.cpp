@@ -512,7 +512,7 @@ MainWindow::MainWindow(QWidget *parent)
         titlecontainer->setStyleSheet(DockTitleBar_Style);
         QHBoxLayout *titleinternalLayout = new QHBoxLayout(titlecontainer);
         titleinternalLayout->setSpacing(10);
-        titleinternalLayout->setContentsMargins(10,8,10,6);
+        titleinternalLayout->setContentsMargins(17,8,10,6);
         QLabel *label = new QLabel("Algorithms");
         QFont fontlabel=label->font();
         QSpacerItem* titlespc = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
@@ -522,7 +522,7 @@ MainWindow::MainWindow(QWidget *parent)
         dockclose->setIconSize(QSize(14, 14));
         fontlabel.setFamily("Work Sans");
         label->setFont(fontlabel);
-        label->setStyleSheet("color: #495057;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal;");
+        label->setStyleSheet("color: #495057;font-size: 16px;font-style: normal;font-weight: 700;line-height: normal;");
         titleinternalLayout->addWidget(label);
         titleinternalLayout->addSpacerItem(titlespc);
         titleinternalLayout->addWidget(dockclose);
@@ -533,7 +533,7 @@ MainWindow::MainWindow(QWidget *parent)
             T_Portfolio_DockWin->setWidget(container);
             QGridLayout *lay = new QGridLayout(container);
             container->setLayout(lay);
-            lay->setContentsMargins(0, 0, 0, 0);
+            lay->setContentsMargins(5, 0, 0, 0);
             lay->setSpacing(0);
             lay->setRowStretch(0, 0); //set minimum hieght for first row
             lay->setRowStretch(1, 1);//set maximum hieght for second row table
@@ -545,28 +545,30 @@ MainWindow::MainWindow(QWidget *parent)
 
             QToolButton *ConvertAlgo_button = new QToolButton();
             connect(ConvertAlgo_button, SIGNAL(clicked()), this, SLOT(on_ConvertAlgo_button_clicked()));
-            ConvertAlgo_button->setFixedSize(125,24);
             //Frame 364.png
             ConvertAlgo_button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            ConvertAlgo_button->setIcon(QIcon(":/Convert to Algo.png"));
-            ConvertAlgo_button->setText("Convert to Algo");
-            ConvertAlgo_button->setLayoutDirection(Qt::LeftToRight);
+
+            ConvertAlgo_button->setText("Build Algo");
+            ConvertAlgo_button->setStyleSheet("text-align: center;");
+
             const char convert_to_algo_button[]="QToolButton {"
-                                                "border-radius: 4px;" "border: 1px solid #188CCA;"
-                                                "background: #1585C0;"
-                                                "color: #FFF;"
-                                                "font-size: 12px;"
-                                                "font-style: normal;"
-                                                "font-weight: 500;"
-                                                "line-height: normal;"
-                                                "}"
-                                                "QToolButton:hover{"
-                                                "border-radius: 4px;"
-                                                "border: 1px solid #106B9A;"
-                                                "background: #106B9A;"
-                                                "}";
+                                                  "border-radius: 4px;" "border: 1px solid #188CCA;"
+                                                  "background: #1585C0;"
+                                                  "color: #FFF;"
+                                                  "font-size: 12px;"
+                                                  "font-style: normal;"
+                                                  "font-weight: 500;"
+                                                  "line-height: normal;"
+                                                  "}"
+                                                  "QToolButton:hover{"
+                                                  "border-radius: 4px;"
+                                                  "border: 1px solid #106B9A;"
+                                                  "background: #106B9A;"
+                                                  "}";
             ConvertAlgo_button->setStyleSheet(convert_to_algo_button);
+            ConvertAlgo_button->setContentsMargins(10,-1,-1,-1);
             ConvertAlgo_button->setFont(headerfont);
+
 
             QWidget *test=new QWidget;
             const char layss[]="background: #E9ECEF;";
@@ -605,7 +607,7 @@ MainWindow::MainWindow(QWidget *parent)
                                         "background: #F7F7FF;"
                                         "color: #4F5D75;"
                                         "font-style: normal;"
-                                        "font-size: 10px;"
+                                        "font-size: 12px;"
                                         "font-weight: 500;"
                                         "line-height: normal;"
                                         "}"
@@ -615,7 +617,7 @@ MainWindow::MainWindow(QWidget *parent)
                                         "background: #4F5D75;"
                                         "color: #FFF; "
                                         "font-family: Work Sans;"
-                                        "font-size: 10px;"
+                                        "font-size: 12px;"
                                         "font-style: normal;"
                                         "font-weight: 500;"
                                         "line-height: normal;"
@@ -919,6 +921,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Algorithms_Close->setVisible(false);
     ui->OrderBook_Close->setVisible(false);
     ui->Positions_Close->setVisible(false);
+    ui->Liners_Close->setVisible(false);
     ui->HP_Close->setVisible(false);
     ui->Templates_Close->setVisible(false);
 
@@ -938,6 +941,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Algorithms_Close->setIcon(pixmapbuttonclose);
     ui->OrderBook_Close->setIcon(pixmapbuttonclose);
     ui->Positions_Close->setIcon(pixmapbuttonclose);
+    ui->Liners_Close->setIcon(pixmapbuttonclose);
     ui->HP_Close->setIcon(pixmapbuttonclose);
     ui->Templates_Close->setIcon(pixmapbuttonclose);
 
@@ -1290,35 +1294,45 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 }
            // }
     }
-            break;
+    break;
+
+    case PortfolioData_Idx::_BuyPriceDifference:{
+                QString BuyPriceDifference = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->BuyPriceDifference*devicer,'f',decimal_precision);
+
+                QString Query = "UPDATE Portfolios SET"
+                                " BuyPriceDifference="+BuyPriceDifference+
+                                " WHERE PortfolioNumber="+PortfolioNumber;
+                db_conn->updateDB_Table(Query);
+                bool success = db_conn->updateDB_Table(Query);
+                if(success){
+                  db_conn->logToDB(QString("BuyPriceDifference["+BuyPriceDifference+"] " +
+                                           "PortfolioNumber["+PortfolioNumber+"]"));
+                }
+
+    }
+    break;
+
+    case PortfolioData_Idx::_SellPriceDifference:{
+                QString SellPriceDifference = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->SellPriceDifference*devicer,'f',decimal_precision);
+
+                QString Query = "UPDATE Portfolios SET"
+                                " SellPriceDifference="+SellPriceDifference+
+                                " WHERE PortfolioNumber="+PortfolioNumber;
+                db_conn->updateDB_Table(Query);
+                bool success = db_conn->updateDB_Table(Query);
+                if(success){
+                  db_conn->logToDB(QString("SellPriceDifference["+SellPriceDifference+"] " +
+                                           "PortfolioNumber["+PortfolioNumber+"]"));
+                }
+
+    }
+    break;
+
+
 
 
 
     default:{
-        QString SellPriceDifference = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->SellPriceDifference*devicer,'f',decimal_precision);
-        QString BuyPriceDifference = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->BuyPriceDifference*devicer,'f',decimal_precision);
-        QString SellTotalQuantity = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity*T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize());
-        QString BuyTotalQuantity = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity*T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize());
-        QString OrderQuantity = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity);
-
-        QString Query = "UPDATE Portfolios SET"
-                        " SellPriceDifference="+SellPriceDifference+
-                        ", BuyPriceDifference="+BuyPriceDifference+
-                        ", SellTotalQuantity="+SellTotalQuantity+
-                        ", BuyTotalQuantity="+BuyTotalQuantity+
-                        ", OrderQuantity="+OrderQuantity+
-                        " WHERE PortfolioNumber="+PortfolioNumber;
-
-        bool success = db_conn->updateDB_Table(Query);
-        if(success){
-            db_conn->logToDB(QString("BuyPriceDifference["+BuyPriceDifference+"] " +
-                                     "SellPriceDifference["+SellPriceDifference+"] " +
-                                     "BuyTotalQuantity["+BuyTotalQuantity+"] " +
-                                     "SellTotalQuantity["+SellTotalQuantity+"] " +
-                                     "OrderQuantity["+OrderQuantity+"]"+
-                                     "PortfolioNumber["+PortfolioNumber+"]"));
-        }
-
 
     }
     break;
@@ -1463,7 +1477,8 @@ void MainWindow::loadDataAndUpdateTable(int table){
     }
 
     case T_Table::NET_POS:{
-        db_conn->getNetPosTableData(net_pos_model,QString::number(userData.UserId));
+        QHash<QString,int> PortFoliosLotSizeHash = T_Portfolio_Model->getPortFoliosLotSize();
+        db_conn->getNetPosTableData(net_pos_model,QString::number(userData.UserId),PortFoliosLotSizeHash);
         emit data_loded_signal(T_Table::NET_POS);
         break;
     }
@@ -1664,6 +1679,20 @@ void MainWindow::on_Positions_Close_clicked()
     ui->Positions_Widget->setStyleSheet("");
     ui->Positions_Close->setVisible(false);
 }
+void MainWindow::on_Liners_Button_clicked()
+{
+    //10
+    ui->Liners_Widget->setStyleSheet(stylesheetvis);
+    ui->Liners_Close->setVisible(true);
+}
+
+
+void MainWindow::on_Liners_Close_clicked()
+{
+    //10
+    ui->Liners_Widget->setStyleSheet("");
+    ui->Liners_Close->setVisible(false);
+}
 
 
 void MainWindow::on_HP_Button_clicked()
@@ -1804,6 +1833,14 @@ void MainWindow::OnPositionsDockWidgetVisiblityChanged(bool p_Visible)
     else
         ui->Positions_Widget->setStyleSheet("");
     ui->Positions_Close->setVisible(p_Visible);
+}
+void MainWindow::OnLinersDockWidgetVisiblityChanged(bool p_Visible)
+{
+    if(p_Visible)
+        ui->Liners_Widget->setStyleSheet(stylesheetvis);
+    else
+        ui->Liners_Widget->setStyleSheet("");
+    ui->Liners_Close->setVisible(p_Visible);
 }
 
 void MainWindow::OnHPDockWidgetVisiblityChanged(bool p_Visible)

@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'order_detail_popup.ui'
 **
-** Created by: Qt User Interface Compiler version 6.3.1
+** Created by: Qt User Interface Compiler version 6.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -75,7 +75,7 @@ public:
         if (OrderDetail_Popup->objectName().isEmpty())
             OrderDetail_Popup->setObjectName(QString::fromUtf8("OrderDetail_Popup"));
         OrderDetail_Popup->resize(1090, 589);
-        OrderDetail_Popup->setStyleSheet(QString::fromUtf8("backgroung-color:#FFF;"));
+        OrderDetail_Popup->setStyleSheet(QString::fromUtf8("background-color:#FFF;"));
         gridLayout = new QGridLayout(OrderDetail_Popup);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         buttonBox = new QDialogButtonBox(OrderDetail_Popup);
@@ -88,7 +88,7 @@ public:
         widget_3 = new QWidget(OrderDetail_Popup);
         widget_3->setObjectName(QString::fromUtf8("widget_3"));
         widget_3->setMinimumSize(QSize(1, 1));
-        widget_3->setStyleSheet(QString::fromUtf8("backgroung-color:#FFF;"));
+        widget_3->setStyleSheet(QString::fromUtf8(""));
         gridLayout_3 = new QGridLayout(widget_3);
         gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
         label_27 = new QLabel(widget_3);
@@ -262,7 +262,7 @@ public:
         tableWidget_Buy->setHorizontalHeaderItem(5, __qtablewidgetitem5);
         tableWidget_Buy->setObjectName(QString::fromUtf8("tableWidget_Buy"));
         tableWidget_Buy->setMinimumSize(QSize(50, 50));
-        tableWidget_Buy->setStyleSheet(QString::fromUtf8("backgroung-color:#FFF;"));
+        tableWidget_Buy->setStyleSheet(QString::fromUtf8(""));
         tableWidget_Buy->setLineWidth(1);
         tableWidget_Buy->setIconSize(QSize(10, 10));
         tableWidget_Buy->verticalHeader()->setMinimumSectionSize(15);
@@ -287,8 +287,8 @@ public:
         widget_2->setSizePolicy(sizePolicy);
         widget_2->setMinimumSize(QSize(0, 0));
         widget_2->setLayoutDirection(Qt::LeftToRight);
-        widget_2->setAutoFillBackground(true);
-        widget_2->setStyleSheet(QString::fromUtf8("backgroung-color:#FFF;"));
+        widget_2->setAutoFillBackground(false);
+        widget_2->setStyleSheet(QString::fromUtf8(""));
         gridLayout_4 = new QGridLayout(widget_2);
         gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
         label = new QLabel(widget_2);
@@ -467,7 +467,7 @@ public:
         QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
         tableWidget_Sell->setHorizontalHeaderItem(5, __qtablewidgetitem11);
         tableWidget_Sell->setObjectName(QString::fromUtf8("tableWidget_Sell"));
-        tableWidget_Sell->setStyleSheet(QString::fromUtf8("backgroung-color:#FFF;"));
+        tableWidget_Sell->setStyleSheet(QString::fromUtf8(""));
         tableWidget_Sell->setFrameShape(QFrame::NoFrame);
 
         gridLayout->addWidget(tableWidget_Sell, 4, 3, 1, 1);

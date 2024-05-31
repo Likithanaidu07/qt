@@ -276,7 +276,7 @@ void mysql_conn::getPortfoliosTableData(Table_Portfolios_Model *model, Combined_
 
     bool ok = checkDBOpened(msg);
     if(ok){
-        QString sqlquery = "SELECT PortfolioNumber, (sum(TradedPrice*TotalVolume) * 1.0 / sum(TotalVolume))/"+QString::number(devicer)+" as AvgPrice, TokenNo, BuySellIndicator from Trades WHERE TraderID='"+user_id+"' group by PortfolioNumber, TokenNo, BuySellIndicator ";
+       QString sqlquery = "SELECT PortfolioNumber, (sum(TradedPrice*TotalVolume) * 1.0 / sum(TotalVolume))/"+QString::number(devicer)+" as AvgPrice, TokenNo, BuySellIndicator from Trades WHERE TraderID='"+user_id+"' group by PortfolioNumber, TokenNo, BuySellIndicator ";
         QSqlQuery queryAvgPrice(sqlquery, db);
         if(!queryAvgPrice.exec())
         {
@@ -970,7 +970,7 @@ void mysql_conn::getLinersTableData(QString user_id)
 }
 
 
-void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user_id)
+void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash)
 {
     QMutexLocker lock(&mutex);
 
@@ -1093,9 +1093,9 @@ void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user
 
     bool ok = checkDBOpened(msg);
     if(ok){
-        QString query_str ="SELECT TokenNo,StockName, (sum(TradedPrice * TotalVolume) / sum(TotalVolume)) /"+QString::number(devicer)+"  as AvgPrice, sum(TotalVolume) as Qty, BuySellIndicator FROM Trades where TraderId = '"+user_id+"'group by TokenNo, BuySellIndicator,StockName";
+        QString query_str ="SELECT TokenNo,StockName,PortfolioNumber, (sum(TradedPrice * TotalVolume) / sum(TotalVolume)) /"+QString::number(devicer)+"  as AvgPrice, sum(TotalVolume) as Qty, BuySellIndicator FROM Trades where TraderId = '"+user_id+"'group by TokenNo, BuySellIndicator,StockName,PortfolioNumber";
         //QString Buy_Avg_Price="SELECT Trades.TokenNo, FORMAT((SUM(Trades.TradedPrice * Trades.TotalVolume)/ SUM(Trades.TotalVolume)/100),2) AS avgpri, Trades.BuySellIndicator FROM Trades WHERE Trades.BuySellIndicator=1 GROUP BY Trades.TokenNo,Trades.BuySellIndicator";
-
+         //QString query_str="SELECT StockName, (sum(TradedPrice * TotalVolume) / sum(TotalVolume)) /"+QString::number(devicer)+"  as AvgPrice, sum(TotalVolume) as Qty, BuySellIndicator FROM Trades where TraderId = '"+user_id+"' group by  StockName,BuySellIndicator";
         QSqlQuery query(query_str,db);
         if( !query.exec() )
         {
@@ -1110,6 +1110,10 @@ void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user
                 double Qty = query.value(rec.indexOf("Qty")).toDouble();
                 double AvgPrice = query.value(rec.indexOf("AvgPrice")).toDouble();
                 QString StockName = query.value(rec.indexOf("StockName")).toString();
+                int PortfolioNumber = query.value(rec.indexOf("PortfolioNumber")).toInt();
+                if(PortfolioNumber>1500000)
+                    PortfolioNumber = PortfolioNumber-1500000;
+
 
                 QString key = QString::number(TokenNo);
                 if(net_pos_dataList.contains(key)){
@@ -1125,6 +1129,7 @@ void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user
                 else{
                     net_pos_data_ net_pos;
                     net_pos.Stock_Name = StockName;
+                    net_pos.PortfolioNumber = QString::number(PortfolioNumber);
 
                     if(buy_sell=="1"){
                         net_pos.Buy_Avg_Price =AvgPrice;
@@ -1144,22 +1149,31 @@ void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user
                 portfolio_type = P.PortfolioType.toInt();
             }*/
            QHashIterator<QString, net_pos_data_> iter(net_pos_dataList);
+           int c=0;
            while(iter.hasNext())
             {
                 iter.next();
                 QString TokenNo =  iter.key();
+
+                QString PortfolioNumber = net_pos_dataList[TokenNo].PortfolioNumber;
+                int lotSize = 1;
+                if(PortFoliosLotSizeHash.contains(PortfolioNumber)){
+                    lotSize = PortFoliosLotSizeHash[PortfolioNumber];
+                }
                 QDateTime dt;//need portfolio type later = ContractDetail::getInstance().GetExpiryDate(TokenNo.toInt());
                 dt = dt.addYears(10);
+
                // QString stock_name=ContractDetail::getInstance().GetStockName(TokenNo.toInt(),portfolio_type);
-                net_pos_dataList[TokenNo].Net_Qty = net_pos_dataList[TokenNo].Sell_Total_Lot-net_pos_dataList[TokenNo].Buy_Total_Lot;
+                net_pos_dataList[TokenNo].Net_Qty = net_pos_dataList[TokenNo].Buy_Total_Lot-net_pos_dataList[TokenNo].Sell_Total_Lot;
                 net_pos_dataList[TokenNo].Buy_Price =net_pos_dataList[TokenNo].Buy_Avg_Price*net_pos_dataList[TokenNo].Buy_Total_Lot;
                 net_pos_dataList[TokenNo].Sell_Price = net_pos_dataList[TokenNo].Sell_Total_Lot*net_pos_dataList[TokenNo].Sell_Avg_Price;
 
                 double Profit = net_pos_dataList[TokenNo].Sell_Price-net_pos_dataList[TokenNo].Buy_Price;
                 QStringList rowList;
+                rowList.append(QString::number(c));
                 rowList.append(net_pos_dataList[TokenNo].Stock_Name);
-                rowList.append(fixDecimal(net_pos_dataList[TokenNo].Buy_Total_Lot,decimal_precision));
-                rowList.append(fixDecimal(net_pos_dataList[TokenNo].Sell_Total_Lot,decimal_precision));
+                rowList.append(QString::number(net_pos_dataList[TokenNo].Buy_Total_Lot/lotSize));
+                rowList.append(QString::number(net_pos_dataList[TokenNo].Sell_Total_Lot/lotSize));
                 rowList.append(fixDecimal(net_pos_dataList[TokenNo].Buy_Price,decimal_precision));
                 rowList.append(fixDecimal(net_pos_dataList[TokenNo].Sell_Price,decimal_precision));
                 rowList.append(fixDecimal(net_pos_dataList[TokenNo].Buy_Avg_Price,decimal_precision));
@@ -1169,6 +1183,7 @@ void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user
                 rowList.append("-");
                 rowList.append(TokenNo); // this should be the last one
                 netPos_data_listTmp.append(rowList);
+                c++;
             }
             model->setDataList(netPos_data_listTmp);
         }
