@@ -32,6 +32,7 @@ struct net_pos_data_{
     double Buy_Avg_Price;
     double Sell_Avg_Price;
     double Net_Qty;
+    QString PortfolioNumber;
     //QString MTM;
 };
 
@@ -66,7 +67,7 @@ public:
     bool updateDB_Table(QString query_str);
     QString get_Algo_Name(int algo_type,int leg1_token_number,int leg2_token_number,int leg3_token_number,double devicer,int decimal_precision);
     void  getTradeTableData(Trade_Table_Model* model,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
-    void  getNetPosTableData(Net_Position_Table_Model* model,QString user_id);
+    void  getNetPosTableData(Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash);
     void getSummaryTableData();
     void getLinersTableData(QString user_id);
     QString fixDecimal(double num,int decimal_precision);

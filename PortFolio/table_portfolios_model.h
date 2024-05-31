@@ -24,6 +24,7 @@ public:
     QList <PortfolioObject*> portfolio_data_list;
     QList<int>  portfolio_tokens; //leg1,leg2,leg3,leg4,leg5,leg6
     QHash<QString,PortFolioData_Less> getPortFolioDataLess();
+    QHash<QString,int> getPortFoliosLotSize();
     QMutex mutex; // Define a QMutex to protect shared data
     void refreshTable();
     int switchstatetest() const;
@@ -38,8 +39,8 @@ private:
                           "Avg","Diff","TQ",
                           "TTQ","RQ","Rate",
                           "Avg", "Diff","TQ",
-                          "TTQ","RQ","Expiry 1", /*"Expiry 2",*/
-                          "Cost","Odr Qty" ,"Qty Ratio",
+                          "TTQ","RQ","Odr Qty","Expiry 1", /*"Expiry 2",*/
+                          "Cost" ,"Qty Ratio",
                           "Skip/Market Strike", "Bid Leg", "Fut Price"};
 
 

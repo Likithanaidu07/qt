@@ -180,6 +180,8 @@ private slots:
     void on_OrderBook_Close_clicked();
     void on_Positions_Button_clicked();
     void on_Positions_Close_clicked();
+    void on_Liners_Button_clicked();
+    void on_Liners_Close_clicked();
     void on_HP_Button_clicked();
     void on_HP_Close_clicked();
     void on_Templates_Button_clicked();
@@ -199,6 +201,7 @@ private slots:
     void OnOrderBookDockWidgetVisiblityChanged(bool p_Visible);
     void OnPositionsDockWidgetVisiblityChanged(bool p_Visible);
     void OnHPDockWidgetVisiblityChanged(bool p_Visible);
+    void OnLinersDockWidgetVisiblityChanged(bool p_Visible);
     void on_Algorithms_Button_clicked();
     void on_Algorithms_Close_clicked();
 
