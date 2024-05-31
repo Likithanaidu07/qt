@@ -716,6 +716,7 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
                 QString Remaining_Lot = QString::number(static_cast<double>(query.value(rec.indexOf("RemainingQty")).toDouble()) / lotSize);
                 long long Trade_Time = query.value(rec.indexOf("TimeOrderEnteredHost")).toLongLong();
                 QDateTime dt = QDateTime::fromSecsSinceEpoch(Trade_Time);
+                dt = dt.toUTC();
 
                 QHash<QString,QString> tmp;
                 tmp.insert("Algo_ID",Algo_ID);
