@@ -2,8 +2,6 @@ new_speedtrade.pro.user*
 /release
 /debug
 /.qtc_clangd
-/release
-release
-/Makefile.Release
 /Makefile
+/Makefile.Release
 /Makefile.Debug
