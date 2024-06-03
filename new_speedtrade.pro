@@ -2,6 +2,11 @@ QT       += core gui
 QT+=sql
 QT += network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
+DEFINES += QT_MESSAGELOGCONTEXT
+# To disable log uncomment the respetive line for debug, info and warning
+#DEFINES += QT_NO_DEBUG_OUTPUT
+#DEFINES += QT_NO_INFO_OUTPUT
+#DEFINES += QT_NO_WARNING_OUTPUT
 
 CONFIG += c++17
 
@@ -43,6 +48,8 @@ SOURCES += \
     custom_grid_table/gridtableview.cpp \
     custom_grid_table/tableheaderitem.cpp \
     custom_q_completer.cpp \
+    loadingdatawindow.cpp \
+    logger/logger.cpp \
     loginwindow.cpp \
     main.cpp \
     mainwindow.cpp \
@@ -89,6 +96,8 @@ HEADERS += \
     custom_grid_table/tableheaderitem.h \
     custom_q_completer.h \
     defines.h \
+    loadingdatawindow.h \
+    logger/logger.h \
     loginwindow.h \
     mainwindow.h \
     mysql_conn.h \
@@ -98,6 +107,7 @@ HEADERS += \
 
 FORMS += \
     convert_algo_win.ui \
+    loadingdatawindow.ui \
     loginwindow.ui \
     mainwindow.ui \
     order_detail_popup.ui \

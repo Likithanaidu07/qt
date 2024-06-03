@@ -342,13 +342,15 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             p2.setX(p2.x()+5);
             painter->drawLine(p1,p2);
 
-            // Load an example image (replace with your logic to get the image)
             QPixmap imagePixmap(":/enable.png");
-            // Assuming 'rect' represents the bounding rectangle of the checkbox
-            int middleColumnX = option.rect.left() + (option.rect.width() - imagePixmap.width()) / 2;
-            int middleColumnY = option.rect.top() + (option.rect.height() - imagePixmap.height()) / 2;
-            QRect imageRect(QPoint(middleColumnX, middleColumnY), imagePixmap.size());
-            painter->drawPixmap(imageRect, imagePixmap);
+            QSize p_Size(40, 40);
+            QPixmap p_pixmap = imagePixmap.scaled(p_Size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+            int middleColumnX = option.rect.left() + (option.rect.width() - p_pixmap.width()) / 2;
+            int middleColumnY = option.rect.top() + (option.rect.height() - p_pixmap.height()) / 2;
+            QRect imageRect(QPoint(middleColumnX, middleColumnY), p_pixmap.size());
+            painter->drawPixmap(imageRect, p_pixmap);
+
 
         }
         else if(portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser)
@@ -362,12 +364,14 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
 
-            // Load an example image (replace with your logic to get the image)
             QPixmap imagePixmap(":/disable.png");
-            int middleColumnX = option.rect.left() + (option.rect.width() - imagePixmap.width()) / 2;
-            int middleColumnY = option.rect.top() + (option.rect.height() - imagePixmap.height()) / 2;
-            QRect imageRect(QPoint(middleColumnX, middleColumnY), imagePixmap.size());
-            painter->drawPixmap(imageRect, imagePixmap);
+            QSize p_Size(40, 40);
+            QPixmap p_pixmap = imagePixmap.scaled(p_Size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+            int middleColumnX = option.rect.left() + (option.rect.width() - p_pixmap.width()) / 2;
+            int middleColumnY = option.rect.top() + (option.rect.height() - p_pixmap.height()) / 2;
+            QRect imageRect(QPoint(middleColumnX, middleColumnY), p_pixmap.size());
+            painter->drawPixmap(imageRect, p_pixmap);
 
         }
 

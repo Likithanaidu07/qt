@@ -36,6 +36,8 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     connect(this,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
     convertalgo=new ConvertAlgo_Win(this);
+    loadingDataWinodw = new loadingdatawindow(this);
+    connect(this,SIGNAL(signalHideProgressBar()),this,SLOT(slotHideProgressBar()));
 
     // db_conn =new mysql_conn(this,"main_db_conn");
     db_conn =new mysql_conn(0,"main_db_conn");
@@ -1378,6 +1380,9 @@ void MainWindow::loadContract(){
 
         emit display_log_text_signal(htmlContent);
 
+        // to hide progress bar winodw
+        emit signalHideProgressBar();
+
         foo_token_number_start_strike = "";
 
         if(loggedInFlg.loadRelaxed()==1){
@@ -1386,7 +1391,6 @@ void MainWindow::loadContract(){
     };
     emit update_ui_signal(LOADED_MODEL);
     QFuture<void> future = QtConcurrent::run(loadContract_BackgroundTask);
-
 }
 
 void MainWindow::start_dataLoadingThread(){
@@ -1626,8 +1630,15 @@ void MainWindow::loadCurrentDayLogs()
 
 void MainWindow::loggedInSucessful(userInfo userData)
 {
+    loadingDataWinodw->move((width() - loadingDataWinodw->width()) / 2 + pos().x(),
+                  (height() - loadingDataWinodw->height()) / 2 + pos().y());
+
+    loadingDataWinodw->show();
+
+    //loading data
     loadCurrentDayLogs();
     loadContract();
+
 }
 
 void MainWindow::loggedOut(){
@@ -1982,6 +1993,11 @@ void MainWindow::slotAddLogForAddAlgoRecord(QString str)
     // To show the latest log at top
     htmlLogsContent.prepend(str);
     ui->textEdit->setText(htmlLogsContent);
+}
+
+void MainWindow::slotHideProgressBar()
+{
+   loadingDataWinodw->hide();
 }
 
 /*********************Watch data section*************************/
