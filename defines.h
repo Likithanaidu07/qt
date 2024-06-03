@@ -66,17 +66,20 @@ enum PortfolioData_Idx
     _SellTotalQuantity,
     _SellTradedQuantity,
     _SellRemainingQuantity,
-    _ExpiryDateTime,
-    _Leg1,
-    _Cost, //currently up to this the data is displayed on portfolio table in the same order as the enum
     _OrderQuantity,
+    _ExpiryDateTime,
+    _Cost, //currently up to this the data is displayed on portfolio table in the same order as the enum
+    _QuantityRatio,
+    _SkipMarketStrike,
+    _BidLeg,
+    _FuturePrice,
     _InstrumentName,
+    _Leg1,
     _Leg2,
     _Leg3,
     _AdditionalData1,
     _PortfolioType,
     _Price,
-    _FuturePrice,
 
 };
 
@@ -160,6 +163,7 @@ enum T_Table{
     PORTFOLIO = 0,
     TRADE = 1,
     NET_POS = 2,
+    SUMMARY,
 };
 
 enum T_LoginErroCode{
@@ -239,6 +243,8 @@ struct userInfo{
     QString loginResponse;
     int errorCode;
     int MaxPortfolioCount;
+    int IDXOpenLimit;
+    int STKOpenLimit;
 
     QMap<PortfolioType,QString> algoFilterMap;
 
@@ -287,6 +293,11 @@ struct Indices_Data_Struct{
     QString change;
     QString percentagechange;
     QString netChangeIndicator;
+    QString openingIdx;
+    QString closingIdx;
+    QString highIndexValue;
+    QString lowIndexValue;
+    QString marketCapitialisation;
     int display_widget_idx;
 };
 
@@ -310,5 +321,7 @@ enum NOTIFICATION_TYPE
     CMD_ID_TRADE_UPDATED_CMD_300 = 300,
     CMD_ID_PORTTFOLIO_UPDATED_301 = 301,
 };
+
+
 
 #endif // DEFINES_H

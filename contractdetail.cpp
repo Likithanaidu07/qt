@@ -33,7 +33,10 @@ ContractDetail::ContractDetail() noexcept
 ContractDetail &ContractDetail::getInstance()
 {
     if(!settingLoaded){
-        QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        //currently hardcoded for FO
+        devicer_contract = FO_DEVICER;
+        decimal_precision_contract = FO_DECIMAL_PRECISION;
+        /*QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
         QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
         QStringList groups = settings.childGroups();
         QString market_type = "fo";
@@ -52,7 +55,7 @@ ContractDetail &ContractDetail::getInstance()
         else{
             devicer_contract = CDS_DEVICER;
             decimal_precision_contract = CDS_DECIMAL_PRECISION;
-        }
+        }*/
 
         settingLoaded = true;
     }
@@ -89,14 +92,14 @@ void ContractDetail::ReloadContractDetails(userInfo uData)
     //m_ContractDetails = con.getContractTable(m_ContractDetailsFiltered);
     // return; // below  need to read write using Qt
 
+#ifdef STORE_CONTRACT_LOCALLY
     //check data stored in Local file and load from there
-    // if (!LoadData(m_ContractDetailsFiltered))
-    // {
-    /*if (!LoadFromFTP(ContractFilePathFTP))
-            {
-                MySQL_Conn con(0,"contract_conn");
-                m_ContractDetails = con.getContractTable(m_ContractDetailsFiltered);
-            }*/
+     if (!LoadContractLocal(m_ContractDetailsFiltered,
+                           F2F_data_list_Sorted_Key,
+                           BFLY_data_list_Sorted_Key,
+                           BFLY_BID_data_list_Sorted_Key))
+     {
+#endif
 
     userData = uData;
     mysql_conn con(0,"contract_conn");
@@ -104,13 +107,15 @@ void ContractDetail::ReloadContractDetails(userInfo uData)
                                              F2F_data_list_Sorted_Key,
                                              BFLY_data_list_Sorted_Key,
                                              BFLY_BID_data_list_Sorted_Key, uData);
-    //qDebug()<<"Loaded ContractDetails from DB size="<<m_ContractDetails.size();
-    //StoreData();
-    //}
+    qDebug()<<"Loaded ContractDetails from DB size="<<m_ContractDetails.size();
+
+#ifdef STORE_CONTRACT_LOCALLY
+        StoreContractToLocalFile();
+    }
+#endif
 
     create_inputFiledAutoFillModel_For_AddAlgoWindow();
-
-    // std::sort(m_ContractDetails.begin(), m_ContractDetails.end(), [](const ContractDetail& a, const ContractDetail& b) { return a.InstrumentName < b.InstrumentName; });
+    //std::sort(m_ContractDetails.begin(), m_ContractDetails.end(), [](const ContractDetail& a, const ContractDetail& b) { return a.InstrumentName < b.InstrumentName; });
 }
 
 QMap<int, QHash<QString, contract_table>> ContractDetail::GetContracts()
@@ -525,149 +530,6 @@ qint64 ContractDetail::GetExpiry(int token,int type)
     else
         return 0;
 }
-// bool LoadData(QHash<QString, QStringList> &_m_ContractDetailsFiltered)
-// {
-//     try
-//     {
-//         QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-//         QString directory = appDataPath + "/contracts";
-
-//         QDir().mkpath(directory);
-
-//         QString fileName = directory + "/contracts.bin";
-
-//         if (QFile::exists(fileName))
-//         {
-//             QFileInfo fileInfo(fileName);
-//             QDateTime lastModified = fileInfo.lastModified();
-//             QDateTime currentTime = QDateTime::currentDateTime();
-//             if (currentTime.date() != lastModified.date())
-//             {
-//                 if (!QFile::remove(fileName))
-//                 {
-//                     return false;
-//                 }
-//             }
-
-//             QFile file(fileName);
-//             if (file.open(QIODevice::ReadOnly))
-//             {
-//                 m_ContractDetails.clear();
-//                 F2F_data_list_Sorted_Key.clear();
-//                 BFLY_data_list_Sorted_Key.clear();
-//                 BFLY_BID_data_list_Sorted_Key.clear();
-//                 QList <contract_table> BFLY_data_list;
-//                 QList <contract_table> F2F_data_list;
-//                 QList <contract_table> BFLY_BID_data_list;
-
-//                 long long actualMin = LLONG_MAX ;
-
-//                 int size;
-//                 QDataStream in(&file);
-//                 in >> size;
-
-
-
-//                 for (int i = 0; i < size; i++) {
-//                     QString key;
-//                     contract_table value;
-//                     in >> key >> value.InstrumentType >> value.InstrumentName >> value.OptionType >> value.StrikePrice >> value.LotSize >> value.Expiry >> value.TokenNumber >> value.StockName >> value.MinimumSpread;
-
-//                     m_ContractDetails[key] = value;
-//                     if(value.Expiry>0){
-//                         if(actualMin>value.Expiry)
-//                             actualMin = value.Expiry;
-//                     }
-//                     _m_ContractDetailsFiltered[value.InstrumentType].append(QString::number(value.TokenNumber));
-
-//                     PortfolioType algo_type = checkAlogTypeForTheData(value.InstrumentType);
-//                     // qDebug() << "---test--- algo type"<<algo_type << value.InstrumentType;
-//                     switch (algo_type) {
-//                     case PortfolioType::BY:{
-//                         BFLY_data_list.append(value);
-//                         break;
-//                     }
-//                     case PortfolioType::F2F:{
-//                         F2F_data_list.append(value);
-//                         break;
-//                     }
-//                     case PortfolioType::BFLY_BID:{
-//                         BFLY_BID_data_list.append(value);
-//                         break;
-//                     }
-
-//                     default:
-//                         break;
-//                     }
-
-
-//                 }
-//                 //sort F2F_data_list based on date
-//                 // std::sort(F2F_data_list.begin(), F2F_data_list.end(), [](const contract_table& a, const contract_table& b)->bool{
-//                 //     return  a.Expiry < b.Expiry; // sort data based  expiry_date
-//                 // });
-//                 // //sort BFLY_data_list based on strike_price
-//                 // std::sort(BFLY_data_list.begin(), BFLY_data_list.end(), [](const contract_table& a, const contract_table& b)->bool{
-//                 //     return  a.StrikePrice < b.StrikePrice; // sort data based  strike price
-//                 // });
-
-//                 //sort BFLY_BID_data_list based on strike_price
-//                 // std::sort(BFLY_BID_data_list.begin(), BFLY_BID_data_list.end(), [](const contract_table& a, const contract_table& b)->bool{
-//                 //     return  a.StrikePrice < b.StrikePrice; // sort data based  strike price
-//                 // });
-
-//                 for(int i=0;i<F2F_data_list.length();i++){
-//                     F2F_data_list_Sorted_Key.append(QString::number(F2F_data_list[i].TokenNumber));
-//                 }
-//                 for(int i=0;i<BFLY_data_list.length();i++){
-//                     BFLY_data_list_Sorted_Key.append(QString::number(BFLY_data_list[i].TokenNumber));
-//                 }
-//                 for(int i=0;i<BFLY_BID_data_list.length();i++){
-//                     BFLY_BID_data_list_Sorted_Key.append(QString::number(BFLY_BID_data_list[i].TokenNumber));
-//                 }
-
-//                 qDebug()<<"Loaded ContractDetails from "<<fileName<<"  size="<<m_ContractDetails.size();
-
-//                 if(m_ContractDetails.size()==0)
-//                     return false;
-
-
-
-//                 try
-//                 {
-//                     mysql_conn con(0,"contract_conn");
-//                     QSqlQuery expiryQuery = con.runQuery("SELECT min(Contract.ExpiryDate) as MinExpiry FROM Contract where ExpiryDate > 0;");
-//                     //QSqlQuery expiryQuery("SELECT min(Contract.ExpiryDate) as MinExpiry FROM Contract where ExpiryDate > 0;", database);
-
-//                     if (expiryQuery.next())
-//                     {
-//                         long long minExpiry = expiryQuery.value("MinExpiry").toLongLong();
-
-//                         if (minExpiry != actualMin)
-//                         {
-//                             m_ContractDetails.clear();
-//                             return false;
-//                         }
-//                     }
-//                 }
-//                 catch (const std::exception& e)
-//                 {
-//                     qDebug() << "OnLoadData : " << e.what();
-//                 }
-
-
-//                 return true;
-//             }
-//         }
-//     }
-//     catch (const std::exception& e)
-//     {
-//         qDebug() << "OnLoadData2 : " << e.what();
-//     }
-
-//     return false;
-// }
-
 
 
 /* QString ContractDetail::toString() const
@@ -680,7 +542,7 @@ qint64 ContractDetail::GetExpiry(int token,int type)
 //    QStandardItemModel* Get_model_searchInstrument_BOX_Leg1()
 //    {
 
-////        return model_searchInstrument_BOX_Leg1;
+//       return model_searchInstrument_BOX_Leg1;
 //    }
 //    QString GetExpiryMonth(int token, QString format)
 //    {
@@ -696,31 +558,186 @@ qint64 ContractDetail::GetExpiry(int token,int type)
 //            return "-";
 //    }
 
+#ifdef STORE_CONTRACT_LOCALLY
 
-// void StoreData() {
-//     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-//     QString directory = appDataPath + "/contracts";
-//     QDir().mkpath(directory);
+ PortfolioType ContractDetail::checkAlogTypeForTheData(QString instrument_type){
+     if(instrument_type=="OPTSTK"||instrument_type=="OPTIDX"||instrument_type=="OPTCUR"||instrument_type=="OPTIRC")
+         return PortfolioType::BY;
+     if(instrument_type=="FUTIDX"||instrument_type=="FUTSTK"||instrument_type=="FUTCUR"||instrument_type=="FUTIRC"||instrument_type=="FUTIRT")
+         return PortfolioType::F2F;
 
-//     QString filename = directory + "/contracts.bin";
-//     QFile file(filename);
-//     if (!file.open(QIODevice::WriteOnly)) {
-//         qDebug() << "Failed to open file: " << filename;
-//         return;
-//     }
 
-//     int size =  m_ContractDetails.size();
-//     QDataStream out(&file);
-//     out << size;
+     return PortfolioType::INVALID;
 
-//     QHashIterator<QString, contract_table> it(m_ContractDetails);
-//     while (it.hasNext()) {
-//         it.next();
-//         out << it.key() << it.value().InstrumentType << it.value().InstrumentName << it.value().OptionType << it.value().StrikePrice << it.value().LotSize << it.value().Expiry << it.value().TokenNumber << it.value().StockName << it.value().MinimumSpread;
-//     }
+ }
 
-// }
 
+ bool ContractDetail::LoadContractLocal(QHash<QString, QStringList> &_m_ContractDetailsFiltered,
+                                        QStringList &F2F_data_list_Sorted_Key,
+                                        QStringList &BFLY_data_list_Sorted_Key,
+                                        QStringList &BFLY_BID_data_list_Sorted_Key)
+
+ {
+     try
+     {
+         QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+         QString directory = appDataPath + "/Data";
+
+
+         QString fileName = directory + "/contracts.bin";
+
+         if (QFile::exists(fileName))
+         {
+             QFileInfo fileInfo(fileName);
+             QDateTime lastModified = fileInfo.lastModified();
+             QDateTime currentTime = QDateTime::currentDateTime();
+             if (currentTime.date() != lastModified.date())
+             {
+                 if (!QFile::remove(fileName))
+                 {
+                     return false;
+                 }
+             }
+
+             QFile file(fileName);
+             if (file.open(QIODevice::ReadOnly))
+             {
+                 m_ContractDetails.clear();
+                 F2F_data_list_Sorted_Key.clear();
+                 BFLY_data_list_Sorted_Key.clear();
+                 BFLY_BID_data_list_Sorted_Key.clear();
+
+
+                 QHash<QString, contract_table> BFLY_Contract_Hash;
+                 QHash<QString, contract_table> F2F_Contract_Hash;
+                 QHash<QString, contract_table> BFLY_BID_Contract_Hash;
+
+                 long long actualMin = LLONG_MAX ;
+                 QDataStream in(&file);
+
+                while (!in.atEnd()) {
+                     QString tokenNo;
+                     QString PortfolioType;
+
+                     contract_table contractT;
+                     in >> PortfolioType>> tokenNo >> contractT.InstrumentType >> contractT.InstrumentName >> contractT.OptionType >> contractT.StrikePrice >> contractT.LotSize >> contractT.Expiry >> contractT.TokenNumber >> contractT.StockName >> contractT.MinimumSpread;
+                     if(contractT.Expiry>0){
+                         if(actualMin>contractT.Expiry)
+                             actualMin = contractT.Expiry;
+                     }
+                     _m_ContractDetailsFiltered[contractT.InstrumentType].append(QString::number(contractT.TokenNumber));
+
+                     int algo_type = PortfolioType.toInt();
+                     // qDebug() << "---test--- algo type"<<algo_type << value.InstrumentType;
+                     switch (algo_type) {
+                     case PortfolioType::BY:{
+                         BFLY_Contract_Hash.insert( tokenNo, contractT);
+                         BFLY_data_list_Sorted_Key.append(tokenNo);
+                         break;
+                     }
+                     case PortfolioType::F2F:{
+                         F2F_Contract_Hash.insert( tokenNo, contractT);
+                         F2F_data_list_Sorted_Key.append(tokenNo);
+                         break;
+                     }
+                     case PortfolioType::BFLY_BID:{
+                         BFLY_BID_Contract_Hash.insert( tokenNo, contractT);
+                         BFLY_BID_data_list_Sorted_Key.append(tokenNo);
+                         break;
+                     }
+
+                     default:
+                         break;
+                     }
+                 }
+
+                m_ContractDetails[PortfolioType::BFLY_BID] = BFLY_BID_Contract_Hash;
+                m_ContractDetails[PortfolioType::BY] = BFLY_Contract_Hash;
+                m_ContractDetails[PortfolioType::F2F] = F2F_Contract_Hash;
+
+
+
+                 qDebug()<<"Loaded ContractDetails from "<<fileName<<"  size="<<m_ContractDetails.size();
+
+                 if(BFLY_BID_Contract_Hash.size()==0&&BFLY_Contract_Hash.size()==0&&F2F_Contract_Hash.size()==0)
+                     return false;
+
+
+                 try
+                 {
+                     mysql_conn con(0,"contract_conn");
+                     QSqlQuery expiryQuery = con.runQuery("SELECT min(Contract.ExpiryDate) as MinExpiry FROM Contract where ExpiryDate > 0;");
+                     //QSqlQuery expiryQuery("SELECT min(Contract.ExpiryDate) as MinExpiry FROM Contract where ExpiryDate > 0;", database);
+
+                     if (expiryQuery.next())
+                     {
+                         long long minExpiry = expiryQuery.value("MinExpiry").toLongLong();
+
+                         if (minExpiry != actualMin)
+                         {
+                             m_ContractDetails.clear();
+                             return false;
+                         }
+                     }
+                 }
+                 catch (const std::exception& e)
+                 {
+                     qDebug() << "OnLoadData : " << e.what();
+                 }
+
+
+                 return true;
+             }
+         }
+     }
+     catch (const std::exception& e)
+     {
+         qDebug() << "LoadContractLocal : " << e.what();
+     }
+
+     return false;
+ }
+
+ void ContractDetail::StoreContractToLocalFile() {
+     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+     QString directory = appDataPath + "/Data";
+     QDir().mkpath(directory);
+
+     QString filename = directory + "/contracts.bin";
+     QFile file(filename);
+     if (!file.open(QIODevice::WriteOnly)) {
+         qDebug() << "Failed to open file: " << filename;
+         return;
+     }
+
+    // int size =  m_ContractDetails.size();
+     QDataStream out(&file);
+
+     // Iterate over the QMap
+     for (auto it = ContractDetail::m_ContractDetails.begin(); it != ContractDetail::m_ContractDetails.end(); ++it) {
+         QString PortfolioType = QString::number(it.key());
+         QHash<QString, contract_table>& hash = it.value();
+
+         // Iterate over the QHash
+         for (auto hashIt = hash.begin(); hashIt != hash.end(); ++hashIt) {
+             QString toeknNo = hashIt.key();
+             out << PortfolioType
+                 << toeknNo
+                 << hashIt.value().InstrumentType
+                 << hashIt.value().InstrumentName
+                 << hashIt.value().OptionType
+                 << hashIt.value().StrikePrice
+                 << hashIt.value().LotSize
+                 << hashIt.value().Expiry
+                 << hashIt.value().TokenNumber
+                 << hashIt.value().StockName
+                 << hashIt.value().MinimumSpread;
+         }
+     }
+
+
+ }
+#endif
 
 // bool LoadFromFTP(const std::string& ftpLocation)
 // {

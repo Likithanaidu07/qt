@@ -55,6 +55,9 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
         return  trade_data_list[r][c];
     default:
         return QVariant();
+    case Qt::TextAlignmentRole:{
+        return Qt::AlignCenter;
+    }
 
     case Qt::FontRole: {
         QFont font("Work Sans");
@@ -93,7 +96,8 @@ void Trade_Table_Model::setDataList(QList <QStringList> trade_data_listNew){
         for(int i=0;i<trade_data_listNew.length();i++){
             bool newData = true;
             for(int j=0;j<trade_data_list.length();j++){
-                if(trade_data_listNew[i][1]==trade_data_list[j][1]){ // trade_data_list---this will be unique for row
+                int trader_data_idx = trade_data_list[j].size()-1; // traded data will be inserted as last data
+                if(trade_data_listNew[i][trader_data_idx]==trade_data_list[j][trader_data_idx]){ // trade_data_list---this will be unique for row
                     newData = false;
                     for(int k=0;k<trade_data_listNew[i].size();k++){
                         if(trade_data_listNew[i][k]!=trade_data_list[j][k]){
@@ -114,8 +118,10 @@ void Trade_Table_Model::setDataList(QList <QStringList> trade_data_listNew){
         QList<int> rowsToRemove;
         for(int i=0;i<trade_data_list.length();i++){
             bool deletRow = true;
+            int trader_data_idx = trade_data_list[i].size()-1; // traded data will be inserted as last data
+
             for(int j=0;j<trade_data_listNew.length();j++){
-                if(trade_data_list[i][1]==trade_data_listNew[j][1]){ // alog_data_list---this will be unique for row
+                if(trade_data_list[i][trader_data_idx]==trade_data_listNew[j][trader_data_idx]){ // alog_data_list---this will be unique for row
                     deletRow=false; //the id is there in new and old data so do not remove this row.
                 }
             }

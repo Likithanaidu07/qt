@@ -19,11 +19,11 @@ Table_Portfolios_Model::Table_Portfolios_Model(QObject *parent) : QAbstractTable
 {
     devicer = FO_DEVICER;
     decimal_precision = FO_DECIMAL_PRECISION;
-    loadSettings();
+   // loadSettings();
 }
 
 void Table_Portfolios_Model::loadSettings(){
-    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+   /* QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
     QStringList groups = settings.childGroups();
     QString market_type = "fo";
@@ -40,7 +40,7 @@ void Table_Portfolios_Model::loadSettings(){
     else{
         devicer = CDS_DEVICER;
         decimal_precision = CDS_DECIMAL_PRECISION;
-    }
+    }*/
 
 }
 
@@ -125,18 +125,21 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
                  c == PortfolioData_Idx::_SellPriceDifference ||
                  c == PortfolioData_Idx::_SellTotalQuantity ||
                  c == PortfolioData_Idx::_SellTradedQuantity ||
-                 c == PortfolioData_Idx::_SellRemainingQuantity ||
-                 c == PortfolioData_Idx::_ExpiryDateTime ||
-                 c == PortfolioData_Idx::_Leg1 ||
-                 c == PortfolioData_Idx::_Cost ||
-                 c == PortfolioData_Idx::_OrderQuantity ||
-                 c == PortfolioData_Idx::_InstrumentName ||
-                 c == PortfolioData_Idx::_Leg2 ||
-                 c == PortfolioData_Idx::_Leg3 ||
-                 c == PortfolioData_Idx::_AdditionalData1 ||
-                 c == PortfolioData_Idx::_PortfolioType ||
-                 c == PortfolioData_Idx::_Price ||
-                 c == PortfolioData_Idx::_FuturePrice){
+                   c == PortfolioData_Idx::_SellRemainingQuantity ||
+                   c == PortfolioData_Idx::_OrderQuantity ||
+                   c == PortfolioData_Idx::_ExpiryDateTime ||
+                   c == PortfolioData_Idx::_Leg1 ||
+                   c == PortfolioData_Idx::_Cost ||
+                   c == PortfolioData_Idx::_InstrumentName ||
+                   c == PortfolioData_Idx::_Leg2 ||
+                   c == PortfolioData_Idx::_Leg3 ||
+                   c == PortfolioData_Idx::_AdditionalData1 ||
+                   c == PortfolioData_Idx::_PortfolioType ||
+                   c == PortfolioData_Idx::_Price ||
+                 c == PortfolioData_Idx::_FuturePrice||
+                 c == PortfolioData_Idx::_QuantityRatio ||
+                 c == PortfolioData_Idx::_SkipMarketStrike||
+                 c == PortfolioData_Idx::_BidLeg){
 
             return font;
         }
@@ -166,6 +169,22 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
             return Qt::AlignCenter;
         }
         else if(index.column()==PortfolioData_Idx::_ExpiryDateTime || index.column()==PortfolioData_Idx::_Leg1){
+            return Qt::AlignCenter;
+        }
+        else if(index.column()==PortfolioData_Idx::_SkipMarketStrike){
+            return Qt::AlignCenter;
+        }
+        else if(index.column()==PortfolioData_Idx::_FuturePrice){
+            return Qt::AlignCenter;
+        }
+        else if(index.column()==PortfolioData_Idx::_BidLeg){
+            return Qt::AlignCenter;
+        }
+        else if(index.column()==PortfolioData_Idx::_QuantityRatio){
+            return Qt::AlignCenter;
+
+        }
+        else if(index.column()==PortfolioData_Idx::_Cost){
             return Qt::AlignCenter;
         }
     }
@@ -232,8 +251,11 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         else if (index.column() == PortfolioData_Idx::_BuyRemainingQuantity) {
             return portfolio->BuyRemainingQuantity;
         }
+        else if (index.column() == PortfolioData_Idx::_OrderQuantity) {
+            return portfolio->OrderQuantity;
+        }
         else if (index.column() == PortfolioData_Idx::_ExpiryDateTime) {
-            return portfolio->ExpiryDateTime.toString("ddMMMyy");
+            return portfolio->ExpiryDateTime.toString("dd-MM-Myy");
         }
         else if (index.column() == PortfolioData_Idx::_Leg1) {
             return portfolio->Leg1;
@@ -241,8 +263,22 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         else if (index.column() == PortfolioData_Idx::_Cost) {
             return portfolio->Cost;
         }
-        else if (index.column() == PortfolioData_Idx::_OrderQuantity) {
-            return portfolio->OrderQuantity;
+
+        else if (index.column() == PortfolioData_Idx::_QuantityRatio) {
+            return portfolio->QuantityRatio;
+
+        }
+        else if (index.column() == PortfolioData_Idx::_SkipMarketStrike) {
+            return portfolio->SkipMarketStrike;
+
+        }
+        else if (index.column() == PortfolioData_Idx::_BidLeg) {
+            return portfolio->BidLeg;
+
+        }
+        else if (index.column() == PortfolioData_Idx::_FuturePrice) {
+            return portfolio->FuturePrice;
+
         }
         /*else if (index.column() == PortfolioData_Idx::_InstrumentName) {
                      return portfolio->InstrumentName;
@@ -649,6 +685,19 @@ QHash<QString,PortFolioData_Less> Table_Portfolios_Model::getPortFolioDataLess()
 
     }
     return PortFolioDataHash;
+}
+
+QHash<QString,int> Table_Portfolios_Model::getPortFoliosLotSize(){
+
+    QMutexLocker locker(&mutex); // Lock the mutex automatically
+    QHash<QString,int>  PortFolioLotSizeHash;
+    for(int i=0;i<portfolio_data_list.length();i++){
+        PortFolioData_Less P;
+        int lotSize = portfolio_data_list[i]->GetLotSize();
+        PortFolioLotSizeHash.insert(QString::number(portfolio_data_list[i]->PortfolioNumber),lotSize);
+
+    }
+    return PortFolioLotSizeHash;
 }
 
 void Table_Portfolios_Model::refreshTable(){

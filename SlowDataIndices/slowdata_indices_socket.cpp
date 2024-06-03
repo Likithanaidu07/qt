@@ -324,9 +324,14 @@ void Slowdata_Indices_Socket::run()
                     Indices_Data_Struct data;
                     data.indexName =indexName;
                     data.indexValue = QString::number(indexValueD,'f',2);
-                    data.change = QString::number(((closingIDx-indexValue)/100.0),'f',2);
+                    data.change = QString::number(((indexValue-closingIDx)/100.0),'f',2);
                     data.percentagechange = QString::number(((percentChange)/100.0),'f',2);
                     data.netChangeIndicator = netChangeIndicator;
+                    data.highIndexValue = QString::number(highIndexValue);
+                    data.lowIndexValue = QString::number(lowIndexValue);
+                    data.openingIdx = QString::number(openingIdx);
+                    data.closingIdx = QString::number(closingIDx);
+                    data.marketCapitialisation = QString::number(marketCapitialisation);
                     data.display_widget_idx = IndicesDataWidgetID::WIDGET_NIFTY_50;
                     emit dataSignal(data);
                 }
@@ -334,9 +339,14 @@ void Slowdata_Indices_Socket::run()
                     Indices_Data_Struct data;
                     data.indexName =indexName;
                     data.indexValue = QString::number(indexValueD,'f',2);
-                    data.change = QString::number(((closingIDx-indexValue)/100.0),'f',2);
+                    data.change = QString::number(((indexValue-closingIDx)/100.0),'f',2);
                     data.percentagechange = QString::number(((percentChange)/100.0),'f',2);
                     data.netChangeIndicator = netChangeIndicator;
+                    data.highIndexValue = QString::number(highIndexValue);
+                    data.lowIndexValue = QString::number(lowIndexValue);
+                    data.openingIdx = QString::number(openingIdx);
+                    data.closingIdx = QString::number(closingIDx);
+                    data.marketCapitialisation = QString::number(marketCapitialisation);
                     data.display_widget_idx = IndicesDataWidgetID::WIDGET_NIFTY_BANK;
                     emit dataSignal(data);
                 }
@@ -345,9 +355,14 @@ void Slowdata_Indices_Socket::run()
                     data.indexName =indexName;
                     indexValueD = indexValueD/100.0; // for VIX it need to device with 10000 follow swastika app
                     data.indexValue = QString::number(indexValueD,'f',2);
-                    data.change = QString::number(((closingIDx-indexValue)/10000.0),'f',2);// for VIX it need to device with 10000 follow swastika app
+                    data.change = QString::number(((indexValue-closingIDx)/10000.0),'f',2);// for VIX it need to device with 10000 follow swastika app
                     data.percentagechange = QString::number(((percentChange)/10000.0),'f',2);
                     data.netChangeIndicator = netChangeIndicator;
+                    data.highIndexValue = QString::number(highIndexValue);
+                    data.lowIndexValue = QString::number(lowIndexValue);
+                    data.openingIdx = QString::number(openingIdx);
+                    data.closingIdx = QString::number(closingIDx);
+                    data.marketCapitialisation = QString::number(marketCapitialisation);
                     data.display_widget_idx = IndicesDataWidgetID::WIDGET_INDIA_VIX;
                     emit dataSignal(data);
                 }
@@ -355,9 +370,14 @@ void Slowdata_Indices_Socket::run()
                     Indices_Data_Struct data;
                     data.indexName =indexName;
                     data.indexValue = QString::number(indexValueD,'f',2);
-                    data.change = QString::number(((closingIDx-indexValue)/100.0),'f',2);
+                    data.change = QString::number(((indexValue-closingIDx)/100.0),'f',2);
                     data.percentagechange = QString::number(((percentChange)/100.0),'f',2);
                     data.netChangeIndicator = netChangeIndicator;
+                    data.highIndexValue = QString::number(highIndexValue);
+                    data.lowIndexValue = QString::number(lowIndexValue);
+                    data.openingIdx = QString::number(openingIdx);
+                    data.closingIdx = QString::number(closingIDx);
+                    data.marketCapitialisation = QString::number(marketCapitialisation);
                     data.display_widget_idx = IndicesDataWidgetID::WIDGET_NIFTY_FINANCIAL_SERVICES;
                     emit dataSignal(data);
                 }

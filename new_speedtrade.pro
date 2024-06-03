@@ -54,6 +54,7 @@ SOURCES += \
     main.cpp \
     mainwindow.cpp \
     mysql_conn.cpp \
+    order_detail_popup.cpp \
     uidockwidget.cpp \
     watch_data_list_item.cpp
 
@@ -100,6 +101,7 @@ HEADERS += \
     loginwindow.h \
     mainwindow.h \
     mysql_conn.h \
+    order_detail_popup.h \
     uidockwidget.h \
     watch_data_list_item.h
 
@@ -108,6 +110,7 @@ FORMS += \
     loadingdatawindow.ui \
     loginwindow.ui \
     mainwindow.ui \
+    order_detail_popup.ui \
     watch_data_list_item.ui
 
 

@@ -28,8 +28,6 @@ watch_Data_List_Item::watch_Data_List_Item(QWidget *parent) :
 }
 
 void watch_Data_List_Item::setData(Indices_Data_Struct data) {
-
-
     bool redArrow = true;
     //if(data.netChangeIndicator=="+")
     // redArrow = false;
@@ -44,8 +42,8 @@ void watch_Data_List_Item::setData(Indices_Data_Struct data) {
         ui->indicator->setPixmap(pixmap);
         ui->indicator->setMask(pixmap.mask());
         ui->value1->setStyleSheet("font-family: 'Work Sans';"
-                                  "font-size: 10px;"
-                                  "font-weight: 500;"
+                                  "font-size: 13px;"
+                                  "font-weight: 600;"
                                   "color:#CC3437"
                                   );
     }
@@ -56,15 +54,15 @@ void watch_Data_List_Item::setData(Indices_Data_Struct data) {
         ui->indicator->setMask(pixmap.mask());
 
         ui->value1->setStyleSheet("font-family: 'Work Sans';"
-                                  "font-size: 10px;"
-                                  "font-weight: 500;"
+                                  "font-size: 13px;"
+                                  "font-weight: 600;"
                                   "color:#008000"
                                   );
     }
 
     QString percent = (data.change+"("+data.percentagechange+"%)");
     ui->name->setText(data.indexName);
-    ui->value1->setText(data.indexName);
+    ui->value1->setText(data.indexValue);
     ui->value2->setText(percent);
 
 

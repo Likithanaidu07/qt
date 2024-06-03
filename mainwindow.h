@@ -33,6 +33,7 @@
 #include "Convert_to_Algo/convert_algo_win.h"
 #include"ui_loginwindow.h"
 #include "loadingdatawindow.h"
+#include "order_detail_popup.h"
 
 class mysql_conn;
 QT_BEGIN_NAMESPACE
@@ -56,6 +57,8 @@ public:
     bool pressed;
     QPoint position;
     QStandardItemModel model;
+    OrderDetail_Popup *orderWin;
+
 
 
 //    QStandardItemModel *model_searchInstrument_BOX_Leg1;
@@ -146,12 +149,15 @@ private:
     QHash<QString, Indices_Data_Struct> indicesDataList;//hash to store indices data for watch
 
     QMutex indicesDataMutex; //list to store indices data for watch
-
+    QString watchItemSelectedindexName;
     QStringList savedWatchItems; // saved watch item to display on watch
     void showSaveWatchOnListView();
     void initWatchWindow();
-
-
+    void updateSelecteWatch_UI( Indices_Data_Struct data);
+    void addToSavedWatchItems(Indices_Data_Struct data);
+    void removeFromSavedWatchItems(Indices_Data_Struct data);
+    void saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList);
+    void loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList);
 
 public slots:
     void profolioTableEditFinshedSlot(QString val,QModelIndex);
@@ -168,6 +174,7 @@ public slots:
     void updatePortFolioStatus();
     void resizePortFolioTableColWidthSlot(int width);
     void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
+    void T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index);
     void slotAddLogForAddAlgoRecord(QString str);
     void slotHideProgressBar();
 
@@ -199,13 +206,15 @@ private slots:
     void OnOrderBookDockWidgetVisiblityChanged(bool p_Visible);
     void OnPositionsDockWidgetVisiblityChanged(bool p_Visible);
     void OnHPDockWidgetVisiblityChanged(bool p_Visible);
+    void OnLinersDockWidgetVisiblityChanged(bool p_Visible);
     void on_Algorithms_Button_clicked();
     void on_Algorithms_Close_clicked();
 
     void on_ConvertAlgo_button_clicked();
     void on_lineEditWatchSearch_textChanged(const QString &arg1);
     void on_listWidgetWatch_itemClicked(QListWidgetItem *item);
-    void on_Add_Watch_Button_clicked();
-    void on_Subtract_Watch_Button_clicked();
+
+    void on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item);
+    void on_listWidgetWatch_itemSelectionChanged();
 };
 #endif // MAINWINDOW_H

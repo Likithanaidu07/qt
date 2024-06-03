@@ -19,6 +19,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
 
         obj.PortfolioType = QString::number(type);
         obj.PortfolioTypeEnum = type;
+        obj.Cost = "-";
 
         obj.IsBroker = query.value("IsBroker").toBool();
         obj.TraderID = query.value("TraderID").toInt();
@@ -56,6 +57,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         int totalQty = 0;
 
         totalQty = query.value("SellTotalQuantity").toInt() / lotSize;
+
         obj.SellPriceDifference =query.value("SellPriceDifference").toDouble()/devicer_;//convert->ToRupees(query.value("SellPriceDifference").toDouble());
         obj.SellTradedQuantity = query.value("SellTradedQuantity").toInt() / lotSize;
         obj.SellTotalQuantity = totalQty;
@@ -66,8 +68,8 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         obj.BuyTradedQuantity = query.value("BuyTradedQuantity").toInt() / lotSize;
         obj.BuyTotalQuantity = totalQty;
         obj.BuyRemainingQuantity = totalQty - obj.BuyTradedQuantity;
+        obj.OrderQuantity = query.value("OrderQuantity").toInt()/ lotSize;
 
-        obj.OrderQuantity = query.value("OrderQuantity").toInt();
         obj.InstrumentName = ContractDetail::getInstance().GetInstrumentName(obj.GetFirstToken(),type);
 
         obj.Leg1 = "-";
@@ -103,6 +105,18 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
             obj.StatusVal = QString::number(portfolio_status::DisabledByUser);
         else
             obj.StatusVal = QString::number(portfolio_status::Filled);
+
+        if(obj.PortfolioType=="250" || obj.PortfolioType=="2"){
+            obj.QuantityRatio="1:2:1";
+        }
+        else{
+            obj.QuantityRatio="N/A";
+        }
+
+        obj.BidLeg = ContractDetail::getInstance().GetStockName(obj.Leg2TokenNo,obj.PortfolioType.toInt());
+
+        obj.SkipMarketStrike= "-";
+        obj.FuturePrice="-";
 
         QHash<QString, contract_table> contractDetails = ContractDetail::getInstance().GetContracts("FUT");
 
@@ -546,7 +560,7 @@ QString PortfolioParser::get_Algo_Name(PortfolioType algo_type,int leg1_token_nu
         Algo_Name = Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg1_token_number,"ddMMM",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type);
     }
     else if(algo_type==PortfolioType::BFLY_BID){
-        Algo_Name = "Bfly-Bid-";//Nifty-18000-CE-200";
+        Algo_Name = "Bfly-";//Nifty-18000-CE-200";
         double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
     }

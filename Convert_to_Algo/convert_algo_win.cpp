@@ -166,24 +166,27 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
     QStringList groups = settings.childGroups();
-    QString market_type = "fo";
+  //  QString market_type = "fo";
     QString bidTypeFromSettings{};
     if(groups.contains("GeneralSettings")){
         settings.beginGroup("GeneralSettings");
-        if (settings.contains("market_type"))
-            market_type = settings.value("market_type").toString();
+       // if (settings.contains("market_type"))
+          //  market_type = settings.value("market_type").toString();
         if (settings.contains("enable_bidType"))
             bidTypeFromSettings = settings.value("enable_bidType").toString();
         settings.endGroup();
     }
-    if(market_type=="fo"){
+    //currently hardcoded for FO
+    sharedData->devicer = FO_DEVICER;
+    sharedData->decimal_precision = FO_DECIMAL_PRECISION;
+    /*if(market_type=="fo"){
         sharedData->devicer = FO_DEVICER;
         sharedData->decimal_precision = FO_DECIMAL_PRECISION;
     }
     else{
         sharedData->devicer = CDS_DEVICER;
         sharedData->decimal_precision = CDS_DECIMAL_PRECISION;
-    }
+    }*/
 
      ui->comboBox_AlgoType->setItemData(1, QVariant(0), Qt::UserRole-1);
 
@@ -720,11 +723,12 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                 else if(algo_type==QString::number(PortfolioType::OPEN_BOX))
                     algo_type="Open-BOX";
                 else if(algo_type==QString::number(PortfolioType::BFLY_BID))
-                    algo_type=BFLY_BID_TYPE;
+                    algo_type="BFLY_BID_TYPE";
 
                 QString Algo_Name = algo_type+"-"+sharedData->algo_data_list[i].Algo_Name;
-                QString htmlContent = "<p><span style='background-color:#B3C1DE;'>" + QTime::currentTime().toString(LOG_TIME_FORMAT) +"</span>"
-                              + "<span style='color: black;'>"+sharedData->foo_user_id +
+                QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.2;'>"
+                                      "<span>" + QTime::currentTime().toString("hh:mm:ss") +"&nbsp;</span>"
+                              + "<span style='font-weight:400;color: black;'>"+sharedData->foo_user_id +
                                       " Inserted New Algo: "+ Algo_Name +"</span> </p>";
 
                 emit display_log_text_signal(htmlContent);

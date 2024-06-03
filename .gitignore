@@ -1,1 +1,7 @@
 new_speedtrade.pro.user*
+/release
+/debug
+/.qtc_clangd
+/Makefile
+/Makefile.Release
+/Makefile.Debug

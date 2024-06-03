@@ -33,6 +33,9 @@ QVariant Net_Position_Table_Model::data(const QModelIndex &index, int role) cons
         return  net_pos_data_list[r][c];
     default:
         return QVariant();
+    case Qt::TextAlignmentRole:{
+        return Qt::AlignCenter;
+    }
 
     case Qt::FontRole: {
         QFont font("Work Sans");

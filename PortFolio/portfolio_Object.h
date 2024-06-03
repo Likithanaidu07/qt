@@ -50,6 +50,11 @@ public:
     QString Cost; //Cost
     QString FuturePrice; //"Future Price";
     QAtomicInt edting;
+    QString FutPrice;
+    QString StockName;
+    QString BidLeg;
+    QString SkipMarketStrike;
+    QString QuantityRatio;
     /***********************************************************************************/
 
     QDateTime AverageUpdateTime;
