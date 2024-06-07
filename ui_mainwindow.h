@@ -170,7 +170,7 @@ public:
     QPushButton *Positions_Button;
     QToolButton *Positions_Close;
     QWidget *Liners_Widget;
-    QVBoxLayout *verticalLayout_16;
+    QHBoxLayout *horizontalLayout_7;
     QPushButton *Liners_Button;
     QToolButton *Liners_Close;
     QWidget *HP_Widget;
@@ -1141,23 +1141,23 @@ public:
         Liners_Widget->setSizePolicy(sizePolicy1);
         Liners_Widget->setMinimumSize(QSize(0, 0));
         Liners_Widget->setMaximumSize(QSize(16777215, 16777215));
-        verticalLayout_16 = new QVBoxLayout(Liners_Widget);
-        verticalLayout_16->setSpacing(4);
-        verticalLayout_16->setObjectName(QString::fromUtf8("verticalLayout_16"));
-        verticalLayout_16->setContentsMargins(8, 0, 8, 0);
+        horizontalLayout_7 = new QHBoxLayout(Liners_Widget);
+        horizontalLayout_7->setSpacing(3);
+        horizontalLayout_7->setObjectName(QString::fromUtf8("horizontalLayout_7"));
+        horizontalLayout_7->setContentsMargins(8, 0, 8, 0);
         Liners_Button = new QPushButton(Liners_Widget);
         Liners_Button->setObjectName(QString::fromUtf8("Liners_Button"));
         sizePolicy3.setHeightForWidth(Liners_Button->sizePolicy().hasHeightForWidth());
         Liners_Button->setSizePolicy(sizePolicy3);
         Liners_Button->setMaximumSize(QSize(55, 14));
 
-        verticalLayout_16->addWidget(Liners_Button);
+        horizontalLayout_7->addWidget(Liners_Button);
 
         Liners_Close = new QToolButton(Liners_Widget);
         Liners_Close->setObjectName(QString::fromUtf8("Liners_Close"));
         Liners_Close->setMaximumSize(QSize(8, 8));
 
-        verticalLayout_16->addWidget(Liners_Close);
+        horizontalLayout_7->addWidget(Liners_Close);
 
 
         horizontalLayout_2->addWidget(Liners_Widget);

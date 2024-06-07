@@ -68,7 +68,7 @@ QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOp
     if ( c == PortfolioData_Idx::_OrderQuantity)
     {
         QLineEdit *editor = new QLineEdit(parent);
-        editor->setValidator(new QIntValidator(0, 1000000000));
+        editor->setValidator(new IntDiffValidator(1, 1000000000, editor));
         editor->installEventFilter(const_cast<Table_Portfolios_Delegate *>(this));
         return editor;
     }
@@ -231,6 +231,10 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                                 if(incValue<0)
                                     incValue = 0;
                             }
+                            if(currentIndex.column()== PortfolioData_Idx::_OrderQuantity){
+                                if(incValue<1)
+                                    incValue = 1;
+                            }
                             value = QString::number(incValue);
                             lineEdit->setText(value);
                             // currentIndex.model()->setData(currentIndex, value, Qt::EditRole);
@@ -305,7 +309,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
     if(c == PortfolioData_Idx::_Status)
     {
-        QPixmap checkboxPixmap(32, 32);
+        QPixmap checkboxPixmap(10,10);
         checkboxPixmap.fill(Qt::transparent); // Fill with transparent background
 
         QStyleOptionButton checkboxOption;
@@ -327,7 +331,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
         if(portfolio->StatusVal.toInt()==portfolio_status::Active)
         {
-            QColor color("#FED9D9");
+            QColor color("#FFF");
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText , Qt::black);
             painter->fillRect(option.rect,  color);

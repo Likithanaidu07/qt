@@ -16,6 +16,38 @@
 #include <QAbstractTableModel>
 
 
+
+// Integer Validator, only allow value between bottom and top
+class IntDiffValidator : public QIntValidator
+{
+public:
+    IntDiffValidator(int bottom, int top, QObject *parent) :
+        QIntValidator(bottom, top, parent)
+    {
+    }
+
+    QValidator::State validate(QString &s, int &i) const override
+    {
+        if (s.isEmpty() || s == "-") {
+            return QValidator::Intermediate;
+        }
+
+        bool ok;
+        int value = s.toInt(&ok);
+
+        if (ok) {
+            if (value >= bottom() && value <= top()) {
+                return QValidator::Acceptable;
+            } else {
+                return QValidator::Invalid;
+            }
+        } else {
+            return QValidator::Invalid;
+        }
+    }
+};
+
+
 // Double  Validator, only allow value beteween bottom and top and last digit should be 0 or 5
 class DiffValidator : public QDoubleValidator
 {

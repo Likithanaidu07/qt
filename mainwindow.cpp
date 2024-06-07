@@ -648,7 +648,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(T_Portfolio_Model,SIGNAL(edit_Started(int,int)),this,SLOT(edit_Started_PortFolio_Table(int,int)));
     QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::editFinished, this, &MainWindow::profolioTableEditFinshedSlot);
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::editCompleted, this, &MainWindow::profolioTableEditFinshedSlot);
-    QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::tabKeyPressed, T_Portfolio_Table, &table_portfolios_custom::handleTabKeyPressFromEditableCell);
+     QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::tabKeyPressed, T_Portfolio_Table, &table_portfolios_custom::handleTabKeyPressFromEditableCell);
     QObject::connect(T_Portfolio_Table, &table_portfolios_custom::spaceKeySignal, this, &MainWindow::updatePortFolioStatus);
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::resizePortFolioTableColWidth, this, &MainWindow::resizePortFolioTableColWidthSlot);
     QObject::connect(T_Portfolio_Table, &table_portfolios_custom::clicked, T_Portfolio_Model, &Table_Portfolios_Model::onItemChanged);
@@ -837,6 +837,64 @@ MainWindow::MainWindow(QWidget *parent)
     net_pos_table->show();
     /************Net Position Window********************************/
 
+    /************Liners Window********************************/
+    QPixmap pixmapdock_Liners_close(":/dock_close.png");
+
+    dock_win_liners =  new QDockWidget(tr("Liners"), this);
+    connect(dock_win_liners, SIGNAL(visibilityChanged(bool)), this, SLOT(OnLinersDockWidgetVisiblityChanged(bool)));
+    dock_win_liners->setAllowedAreas(Qt::AllDockWidgetAreas );
+    subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_liners);
+    dock_win_liners->setStyleSheet(dock_style);
+
+    //create a titlebar
+    QWidget *liners_titlebar=new QWidget;
+    liners_titlebar->setStyleSheet(DockTitleBar_Style);
+    QHBoxLayout *liners_title_layout=new QHBoxLayout(liners_titlebar);
+    liners_title_layout->setSpacing(10);
+    liners_title_layout->setContentsMargins(17,8,10,6);
+    QLabel *liners_label=new QLabel("Liners");
+    QFont font_liners_label=position_label->font();
+    font_liners_label.setFamily("Work Sans");
+    liners_label->setFont(font_liners_label);
+    liners_label->setStyleSheet("color: #495057;font-size: 16px;font-style: normal;font-weight: 700;line-height: normal;");
+    QSpacerItem* liners_spacer=new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QLineEdit* line_edit_liners = new QLineEdit;
+    line_edit_liners->setMaximumWidth(160);
+    line_edit_liners->setStyleSheet(lineedit_dock_SS);
+    QToolButton* liners_close=new QToolButton();
+    connect(liners_close, &QToolButton::clicked, [=](){ dock_win_liners->close(); });
+    liners_close->setIcon(pixmapdock_position_close);
+    liners_close->setIconSize(QSize(14, 14));
+    liners_title_layout->addWidget(liners_label);
+    liners_title_layout->addSpacerItem(liners_spacer);
+    liners_title_layout->addWidget(line_edit_liners);
+    liners_title_layout->addWidget(liners_close);
+    dock_win_liners->setTitleBarWidget(liners_titlebar);
+
+
+    liners_table = new QTableView(dock_win_liners);
+    liners_table->setStyleSheet(scroll_bar_SS);
+    liners_table->horizontalHeader()->setFixedHeight(32);
+    liners_table->horizontalHeader()->setFont(headerfont);
+    liners_table->setStyleSheet(tableview_SS);
+    liners_table->setShowGrid(false);
+    liners_table->setAlternatingRowColors(true);
+    liners_model = new Liners_Model();
+    liners_table->setModel(liners_model);
+    liners_table->horizontalHeader()->setStretchLastSection(true);
+    liners_table->verticalHeader()->setVisible(false);
+    /*  net_pos_table->setStyleSheet("QTableView {selection-background-color: #EFB37F;"
+                                        "selection-color: #4D4D4D;"
+                                        "color:#3D3D3D;"
+                                        "} "
+                                        "QHeaderView { background-color: #C0AAE5;color:#3D3D3D;} QHeaderView::section { background-color:#C0AAE5;color:#3D3D3D;font-weight: 400; }");*/
+
+    liners_table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    liners_table->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    dock_win_liners->setWidget(liners_table);
+    liners_table->show();
+    /************Liners Window********************************/
 
     /************Historical Positions Window********************************/
     QPixmap pixmapdock_hp_close(":/dock_close.png");
@@ -850,7 +908,7 @@ MainWindow::MainWindow(QWidget *parent)
     hp_titlebar->setStyleSheet(DockTitleBar_Style);
     QHBoxLayout *position_hp_layout=new QHBoxLayout(hp_titlebar);
     position_hp_layout->setSpacing(10);
-    position_hp_layout->setContentsMargins(17,8,10,6);
+   position_hp_layout->setContentsMargins(17,8,10,6);
     QLabel *hp_label=new QLabel("Historical Positions");
     QFont font_hp_label=hp_label->font();
     font_hp_label.setFamily("Work Sans");
@@ -858,7 +916,7 @@ MainWindow::MainWindow(QWidget *parent)
     hp_label->setStyleSheet("color: #495057;font-size: 16px;font-style: normal;font-weight: 700;line-height: normal;");
     QSpacerItem* hp_spacer=new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
     QLineEdit* line_edit_hp = new QLineEdit;
-    line_edit_hp->setMaximumWidth(160);
+   line_edit_hp->setMaximumWidth(160);
     line_edit_hp->setStyleSheet(lineedit_dock_SS);
     QToolButton* hp_close=new QToolButton();
     connect(hp_close, &QToolButton::clicked, [=](){ dock_win_combined_tracker->close(); });
@@ -1194,8 +1252,12 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
             QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
             T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0); // maked the row flg not editing, so the bg data will be updated.
-            switch (index.column()) {
-            case PortfolioData_Idx::_Status:{
+
+
+
+
+        switch (index.column()) {
+        case PortfolioData_Idx::_Status:{
         if(valStr == "0"){
             QString Query = "UPDATE Portfolios SET Status='DisabledByUser' where PortfolioNumber="+PortfolioNumber;
             bool success = db_conn->updateDB_Table(Query);
@@ -1352,7 +1414,7 @@ void MainWindow::loadContract(){
 
     auto loadContract_BackgroundTask = [this]() {
 
-        QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:0.4;'>"
+        QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
                               "<span>" + QTime::currentTime().toString("hh:mm:ss")
                               + "&nbsp;</span><span style='font-weight:400;color: black;'> file loading... </span></p>";
 
@@ -1371,7 +1433,7 @@ void MainWindow::loadContract(){
         // Rest of your background task code...
         //if not logged in the data loading thread start by login function
 
-        htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:0.4;'>"
+        htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
                       "<span>" + QTime::currentTime().toString("hh:mm:ss")
                       + "&nbsp;</span><span style='font-weight:400;color: black;'> file loaded </span></p>";
 
@@ -1471,10 +1533,17 @@ void MainWindow::loadDataAndUpdateTable(int table){
     case T_Table::TRADE:{
 //        OutputDebugStringA("Test1 \n");
         QHash<QString, PortFolioData_Less> PortFolioHash = T_Portfolio_Model->getPortFolioDataLess();
-        db_conn->getTradeTableData(trade_model,QString::number(userData.UserId),PortFolioHash);
+        db_conn->getTradeTableData(trade_model,liners_model,QString::number(userData.UserId),PortFolioHash);
         emit data_loded_signal(T_Table::TRADE);
         break;
     }
+   /* case T_Table::Liners:{
+         QHash<QString, PortFolioData_Less> PortFolioTypeHash = T_Portfolio_Model->getPortFolioDataLess();
+        db_conn->getLinersTableData(liners_model,QString::number(userData.UserId), PortFolioTypeHash);
+         db_conn->getTradeTableData(trade_model,QString::number(userData.UserId),PortFolioTypeHash);
+         emit data_loded_signal(T_Table::Liners);
+         break;
+    }*/
 
     case T_Table::NET_POS:{
         QHash<QString,int> PortFoliosLotSizeHash = T_Portfolio_Model->getPortFoliosLotSize();
@@ -1682,6 +1751,7 @@ void MainWindow::on_Positions_Close_clicked()
 void MainWindow::on_Liners_Button_clicked()
 {
     //10
+    dock_win_liners->show();
     ui->Liners_Widget->setStyleSheet(stylesheetvis);
     ui->Liners_Close->setVisible(true);
 }
@@ -1690,6 +1760,7 @@ void MainWindow::on_Liners_Button_clicked()
 void MainWindow::on_Liners_Close_clicked()
 {
     //10
+    dock_win_liners->close();
     ui->Liners_Widget->setStyleSheet("");
     ui->Liners_Close->setVisible(false);
 }

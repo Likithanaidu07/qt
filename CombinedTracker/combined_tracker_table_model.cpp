@@ -130,3 +130,4 @@ QVariant Combined_Tracker_Table_Model::headerData(int section, Qt::Orientation o
         return QString::number(section);
 
 }
+

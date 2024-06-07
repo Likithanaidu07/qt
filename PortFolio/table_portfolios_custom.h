@@ -20,7 +20,7 @@ public:
         QTableView::resizeEvent(event);
         if (model())
         {
-           static_cast<Table_Portfolios_Model*>(model())->setColumnWidths(this);
+            static_cast<Table_Portfolios_Model*>(model())->setColumnWidths(this);
         }
     }
 

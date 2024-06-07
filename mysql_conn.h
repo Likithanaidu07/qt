@@ -18,6 +18,7 @@
 #include <TradePosition/trade_table_model.h>
 #include "NetPosition/net_position_table_model.h"
 #include "CombinedTracker/combined_tracker_table_model.h"
+#include "Liners/liners_model.h"
 //class MainWindow;
 
 
@@ -34,6 +35,17 @@ struct net_pos_data_{
     double Net_Qty;
     QString PortfolioNumber;
     //QString MTM;
+};
+struct Liners_Data{
+    QString algoID;
+    QString algoName;
+    QList<double> BuyAvgPrice;
+    QList<int> BuyQtyLots;
+    QList<double> SellAvgPrice;
+    QList<int> SellQtyLots;
+    QList<double> NetQty;
+    QList<double> profit;
+    QString Traded_Lot;
 };
 
 //class chlildofMainWindow: public MainWindow{
@@ -66,10 +78,10 @@ public:
     QSqlQuery runQuery(QString qry_str);
     bool updateDB_Table(QString query_str);
     QString get_Algo_Name(int algo_type,int leg1_token_number,int leg2_token_number,int leg3_token_number,double devicer,int decimal_precision);
-    void  getTradeTableData(Trade_Table_Model* model,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
+    void  getTradeTableData(Trade_Table_Model *model,Liners_Model *liners_model ,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
     void  getNetPosTableData(Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash);
     void getSummaryTableData();
-    void getLinersTableData(QString user_id);
+    void getLinersTableData(Liners_Model *model,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
     QString fixDecimal(double num,int decimal_precision);
     algo_data_insert_status insertToAlgoTable(algo_data_to_insert data,int MaxPortfolioCount,QString &msg);
     bool deleteAlgo(QString PortfolioNumber,QString &msg);
@@ -88,6 +100,8 @@ private:
     QMutex mutex;
     QString getAlgoTypeQuery(PortfolioType type, userInfo obj);
     userInfo userLoginInfo;
+    double calculateAverage(const QList<double> &list);
+    int calculateSum(const QList<int> &list);
 
 
 //    MainWindow MainWindow;

@@ -163,6 +163,7 @@ enum T_Table{
     PORTFOLIO = 0,
     TRADE = 1,
     NET_POS = 2,
+    Liners,
     SUMMARY,
 };
 
