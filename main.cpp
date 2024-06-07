@@ -3,6 +3,7 @@
 #include <QFontDatabase>
 #include <QApplication>
 #include <QMessageBox>
+#include "logger/logger.h"
 //#include "UiUtils.h"
 QString userNameLogged;
 QAtomicInt data_exchangeTimestamp(0);
@@ -10,50 +11,13 @@ QAtomicInt portfolio_table_updating_db(0);
 std::atomic<int> portfolio_table_slected_idx_for_editing;
 MainWindow *MainWindowObj;
 
-void myMessageHandler(QtMsgType type, const QMessageLogContext &, const QString & msg)
-{
-    QString txt;
-    switch (type) {
-    case QtDebugMsg:
-        txt = QString("Debug: %1").arg(msg);
-        break;
-    case QtWarningMsg:
-        txt = QString("Warning: %1").arg(msg);
-        break;
-    case QtCriticalMsg:
-        txt = QString("Critical: %1").arg(msg);
-        break;
-    case QtFatalMsg:
-        txt = QString("Fatal: %1").arg(msg);
-        abort();
-    }
-    txt = QDateTime::currentDateTime().toString()+": "+txt;
-
-    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-
-    QString directoryPath = appDataPath+"/logs";
-    QDir directory(directoryPath);
-    if (!directory.exists()){
-        directory.mkpath(".");
-    }
-    QString fileName = "SpeedTradeLog_"+QDateTime::currentDateTime().toString("dd_MM_yyyy_hh_mm_ss")+".txt";
-    if (directory.exists())
-        fileName = directoryPath+"/"+fileName;
-
-    QFile outFile(fileName);
-    outFile.open(QIODevice::WriteOnly | QIODevice::Append);
-    QTextStream ts(&outFile);
-    ts << txt << "\n";
-    outFile.close();
-}
-
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName("New_SpeedTrade");
     QCoreApplication::setOrganizationName("New_AlgoMethods");
     // #ifndef QT_DEBUG
-    qInstallMessageHandler(myMessageHandler);
+    logger::initLogging("SpeedTradeLog_");
     // #endif
     QFontDatabase::addApplicationFont(":/RacingSansOne-Regular.ttf");
     QTranslator translator;

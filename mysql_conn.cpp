@@ -593,13 +593,7 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
     bool ok = checkDBOpened(msg);
     if(ok)
     {
-       // QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and Leg2_OrderState=7 and PortfolioNumber="+portfolioNumber+" ORDER BY Trader_Data DESC";
-        QString query_str = QString("SELECT * FROM Order_Table_Bid WHERE Trader_ID='%1' "
-                                    "AND Leg2_OrderState=7 AND (PortfolioNumber=%2 OR PortfolioNumber=%3) "
-                                    "ORDER BY Trader_Data DESC")
-                                .arg(user_id)
-                                .arg(portfolioNumber)
-                               .arg(portfolioNumber.toInt() + 1500000);
+        QString query_str = "SELECT * FROM Order_Table_bid WHERE Trader_ID='"+user_id+"' and OrderState=7  ORDER BY Trader_Data DESC";
 
         QSqlQuery query(query_str,db);
         if( !query.exec() )
