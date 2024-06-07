@@ -34,6 +34,7 @@
 #include"ui_loginwindow.h"
 #include "loadingdatawindow.h"
 #include "order_detail_popup.h"
+#include "Liners/liners_model.h"
 
 class mysql_conn;
 QT_BEGIN_NAMESPACE
@@ -112,6 +113,10 @@ private:
     QTableView *net_pos_table;
     Net_Position_Table_Model *net_pos_model;
     QDockWidget *dock_win_net_pos;
+
+    QTableView *liners_table;
+    Liners_Model *liners_model;
+    QDockWidget *dock_win_liners;
 
     QTableView *combined_tracker_table;
     Combined_Tracker_Table_Model *combined_tracker_model;

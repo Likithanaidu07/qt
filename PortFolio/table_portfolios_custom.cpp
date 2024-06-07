@@ -21,124 +21,115 @@ void table_portfolios_custom::handleTabKeyPressFromEditableCell(nav_direction di
 
     return;
 }
-
 void table_portfolios_custom::keyPressEvent(QKeyEvent *event)
 {
-     if(event->key() == Qt::Key_Tab || event->key() == Qt::Key_Backtab){
+    QModelIndex currentIdx = currentIndex();
+    int currentRow = currentIdx.row();
+    int currentColumn = currentIdx.column();
+    int nextRow = currentRow;
+    int nextColumn = currentColumn;
 
+    if (event->key() == Qt::Key_Tab || event->key() == Qt::Key_Backtab)
+    {
         nav_direction direction = nav_direction::nav_forward;
-        if( event->key() == Qt::Key_Backtab)
-            direction =  nav_direction::nav_backward;
+        if (event->key() == Qt::Key_Backtab)
+            direction = nav_direction::nav_backward;
 
-        int nextIDx= findNextEditableCell(currentIndex().column(),direction);
-        this->setCurrentIndex(model()->index(currentIndex().row(), nextIDx));
-        this->edit(currentIndex());
-        return;
-
+        nextColumn = findNextEditableCell(currentColumn, direction);
     }
-    else if(event->key() == Qt::Key_Space){
-       // if(currentIndex().column() == PortfolioData_Idx::_Status)
-            emit spaceKeySignal();
-    }
-    /* else if (event->key() == Qt::Key_Left || event->key() == Qt::Key_Right)
+    else if (event->key() == Qt::Key_Down)
+    {
+        nextRow = currentRow + 1;
+        if (nextRow < model()->rowCount())
+        {
+            // make sure that  next cell in the same column is editable
+            if (!(model()->flags(model()->index(nextRow, currentColumn)) & Qt::ItemIsEditable))
             {
-                int currentColIdx = currentIndex().column();
-                QList<int> editableIDx = {
-                    PortfolioData_Idx::_SellPriceDifference,
-                    PortfolioData_Idx::_BuyPriceDifference,
-                    PortfolioData_Idx::_SellTotalQuantity,
-                    PortfolioData_Idx::_BuyTotalQuantity,
-                    PortfolioData_Idx::_OrderQuantity
-                }; // these are the editable table cell indexes in the algo table
+                nextColumn = findNextEditableCell(currentColumn, nav_direction::nav_forward);
+            }
+        }
+        else
+        {
+            nextRow = currentRow;  // Stay same if it's the last row
+        }
+    }
+    else if (event->key() == Qt::Key_Up)
+    {
+        nextRow = currentRow - 1;
+        if (nextRow >= 0)
+        {
+            // Ensure the previous cell in the same column is editable
+            if (!(model()->flags(model()->index(nextRow, currentColumn)) & Qt::ItemIsEditable))
+            {
+                nextColumn = findNextEditableCell(currentColumn, nav_direction::nav_backward);
+            }
+        }
+        else
+        {
+            nextRow = currentRow;  // Stay in the current row if it's the first row
+        }
+    }
+    else if (event->key() == Qt::Key_Right)
+    {
+        nextColumn = findNextEditableCell(currentColumn, nav_direction::nav_forward);
+    }
+    else if (event->key() == Qt::Key_Left)
+    {
+        nextColumn = findNextEditableCell(currentColumn, nav_direction::nav_backward);
+    }
+    else
+    {
+        QTableView::keyPressEvent(event); // Call the base class implementation for other keys
+        return;
+    }
 
-                if (editableIDx.contains(currentColIdx))
-                {
-                    int increment = (event->key() == Qt::Key_Right) ? 1 : -1;
-                    int currentValue = model()->data(currentIndex()).toInt();
-                    model()->setData(currentIndex(), currentValue + increment);
-                }
-
-                return;
-            }*/
-
-
-    QTableView::keyPressEvent(event);
+    if (nextRow != currentRow || nextColumn != currentColumn)
+    {
+        this->setCurrentIndex(model()->index(nextRow, nextColumn));
+        this->edit(currentIndex());
+    }
 }
-/*
-int table_portfolios_custom::findNextEditableCell(int currentColIdx,nav_direction direction){
 
-  QList<int> editableIDx = {PortfolioData_Idx::_SellPriceDifference,
-                            PortfolioData_Idx::_BuyPriceDifference,
-                            PortfolioData_Idx::_SellTotalQuantity,
-                            PortfolioData_Idx::_BuyTotalQuantity,
-                           }; // these are the editable table cell in algo table
-  std::sort(editableIDx.begin(), editableIDx.end());
-
-
-
-  int idx=currentColIdx;
-  if(currentColIdx<editableIDx[0])
-      idx = editableIDx[0];
-  else if(currentColIdx>=editableIDx[editableIDx.size()-1])
-      idx = editableIDx[0];
-  else{
-      while(1){
-          idx++;
-          if( editableIDx.contains(idx))
-              break;
-
-      }
-      for(int i=0;i<editableIDx.size();i++){
-          if(currentColIdx==editableIDx[i]&&i<editableIDx.size()){
-              qDebug()<<"loop.....currentColIdx="<<currentColIdx<<"  Next idx="<<editableIDx[i];
-
-              idx=editableIDx[i+1];
-              break;
-          }
-
-      }
-  }
-
-
-  qDebug()<<"currentColIdx="<<currentColIdx<<"  Next idx="<<idx;
-
-
-  return idx;
-
-}*/
-
-int table_portfolios_custom::findNextEditableCell(int currentColIdx, nav_direction direction) {
-
-    QList<int> editableIDx = { PortfolioData_Idx::_SellPriceDifference,
-                              PortfolioData_Idx::_BuyPriceDifference,
-                              PortfolioData_Idx::_SellTotalQuantity,
-                              PortfolioData_Idx::_BuyTotalQuantity,
-                              PortfolioData_Idx::_Status,
-                              PortfolioData_Idx::_OrderQuantity,
-                              }; // These are the editable table cells in algo table
+int table_portfolios_custom::findNextEditableCell(int currentColIdx, nav_direction direction)
+{
+    QList<int> editableIDx = {
+        PortfolioData_Idx::_SellPriceDifference,
+        PortfolioData_Idx::_BuyPriceDifference,
+        PortfolioData_Idx::_SellTotalQuantity,
+        PortfolioData_Idx::_BuyTotalQuantity,
+        PortfolioData_Idx::_Status,
+        PortfolioData_Idx::_OrderQuantity,
+    }; // These are the editable table cells in algo table
     std::sort(editableIDx.begin(), editableIDx.end());
 
     int idx = currentColIdx;
 
-    if (direction == nav_direction::nav_forward) {
+    if (direction == nav_direction::nav_forward)
+    {
         if (currentColIdx < editableIDx[0])
             idx = editableIDx[0];
         else if (currentColIdx >= editableIDx[editableIDx.size() - 1])
             idx = editableIDx[0];
-        else {
-            while (1) {
+        else
+        {
+            while (1)
+            {
                 idx++;
                 if (editableIDx.contains(idx))
                     break;
             }
         }
-    } else if (direction == nav_direction::nav_backward) {
+    }
+    else if (direction == nav_direction::nav_backward)
+    {
         if (currentColIdx > editableIDx[editableIDx.size() - 1])
             idx = editableIDx[editableIDx.size() - 1];
         else if (currentColIdx <= editableIDx[0])
             idx = editableIDx[editableIDx.size() - 1];
-        else {
-            while (1) {
+        else
+        {
+            while (1)
+            {
                 idx--;
                 if (editableIDx.contains(idx))
                     break;
@@ -150,4 +141,3 @@ int table_portfolios_custom::findNextEditableCell(int currentColIdx, nav_directi
 
     return idx;
 }
-

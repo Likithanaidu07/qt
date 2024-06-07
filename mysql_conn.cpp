@@ -400,7 +400,7 @@ void mysql_conn::logToDB(QString logMessage)
             qDebug() << "Query Str: " << qryStr;
         }
 
-        QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:0.4;'>"
+        QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
                               "<span>" + QTime::currentTime().toString("hh:mm:ss")
                               + "&nbsp;</span><span style='font-weight:400;color: black;'>"+ logMessage + "</span></p>";
         emit display_log_text_signal(htmlContent);
@@ -446,12 +446,11 @@ void mysql_conn::loadCurrentDayLogs()
             QString timeString = selQry.value(rec.indexOf("Time")).toString();
             qint64 epochTime = timeString.toLongLong();
             QDateTime dateTime = QDateTime::fromSecsSinceEpoch(epochTime);
-            QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;'>"
+            QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0'>"
                                   "<span>" + QTime::currentTime().toString("hh:mm:ss")
                                   + "&nbsp;</span><span style='font-weight:400;color: black;'>"+ logMessage.prepend("  ") + "</span></p>";
             emit display_log_text_signal(htmlContent);
         }
-
     }
 }
 
@@ -730,20 +729,21 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
     return tradeData;
 }
 
-void mysql_conn::getTradeTableData(Trade_Table_Model *model, QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash)
+void mysql_conn::getTradeTableData(Trade_Table_Model *model,Liners_Model *liners_model ,QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash)
 {
     QMutexLocker lock(&mutex);
 
     QList <QStringList> trade_data_listTmp;
-    // QList <QStringList> algo_pos_data_listTmp;
 
-    // QHash<QString, alog_pos_data_> alog_pos_data;
+    // QList <QStringList> algo_pos_data_listTmp;
+QList <QStringList> liners_listTmp;
+    QHash<QString, Liners_Data> Liners_Data_Hash;
     QString msg;
 
     bool ok = checkDBOpened(msg);
     if(ok)
     {
-        QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and Leg2_OrderState=7  ORDER BY Trader_Data DESC";
+        QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and (Leg1_OrderState=7 and Leg2_OrderState=7 and Leg3_OrderState=7) ORDER BY Trader_Data DESC";
         QSqlQuery query(query_str,db);
         if( !query.exec() )
         {
@@ -940,26 +940,187 @@ void mysql_conn::getTradeTableData(Trade_Table_Model *model, QString user_id, QH
 
                 trade_data_listTmp.append(rowList);
 
+
+
+                QString linersDataKey = Algo_ID;
+                //populate netpos data here
+                if(Liners_Data_Hash.contains(linersDataKey)){
+                    if(Buy_Sell=="Buy"){
+                        Liners_Data_Hash[linersDataKey].BuyAvgPrice.append(Exch_Price_val);
+                        Liners_Data_Hash[linersDataKey].BuyQtyLots.append(qty);
+                    }
+                    else{
+                        Liners_Data_Hash[linersDataKey].SellAvgPrice.append(Exch_Price_val);
+                        Liners_Data_Hash[linersDataKey].SellQtyLots.append(qty);
+                    }
+                }
+                else{
+                    Liners_Data liners_data;
+                    liners_data.algoID = Algo_ID;
+                    liners_data.algoName=Algo_Name;
+                    if(Buy_Sell=="Buy"){
+                        Liners_Data_Hash[linersDataKey].BuyAvgPrice.append(Exch_Price_val);
+                        Liners_Data_Hash[linersDataKey].BuyQtyLots.append(qty);
+                    }
+                    else{
+                        Liners_Data_Hash[linersDataKey].SellAvgPrice.append(Exch_Price_val);
+                        Liners_Data_Hash[linersDataKey].SellQtyLots.append(qty);
+                    }
+
+
+                    Liners_Data_Hash.insert(linersDataKey,liners_data);
+                }
+
+
             }
+
+
+
             model->setDataList(trade_data_listTmp);
+
+            //iterate Liners_Data_Hash and create a QStringList;
+            for (const QString &key : Liners_Data_Hash.keys()) {
+                Liners_Data linersData = Liners_Data_Hash.value(key);
+
+
+                double  BuyAvgPrice = calculateAverage(linersData.BuyAvgPrice);
+                int  BuyQtyLots = calculateSum(linersData.BuyQtyLots);
+
+
+                double  SellAvgPrice = calculateAverage(linersData.SellAvgPrice);
+                int   SellQtyLots = calculateSum(linersData.SellQtyLots);
+
+                double profit = SellAvgPrice - BuyAvgPrice;
+                double NetQty = BuyQtyLots - SellQtyLots;
+                //                int portfolio_type = -1;
+                //                 int leg1_token_number = query.value(rec.indexOf("Leg1_Tok_No")).toInt();
+                //                 int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
+                QStringList rowList;
+                rowList.append(linersData.algoID);
+                rowList.append(linersData.algoName);
+                rowList.append(fixDecimal(BuyAvgPrice,decimal_precision));
+                rowList.append(QString::number(BuyQtyLots));
+                rowList.append(fixDecimal(SellAvgPrice,decimal_precision));
+                rowList.append(QString::number(SellQtyLots));
+                rowList.append(QString::number(NetQty));
+                rowList.append(fixDecimal(profit,decimal_precision));
+                liners_listTmp.append(rowList);
+
+            }
+
+
+        liners_model->setDataList(liners_listTmp);
+
 
         }
     }
 }
 
-void mysql_conn::getLinersTableData(QString user_id)
+double mysql_conn::calculateAverage(const QList<double> &list) {
+    if (list.isEmpty()) {
+        return 0.0; // Return 0.0 if the list is empty to avoid division by zero
+    }
+
+    double sum = 0.0;
+    for (double value : list) {
+        sum += value;
+    }
+
+    double average = sum / list.size();
+    return average;
+}
+int  mysql_conn::calculateSum(const QList<int> &list) {
+    if (list.isEmpty()) {
+        return 0; // Return 0.0 if the list is empty to avoid division by zero
+    }
+
+    int  sum = 0;
+    for (int value : list) {
+        sum += value;
+    }
+
+     return sum;
+}
+
+
+void mysql_conn::getLinersTableData(Liners_Model *model,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash)
 {
     QMutexLocker lock(&mutex);
 
-    QList <QStringList> liners_list;
-    // QList <QStringList> algo_pos_data_listTmp;
 
-    // QHash<QString, alog_pos_data_> alog_pos_data;
+    QList <QStringList> liners_list;
+    //QList <QStringList> algo_pos_data_listTmp;
+
+    //QHash<QString, alog_pos_data_> alog_pos_data;
     QString msg;
 
     bool ok = checkDBOpened(msg);
-    if(ok){
-      //int  i=0;
+    if(ok)
+    {
+        QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and Leg2_OrderState=7  ORDER BY Trader_Data DESC";
+        QSqlQuery query(query_str,db);
+        if( !query.exec() )
+        {
+            // Error Handling, check query.lastError(), probably return
+            qDebug()<<query.lastError().text();
+        }
+        else{
+            QSqlRecord rec = query.record();
+            while (query.next()) {
+
+                QString Algo_ID = ""; // same as PortfolioNumber
+                QString Buy_Sell = "";
+
+                QString traderData =  query.value(rec.indexOf("Trader_Data")).toString();
+                int Algo_ID_Int = query.value(rec.indexOf("PortfolioNumber")).toInt();
+
+                if(Algo_ID_Int>1500000){
+                    Buy_Sell = "Buy";
+                    Algo_ID = QString::number(Algo_ID_Int - 1500000);
+                }
+                else{
+                    Buy_Sell = "Sell";
+                    Algo_ID = QString::number(Algo_ID_Int);
+                }
+
+                QString Volant_No = query.value(rec.indexOf("Trader_Data")).toString();
+                int leg1_token_number = query.value(rec.indexOf("Leg1_Tok_No")).toInt();
+                int leg2_token_number = query.value(rec.indexOf("Leg2_Tok_No")).toInt();
+                int leg3_token_number = query.value(rec.indexOf("Leg3_Tok_No")).toInt();
+
+                int portfolio_type = -1;
+                QString Algo_Name = "";
+                QString Expiry = "";
+
+                if(PortFolioTypeHash.contains(Algo_ID)){
+                    PortFolioData_Less P = PortFolioTypeHash[Algo_ID];
+                    portfolio_type = P.PortfolioType.toInt();
+                    Expiry = P.Expiry;
+                    Algo_Name =get_Algo_Name(portfolio_type,leg1_token_number,leg2_token_number,leg3_token_number,devicer,decimal_precision);
+                }
+
+
+                int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
+                QStringList rowList;
+                rowList.append(Algo_ID);
+                //rowList.append(Volant_No);
+                rowList.append(Algo_Name);
+              /*  rowList.append(Exch_Price);
+                rowList.append(User_Price);
+                rowList.append(Jackpot);
+                rowList.append(Traded_Lot);
+                rowList.append(Remaining_Lot);
+                rowList.append(Buy_Sell);
+                rowList.append(dt.toString("hh:mm:ss"));
+                rowList.append(Leg1_OrderStateStr);
+                rowList.append(Leg3_OrderStateStr);
+                rowList.append(Expiry);
+                rowList.append(traderData); */
+             liners_list.append(rowList);
+            }
+            model->setDataList(liners_list);
+
+        }
     }
 }
 
@@ -1172,7 +1333,7 @@ void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user
                 rowList.append(fixDecimal(net_pos_dataList[TokenNo].Sell_Price,decimal_precision));
                 rowList.append(fixDecimal(net_pos_dataList[TokenNo].Buy_Avg_Price,decimal_precision));
                 rowList.append(fixDecimal(net_pos_dataList[TokenNo].Sell_Avg_Price,decimal_precision));
-                rowList.append(QString::number(net_pos_dataList[TokenNo].Net_Qty));
+                rowList.append(QString::number(net_pos_dataList[TokenNo].Net_Qty/lotSize));
                 rowList.append(fixDecimal(Profit,decimal_precision));
                 rowList.append("-");
                 rowList.append(TokenNo); // this should be the last one
