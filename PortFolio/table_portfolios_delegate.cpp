@@ -70,6 +70,7 @@ QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOp
         QLineEdit *editor = new QLineEdit(parent);
         editor->setValidator(new IntDiffValidator(1, 1000000000, editor));
         editor->installEventFilter(const_cast<Table_Portfolios_Delegate *>(this));
+
         return editor;
     }
     else if( c == PortfolioData_Idx::_SellTotalQuantity ||
@@ -87,6 +88,7 @@ QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOp
         else
             editor->setValidator(new DiffValidator(-9.9995, 9.9995, CDS_DECIMAL_PRECISION,true, editor));
         editor->installEventFilter(const_cast<Table_Portfolios_Delegate *>(this));
+
         return editor;
     }
     else
@@ -113,6 +115,7 @@ void Table_Portfolios_Delegate::setEditorData(QWidget *editor, const QModelIndex
         {
             lineEdit->setText(value);
             currentIndex = index;
+            lineEdit->setAlignment(Qt::AlignCenter);
         }
         else
         {
@@ -157,6 +160,7 @@ void Table_Portfolios_Delegate::setModelData(QWidget *editor, QAbstractItemModel
                 mutableModel = const_cast<QAbstractItemModel *>(model);
                 mutableModel->setData(index, value, Qt::EditRole);
                 mutableModel = nullptr;
+                lineEdit->setAlignment(Qt::AlignCenter);
 
             }
         }
@@ -175,12 +179,9 @@ void Table_Portfolios_Delegate::updateEditorGeometry(QWidget *editor, const QSty
 
 
 
-
 bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress) {
-        // qDebug()<<"row: "<<currentIndex.row()<<"column: "<<currentIndex.column();
-
         int currentColIdx = currentIndex.column();
         QList<int> editableIDx = {
             PortfolioData_Idx::_SellPriceDifference,
@@ -192,18 +193,14 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
 
         if (editableIDx.contains(currentColIdx))
         {
-            double incStep =quantity_incrementer;
-            if(currentColIdx == PortfolioData_Idx::_SellPriceDifference || currentColIdx == PortfolioData_Idx::_BuyPriceDifference){
+            double incStep = quantity_incrementer;
+            if (currentColIdx == PortfolioData_Idx::_SellPriceDifference || currentColIdx == PortfolioData_Idx::_BuyPriceDifference){
                 incStep = price_diff_incrementer;
             }
             QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
             if (keyEvent->key() == Qt::Key_Left || keyEvent->key() == Qt::Key_Right) {
-                //QLineEdit *lineEdit = qobject_cast<QLineEdit *>(obj);
                 if (currentIndex.isValid()) {
-
                     if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(obj)){
-                        //  qDebug()<<"incStep: "<<incStep;
-
                         QString value = lineEdit->text();
                         bool ok;
                         double incValue = value.toDouble(&ok);
@@ -212,32 +209,36 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                             int result = std::round(incValue * 100);
                             if (keyEvent->key() == Qt::Key_Right){
                                 if(std::fmod(result, divisor) == 0.0)
-                                    incValue = incValue+incStep;
+                                    incValue = incValue + incStep;
                                 else{
                                     double roundedNumber = std::ceil(incValue / 0.05) * 0.05;
-                                    incValue=roundedNumber;
+                                    incValue = roundedNumber;
                                 }
                             }
                             else if (keyEvent->key() == Qt::Key_Left){
                                 if(std::fmod(result, divisor) == 0.0){
-                                    incValue = incValue-incStep;
+                                    incValue = incValue - incStep;
                                 }
                                 else{
                                     double roundedNumber = std::floor(incValue / 0.05) * 0.05;
-                                    incValue=roundedNumber;
+                                    incValue = roundedNumber;
                                 }
                             }
-                            if(currentIndex.column()== PortfolioData_Idx::_BuyTotalQuantity||currentIndex.column()== PortfolioData_Idx::_SellTotalQuantity){
-                                if(incValue<0)
+                            if(currentIndex.column() == PortfolioData_Idx::_BuyTotalQuantity || currentIndex.column() == PortfolioData_Idx::_SellTotalQuantity){
+                                if(incValue < 0)
                                     incValue = 0;
                             }
-                            if(currentIndex.column()== PortfolioData_Idx::_OrderQuantity){
-                                if(incValue<1)
+                            if(currentIndex.column() == PortfolioData_Idx::_OrderQuantity){
+                                if(incValue < 1)
                                     incValue = 1;
                             }
                             value = QString::number(incValue);
                             lineEdit->setText(value);
-                            // currentIndex.model()->setData(currentIndex, value, Qt::EditRole);
+                            //cursor
+                            if ( keyEvent->key() == Qt::Key_Left) {
+                                lineEdit->setCursorPosition(-1); // Set cursor position outside visible range
+                            }
+                            lineEdit->setAlignment(Qt::AlignCenter);
                         }
                     }
                 }
@@ -250,14 +251,14 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                     {
                         double currentValue = lineEdit->text().toDouble();
                         double multiplied = round(currentValue * 20.0);
-                        double newvalue= multiplied / 20.0;
+                        double newvalue = multiplied / 20.0;
                         mutableModel = const_cast<QAbstractItemModel *>(currentIndex.model());
                         mutableModel->setData(currentIndex, newvalue, Qt::EditRole);
                         // Close the editor and commit the data
                         emit commitData(lineEdit);
                         emit closeEditor(lineEdit);
                         mutableModel = nullptr;
-                        emit editFinished(QString::number(currentValue),currentIndex);
+                        emit editFinished(QString::number(currentValue), currentIndex);
                         return true;
                     }
                 }
@@ -268,16 +269,12 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
             }
             else if (keyEvent->key() == Qt::Key_Tab){
                 emit tabKeyPressed(nav_direction::nav_forward);
-                // qDebug()<<"\n\n----------------------Key_Tab pressed-----------\n\n";
             }
         }
-
-
     }
-
-
     return QStyledItemDelegate::eventFilter(obj, event);
 }
+
 
 
 QSize Table_Portfolios_Delegate::sizeHint(const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -346,15 +343,13 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             p2.setX(p2.x()+5);
             painter->drawLine(p1,p2);
 
+            // Load an example image (replace with your logic to get the image)
             QPixmap imagePixmap(":/enable.png");
-            QSize p_Size(40, 40);
-            QPixmap p_pixmap = imagePixmap.scaled(p_Size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
-            int middleColumnX = option.rect.left() + (option.rect.width() - p_pixmap.width()) / 2;
-            int middleColumnY = option.rect.top() + (option.rect.height() - p_pixmap.height()) / 2;
-            QRect imageRect(QPoint(middleColumnX, middleColumnY), p_pixmap.size());
-            painter->drawPixmap(imageRect, p_pixmap);
-
+            // Assuming 'rect' represents the bounding rectangle of the checkbox
+            int middleColumnX = option.rect.left() + (option.rect.width() - imagePixmap.width()) / 2;
+            int middleColumnY = option.rect.top() + (option.rect.height() - imagePixmap.height()) / 2;
+            QRect imageRect(QPoint(middleColumnX, middleColumnY), imagePixmap.size());
+            painter->drawPixmap(imageRect, imagePixmap);
 
         }
         else if(portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser)
@@ -368,14 +363,12 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
 
+            // Load an example image (replace with your logic to get the image)
             QPixmap imagePixmap(":/disable.png");
-            QSize p_Size(40, 40);
-            QPixmap p_pixmap = imagePixmap.scaled(p_Size, Qt::KeepAspectRatio, Qt::SmoothTransformation);
-
-            int middleColumnX = option.rect.left() + (option.rect.width() - p_pixmap.width()) / 2;
-            int middleColumnY = option.rect.top() + (option.rect.height() - p_pixmap.height()) / 2;
-            QRect imageRect(QPoint(middleColumnX, middleColumnY), p_pixmap.size());
-            painter->drawPixmap(imageRect, p_pixmap);
+            int middleColumnX = option.rect.left() + (option.rect.width() - imagePixmap.width()) / 2;
+            int middleColumnY = option.rect.top() + (option.rect.height() - imagePixmap.height()) / 2;
+            QRect imageRect(QPoint(middleColumnX, middleColumnY), imagePixmap.size());
+            painter->drawPixmap(imageRect, imagePixmap);
 
         }
 

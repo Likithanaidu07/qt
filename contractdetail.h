@@ -58,12 +58,14 @@ public:
     QStringList Get_BFLY_BID_data_list_Sorted_Key();
     QHash<QString, contract_table> GetFutureContracts();
     QHash<QString, contract_table> GetContracts(QString type);
+
     int GetLotSize(int token, int type);
     contract_table GetDetail(int token, int type);
     QString GetStockName(int token, int type);
     QString GetInstrumentName(int token, int type);
     int GetStrikePriceOrg(int token, int type);
     QString GetStrikePrice(int token, int type);
+    double GetVolumeFreezeQty(int token, int type);
     QString GetOptionType(int token, int type);
     QString GetExpiry(int token, QString format, int type);
     QString GetExpiry(QString format, long long Expiry) const;

@@ -21,6 +21,7 @@ void table_portfolios_custom::handleTabKeyPressFromEditableCell(nav_direction di
 
     return;
 }
+
 void table_portfolios_custom::keyPressEvent(QKeyEvent *event)
 {
     QModelIndex currentIdx = currentIndex();
@@ -86,7 +87,21 @@ void table_portfolios_custom::keyPressEvent(QKeyEvent *event)
     if (nextRow != currentRow || nextColumn != currentColumn)
     {
         this->setCurrentIndex(model()->index(nextRow, nextColumn));
+        this->scrollTo(currentIndex(), QAbstractItemView::PositionAtCenter);
         this->edit(currentIndex());
+    }
+}
+
+void table_portfolios_custom::mousePressEvent(QMouseEvent *event)
+{
+    QTableView::mousePressEvent(event);
+
+    QModelIndex currentIdx = indexAt(event->pos());
+    if (model()->flags(currentIdx) & Qt::ItemIsEditable)
+    {
+        this->setCurrentIndex(currentIdx);
+        this->scrollTo(currentIdx, QAbstractItemView::PositionAtCenter);
+        this->edit(currentIdx);
     }
 }
 
