@@ -429,6 +429,18 @@ int ContractDetail::GetStrikePriceOrg(int token, int type)
 
 }
 
+double ContractDetail::GetVolumeFreezeQty(int token, int type)
+{
+    if (token == 0)
+        return 0;
+    QString key = QString::number(token);
+    if(m_ContractDetails[type].contains(key))
+        return m_ContractDetails[type][key].VolumeFreezeQty;
+    else
+        return 0;
+
+}
+
 QString ContractDetail::GetStrikePrice(int token, int type)
 {
     if (token == 0)

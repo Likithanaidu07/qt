@@ -478,6 +478,8 @@ QHash<QString, contract_table> mysql_conn::prpareContractDataFromDB(QString quer
             contractTableTmp.TokenNumber = query.value(rec.indexOf("Token")).toInt();
             contractTableTmp.StockName = query.value(rec.indexOf("StockName")).toString();
             contractTableTmp.MinimumSpread = query.value(rec.indexOf("MinSpread")).toInt();
+            contractTableTmp.VolumeFreezeQty = query.value(rec.indexOf("VolumeFreezeQty")).toDouble();
+
             tokenData.append(QString::number(contractTableTmp.TokenNumber));
             contract_table_hash.insert( query.value(rec.indexOf("Token")).toString(), contractTableTmp);
 
@@ -1788,7 +1790,7 @@ QString mysql_conn::getAlgoTypeQuery(PortfolioType type, userInfo userLoginInfo)
     }
     whereStr += ")";
 
-    return "SELECT InstrumentType, InstrumentName, OptionType, StrikePrice, LotSize, ExpiryDate, Token, StockName, MinSpread FROM Contract" +
+    return "SELECT InstrumentType, InstrumentName, OptionType, StrikePrice, LotSize, ExpiryDate, Token, StockName, MinSpread,VolumeFreezeQty FROM Contract" +
            whereStr +
            " ORDER BY ExpiryDate,Token, InstrumentName, OptionType, StrikePrice";
 }

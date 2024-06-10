@@ -33,6 +33,8 @@ protected:
 
 public slots:
     void handleTabKeyPressFromEditableCell(nav_direction direction);
+    void mousePressEvent(QMouseEvent *event);
+
 
 signals:
     void spaceKeySignal();

@@ -15,6 +15,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         obj.devicer = devicer_;
 
 
+
         PortfolioType type = static_cast<PortfolioType>(query.value("PortfolioType").toInt());
 
         obj.PortfolioType = QString::number(type);
@@ -37,7 +38,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
             SlowDataReader::GetInstance().RegisterContract(static_cast<uint>(obj.Leg4TokenNo));
             SlowDataReader::GetInstance().RegisterContract(static_cast<uint>(obj.Leg5TokenNo));
             SlowDataReader::GetInstance().RegisterContract(static_cast<uint>(obj.Leg6TokenNo));*/
-
+        obj.VolumeFreezeQty = ContractDetail::getInstance().GetVolumeFreezeQty(obj.Leg1TokenNo,type);
         obj.Leg1LotSizeOrg = ContractDetail::getInstance().GetLotSize(obj.Leg1TokenNo,type);
         obj.Leg2LotSize = ContractDetail::getInstance().GetLotSize(obj.Leg2TokenNo,type);
         obj.Leg3LotSize = ContractDetail::getInstance().GetLotSize(obj.Leg3TokenNo,type);

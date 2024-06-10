@@ -182,6 +182,14 @@ public:
     QPushButton *Templates_Button;
     QToolButton *Templates_Close;
     QSpacerItem *horizontalSpacer_4;
+    QWidget *widget_31;
+    QHBoxLayout *horizontalLayout_151;
+    QPushButton *toggle_Button1;
+    QWidget *widget_41;
+    QHBoxLayout *horizontalLayout_181;
+    QGridLayout *gridLayout_21;
+    QVBoxLayout *verticalLayout_111;
+    QLabel *label_4;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -1219,6 +1227,55 @@ public:
 
         gridLayout->addWidget(widget_5, 3, 0, 1, 5);
 
+        widget_31 = new QWidget(centralwidget);
+        widget_31->setObjectName(QString::fromUtf8("widget_31"));
+        sizePolicy.setHeightForWidth(widget_31->sizePolicy().hasHeightForWidth());
+        widget_31->setSizePolicy(sizePolicy);
+        widget_31->setMinimumSize(QSize(10, 0));
+        widget_31->setStyleSheet(QString::fromUtf8("#widget_3{\n"
+"\n"
+"}"));
+        horizontalLayout_151 = new QHBoxLayout(widget_31);
+        horizontalLayout_151->setObjectName(QString::fromUtf8("horizontalLayout_151"));
+        horizontalLayout_151->setContentsMargins(-1, -1, 0, -1);
+        toggle_Button1 = new QPushButton(widget_31);
+        toggle_Button1->setObjectName(QString::fromUtf8("toggle_Button1"));
+        toggle_Button1->setMaximumSize(QSize(13, 40));
+        toggle_Button1->setStyleSheet(QString::fromUtf8(""));
+
+        horizontalLayout_151->addWidget(toggle_Button1);
+
+
+        gridLayout->addWidget(widget_31, 4, 1, 2, 1);
+
+        widget_41 = new QWidget(centralwidget);
+        widget_41->setObjectName(QString::fromUtf8("widget_41"));
+        widget_41->setMinimumSize(QSize(0, 6));
+        widget_41->setMaximumSize(QSize(6, 16777215));
+        widget_41->setStyleSheet(QString::fromUtf8("#widget_4{\n"
+"background: #86A2B1;\n"
+"}"));
+        horizontalLayout_181 = new QHBoxLayout(widget_41);
+        horizontalLayout_181->setObjectName(QString::fromUtf8("horizontalLayout_181"));
+
+        gridLayout->addWidget(widget_41, 4, 2, 2, 1);
+
+        gridLayout_21 = new QGridLayout();
+        gridLayout_21->setObjectName(QString::fromUtf8("gridLayout_21"));
+        gridLayout_21->setContentsMargins(8, 8, 0, 0);
+        verticalLayout_111 = new QVBoxLayout();
+        verticalLayout_111->setObjectName(QString::fromUtf8("verticalLayout_111"));
+
+        gridLayout_21->addLayout(verticalLayout_111, 0, 0, 1, 1);
+
+
+        gridLayout->addLayout(gridLayout_21, 4, 0, 1, 1);
+
+        label_4 = new QLabel(centralwidget);
+        label_4->setObjectName(QString::fromUtf8("label_4"));
+
+        gridLayout->addWidget(label_4, 5, 0, 1, 1);
+
         gridLayout->setColumnStretch(0, 1);
         MainWindow->setCentralWidget(centralwidget);
 
@@ -1432,6 +1489,8 @@ public:
         HP_Close->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         Templates_Button->setText(QCoreApplication::translate("MainWindow", "Templates", nullptr));
         Templates_Close->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
+        toggle_Button1->setText(QString());
+        label_4->setText(QCoreApplication::translate("MainWindow", "1.1 20-05-2024_11_00_PM", nullptr));
     } // retranslateUi
 
 };

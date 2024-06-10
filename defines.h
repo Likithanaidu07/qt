@@ -235,6 +235,7 @@ struct contract_table{
     int TokenNumber;
     QString StockName;
     int MinimumSpread;
+    double VolumeFreezeQty;
 };
 struct userInfo{
     int UserId;

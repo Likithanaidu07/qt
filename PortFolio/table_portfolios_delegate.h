@@ -24,8 +24,8 @@ public:
     IntDiffValidator(int bottom, int top, QObject *parent) :
         QIntValidator(bottom, top, parent)
     {
-    }
 
+    }
     QValidator::State validate(QString &s, int &i) const override
     {
         if (s.isEmpty() || s == "-") {
@@ -118,6 +118,7 @@ public:
     mutable QAbstractItemModel *mutableModel;
 
     bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override;
+
 signals:
     void editFinished(QString text, QModelIndex idx) const;
     void tabKeyPressed(nav_direction);

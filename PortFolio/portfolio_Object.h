@@ -100,7 +100,7 @@ public:
     int Leg2Multiplier;
     int Leg3Multiplier;
     int Leg4Multiplier;
-
+    double VolumeFreezeQty;
 
     bool operator ==(const PortfolioObject &other) const;
     bool operator !=(const PortfolioObject &other) const;
