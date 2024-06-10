@@ -1321,14 +1321,22 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
               int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
               double val = valStr.toDouble();
               val=val*lotSize;
-              QString Query = "UPDATE Portfolios SET OrderQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
-
-              db_conn->updateDB_Table(Query);
-              bool success = db_conn->updateDB_Table(Query);
-            if(success){
-                db_conn->logToDB(QString("OrderQuantity ["+valStr+"]"));
-             }
+              double vfq = T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
+              if(val > vfq){
+                QMessageBox msgBox;
+                msgBox.setText("greater");
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.exec();
+              }
+              else{
+                  QString Query = "UPDATE Portfolios SET OrderQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
+                  db_conn->updateDB_Table(Query);
+                  bool success = db_conn->updateDB_Table(Query);
+                  if(success){
+                     db_conn->logToDB(QString("OrderQuantity ["+valStr+"]"));
+              }
           }
+    }
            break;
     case PortfolioData_Idx::_BuyTotalQuantity:{
              int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
