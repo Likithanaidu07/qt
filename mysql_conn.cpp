@@ -745,7 +745,7 @@ QList <QStringList> liners_listTmp;
     bool ok = checkDBOpened(msg);
     if(ok)
     {
-        QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and (Leg1_OrderState=7 and Leg2_OrderState=7 and Leg3_OrderState=7) ORDER BY Trader_Data DESC";
+        QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and Leg2_OrderState=7 ORDER BY Trader_Data DESC";
         QSqlQuery query(query_str,db);
         if( !query.exec() )
         {
