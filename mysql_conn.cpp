@@ -702,6 +702,7 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
                 double JackpotVal =(Exch_Price_val-userPriceVal);
                 QString Jackpot = QString::number(JackpotVal,'f',decimal_precision);
 
+
                 int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
 
                 if(qty>0&&lotSize>0) // to prevent crash
@@ -723,6 +724,7 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
                 tmp.insert("Remaining_Lot",Remaining_Lot);
                 tmp.insert("Buy_Sell",Buy_Sell);
                 tmp.insert("Time",dt.toString("hh:mm:ss"));
+
                 tradeData.append(tmp);
             }
 
@@ -795,8 +797,14 @@ QList <QStringList> liners_listTmp;
                 int Leg1BuySellIndicator = query.value(rec.indexOf("Leg1_Buy/Sell")).toInt();
                 int Leg1_OrderState = query.value(rec.indexOf("Leg1_OrderState")).toInt();
                 int Leg3_OrderState = query.value(rec.indexOf("Leg3_OrderState")).toInt();
-                QString Leg1_OrderStateStr = "-";
-                QString Leg3_OrderStateStr = "-";
+                int  Leg2_OrderState = query.value(rec.indexOf("Leg2_OrderState")).toInt();
+                int Leg1_Total_Volume = query.value(rec.indexOf("Leg1_Total_Volume")).toInt();
+                int Leg2_Total_Volume = query.value(rec.indexOf("Leg2_Total_Volume")).toInt();
+                int Leg3_Total_Volume = query.value(rec.indexOf("Leg3_Total_Volume")).toInt();
+                QString Leg1_OrderStateStr ;
+                QString Leg3_OrderStateStr ;
+                QString Leg2_OrderStateStr ;
+
 
                 if(Leg1_OrderState==1){
                     Leg1_OrderStateStr = "Sent to Exachange";
@@ -819,6 +827,10 @@ QList <QStringList> liners_listTmp;
                 else if(Leg1_OrderState==12){
                     Leg1_OrderStateStr = "CancelPending";
                 }
+                else if(Leg1_OrderState==8){
+                    Leg1_OrderStateStr = "PartialTrade";
+                }
+
 
                 if(Leg3_OrderState==1){
                     Leg3_OrderStateStr = "Sent to Exachange";
@@ -841,14 +853,46 @@ QList <QStringList> liners_listTmp;
                 else if(Leg3_OrderState==12){
                     Leg3_OrderStateStr = "CancelPending";
                 }
+                else if(Leg3_OrderState==8){
+                    Leg3_OrderStateStr = "PartialTrade";
+                }
+
+
+                if(Leg2_OrderState==1){
+                    Leg2_OrderStateStr = "Sent to Exachange";
+                }
+                else if(Leg2_OrderState==5){
+                    Leg2_OrderStateStr = "Cancelled";
+                }
+                else if(Leg2_OrderState==6){
+                    Leg2_OrderStateStr = "Rejected";
+                }
+                else if(Leg2_OrderState==7){
+                    Leg2_OrderStateStr = "Traded";
+                }
+                else if(Leg2_OrderState==9){
+                    Leg2_OrderStateStr = "Open";
+                }
+                else if(Leg2_OrderState==10){
+                    Leg2_OrderStateStr = "ModifyPending";
+                }
+                else if(Leg2_OrderState==12){
+                    Leg2_OrderStateStr = "CancelPending";
+                }
+                else if(Leg2_OrderState==8){
+                    Leg2_OrderStateStr = "PartialTrade";
+                }
 
 
 
+                int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
 
-
+//                Leg1_OrderStateStr = ContractDetail::getInstance().GetStockName(leg1_token_number,portfolio_type)+" "+"["+(QString::number(Leg1_Total_Volume/lotSize))+"]";
+//                Leg3_OrderStateStr = ContractDetail::getInstance().GetStockName(leg3_token_number,portfolio_type)+" "+"["+(QString::number(Leg3_Total_Volume/lotSize))+"]";
+                //Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")";
                 Leg1_OrderStateStr = Leg1_OrderStateStr+" ("+(QString::number(Leg1_OrderState))+")";
                 Leg3_OrderStateStr = Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")";
-
+                Leg2_OrderStateStr = Leg2_OrderStateStr+" ("+(QString::number(Leg2_OrderState))+")";
 
                 QString Exch_Price = "0";
                 double Exch_Price_val  = 0;
@@ -910,8 +954,8 @@ QList <QStringList> liners_listTmp;
                 double userPriceVal = query.value(rec.indexOf("DesiredRate")).toDouble() / devicer;
                 double JackpotVal =(Exch_Price_val-userPriceVal);
                 QString Jackpot = QString::number(JackpotVal,'f',decimal_precision);
-
-                int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
+ //               QString BidLeg = ContractDetail::getInstance().GetStockName(leg2_token_number,portfolio_type)+ " "+"["+(QString::number(Leg2_Total_Volume/lotSize))+"]";
+                //int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
 
                 if(qty>0&&lotSize>0) // to prevent crash
                     qty = qty / lotSize;
@@ -934,9 +978,13 @@ QList <QStringList> liners_listTmp;
                 rowList.append(Remaining_Lot);
                 rowList.append(Buy_Sell);
                 rowList.append(dt.toString("hh:mm:ss"));
+                rowList.append(Leg2_OrderStateStr);
                 rowList.append(Leg1_OrderStateStr);
                 rowList.append(Leg3_OrderStateStr);
                 rowList.append(Expiry);
+//                rowList.append(Leg1_OrderState); // this should be the 4th last data inserted to the row
+ //               rowList.append(Leg3_OrderState); // this should be the 3rd last data inserted to the row
+  //              rowList.append(Leg2_OrderState); // this should be the 2nd last data inserted to the row
                 rowList.append(traderData); // this should be the last data inserted to the row
 
 

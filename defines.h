@@ -111,7 +111,10 @@ enum OrderBook_Idx{
     TradedLot_OB,
     RemainingLot_OB,
     BuyorSell_OB,
-    TradeTime_OB
+    TradeTime_OB,
+    BidLegState_OB,
+    Leg1State_OB,
+    Leg3State_OB
 };
 
 enum PortfolioType

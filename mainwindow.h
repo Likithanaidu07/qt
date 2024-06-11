@@ -183,6 +183,8 @@ public slots:
     void slotAddLogForAddAlgoRecord(QString str);
     void slotHideProgressBar();
     void on_startall_Button_clicked();
+    void on_stopall_Button_clicked();
+
 
 private slots:
     void on_close_clicked();
