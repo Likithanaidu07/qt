@@ -126,6 +126,7 @@ void Table_Portfolios_Delegate::setEditorData(QWidget *editor, const QModelIndex
 
 }
 
+
 void Table_Portfolios_Delegate::setModelData(QWidget *editor, QAbstractItemModel *model,  const QModelIndex &index) const
 {
     int c= index.column();

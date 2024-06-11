@@ -581,6 +581,7 @@ MainWindow::MainWindow(QWidget *parent)
             internalLayout->setContentsMargins(10,-1,-1,-1);
             QSpacerItem* spc = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
             QToolButton* button1=new QToolButton();
+            connect(button1, SIGNAL(clicked()), this, SLOT(on_startall_Button_clicked()));
             button1->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             //button1->setIcon(QIcon(a1));
             button1->setText("Start All");
@@ -1322,14 +1323,14 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
               int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
               double val = valStr.toDouble();
               val=val*lotSize;
-//              double vfq = T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty/lotSize;
-//              if(val > vfq){
-//                QMessageBox msgBox;
-//                msgBox.setText("OrderQty is greater than FreezeQty");
-//                msgBox.setIcon(QMessageBox::Warning);
-//                msgBox.exec();
-//              }
-//              else{
+              double vfq = T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
+              if(val > vfq){
+              QMessageBox msgBox;
+              msgBox.setText("OrderQty is greater than FreezeQty");
+              msgBox.setIcon(QMessageBox::Warning);
+              msgBox.exec();
+           }
+              else{
                   QString Query = "UPDATE Portfolios SET OrderQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
                   db_conn->updateDB_Table(Query);
                   bool success = db_conn->updateDB_Table(Query);
@@ -1337,7 +1338,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                      db_conn->logToDB(QString("OrderQuantity ["+valStr+"]"));
               }
           }
-    //}
+    }
            break;
     case PortfolioData_Idx::_BuyTotalQuantity:{
              int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
@@ -1895,8 +1896,23 @@ void MainWindow::on_toggle_Button_clicked()
             ui->toggle_Button->setIcon(pixmapright);
         }
 }
+void MainWindow::on_startall_Button_clicked()
+{
+        QStringList portfolioNumbers;
+        for(int i=0;i<T_Portfolio_Model->portfolio_data_list.size();i++){
+            if (T_Portfolio_Model->portfolio_data_list[i]) {
+            portfolioNumbers.append(QString::number(T_Portfolio_Model->portfolio_data_list[i]->PortfolioNumber));
+            }
+        }
 
-
+        //Got all the porfolio numebr
+        QString joinedPortfolioNumbers = portfolioNumbers.join(", ");
+        QString Query = "UPDATE Portfolios SET Status='Active' WHERE PortfolioNumber IN (" + joinedPortfolioNumbers + ")";
+        bool success =  db_conn->updateDB_Table(Query);
+        if(success){
+            db_conn->logToDB(QString("Activated  portfolio ["+joinedPortfolioNumbers+"]"));
+        }
+}
 
 
 void MainWindow::OnAlgorithmDockWidgetVisiblityChanged(bool p_Visible)
@@ -1959,14 +1975,12 @@ void MainWindow::on_Algorithms_Close_clicked()
     ui->Algorithms_Widget->setStyleSheet("");
     ui->Algorithms_Close->setVisible(false);
 }
-
 void MainWindow::on_ConvertAlgo_button_clicked(){
 
     convertalgo->update_contract_tableData(QString::number(userData.UserId),userData.MaxPortfolioCount);
     if(!convertalgo->isVisible())
     convertalgo->show();
 }
-
 void MainWindow::Delete_clicked_slot()
 {
     QMessageBox::StandardButton reply;
