@@ -32,10 +32,11 @@ private:
                           "Traded Lot",
                           "Remaining Lot",
                           "Buy/Sell",
-                          "Trade Time",
+                          "Time",
                           "BidLeg State",
                           "Leg1 State",
-                          "Leg3 State"};
+                          "Leg3 State",
+                          "Order Id"};
 
 
 signals:

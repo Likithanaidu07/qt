@@ -114,7 +114,8 @@ enum OrderBook_Idx{
     TradeTime_OB,
     BidLegState_OB,
     Leg1State_OB,
-    Leg3State_OB
+    Leg3State_OB,
+    OrderId_OB
 };
 
 enum PortfolioType

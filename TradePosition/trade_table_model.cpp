@@ -14,9 +14,6 @@ int Trade_Table_Model::columnCount(const QModelIndex & /*parent*/) const
 {
     return col_count;
 }
-
-
-
 QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
 {
     int r = index.row();
@@ -40,20 +37,24 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
 //                return QVariant::fromValue(QColor(Qt::red));
 
 //        }
-        if(c==OrderBook_Idx::BuyorSell_OB
-          /* c==OrderBook_Idx::ExchPrice_OB ||
+        if(c==OrderBook_Idx::BuyorSell_OB ||
+          c==OrderBook_Idx::ExchPrice_OB ||
            c==OrderBook_Idx::UserPrice_OB ||
            c==OrderBook_Idx::Jackpot_OB ||
            c==OrderBook_Idx::TradedLot_OB ||
            c==OrderBook_Idx::RemainingLot_OB ||
-           c==OrderBook_Idx::TradeTime_OB*/ ){
-            QString buy_sell =  trade_data_list[r][c];
+           c==OrderBook_Idx::TradeTime_OB ){
+          //  QString buy_sell =  trade_data_list[r][c];
+            QString buy_sell =  trade_data_list[r][OrderBook_Idx::BuyorSell_OB];
+
           //  QString Exch_Price =  trade_data_list[r][c];
-            if(buy_sell=="Buy")
-                return QVariant::fromValue(QColor(0,122,0));
-            else
+            if(buy_sell=="Sell")
                 return QVariant::fromValue(QColor(203,5,5));
+            else
+                return QVariant::fromValue(QColor(0,122,0));
         }
+
+
         //
 
  /*       else if(c==OrderBook_Idx::BidLegState_OB){
@@ -124,7 +125,8 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
                    c==OrderBook_Idx::BuyorSell_OB ||
                    c==OrderBook_Idx::BidLegState_OB||
                    c==OrderBook_Idx::Leg1State_OB||
-                   c==OrderBook_Idx::Leg3State_OB){
+                   c==OrderBook_Idx::Leg3State_OB||
+                   c==OrderBook_Idx::OrderId_OB){
 
             return font;
         }
@@ -132,6 +134,7 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
             return QVariant();
     }
     }
+
 }
 
 void Trade_Table_Model::setDataList(QList <QStringList> trade_data_listNew){

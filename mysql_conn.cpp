@@ -801,6 +801,7 @@ QList <QStringList> liners_listTmp;
                 int Leg1_Total_Volume = query.value(rec.indexOf("Leg1_Total_Volume")).toInt();
                 int Leg2_Total_Volume = query.value(rec.indexOf("Leg2_Total_Volume")).toInt();
                 int Leg3_Total_Volume = query.value(rec.indexOf("Leg3_Total_Volume")).toInt();
+                QString order_id = query.value(rec.indexOf("Trader_Data")).toString();
                 QString Leg1_OrderStateStr ;
                 QString Leg3_OrderStateStr ;
                 QString Leg2_OrderStateStr ;
@@ -830,6 +831,9 @@ QList <QStringList> liners_listTmp;
                 else if(Leg1_OrderState==8){
                     Leg1_OrderStateStr = "PartialTrade";
                 }
+                else if(Leg1_OrderState==13){
+                    Leg1_OrderStateStr = "Cancelled";
+                }
 
 
                 if(Leg3_OrderState==1){
@@ -856,6 +860,9 @@ QList <QStringList> liners_listTmp;
                 else if(Leg3_OrderState==8){
                     Leg3_OrderStateStr = "PartialTrade";
                 }
+                else if(Leg3_OrderState==13){
+                    Leg1_OrderStateStr = "Cancelled";
+                }
 
 
                 if(Leg2_OrderState==1){
@@ -881,6 +888,9 @@ QList <QStringList> liners_listTmp;
                 }
                 else if(Leg2_OrderState==8){
                     Leg2_OrderStateStr = "PartialTrade";
+                }
+                else if(Leg2_OrderState==13){
+                    Leg1_OrderStateStr = "Cancelled";
                 }
 
 
@@ -981,6 +991,7 @@ QList <QStringList> liners_listTmp;
                 rowList.append(Leg2_OrderStateStr);
                 rowList.append(Leg1_OrderStateStr);
                 rowList.append(Leg3_OrderStateStr);
+                rowList.append(order_id);
                 rowList.append(Expiry);
 //                rowList.append(Leg1_OrderState); // this should be the 4th last data inserted to the row
  //               rowList.append(Leg3_OrderState); // this should be the 3rd last data inserted to the row
