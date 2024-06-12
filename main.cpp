@@ -16,9 +16,9 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName("New_SpeedTrade");
     QCoreApplication::setOrganizationName("New_AlgoMethods");
-    // #ifndef QT_DEBUG
+ #ifndef QT_DEBUG
     logger::initLogging("SpeedTradeLog_");
-    // #endif
+ #endif
     QFontDatabase::addApplicationFont(":/RacingSansOne-Regular.ttf");
     QTranslator translator;
     const QStringList uiLanguages = QLocale::system().uiLanguages();
