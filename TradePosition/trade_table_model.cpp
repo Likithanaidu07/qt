@@ -14,9 +14,6 @@ int Trade_Table_Model::columnCount(const QModelIndex & /*parent*/) const
 {
     return col_count;
 }
-
-
-
 QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
 {
     int r = index.row();
@@ -40,14 +37,66 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
 //                return QVariant::fromValue(QColor(Qt::red));
 
 //        }
-        if(c==OrderBook_Idx::BuyorSell_OB){
-            QString buy_sell =  trade_data_list[r][c];
-            if(buy_sell=="Buy")
-                return QVariant::fromValue(QColor(0,122,0));
-            else
+        if(c==OrderBook_Idx::BuyorSell_OB ||
+          c==OrderBook_Idx::ExchPrice_OB ||
+           c==OrderBook_Idx::UserPrice_OB ||
+           c==OrderBook_Idx::Jackpot_OB ||
+           c==OrderBook_Idx::TradedLot_OB ||
+           c==OrderBook_Idx::RemainingLot_OB ||
+           c==OrderBook_Idx::TradeTime_OB ){
+          //  QString buy_sell =  trade_data_list[r][c];
+            QString buy_sell =  trade_data_list[r][OrderBook_Idx::BuyorSell_OB];
+
+          //  QString Exch_Price =  trade_data_list[r][c];
+            if(buy_sell=="Sell")
                 return QVariant::fromValue(QColor(203,5,5));
+            else
+                return QVariant::fromValue(QColor(0,122,0));
         }
+
+
         //
+
+ /*       else if(c==OrderBook_Idx::BidLegState_OB){
+            int Leg2_OrderState_idx = trade_data_list[r].size()-2;
+            int Leg2_OrderState = trade_data_list[r][Leg2_OrderState_idx].toInt();
+            if(Leg2_OrderState==7 )
+                return QVariant::fromValue(QColor(0,122,0));
+            else if(Leg2_OrderState==13)
+                return QVariant::fromValue(QColor(203,5,5));
+            else if (Leg2_OrderState==8)
+                return QVariant::fromValue(QColor(0,0,255));
+            else
+                return QVariant::fromValue(QColor(0,0,0));
+        }
+        else if(c==OrderBook_Idx::Leg1State_OB){
+            int Leg1_OrderState_idx = trade_data_list[r].size()-4;
+            int Leg1_OrderState = trade_data_list[r][Leg1_OrderState_idx].toInt();
+            //            QString Leg2_OrderState =  trade_data_list[r][c];
+            //            QString Leg3_OrderState =  trade_data_list[r][c];
+            if(Leg1_OrderState==7 )
+                return QVariant::fromValue(QColor(0,122,0));
+            else if(Leg1_OrderState==13)
+                return QVariant::fromValue(QColor(203,5,5));
+            else if (Leg1_OrderState==8)
+                return QVariant::fromValue(QColor(0,0,255));
+            else
+                return QVariant::fromValue(QColor(0,0,0));
+        }
+        else if(c==OrderBook_Idx::Leg3State_OB){
+            int Leg3_OrderState_idx = trade_data_list[r].size()-3;
+            int Leg3_OrderState = trade_data_list[r][Leg3_OrderState_idx].toInt();
+            //            QString Leg2_OrderState =  trade_data_list[r][c];
+            //            QString Leg3_OrderState =  trade_data_list[r][c];
+            if(Leg3_OrderState==7 )
+                return QVariant::fromValue(QColor(0,122,0));
+            else if(Leg3_OrderState==13)
+                return QVariant::fromValue(QColor(203,5,5));
+            else if (Leg3_OrderState==8)
+                return QVariant::fromValue(QColor(0,0,255));
+            else
+                return QVariant::fromValue(QColor(0,0,0));
+        } */
         else
             return QVariant();
 
@@ -73,7 +122,11 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
                    c==OrderBook_Idx::Jackpot_OB ||
                    c==OrderBook_Idx::TradedLot_OB ||
                    c==OrderBook_Idx::RemainingLot_OB ||
-                   c==OrderBook_Idx::BuyorSell_OB ){
+                   c==OrderBook_Idx::BuyorSell_OB ||
+                   c==OrderBook_Idx::BidLegState_OB||
+                   c==OrderBook_Idx::Leg1State_OB||
+                   c==OrderBook_Idx::Leg3State_OB||
+                   c==OrderBook_Idx::OrderId_OB){
 
             return font;
         }
@@ -81,6 +134,7 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
             return QVariant();
     }
     }
+
 }
 
 void Trade_Table_Model::setDataList(QList <QStringList> trade_data_listNew){

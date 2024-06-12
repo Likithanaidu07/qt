@@ -182,6 +182,9 @@ public slots:
     void T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index);
     void slotAddLogForAddAlgoRecord(QString str);
     void slotHideProgressBar();
+    void on_startall_Button_clicked();
+    void on_stopall_Button_clicked();
+
 
 private slots:
     void on_close_clicked();
@@ -198,6 +201,7 @@ private slots:
     void on_Templates_Close_clicked();
     void on_maximize_clicked();
     void on_toggle_Button_clicked();
+
 
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent* event) override;

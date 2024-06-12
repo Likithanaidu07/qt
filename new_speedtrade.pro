@@ -39,6 +39,7 @@ SOURCES += \
     SlowDataIndices/slowdata_indices_socket.cpp \
     SlowDataIndices/slowdataindices.cpp \
     SwitchButton/switchbutton.cpp \
+    TradePosition/trade_table_delegate.cpp \
     TradePosition/trade_table_model.cpp \
     backendcomm/backendcomm.cpp \
     contractdetail.cpp \
@@ -86,6 +87,7 @@ HEADERS += \
     SlowDataIndices/slowdataindices.h \
     SwitchButton/switchbutton.h \
     TradePosition/OrderBook_Object.h \
+    TradePosition/trade_table_delegate.h \
     TradePosition/trade_table_model.h \
     backendcomm/backendcomm.h \
     contractdetail.h \

@@ -12,6 +12,7 @@
 #include <QFontDatabase>
 #include <QTreeView>
 #include <QStandardItemModel>
+#include <QLabel>
 #include "ContractDetail.h"
 #include "OrderBook/table_orderbook_delegate.h"
 #include "mysql_conn.h"
@@ -580,10 +581,12 @@ MainWindow::MainWindow(QWidget *parent)
             internalLayout->setContentsMargins(10,-1,-1,-1);
             QSpacerItem* spc = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
             QToolButton* button1=new QToolButton();
+            connect(button1, SIGNAL(clicked()), this, SLOT(on_startall_Button_clicked()));
             button1->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             //button1->setIcon(QIcon(a1));
             button1->setText("Start All");
             QToolButton* button2=new QToolButton();
+            connect(button2, SIGNAL(clicked()), this, SLOT(on_stopall_Button_clicked()));
             button2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             //button2->setIcon(QIcon(a2));
             button2->setText("Stop All");
@@ -1250,6 +1253,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             qDebug()<<"portfolio_table_updating_db----- in progress.";
                 return;
         }
+
         portfolio_table_updating_db.storeRelaxed(1);
         QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
         T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0); // maked the row flg not editing, so the bg data will be updated.
@@ -1863,8 +1867,40 @@ void MainWindow::on_toggle_Button_clicked()
             ui->toggle_Button->setIcon(pixmapright);
         }
 }
+void MainWindow::on_startall_Button_clicked()
+{
+        QStringList portfolioNumbers;
+        for(int i=0;i<T_Portfolio_Model->portfolio_data_list.size();i++){
+            if (T_Portfolio_Model->portfolio_data_list[i]) {
+            portfolioNumbers.append(QString::number(T_Portfolio_Model->portfolio_data_list[i]->PortfolioNumber));
+            }
+        }
 
+        //Got all the porfolio numebr
+        QString joinedPortfolioNumbers = portfolioNumbers.join(", ");
+        QString Query = "UPDATE Portfolios SET Status='Active' WHERE PortfolioNumber IN (" + joinedPortfolioNumbers + ")";
+        bool success =  db_conn->updateDB_Table(Query);
+        if(success){
+            db_conn->logToDB(QString("Activated  portfolio ["+joinedPortfolioNumbers+"]"));
+        }
+}
+void MainWindow::on_stopall_Button_clicked()
+{
+        QStringList portfolioNumbers;
+        for(int i=0;i<T_Portfolio_Model->portfolio_data_list.size();i++){
+            if (T_Portfolio_Model->portfolio_data_list[i]) {
+            portfolioNumbers.append(QString::number(T_Portfolio_Model->portfolio_data_list[i]->PortfolioNumber));
+            }
+        }
 
+        //Got all the porfolio numebr
+        QString joinedPortfolioNumbers = portfolioNumbers.join(", ");
+        QString Query = "UPDATE Portfolios SET Status='DisabledByUser' WHERE PortfolioNumber IN (" + joinedPortfolioNumbers + ")";
+        bool success =  db_conn->updateDB_Table(Query);
+        if(success){
+            db_conn->logToDB(QString("Disabled  portfolio ["+joinedPortfolioNumbers+"]"));
+        }
+}
 
 
 void MainWindow::OnAlgorithmDockWidgetVisiblityChanged(bool p_Visible)
@@ -1927,14 +1963,12 @@ void MainWindow::on_Algorithms_Close_clicked()
     ui->Algorithms_Widget->setStyleSheet("");
     ui->Algorithms_Close->setVisible(false);
 }
-
 void MainWindow::on_ConvertAlgo_button_clicked(){
 
     convertalgo->update_contract_tableData(QString::number(userData.UserId),userData.MaxPortfolioCount);
     if(!convertalgo->isVisible())
     convertalgo->show();
 }
-
 void MainWindow::Delete_clicked_slot()
 {
     QMessageBox::StandardButton reply;
