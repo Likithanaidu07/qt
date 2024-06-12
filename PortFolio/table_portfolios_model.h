@@ -25,6 +25,8 @@ public:
     QList<int>  portfolio_tokens; //leg1,leg2,leg3,leg4,leg5,leg6
     QHash<QString,PortFolioData_Less> getPortFolioDataLess();
     QHash<QString,int> getPortFoliosLotSize();
+    QHash<int,QString> editingDataHash; //data to store editing cell
+
     QMutex mutex; // Define a QMutex to protect shared data
     void refreshTable();
     int switchstatetest() const;
@@ -49,6 +51,8 @@ private:
     int decimal_precision;
     bool storeToken(PortfolioObject* p);
     void loadSettings();
+    int current_editingRow; //row which is editing currently
+
 
 public slots:
     void onItemChanged(const QModelIndex &index);

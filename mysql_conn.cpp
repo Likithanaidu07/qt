@@ -509,14 +509,14 @@ QSqlQuery mysql_conn::runQuery(QString qry_str){
 
 }
 
-bool mysql_conn::updateDB_Table(QString query_str)
+bool mysql_conn::updateDB_Table(QString query_str, QString &msg)
 {
     qDebug()<<"DB Update Query: "<<query_str;
     QMutexLocker lock(&mutex);
 
     bool ret = false;
 
-    QString msg;
+
     bool ok = checkDBOpened(msg);
     if(ok){
 
@@ -595,7 +595,7 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
     bool ok = checkDBOpened(msg);
     if(ok)
     {
-        QString query_str = "SELECT * FROM Order_Table_bid WHERE Trader_ID='"+user_id+"' and OrderState=7  ORDER BY Trader_Data DESC";
+        QString query_str = "SELECT * FROM Order_Table_bid WHERE Trader_ID='"+user_id+"' and Leg2_OrderState=7  ORDER BY Trader_Data DESC";
 
         QSqlQuery query(query_str,db);
         if( !query.exec() )
@@ -745,7 +745,9 @@ QList <QStringList> liners_listTmp;
     bool ok = checkDBOpened(msg);
     if(ok)
     {
-        QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and (Leg1_OrderState=7 and Leg2_OrderState=7 and Leg3_OrderState=7) ORDER BY Trader_Data DESC";
+       // QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and (Leg1_OrderState=7 and Leg2_OrderState=7 and Leg3_OrderState=7) ORDER BY Trader_Data DESC";
+        QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and Leg2_OrderState=7  ORDER BY Trader_Data DESC";
+
         QSqlQuery query(query_str,db);
         if( !query.exec() )
         {

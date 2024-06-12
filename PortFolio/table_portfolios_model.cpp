@@ -20,6 +20,7 @@ Table_Portfolios_Model::Table_Portfolios_Model(QObject *parent) : QAbstractTable
     devicer = FO_DEVICER;
     decimal_precision = FO_DECIMAL_PRECISION;
    // loadSettings();
+    current_editingRow = -1;
 }
 
 void Table_Portfolios_Model::loadSettings(){
@@ -344,12 +345,25 @@ return QVariant();
 
 }
 
-
+// This called when  the user edits a cell and the delegate commits the new value to the model.
 bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &value, int role)
 {
     QMutexLocker locker(&mutex); // Lock the mutex automatically
-
     int c=index.column();
+
+    qDebug()<<"setData...."<<index.row();
+    qDebug()<<"current_editingRow...."<<current_editingRow;
+
+    //editing row swithced, make previous row flg not editing
+    if(current_editingRow!=index.row()){
+        if(current_editingRow!=-1)
+            portfolio_data_list[current_editingRow]->edting.storeRelaxed(0);;
+        editingDataHash.clear();
+    }
+
+    current_editingRow = index.row();
+
+
     if (role == Qt::ItemIsUserCheckable
         && index.column() == PortfolioData_Idx::_Status)
     {
@@ -363,11 +377,19 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
         if (!checkIndex(index))
             return false;
         if(c==PortfolioData_Idx::_SellPriceDifference){
+            //store data to editing hash if it not equal to previous value
+            if(portfolio_data_list[index.row()]->SellPriceDifference != value.toDouble())
+                editingDataHash[c] = value.toString();
+
             portfolio_data_list[index.row()]->SellPriceDifference = value.toDouble();
             emit dataChanged(index, index);
             return true;
         }
         else if(c==PortfolioData_Idx::_BuyPriceDifference){
+            //store data to editing hash if it not equal to previous value
+            if(portfolio_data_list[index.row()]->BuyPriceDifference != value.toDouble())
+                editingDataHash[c] = value.toString();
+
             portfolio_data_list[index.row()]->BuyPriceDifference = value.toDouble();
             emit dataChanged(index, index);
             return true;
@@ -375,6 +397,10 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
 
         }
         else if(c==PortfolioData_Idx::_SellTotalQuantity){
+            //store data to editing hash if it not equal to previous value
+            if(portfolio_data_list[index.row()]->SellTotalQuantity != value.toDouble())
+                editingDataHash[c] = value.toString();
+
             portfolio_data_list[index.row()]->SellTotalQuantity = value.toDouble();
             emit dataChanged(index, index);
             return true;
@@ -382,6 +408,10 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
 
         }
         else if(c==PortfolioData_Idx::_BuyTotalQuantity){
+            //store data to editing hash if it not equal to previous value
+            if(portfolio_data_list[index.row()]->BuyTotalQuantity != value.toDouble())
+                editingDataHash[c] = value.toString();
+
             portfolio_data_list[index.row()]->BuyTotalQuantity = value.toDouble();
             emit dataChanged(index, index);
             return true;
@@ -389,6 +419,10 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
 
         }
         else if(c==PortfolioData_Idx::_OrderQuantity){
+            //store data to editing hash if it not equal to previous value
+            if(portfolio_data_list[index.row()]->OrderQuantity != value.toDouble())
+                editingDataHash[c] = value.toString();
+
             portfolio_data_list[index.row()]->OrderQuantity = value.toDouble();
             emit dataChanged(index, index);
             return true;

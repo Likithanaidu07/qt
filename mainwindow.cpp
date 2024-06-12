@@ -1246,169 +1246,137 @@ void MainWindow::searchbar(){
 
 void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
-            if(portfolio_table_updating_db.loadRelaxed()==1){
-                qDebug()<<"portfolio_table_updating_db----- in progress.";
+        if(portfolio_table_updating_db.loadRelaxed()==1){
+            qDebug()<<"portfolio_table_updating_db----- in progress.";
                 return;
+        }
+        portfolio_table_updating_db.storeRelaxed(1);
+        QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
+        T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0); // maked the row flg not editing, so the bg data will be updated.
+
+        //Update status data to DB
+        if(index.column()==PortfolioData_Idx::_Status){
+            if(valStr == "0"){
+                QString Query = "UPDATE Portfolios SET Status='DisabledByUser' where PortfolioNumber="+PortfolioNumber;
+                QString msg;
+                bool success = db_conn->updateDB_Table(Query,msg);
+                if(success){
+                    db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));
+                }
+                else{
+                    QMessageBox msgBox;
+                    msgBox.setWindowTitle("Update Status Failed");
+                    msgBox.setIcon(QMessageBox::Warning);
+                    msgBox.setText(msg);
+                    msgBox.exec();
+                }
             }
-            portfolio_table_updating_db.storeRelaxed(1);
+            else{
+                QString msg;
+                QString Query = "UPDATE Portfolios SET Status='Active' where PortfolioNumber="+PortfolioNumber;
+                bool success =  db_conn->updateDB_Table(Query,msg);
 
-            QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
-            T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0); // maked the row flg not editing, so the bg data will be updated.
-
-
-
-
-        switch (index.column()) {
-        case PortfolioData_Idx::_Status:{
-        if(valStr == "0"){
-            QString Query = "UPDATE Portfolios SET Status='DisabledByUser' where PortfolioNumber="+PortfolioNumber;
-            bool success = db_conn->updateDB_Table(Query);
-            if(success){
-                db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));
+                if(success){
+                    db_conn->logToDB(QString("Activated  portfolio ["+PortfolioNumber+"]"));
+                }
+                else{
+                    QMessageBox msgBox;
+                    msgBox.setWindowTitle("Update Status Failed");
+                    msgBox.setIcon(QMessageBox::Warning);
+                    msgBox.setText(msg);
+                    msgBox.exec();
+                }
             }
         }
+        //Get edited cell data from portfolio table and update DB
         else{
-            QString Query = "UPDATE Portfolios SET Status='Active' where PortfolioNumber="+PortfolioNumber;
-            bool success =  db_conn->updateDB_Table(Query);
-            if(success){
-                db_conn->logToDB(QString("Activated  portfolio ["+PortfolioNumber+"]"));
+            QHash<int, QString> editedCellData(T_Portfolio_Model->editingDataHash);
+            QHash<int, QString>::const_iterator i;
+            QStringList updateQueryList;
+            QString logMsg = "";
+            for (i = editedCellData.constBegin(); i != editedCellData.constEnd(); ++i) {
+                int columnIdx = i.key();
+                QString valStr = i.value();
+                switch (columnIdx) {
+                    case PortfolioData_Idx::_OrderQuantity:{
+                        int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                        double val = valStr.toDouble();
+                        val=val*lotSize;
+                        double vfq = T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
+                        if(val > vfq){
+                            QMessageBox msgBox;
+                            msgBox.setText("Cannot update OrderQuantity");
+                            msgBox.setText("OrderQuantity cannot be greater than VolumeFreezeQty "+QString::number(vfq));
+                            msgBox.setIcon(QMessageBox::Warning);
+                            msgBox.exec();
+                        }
+                        else{
+                            updateQueryList.append("OrderQuantity="+QString::number(val));
+                            logMsg = logMsg+"OrderQuantity ["+QString::number(val)+"], ";
+                        }
+                    }
+                    break;
+
+                    case PortfolioData_Idx::_BuyTotalQuantity:{
+                        int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                        double val = valStr.toDouble();
+                        val=val*lotSize;
+                        updateQueryList.append("BuyTotalQuantity="+QString::number(val));
+                        logMsg = logMsg+"BuyTotalQuantity ["+QString::number(val)+"], ";
+                    }
+                    break;
+
+                    case PortfolioData_Idx::_SellTotalQuantity:{
+                        int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                        double val = valStr.toDouble();
+                        val=val*lotSize;
+                        updateQueryList.append("SellTotalQuantity="+QString::number(val));
+                        logMsg = logMsg+"SellTotalQuantity ["+QString::number(val)+"], ";
+                    }
+                    break;
+
+                    case PortfolioData_Idx::_BuyPriceDifference:{
+                        QString BuyPriceDifference = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->BuyPriceDifference*devicer,'f',decimal_precision);
+                        updateQueryList.append("BuyPriceDifference="+BuyPriceDifference);
+                        logMsg = logMsg+"BuyPriceDifference ["+BuyPriceDifference+"], ";
+
+                    }
+                    break;
+
+                    case PortfolioData_Idx::_SellPriceDifference:{
+                        QString SellPriceDifference = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->SellPriceDifference*devicer,'f',decimal_precision);
+                        updateQueryList.append("SellPriceDifference="+SellPriceDifference);
+                        logMsg = logMsg+"SellPriceDifference ["+SellPriceDifference+"], ";
+                    }
+                    break;
+
+                    default:{
+
+                    }
+                    break;
+
             }
+
+            }
+            if(updateQueryList.size()>0){
+                QString msg;
+                QString Query = "UPDATE Portfolios SET " +
+                                updateQueryList.join(", ") +
+                                " WHERE PortfolioNumber=" + PortfolioNumber;
+                bool success = db_conn->updateDB_Table(Query,msg);
+                if(success){
+                    db_conn->logToDB(logMsg+ " updated for PortfolioNumber="+PortfolioNumber);
+                }
+                else{
+                    QMessageBox msgBox;
+                    msgBox.setWindowTitle("Update DB Failed");
+                    msgBox.setIcon(QMessageBox::Warning);
+                    msgBox.setText(msg);
+                    msgBox.exec();
+                }
+            }
+
         }
-
-    }
-    break;
-        //     case PortfolioData_Idx::_SellPriceDifference:{
-        //       double val = valStr.toDouble();
-        //       val=val*devicer;
-        //       QString Query = "UPDATE Portfolios SET SellPriceDifference="+QString::number(val,'f',decimal_precision)+" where PortfolioNumber="+PortfolioNumber;
-        //       db_conn->updateDB_Table(Query);
-        //     }
-        //     break;
-        // case PortfolioData_Idx::_BuyPriceDifference:{
-        //       double val = valStr.toDouble();
-        //       val=val*devicer;
-        //       QString Query = "UPDATE Portfolios SET BuyPriceDifference="+QString::number(val,'f',decimal_precision)+" where PortfolioNumber="+PortfolioNumber;
-        //       db_conn->updateDB_Table(Query);
-        //     }
-        //     break;
-        // case PortfolioData_Idx::_SellTotalQuantity:{
-        //       int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
-        //       double val = valStr.toDouble();
-        //       val=val*lotSize;
-        //       QString Query = "UPDATE Portfolios SET SellTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
-        //       db_conn->updateDB_Table(Query);
-        //     }
-        //     break;
-        // case PortfolioData_Idx::_BuyTotalQuantity:{
-        //     int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
-        //     double val = valStr.toDouble();
-        //     val=val*lotSize;
-        //       QString Query = "UPDATE Portfolios SET BuyTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
-        //       db_conn->updateDB_Table(Query);
-        //     }
-        //     break;
-
-        // case PortfolioData_Idx::_OrderQuantity:{
-        //       QString Query = "UPDATE Portfolios SET OrderQuantity="+valStr+" where PortfolioNumber="+PortfolioNumber;
-        //       db_conn->updateDB_Table(Query);
-        //       bool success = db_conn->updateDB_Table(Query);
-        //       if(success){
-        //           db_conn->logToDB(QString("OrderQuantity ["+valStr+"]"));
-        //       }
-        //     }
-        //     break;
-    case PortfolioData_Idx::_OrderQuantity:{
-              int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
-              double val = valStr.toDouble();
-              val=val*lotSize;
-              double vfq = T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
-              if(val > vfq){
-                QMessageBox msgBox;
-                msgBox.setText("greater");
-                msgBox.setIcon(QMessageBox::Warning);
-                msgBox.exec();
-              }
-              else{
-                  QString Query = "UPDATE Portfolios SET OrderQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
-                  db_conn->updateDB_Table(Query);
-                  bool success = db_conn->updateDB_Table(Query);
-                  if(success){
-                     db_conn->logToDB(QString("OrderQuantity ["+valStr+"]"));
-              }
-          }
-    }
-           break;
-    case PortfolioData_Idx::_BuyTotalQuantity:{
-             int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
-             double val = valStr.toDouble();
-             val=val*lotSize;
-             //if(val< userData.IDXOpenLimit ) {
-                QString Query = "UPDATE Portfolios SET BuyTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
-                db_conn->updateDB_Table(Query);
-                bool success = db_conn->updateDB_Table(Query);
-                if(success){
-                  db_conn->logToDB(QString("BuyTotalQuantity ["+valStr+"]"));
-                }
-           // }
-    }
-             break;
-
-    case PortfolioData_Idx::_SellTotalQuantity:{
-            int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
-            double val = valStr.toDouble();
-            val=val*lotSize;
-           // if(val<  userData.IDXOpenLimit) {
-                QString Query = "UPDATE Portfolios SET SellTotalQuantity="+QString::number(val)+" where PortfolioNumber="+PortfolioNumber;
-                db_conn->updateDB_Table(Query);
-                bool success = db_conn->updateDB_Table(Query);
-                if(success){
-                  db_conn->logToDB(QString("SellTotalQuantity ["+valStr+"]"));
-                }
-           // }
-    }
-    break;
-
-    case PortfolioData_Idx::_BuyPriceDifference:{
-                QString BuyPriceDifference = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->BuyPriceDifference*devicer,'f',decimal_precision);
-
-                QString Query = "UPDATE Portfolios SET"
-                                " BuyPriceDifference="+BuyPriceDifference+
-                                " WHERE PortfolioNumber="+PortfolioNumber;
-                db_conn->updateDB_Table(Query);
-                bool success = db_conn->updateDB_Table(Query);
-                if(success){
-                  db_conn->logToDB(QString("BuyPriceDifference["+BuyPriceDifference+"] " +
-                                           "PortfolioNumber["+PortfolioNumber+"]"));
-                }
-
-    }
-    break;
-
-    case PortfolioData_Idx::_SellPriceDifference:{
-                QString SellPriceDifference = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->SellPriceDifference*devicer,'f',decimal_precision);
-
-                QString Query = "UPDATE Portfolios SET"
-                                " SellPriceDifference="+SellPriceDifference+
-                                " WHERE PortfolioNumber="+PortfolioNumber;
-                db_conn->updateDB_Table(Query);
-                bool success = db_conn->updateDB_Table(Query);
-                if(success){
-                  db_conn->logToDB(QString("SellPriceDifference["+SellPriceDifference+"] " +
-                                           "PortfolioNumber["+PortfolioNumber+"]"));
-                }
-
-    }
-    break;
-
-
-
-
-
-    default:{
-
-    }
-    break;
-    }
 
             //send notifcation to backend server
             quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
@@ -1639,11 +1607,11 @@ void MainWindow::updatePortFolioStatus(){
             T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::Active);
             T_Portfolio_Model->refreshTable();
             QString Query = "UPDATE Portfolios SET Status='Active' where PortfolioNumber="+PortfolioNumber;
-            bool success = db_conn->updateDB_Table(Query);
+            QString msg;
+            bool success = db_conn->updateDB_Table(Query,msg);
             if(success){
 
                 db_conn->logToDB(QString("Activated portfolio ["+PortfolioNumber+"]"));
-
                 quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
                 const unsigned char dataBytes[] = { 0x01};
                 QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
@@ -1656,7 +1624,8 @@ void MainWindow::updatePortFolioStatus(){
             T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::DisabledByUser);
             T_Portfolio_Model->refreshTable();
             QString Query = "UPDATE Portfolios SET Status='DisabledByUser' where PortfolioNumber="+PortfolioNumber;
-            bool success = db_conn->updateDB_Table(Query);
+            QString msg;
+            bool success = db_conn->updateDB_Table(Query,msg);
             if(success){
 
                 db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));

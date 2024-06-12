@@ -76,7 +76,7 @@ public:
     QMap<int, QHash<QString, contract_table>> getContractTable(QHash<QString, QStringList> &_m_ContractDetailsFiltered, QStringList &F2F_data_list_Sorted_Key, QStringList &BFLY_data_list_Sorted_Key, QStringList &BFLY_BID_data_list_Sorted_Key, userInfo userData);
 
     QSqlQuery runQuery(QString qry_str);
-    bool updateDB_Table(QString query_str);
+    bool updateDB_Table(QString query_str,QString &msg);
     QString get_Algo_Name(int algo_type,int leg1_token_number,int leg2_token_number,int leg3_token_number,double devicer,int decimal_precision);
     void  getTradeTableData(Trade_Table_Model *model,Liners_Model *liners_model ,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
     void  getNetPosTableData(Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash);
