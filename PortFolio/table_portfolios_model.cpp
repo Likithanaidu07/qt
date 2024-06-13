@@ -47,11 +47,25 @@ void Table_Portfolios_Model::loadSettings(){
 
 void Table_Portfolios_Model::onItemChanged(const QModelIndex &index)
 {
+    //qDebug()<<"..............Table_Portfolios_Model: onItemChanged"<<index.row();
     // if (index.column() == PortfolioData_Idx::_Status)
     // {
     //     setData(index, data(index, Qt::ItemIsUserCheckable).value<Qt::CheckState>(), Qt::ItemIsUserCheckable);
     // }
 }
+
+void Table_Portfolios_Model::selectionChangedSlot(int currentIdx){
+    //editing row swithced, make previous row flg not editing
+    if(current_editingRow!=currentIdx){
+        if(current_editingRow!=-1)
+            portfolio_data_list[current_editingRow]->edting.storeRelaxed(0);
+        else if(currentIdx == -1)
+            current_editingRow = -1;
+        editingDataHash.clear();
+    }
+
+}
+
 
 int Table_Portfolios_Model::rowCount(const QModelIndex & /*parent*/) const
 {
@@ -308,6 +322,12 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
             return QVariant();
     }
 case Qt::EditRole:{
+
+    //editing row swithced, make previous row flg not editing
+   if(current_editingRow!=index.row()){
+      if(current_editingRow!=-1)
+          portfolio_data_list[current_editingRow]->edting.storeRelaxed(0);
+    }
     PortfolioObject *portfolio = portfolio_data_list.at(index.row());
     portfolio->edting.storeRelaxed(1);
     qDebug()<<"editStarted";
@@ -351,8 +371,6 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
     QMutexLocker locker(&mutex); // Lock the mutex automatically
     int c=index.column();
 
-    qDebug()<<"setData...."<<index.row();
-    qDebug()<<"current_editingRow...."<<current_editingRow;
 
     //editing row swithced, make previous row flg not editing
     if(current_editingRow!=index.row()){

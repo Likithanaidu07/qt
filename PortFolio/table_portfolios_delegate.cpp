@@ -109,7 +109,7 @@ void Table_Portfolios_Delegate::setEditorData(QWidget *editor, const QModelIndex
         c==PortfolioData_Idx::_OrderQuantity)
     {
         QString value = index.model()->data(index, Qt::EditRole).toString();
-        qDebug()<<"Table_Portfolios_Delegate::setEditorData: "<<value;
+       // qDebug()<<"Table_Portfolios_Delegate::setEditorData: "<<value;
 
         if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor))
         {

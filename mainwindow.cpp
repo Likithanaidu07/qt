@@ -21,8 +21,7 @@ static const char stylesheetvis[]= "background: #596167;" "border-radius: 10px;"
 
 extern MainWindow *MainWindowObj;
 
-
-
+//#define ENABLE_BACKEND_DEBUG_MSG;
 
 
 MainWindow::MainWindow(QWidget *parent)
@@ -656,7 +655,9 @@ MainWindow::MainWindow(QWidget *parent)
      QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::tabKeyPressed, T_Portfolio_Table, &table_portfolios_custom::handleTabKeyPressFromEditableCell);
     QObject::connect(T_Portfolio_Table, &table_portfolios_custom::spaceKeySignal, this, &MainWindow::updatePortFolioStatus);
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::resizePortFolioTableColWidth, this, &MainWindow::resizePortFolioTableColWidthSlot);
-    QObject::connect(T_Portfolio_Table, &table_portfolios_custom::clicked, T_Portfolio_Model, &Table_Portfolios_Model::onItemChanged);
+   // QObject::connect(T_Portfolio_Table, &table_portfolios_custom::clicked, T_Portfolio_Model, &Table_Portfolios_Model::onItemChanged);
+    QObject::connect(T_Portfolio_Table, &table_portfolios_custom::selectionChangedSignal, T_Portfolio_Model, &Table_Portfolios_Model::selectionChangedSlot);
+
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::updateDBOnDataChanged, this, &MainWindow::updatePortFolioStatus);
 
     T_Portfolio_Table->setModel(T_Portfolio_Model);
@@ -1561,14 +1562,20 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
    // ui->textEdit->append(msg);
     //log_to_file logF(0,logfileName);
     //logF.log(data);
+#ifdef ENABLE_BACKEND_DEBUG_MSG
     qDebug()<<"Backend  Comm Data: "<<msg;
+#endif
 
     if((msgType == SocketDataType::BACKEND_COMM_SOCKET_WARNING)||msgType == SocketDataType::BACKEND_COMM_SOCKET_ERROR){
+#ifdef ENABLE_BACKEND_DEBUG_MSG
         qDebug()<<"Backend Data: Backend Socket Error"<<msg;
+#endif
     }
     //ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(255, 32, 36);border-radius:6px;color:#000;");
     else if(msgType == SocketDataType::BACKEND_COMM_SOCKET_CONNECTED){
+#ifdef ENABLE_BACKEND_DEBUG_MSG
         qDebug()<<"Backend Data: Backend Socket Connected"<<msg;
+#endif
     }
     // ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(94, 255, 107);border-radius:6px;color:#000;");
 }
@@ -1597,50 +1604,70 @@ void MainWindow::updatePortFolioStatus(){
         qDebug()<<"portfolio_table_updating_db----- in progress.";
         return;
     }
+
+
     portfolio_table_updating_db.storeRelaxed(1);
 
     QModelIndexList selection = T_Portfolio_Table->selectionModel()->selectedRows();
     for(int i=0; i< selection.count(); i++)
     {
         QModelIndex index = selection.at(i);
-        QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
-        T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(1);
-        portfolio_status status = static_cast<portfolio_status>(T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal.toInt());//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_Status).data().toString();
-        //status is in uncheck state so make it toggle(checked)
-        if(status == portfolio_status::Filled || status == portfolio_status::DisabledByUser){
-            T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::Active);
-            T_Portfolio_Model->refreshTable();
-            QString Query = "UPDATE Portfolios SET Status='Active' where PortfolioNumber="+PortfolioNumber;
-            QString msg;
-            bool success = db_conn->updateDB_Table(Query,msg);
-            if(success){
 
-                db_conn->logToDB(QString("Activated portfolio ["+PortfolioNumber+"]"));
-                quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
-                const unsigned char dataBytes[] = { 0x01};
-                QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
-                QByteArray msg = backend_comm->createPacket(command, data);
-                backend_comm->insertData(msg);
+
+            QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
+            T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(1);
+            portfolio_status status = static_cast<portfolio_status>(T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal.toInt());//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_Status).data().toString();
+            //status is in uncheck state so make it toggle(checked)
+            if(status == portfolio_status::Filled || status == portfolio_status::DisabledByUser){
+                int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                //check remaing qunatity is greater than 1 lot
+                if(T_Portfolio_Model->portfolio_data_list[index.row()]->BuyRemainingQuantity>=lotSize&&T_Portfolio_Model->portfolio_data_list[index.row()]->SellRemainingQuantity>=lotSize){
+                    T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::Active);
+                    T_Portfolio_Model->refreshTable();
+                    QString Query = "UPDATE Portfolios SET Status='Active' where PortfolioNumber="+PortfolioNumber;
+                    QString msg;
+                    bool success = db_conn->updateDB_Table(Query,msg);
+                    if(success){
+                        db_conn->logToDB(QString("Activated portfolio ["+PortfolioNumber+"]"));
+                        quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+                        const unsigned char dataBytes[] = { 0x01};
+                        QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
+                        QByteArray msg = backend_comm->createPacket(command, data);
+                        backend_comm->insertData(msg);
+                    }
+                }
+                else{
+                    QMessageBox msgBox;
+                    msgBox.setWindowTitle("Cannot Update Portfolio Status");
+                    msgBox.setIcon(QMessageBox::Warning);
+                    msgBox.setText("Remaining quntity should greater than 1 Lot");
+                    msgBox.exec();
+                }
             }
-        }
-        //status is in check state so make it toggle(uncheck)
-        else{
-            T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::DisabledByUser);
-            T_Portfolio_Model->refreshTable();
-            QString Query = "UPDATE Portfolios SET Status='DisabledByUser' where PortfolioNumber="+PortfolioNumber;
-            QString msg;
-            bool success = db_conn->updateDB_Table(Query,msg);
-            if(success){
+            //status is in check state so make it toggle(uncheck)
+            else{
+                T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::DisabledByUser);
+                T_Portfolio_Model->refreshTable();
+                QString Query = "UPDATE Portfolios SET Status='DisabledByUser' where PortfolioNumber="+PortfolioNumber;
+                QString msg;
+                bool success = db_conn->updateDB_Table(Query,msg);
+                if(success){
 
-                db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));
+                    db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));
 
-                quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
-                const unsigned char dataBytes[] = { 0x00};
-                QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
-                QByteArray msg = backend_comm->createPacket(command, data);
-                backend_comm->insertData(msg);
+                    quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+                    const unsigned char dataBytes[] = { 0x00};
+                    QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
+                    QByteArray msg = backend_comm->createPacket(command, data);
+                    backend_comm->insertData(msg);
+                }
             }
-        }
+
+
+
+
+
+
         T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0);
 
     }
@@ -1879,7 +1906,8 @@ void MainWindow::on_startall_Button_clicked()
         //Got all the porfolio numebr
         QString joinedPortfolioNumbers = portfolioNumbers.join(", ");
         QString Query = "UPDATE Portfolios SET Status='Active' WHERE PortfolioNumber IN (" + joinedPortfolioNumbers + ")";
-        bool success =  db_conn->updateDB_Table(Query);
+        QString msg;
+        bool success =  db_conn->updateDB_Table(Query,msg);
         if(success){
             db_conn->logToDB(QString("Activated  portfolio ["+joinedPortfolioNumbers+"]"));
         }
@@ -1896,7 +1924,8 @@ void MainWindow::on_stopall_Button_clicked()
         //Got all the porfolio numebr
         QString joinedPortfolioNumbers = portfolioNumbers.join(", ");
         QString Query = "UPDATE Portfolios SET Status='DisabledByUser' WHERE PortfolioNumber IN (" + joinedPortfolioNumbers + ")";
-        bool success =  db_conn->updateDB_Table(Query);
+        QString msg;
+        bool success =  db_conn->updateDB_Table(Query,msg);
         if(success){
             db_conn->logToDB(QString("Disabled  portfolio ["+joinedPortfolioNumbers+"]"));
         }
