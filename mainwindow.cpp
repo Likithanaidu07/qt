@@ -21,7 +21,7 @@ static const char stylesheetvis[]= "background: #596167;" "border-radius: 10px;"
 
 extern MainWindow *MainWindowObj;
 
-//#define ENABLE_BACKEND_DEBUG_MSG;
+#define ENABLE_BACKEND_DEBUG_MSG;
 
 
 MainWindow::MainWindow(QWidget *parent)
