@@ -103,10 +103,10 @@ enum CombinedTrackerData_Idx{
 };
 
 enum OrderBook_Idx{
-    AlgoNo_OB=0,
+    OrderId_OB,
     AlgoName_OB,
-    ExchPrice_OB,
     UserPrice_OB,
+    ExchPrice_OB,
     Jackpot_OB,
     TradedLot_OB,
     RemainingLot_OB,
@@ -115,7 +115,8 @@ enum OrderBook_Idx{
     BidLegState_OB,
     Leg1State_OB,
     Leg3State_OB,
-    OrderId_OB
+    AlgoNo_OB=0,
+
 };
 
 enum PortfolioType

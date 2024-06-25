@@ -17,6 +17,7 @@ class add_algo_btfly_bid : public QObject
 
 public:
     explicit add_algo_btfly_bid(QObject *parent = nullptr);
+
     void copyUIElement(QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_, QListView *sView, QListView *eView);
     QStringList sorted_keys_BFLY_BID; // sorted keys for contract_table hash table
     void create_AutoFillModel_StartStrike();

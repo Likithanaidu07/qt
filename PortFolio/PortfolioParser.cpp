@@ -57,6 +57,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
 
         int totalQty = 0;
 
+       obj.OrderQuantity = 0;
         totalQty = query.value("SellTotalQuantity").toInt() / lotSize;
 
         obj.SellPriceDifference =query.value("SellPriceDifference").toDouble()/devicer_;//convert->ToRupees(query.value("SellPriceDifference").toDouble());
@@ -69,7 +70,17 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         obj.BuyTradedQuantity = query.value("BuyTradedQuantity").toInt() / lotSize;
         obj.BuyTotalQuantity = totalQty;
         obj.BuyRemainingQuantity = totalQty - obj.BuyTradedQuantity;
-        obj.OrderQuantity = query.value("OrderQuantity").toInt()/ lotSize;
+
+
+        // If there is a specific logic to update OrderQuantity, handle it here
+//        int newOrderQty = query.value("OrderQuantity").toInt() / lotSize;
+//        if (newOrderQty > 0) {
+//            obj.OrderQuantity = newOrderQty;
+//        }
+//        if (obj.BuyTotalQuantity > 0 || obj.SellTotalQuantity > 0) {
+//            obj.OrderQuantity = 1;
+//        }
+       obj.OrderQuantity = query.value("OrderQuantity").toInt()/ lotSize;
 
         obj.InstrumentName = ContractDetail::getInstance().GetInstrumentName(obj.GetFirstToken(),type);
 

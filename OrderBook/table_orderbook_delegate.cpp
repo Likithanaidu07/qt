@@ -28,6 +28,27 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
     else{
 
     }
+    if(c==OrderBook_Idx::BidLegState_OB || c==OrderBook_Idx::AlgoNo_OB|| c==OrderBook_Idx::UserPrice_OB){
+        QStyleOptionViewItem op(option);
+
+
+       // if(c==OrderBook_Idx::BidLegState_OB){
+            double borderWidth = 1;
+            QColor myColor(108, 117, 125);
+            QPen pen(myColor);
+            pen.setWidthF(borderWidth);
+            painter->setPen(pen);
+            painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
+
+        }
+//        else if (c==OrderBook_Idx::BidLegState_OB){
+//            double borderWidth = 1;
+//            QColor myColor(108, 117, 125);
+//            QPen pen(myColor);
+//            pen.setWidthF(borderWidth);
+//            painter->setPen(pen);
+//            painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
+//        }
 
 
     QColor color("#E0F1FF");
@@ -51,3 +72,4 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
     painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
     QStyledItemDelegate::paint(painter, op, index);
 }
+

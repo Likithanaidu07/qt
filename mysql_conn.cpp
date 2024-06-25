@@ -237,14 +237,15 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
     // QSqlDatabase::removeDatabase("login_conn");
     return userLoginInfo;
 }
-void  mysql_conn::getSummaryTableData()
+void  mysql_conn::getSummaryTableData(int &OrderCount,QString user_id)
 {
     QMutexLocker lock(&mutex);
     QString msg;
+    OrderCount=0;
 
     bool ok = checkDBOpened(msg);
     if(ok){
-         QString sqlquery ="SELECT COUNT(*) FROM Order_Table_Bid WHERE Order_Table_Bid.Trader_ID=1";
+         QString sqlquery ="SELECT COUNT(*) FROM Order_Table_Bid WHERE Order_Table_Bid.Trader_ID='"+user_id+"'";
          QSqlQuery query(sqlquery, db);
         if(!query.exec())
         {
@@ -257,13 +258,13 @@ void  mysql_conn::getSummaryTableData()
                 return; // Handle empty result set gracefully (optional)
             }
 
-            int bidCount = query.value(0).toInt(); // Assuming the count is in the first column
+             OrderCount = query.value(0).toInt(); // Assuming the count is in the first column
 
 
         }
     }
 }
-void mysql_conn::getPortfoliosTableData(Table_Portfolios_Model *model, Combined_Tracker_Table_Model *comb_tracker_model, QHash<QString, PortfolioAvgPrice> &averagePriceList, QString user_id)
+void mysql_conn::getPortfoliosTableData(int &AlgoCount,Table_Portfolios_Model *model, Combined_Tracker_Table_Model *comb_tracker_model, QHash<QString, PortfolioAvgPrice> &averagePriceList, QString user_id)
 {
     QMutexLocker lock(&mutex);
     // int editing_state = portfolio_table_editing.loadRelaxed();
@@ -350,7 +351,6 @@ void mysql_conn::getPortfoliosTableData(Table_Portfolios_Model *model, Combined_
                     int profit = 1;
                     int BuyQuantity = o->BuyTradedQuantity * lotSize;
                     int SellQuantity = o->BuyTradedQuantity * lotSize;
-                    int OrderQuantity = o->OrderQuantity * lotSize;
                     int qty = SellQuantity > BuyQuantity ? BuyQuantity : SellQuantity;
                     if (qty > 0)
                         profit = (o->SellAveragePrice.toDouble() - o->BuyAveragePrice.toDouble())* qty;
@@ -360,6 +360,8 @@ void mysql_conn::getPortfoliosTableData(Table_Portfolios_Model *model, Combined_
 
             }
             // qDebug() << "Elapsed Time:" << timer.elapsed() << "milliseconds";
+
+            AlgoCount = PortfolioObjectList.size();
 
             comb_tracker_model->setDataList(Combined_TrackerDataList);
 
@@ -733,7 +735,7 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
     return tradeData;
 }
 
-void mysql_conn::getTradeTableData(Trade_Table_Model *model,Liners_Model *liners_model ,QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash)
+void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Liners_Model *liners_model ,QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash)
 {
     QMutexLocker lock(&mutex);
 
@@ -750,6 +752,9 @@ QList <QStringList> liners_listTmp;
 
        // QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and (Leg1_OrderState=7 and Leg2_OrderState=7 and Leg3_OrderState=7) ORDER BY Trader_Data DESC";
         QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and Leg2_OrderState=7  ORDER BY Trader_Data DESC";
+        //QString sqlquery ="SELECT COUNT(*) FROM Order_Table_Bid WHERE Order_Table_Bid.Trader_ID='"+user_id+"'";
+        //QString query_str = "SELECT COUNT(*) FROM (SELECT * FROM Order_Table_Bid WHERE Trader_ID='" + user_id + "' AND Leg2_OrderState=7 ORDER BY Trader_Data DESC) AS SubQuery";
+
 
         QSqlQuery query(query_str,db);
         if( !query.exec() )
@@ -903,9 +908,25 @@ QList <QStringList> liners_listTmp;
 //                Leg1_OrderStateStr = ContractDetail::getInstance().GetStockName(leg1_token_number,portfolio_type)+" "+"["+(QString::number(Leg1_Total_Volume/lotSize))+"]";
 //                Leg3_OrderStateStr = ContractDetail::getInstance().GetStockName(leg3_token_number,portfolio_type)+" "+"["+(QString::number(Leg3_Total_Volume/lotSize))+"]";
                 //Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")";
-                Leg1_OrderStateStr = Leg1_OrderStateStr+" ("+(QString::number(Leg1_OrderState))+")";
-                Leg3_OrderStateStr = Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")";
+               // Leg1_OrderStateStr = Leg1_OrderStateStr+" ("+(QString::number(Leg1_OrderState))+")";
+               // Leg3_OrderStateStr = Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")";
                 Leg2_OrderStateStr = Leg2_OrderStateStr+" ("+(QString::number(Leg2_OrderState))+")";
+                if(Leg1_OrderState==8)
+                {
+                   Leg1_OrderStateStr = Leg1_OrderStateStr+" ("+(QString::number(Leg1_OrderState))+")"+" "+"["+(QString::number(Leg1_Total_Volume/lotSize))+"]";
+                }
+                else
+                {
+                    Leg1_OrderStateStr = Leg1_OrderStateStr+" ("+(QString::number(Leg1_OrderState))+")";
+                }
+                if(Leg3_OrderState==8)
+                {
+                    Leg3_OrderStateStr = Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")"+" "+"["+(QString::number(Leg3_Total_Volume/lotSize))+"]";
+                }
+                else
+                {
+                    Leg3_OrderStateStr = Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")";
+                }
 
                 QString Exch_Price = "0";
                 double Exch_Price_val  = 0;
@@ -981,11 +1002,11 @@ QList <QStringList> liners_listTmp;
                 dt = dt.toUTC();
 
                 QStringList rowList;
-                rowList.append(Algo_ID);
+                rowList.append(order_id);
 //                rowList.append(Volant_No);
                 rowList.append(Algo_Name);
-                rowList.append(Exch_Price);
                 rowList.append(User_Price);
+                rowList.append(Exch_Price);
                 rowList.append(Jackpot);
                 rowList.append(Traded_Lot);
                 rowList.append(Remaining_Lot);
@@ -994,7 +1015,7 @@ QList <QStringList> liners_listTmp;
                 rowList.append(Leg2_OrderStateStr);
                 rowList.append(Leg1_OrderStateStr);
                 rowList.append(Leg3_OrderStateStr);
-                rowList.append(order_id);
+                rowList.append(Algo_ID);
                 rowList.append(Expiry);
 //                rowList.append(Leg1_OrderState); // this should be the 4th last data inserted to the row
  //               rowList.append(Leg3_OrderState); // this should be the 3rd last data inserted to the row
@@ -1003,8 +1024,7 @@ QList <QStringList> liners_listTmp;
 
 
                 trade_data_listTmp.append(rowList);
-
-
+  TraderCount=trade_data_listTmp.size();
 
                 QString linersDataKey = Algo_ID;
                 //populate netpos data here
@@ -1025,10 +1045,12 @@ QList <QStringList> liners_listTmp;
                     if(Buy_Sell=="Buy"){
                         Liners_Data_Hash[linersDataKey].BuyAvgPrice.append(Exch_Price_val);
                         Liners_Data_Hash[linersDataKey].BuyQtyLots.append(qty);
+                        //BuyValue = BuyValue + Exch_Price_val;
                     }
                     else{
                         Liners_Data_Hash[linersDataKey].SellAvgPrice.append(Exch_Price_val);
                         Liners_Data_Hash[linersDataKey].SellQtyLots.append(qty);
+                        //SellValue = SellValue + Exch_Price_val;
                     }
 
 
@@ -1039,7 +1061,7 @@ QList <QStringList> liners_listTmp;
             }
 
 
-
+//
             model->setDataList(trade_data_listTmp);
 
             //iterate Liners_Data_Hash and create a QStringList;
@@ -1074,6 +1096,7 @@ QList <QStringList> liners_listTmp;
 
 
         liners_model->setDataList(liners_listTmp);
+
 
 
         }
@@ -1189,10 +1212,17 @@ void mysql_conn::getLinersTableData(Liners_Model *model,QString user_id,QHash<QS
 }
 
 
-void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash)
+void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty,double &BuyQty_summary,double &SellQty_summary,double &SellQty,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash)
 {
     QMutexLocker lock(&mutex);
-
+     BuyValue_summary=0;
+     SellValue = 0;
+     Profit_summary = 0 ;
+     BuyQty=0;
+     BuyQty_summary = 0;
+     SellQty_summary = 0;
+     SellQty = 0;
+     NetQty_summary = 0;
     //query: SELECT (order_table.Leg2_Price - order_table.Leg1_Price)/10000000 AS Exch_price , order_table.DesiredRate/10000000 as user_price,order_table.Trader_Data FROM  order_table WHERE order_table.OrderState=7
     /*  QList <QStringList> netPos_data_listTmp;
         QHash<QString, net_pos_data_> net_pos_data;
@@ -1339,10 +1369,12 @@ void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user
                     if(buy_sell=="1"){
                         net_pos_dataList[key].Buy_Avg_Price = net_pos_dataList[key].Buy_Avg_Price+AvgPrice;
                         net_pos_dataList[key].Buy_Total_Lot = net_pos_dataList[key].Buy_Total_Lot + Qty;
+                        BuyQty_summary = BuyQty_summary + net_pos_dataList[key].Buy_Total_Lot;
                     }
                     else{
                         net_pos_dataList[key].Sell_Avg_Price =AvgPrice;
                         net_pos_dataList[key].Sell_Total_Lot = Qty;
+                        SellQty_summary = SellQty_summary +  net_pos_dataList[key].Sell_Total_Lot;
                     }
                 }
                 else{
@@ -1353,10 +1385,13 @@ void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user
                     if(buy_sell=="1"){
                         net_pos.Buy_Avg_Price =AvgPrice;
                         net_pos.Buy_Total_Lot = Qty;
+                        BuyQty_summary = BuyQty_summary + net_pos.Buy_Total_Lot;
                     }
                     else{
                         net_pos.Sell_Avg_Price =AvgPrice;
                         net_pos.Sell_Total_Lot = Qty;
+                        SellQty_summary = SellQty_summary + net_pos.Sell_Total_Lot;
+
                     }
                     net_pos_dataList.insert(key,net_pos);
                 }
@@ -1368,7 +1403,8 @@ void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user
                 portfolio_type = P.PortfolioType.toInt();
             }*/
            QHashIterator<QString, net_pos_data_> iter(net_pos_dataList);
-           int c=0;
+           int c=1;
+
            while(iter.hasNext())
             {
                 iter.next();
@@ -1386,8 +1422,13 @@ void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user
                 net_pos_dataList[TokenNo].Net_Qty = net_pos_dataList[TokenNo].Buy_Total_Lot-net_pos_dataList[TokenNo].Sell_Total_Lot;
                 net_pos_dataList[TokenNo].Buy_Price =net_pos_dataList[TokenNo].Buy_Avg_Price*net_pos_dataList[TokenNo].Buy_Total_Lot;
                 net_pos_dataList[TokenNo].Sell_Price = net_pos_dataList[TokenNo].Sell_Total_Lot*net_pos_dataList[TokenNo].Sell_Avg_Price;
-
+                BuyValue_summary = BuyValue_summary + net_pos_dataList[TokenNo].Buy_Price ;
+                SellValue = SellValue +  net_pos_dataList[TokenNo].Sell_Price ;
+                NetQty_summary = NetQty_summary + (net_pos_dataList[TokenNo].Net_Qty / lotSize);
+                BuyQty = BuyQty_summary/lotSize;
+                SellQty =SellQty_summary/lotSize;
                 double Profit = net_pos_dataList[TokenNo].Sell_Price-net_pos_dataList[TokenNo].Buy_Price;
+                Profit_summary = Profit_summary + Profit ;
                 QStringList rowList;
                 rowList.append(QString::number(c));
                 rowList.append(net_pos_dataList[TokenNo].Stock_Name);
@@ -1403,6 +1444,7 @@ void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user
                 rowList.append(TokenNo); // this should be the last one
                 netPos_data_listTmp.append(rowList);
                 c++;
+
             }
             model->setDataList(netPos_data_listTmp);
         }

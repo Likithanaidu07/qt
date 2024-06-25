@@ -26,6 +26,7 @@
 #include "PortFolio/table_portfolios_model.h"
 #include "PortFolio/table_portfolios_custom.h"
 #include "PortFolio/portfolioheaderview.h"
+#include "TradePosition/tradetableheaderview.h"
 #include "TradePosition/trade_table_model.h"
 #include "NetPosition/net_position_table_model.h"
 #include "CombinedTracker/combined_tracker_table_model.h"
@@ -59,6 +60,7 @@ public:
     QPoint position;
     QStandardItemModel model;
     OrderDetail_Popup *orderWin;
+    //void updateLabels();
 
 
 
@@ -73,10 +75,29 @@ signals:
     void display_log_text_signal(QString);
     void update_ui_signal(int);
     void signalHideProgressBar();
+    void data_summary_update_signal();
+
+
 private:
     Ui::MainWindow *ui;
 
     loadingdatawindow *loadingDataWinodw;
+
+    int AlgoCount;
+    int OrderCount;
+    int TraderCount;
+    double BuyValue;
+    double SellValue;
+    double Profit;
+    double BuyQty;
+    double SellQty;
+    double NetQty;
+    int M2M;
+    int AvlMargin;
+    int UsedMargin;
+    double BuyQty_summary;
+    double SellQty_summary;
+
 
     void createINIFileIfNotExist();
     void loadSettings();
@@ -126,6 +147,7 @@ private:
     QTableView *trade_table;
     Trade_Table_Model *trade_model;
     QDockWidget *dock_win_trade;
+
 //    QLineEdit *line_edit_trade_search;
 //    QList<LiveDataWidget*> liveDataWidgetList;
 
@@ -184,6 +206,8 @@ public slots:
     void slotHideProgressBar();
     void on_startall_Button_clicked();
     void on_stopall_Button_clicked();
+    void updateSummaryLabels();
+
 
 
 private slots:
@@ -200,7 +224,6 @@ private slots:
     void on_Templates_Button_clicked();
     void on_Templates_Close_clicked();
     void on_maximize_clicked();
-    void on_toggle_Button_clicked();
 
 
     void mousePressEvent(QMouseEvent *event) override;
@@ -225,5 +248,7 @@ private slots:
 
     void on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item);
     void on_listWidgetWatch_itemSelectionChanged();
+
+    void on_toggle_Button_1_clicked();
 };
 #endif // MAINWINDOW_H

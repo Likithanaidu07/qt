@@ -72,22 +72,22 @@ public:
     QString InstrumentTypeFilter;
 
     userInfo login( QString user_name,  QString password);
-    void  getPortfoliosTableData(Table_Portfolios_Model* model,Combined_Tracker_Table_Model *comb_tracker_model,QHash<QString, PortfolioAvgPrice> &averagePriceList,QString user_id);
+    void  getPortfoliosTableData(int &AlgoCount,Table_Portfolios_Model* model,Combined_Tracker_Table_Model *comb_tracker_model,QHash<QString, PortfolioAvgPrice> &averagePriceList,QString user_id);
     QMap<int, QHash<QString, contract_table>> getContractTable(QHash<QString, QStringList> &_m_ContractDetailsFiltered, QStringList &F2F_data_list_Sorted_Key, QStringList &BFLY_data_list_Sorted_Key, QStringList &BFLY_BID_data_list_Sorted_Key, userInfo userData);
 
     QSqlQuery runQuery(QString qry_str);
     bool updateDB_Table(QString query_str,QString &msg);
     QString get_Algo_Name(int algo_type,int leg1_token_number,int leg2_token_number,int leg3_token_number,double devicer,int decimal_precision);
-    void  getTradeTableData(Trade_Table_Model *model,Liners_Model *liners_model ,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
-    void  getNetPosTableData(Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash);
-    void getSummaryTableData();
+    void  getTradeTableData(int &TraderCount,Trade_Table_Model *model,Liners_Model *liners_model ,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
+    void  getNetPosTableData(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty,double &BuyQty_summary,double &SellQty,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash);
+    void getSummaryTableData(int &OrderCount,QString user_id);
     void getLinersTableData(Liners_Model *model,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
     QString fixDecimal(double num,int decimal_precision);
     algo_data_insert_status insertToAlgoTable(algo_data_to_insert data,int MaxPortfolioCount,QString &msg);
     bool deleteAlgo(QString PortfolioNumber,QString &msg);
     void logToDB(QString logMessage);
 
-      QList<QHash<QString,QString>>  getTradePopUPData(QString user_id, QString portfolioNumber,QString PortfolioType);
+    QList<QHash<QString,QString>>  getTradePopUPData(QString user_id, QString portfolioNumber,QString PortfolioType);
     ///
     /// \brief loadCurrentDayLogs to load logs of one day
     ///
@@ -102,6 +102,7 @@ private:
     userInfo userLoginInfo;
     double calculateAverage(const QList<double> &list);
     int calculateSum(const QList<int> &list);
+
 
 
 //    MainWindow MainWindow;

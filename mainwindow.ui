@@ -237,7 +237,7 @@ line-height: normal;
 }</string>
                </property>
                <property name="text">
-                <string>Summary</string>
+                <string>User Summary</string>
                </property>
               </widget>
              </item>
@@ -294,7 +294,7 @@ line-height: normal;
                  <item>
                   <widget class="QLabel" name="label_2">
                    <property name="text">
-                    <string>Margin Allocated</string>
+                    <string>Algo Count </string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -346,7 +346,7 @@ line-height: normal;
                  <item>
                   <widget class="QLabel" name="label_6">
                    <property name="text">
-                    <string>Profit</string>
+                    <string>Buy value</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -388,7 +388,7 @@ line-height: normal;
                  <item>
                   <widget class="QLabel" name="label_20">
                    <property name="text">
-                    <string>Blank Trade</string>
+                    <string>Buy Lot</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -442,7 +442,7 @@ line-height: normal;
                     </size>
                    </property>
                    <property name="text">
-                    <string>Market Protection</string>
+                    <string>M2M</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -488,7 +488,7 @@ line-height: normal;
                  <item>
                   <widget class="QLabel" name="label_7">
                    <property name="text">
-                    <string>Margin Used</string>
+                    <string>Order Count</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -530,7 +530,7 @@ line-height: normal;
                  <item>
                   <widget class="QLabel" name="label_8">
                    <property name="text">
-                    <string>Total Order</string>
+                    <string>Sell Value</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -590,7 +590,7 @@ line-height: normal;
                     </size>
                    </property>
                    <property name="text">
-                    <string>Active Strategies</string>
+                    <string>Sell Lot</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -641,7 +641,7 @@ line-height: normal;
                  <item>
                   <widget class="QLabel" name="label_10">
                    <property name="text">
-                    <string>Enabled Strategy</string>
+                    <string>Avl Margin</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -687,7 +687,7 @@ line-height: normal;
                  <item>
                   <widget class="QLabel" name="m2mlabel">
                    <property name="text">
-                    <string>M2M</string>
+                    <string>Trade Count</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -729,7 +729,7 @@ line-height: normal;
                  <item>
                   <widget class="QLabel" name="label_13">
                    <property name="text">
-                    <string>Total Trades</string>
+                    <string>Profit</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -777,7 +777,7 @@ line-height: normal;
                  <item>
                   <widget class="QLabel" name="label_14">
                    <property name="text">
-                    <string>Rejected Orders</string>
+                    <string>Net Lot</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -822,7 +822,7 @@ line-height: normal;
                  <item>
                   <widget class="QLabel" name="label_16">
                    <property name="text">
-                    <string>Span Margin</string>
+                    <string>Used Margin</string>
                    </property>
                    <property name="alignment">
                     <set>Qt::AlignCenter</set>
@@ -2221,7 +2221,7 @@ background: #495057;
         <number>0</number>
        </property>
        <item>
-        <widget class="QPushButton" name="toggle_Button">
+        <widget class="QPushButton" name="toggle_Button_1">
          <property name="maximumSize">
           <size>
            <width>13</width>
@@ -2233,6 +2233,10 @@ background: #495057;
          </property>
          <property name="text">
           <string/>
+         </property>
+         <property name="icon">
+          <iconset theme="call-start">
+           <normaloff>.</normaloff>.</iconset>
          </property>
         </widget>
        </item>
