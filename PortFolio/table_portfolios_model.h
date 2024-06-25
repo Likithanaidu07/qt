@@ -56,6 +56,7 @@ private:
 
 public slots:
     void onItemChanged(const QModelIndex &index);
+    void selectionChangedSlot(int currentIdx);
 
 signals:
     void editCompleted(QString text, QModelIndex idx) const;

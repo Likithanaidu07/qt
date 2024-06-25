@@ -29,6 +29,7 @@ private:
     int findNextEditableCell(int currentColIdx,nav_direction direction);
 protected:
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
+    void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) override;
 
 
 public slots:
@@ -38,6 +39,8 @@ public slots:
 
 signals:
     void spaceKeySignal();
+    void selectionChangedSignal(int currentRow);
+
 };
 
 #endif // TABLE_PORTFOLIOS_CUSTOM_H

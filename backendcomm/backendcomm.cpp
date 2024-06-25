@@ -4,6 +4,9 @@
 #include "QAbstractSocket"
 #include <QElapsedTimer>
 #include <defines.h>
+
+//#define ENABLE_DEBUG_MSG
+
 BackendComm::BackendComm(QObject *parent) : QObject(parent)
 {
 
