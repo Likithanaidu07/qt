@@ -270,7 +270,7 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
             return portfolio->OrderQuantity;
         }
         else if (index.column() == PortfolioData_Idx::_ExpiryDateTime) {
-            return portfolio->ExpiryDateTime.toString("dd-MM-Myy");
+            return portfolio->ExpiryDateTime.toString("dd-MMM-yy");
         }
         else if (index.column() == PortfolioData_Idx::_Leg1) {
             return portfolio->Leg1;

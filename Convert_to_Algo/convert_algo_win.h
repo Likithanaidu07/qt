@@ -70,7 +70,7 @@ private:
     AddAlgoSharedVar *sharedData;
     QAtomicInt dataSorted;
     mysql_conn *db_conn;
-    add_algo_btfly *algoBtFly;
+    //add_algo_btfly *algoBtFly;
     add_algo_f2f *algoF2F;
     add_algo_con_rev *algoConRev;
     add_algo_btfly_bid *algoBtFlyBid;

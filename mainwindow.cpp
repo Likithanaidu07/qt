@@ -34,6 +34,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->setupUi(this);
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+
+    connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
     connect(this,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
     convertalgo=new ConvertAlgo_Win(this);
     loadingDataWinodw = new loadingdatawindow(this);
@@ -649,7 +651,7 @@ MainWindow::MainWindow(QWidget *parent)
     // T_Portfolio_Table->viewport()->setFocusPolicy(Qt::NoFocus);
     T_Portfolio_Model = new Table_Portfolios_Model();
     T_Portfolio_Delegate =  new Table_Portfolios_Delegate();
-    connect(T_Portfolio_Model,SIGNAL(edit_Started(int,int)),this,SLOT(edit_Started_PortFolio_Table(int,int)));
+    //connect(T_Portfolio_Model,SIGNAL(edit_Started(int,int)),this,SLOT(edit_Started_PortFolio_Table(int,int)));
     QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::editFinished, this, &MainWindow::profolioTableEditFinshedSlot);
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::editCompleted, this, &MainWindow::profolioTableEditFinshedSlot);
      QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::tabKeyPressed, T_Portfolio_Table, &table_portfolios_custom::handleTabKeyPressFromEditableCell);
@@ -763,6 +765,20 @@ MainWindow::MainWindow(QWidget *parent)
     trade_table->horizontalHeader()->setFont(headerfont);
     trade_table->setShowGrid(false);
     trade_table->setAlternatingRowColors(true);
+    tradetableheaderview* headerViews = new tradetableheaderview(Qt::Horizontal, T_Portfolio_Table);
+    headerViews->setFixedHeight(32);
+    headerViews->setFont(headerfont);
+    headerViews->setStyleSheet(
+        "   background: #495867;"
+        "   border: none;"
+        "   color: #FFF; "
+        "   text-align: center; "
+        "   font-size: 12px; "
+        "   font-style: normal; "
+        "   font-weight: 600; "
+        "   line-height: normal;"
+        );
+    trade_table->setHorizontalHeader(headerViews);
 
     lay_Trade_Window->addWidget(trade_table, 1, 0, 1, 3);
 
@@ -770,6 +786,8 @@ MainWindow::MainWindow(QWidget *parent)
     Table_OrderBook_Delegate* trade_delegate=new Table_OrderBook_Delegate;
     trade_table->setModel(trade_model);
     trade_table->setItemDelegate(trade_delegate);
+    //T_order_Delegate =  new trade_table_delegate();
+    //trade_table->setItemDelegate(T_order_Delegate);
     trade_table->horizontalHeader()->setStretchLastSection(true);
     trade_table->verticalHeader()->setVisible(false);
     // trade_table->setStyleSheet("QHeaderView { background-color: #111111;} QHeaderView::section { background-color:#555555;color:#eeeeee;font-weight: 400; }");
@@ -969,8 +987,12 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    QPixmap pixmapright(":/right_arrow.png");
-    ui->toggle_Button->setIcon(pixmapright);
+//    QPixmap pixmapright(":/right_arrow.png");
+//    ui->toggle_Button->setIcon(pixmapright);
+
+//    QPixmap pixmapLeft(":/left_arrow.png");
+//    ui->toggle_Button->setIcon(pixmapLeft);
+   // connect(ui->toggle_Button, SIGNAL(clicked()), this, SLOT(on_toggle_Button_clicked()));
 
     //stylesheet for summary window title labels
     const char stylesheet_userinfo[] = "color: #2F3339;" "text-align: center;""font-size: 12px;""font-style: normal;""font-weight: bold;""line-height: normal;";
@@ -981,6 +1003,9 @@ MainWindow::MainWindow(QWidget *parent)
         w->setFont(font);
         w->setWordWrap(true);
     }
+
+//    ui->label_3->setText(QString::number(AlgoCount));
+//    ui->label_25->setText(QString::number(OrderCount));
 
     ui->Algorithms_Close->setVisible(false);
     ui->OrderBook_Close->setVisible(false);
@@ -1050,6 +1075,7 @@ MainWindow::MainWindow(QWidget *parent)
    //loadContract();
     initWatchWindow();
 }
+
 
 MainWindow::~MainWindow()
 {
@@ -1316,9 +1342,27 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                             msgBox.exec();
                         }
                         else{
+                            //write
+                            int val1 = valStr.toInt();
+                            int qty = T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity;
+                            if(qty>T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity)
+                                qty = T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity;
+                            //check the condtion
+                            if(val1 >qty){
+                                QMessageBox msgBox;
+                                msgBox.setText("Cannot update OrderQuantity");
+                                msgBox.setText("OrderQuantity cannot be greater than totalQty "+QString::number(qty));
+                                msgBox.setIcon(QMessageBox::Warning);
+                                msgBox.exec();
+                            }
+                            else{
                             updateQueryList.append("OrderQuantity="+QString::number(val));
                             logMsg = logMsg+"OrderQuantity ["+QString::number(val)+"], ";
                         }
+                        }
+
+
+
                     }
                     break;
 
@@ -1463,6 +1507,8 @@ void MainWindow::refreshTableIn_Intervel(){
 //        //}
         loadDataAndUpdateTable(T_Table::TRADE);
         loadDataAndUpdateTable(T_Table::NET_POS);
+        loadDataAndUpdateTable(T_Table::SUMMARY);
+
         //loadMysQLData(Table::ORDER);*/
 
         auto elapsed = timer.elapsed();
@@ -1511,15 +1557,24 @@ void MainWindow::stop_slowdata_indices_worker(){
 void MainWindow::loadDataAndUpdateTable(int table){
     switch (table) {
     case T_Table::PORTFOLIO:
-        db_conn->getPortfoliosTableData(T_Portfolio_Model,combined_tracker_model,averagePriceList,QString::number(userData.UserId));
+        db_conn->getPortfoliosTableData(AlgoCount,T_Portfolio_Model,combined_tracker_model,averagePriceList,QString::number(userData.UserId));
         emit data_loded_signal(T_Table::PORTFOLIO);
+        emit data_summary_update_signal();
+
+        break;
+
+    case T_Table::SUMMARY:
+        db_conn->getSummaryTableData(OrderCount,QString::number(userData.UserId) );  // Correctly get the count
+        emit data_loded_signal(T_Table::SUMMARY);
+        emit data_summary_update_signal();
         break;
 
     case T_Table::TRADE:{
 //        OutputDebugStringA("Test1 \n");
         QHash<QString, PortFolioData_Less> PortFolioHash = T_Portfolio_Model->getPortFolioDataLess();
-        db_conn->getTradeTableData(trade_model,liners_model,QString::number(userData.UserId),PortFolioHash);
+        db_conn->getTradeTableData(TraderCount,trade_model,liners_model,QString::number(userData.UserId),PortFolioHash);
         emit data_loded_signal(T_Table::TRADE);
+        emit data_summary_update_signal();
         break;
     }
    /* case T_Table::Liners:{
@@ -1532,19 +1587,43 @@ void MainWindow::loadDataAndUpdateTable(int table){
 
     case T_Table::NET_POS:{
         QHash<QString,int> PortFoliosLotSizeHash = T_Portfolio_Model->getPortFoliosLotSize();
-        db_conn->getNetPosTableData(net_pos_model,QString::number(userData.UserId),PortFoliosLotSizeHash);
+        db_conn->getNetPosTableData(BuyValue,SellValue,Profit,BuyQty,SellQty,BuyQty_summary,SellQty_summary,NetQty,net_pos_model,QString::number(userData.UserId),PortFoliosLotSizeHash);
         emit data_loded_signal(T_Table::NET_POS);
-        break;
-    }
-    case T_Table::SUMMARY: {
-        db_conn->getSummaryTableData();  // Correctly get the count
-        emit data_loded_signal(T_Table::SUMMARY);
+        emit data_summary_update_signal();
         break;
     }
 
     default:
         break;
     }
+}
+
+void MainWindow::updateSummaryLabels()
+{
+    ui->label_3->setText(QString::number(AlgoCount));
+    ui->label_3->setAlignment(Qt::AlignCenter);
+    ui->label_25->setText(QString::number(OrderCount));
+    ui->label_25->setAlignment(Qt::AlignCenter);
+    ui->label_30->setText(QString::number(TraderCount));
+    ui->label_30->setAlignment(Qt::AlignCenter);
+    ui->label_23->setText(QString::number(BuyValue));
+    ui->label_23->setAlignment(Qt::AlignCenter);
+    ui->label_26->setText(QString::number(SellValue));
+    ui->label_26->setAlignment(Qt::AlignCenter);
+    ui->label_31->setText(QString::number(Profit));
+    ui->label_31->setAlignment(Qt::AlignCenter);
+    ui->label_24->setText(QString::number(BuyQty));
+    ui->label_24->setAlignment(Qt::AlignCenter);
+    ui->label_27->setText(QString::number(SellQty_summary));
+    ui->label_27->setAlignment(Qt::AlignCenter);
+    ui->label_32->setText(QString::number(NetQty));
+    ui->label_32->setAlignment(Qt::AlignCenter);
+    ui->label_33->setText("-");
+    ui->label_33->setAlignment(Qt::AlignCenter);
+    ui->label_28->setText("-");
+    ui->label_28->setAlignment(Qt::AlignCenter);
+    ui->label_34->setText("-");
+    ui->label_34->setAlignment(Qt::AlignCenter);
 }
 
 void MainWindow::start_backend_comm_socket_worker()
@@ -1881,53 +1960,55 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
         }
 }
 
-void MainWindow::on_toggle_Button_clicked()
-{
-        bool currentVisibility = ui->widget->isVisible();
-        if(currentVisibility){
-            ui->widget->setVisible(false);
-            QPixmap pixmapright(":/left_arrow.png");
-            ui->toggle_Button->setIcon(pixmapright);}
-        else{
-            ui->widget->setVisible(true);
-            QPixmap pixmapright(":/right_arrow.png");
-            ui->toggle_Button->setIcon(pixmapright);
-        }
-}
+
 void MainWindow::on_startall_Button_clicked()
 {
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, "Confirmation", "Are you sure you want to activate all selected algos?",
+                                      QMessageBox::Yes|QMessageBox::No);
+        if (reply == QMessageBox::No) {
+            return;
+        }
+
         QStringList portfolioNumbers;
-        for(int i=0;i<T_Portfolio_Model->portfolio_data_list.size();i++){
+        for(int i = 0; i < T_Portfolio_Model->portfolio_data_list.size(); i++){
             if (T_Portfolio_Model->portfolio_data_list[i]) {
             portfolioNumbers.append(QString::number(T_Portfolio_Model->portfolio_data_list[i]->PortfolioNumber));
             }
         }
-
-        //Got all the porfolio numebr
         QString joinedPortfolioNumbers = portfolioNumbers.join(", ");
         QString Query = "UPDATE Portfolios SET Status='Active' WHERE PortfolioNumber IN (" + joinedPortfolioNumbers + ")";
         QString msg;
+
         bool success =  db_conn->updateDB_Table(Query,msg);
         if(success){
-            db_conn->logToDB(QString("Activated  portfolio ["+joinedPortfolioNumbers+"]"));
+            db_conn->logToDB(QString("Enabled Algos [" + joinedPortfolioNumbers + "]"));
         }
+
+
 }
 void MainWindow::on_stopall_Button_clicked()
 {
+        QMessageBox::StandardButton reply;
+        reply = QMessageBox::question(this, "Confirmation", "Are you sure you want to Disable all selected algos?",
+                                      QMessageBox::Yes|QMessageBox::No);
+        if (reply == QMessageBox::No) {
+            return;
+        }
+
         QStringList portfolioNumbers;
         for(int i=0;i<T_Portfolio_Model->portfolio_data_list.size();i++){
             if (T_Portfolio_Model->portfolio_data_list[i]) {
             portfolioNumbers.append(QString::number(T_Portfolio_Model->portfolio_data_list[i]->PortfolioNumber));
             }
         }
-
-        //Got all the porfolio numebr
         QString joinedPortfolioNumbers = portfolioNumbers.join(", ");
         QString Query = "UPDATE Portfolios SET Status='DisabledByUser' WHERE PortfolioNumber IN (" + joinedPortfolioNumbers + ")";
+
         QString msg;
         bool success =  db_conn->updateDB_Table(Query,msg);
         if(success){
-            db_conn->logToDB(QString("Disabled  portfolio ["+joinedPortfolioNumbers+"]"));
+            db_conn->logToDB(QString("Disabled  Algos ["+joinedPortfolioNumbers+"]"));
         }
 }
 
@@ -2452,13 +2533,18 @@ void MainWindow::on_listWidgetWatch_itemSelectionChanged()
 
 
 
+void MainWindow::on_toggle_Button_1_clicked()
+{
+    bool currentVisibility = ui->widget->isVisible();
+    if (currentVisibility) {
+        ui->widget->setVisible(false);
+        QPixmap pixmapRight(":/right_arrow.png");
+        ui->toggle_Button_1->setIcon(pixmapRight);
 
-
-
-
-
-
-
-
-
+    } else {
+        ui->widget->setVisible(true);
+        QPixmap pixmapLeft(":/left_arrow.png");
+        ui->toggle_Button_1->setIcon(pixmapLeft);
+    }
+}
 

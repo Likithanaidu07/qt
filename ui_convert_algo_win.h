@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'convert_algo_win.ui'
 **
-** Created by: Qt User Interface Compiler version 6.3.1
+** Created by: Qt User Interface Compiler version 6.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -30,34 +30,33 @@ class Ui_ConvertAlgo_Win
 {
 public:
     QGridLayout *gridLayout;
+    QWidget *widget_2;
+    QGridLayout *gridLayout_2;
+    QWidget *widget;
+    QGridLayout *gridLayout_3;
+    QLabel *label;
+    QPushButton *pushButtonSelectAll;
+    QTableWidget *tableWidget;
+    QPushButton *pushButton_Reset;
+    QPushButton *pushButtonDelete;
+    QSpacerItem *verticalSpacer_3;
+    QLineEdit *lineEdit_Start_strike;
+    QSpacerItem *verticalSpacer_2;
+    QLineEdit *lineEdit_StrikeDifference;
+    QLineEdit *lineEdit_EndStrike;
+    QSpacerItem *verticalSpacer;
+    QHBoxLayout *horizontalLayout_2;
+    QSpacerItem *horizontalSpacer_3;
+    QPushButton *pushButton_Cancel;
+    QPushButton *pushButtonUpload;
+    QLineEdit *lineEdit_Fut;
+    QComboBox *comboBox_AlgoType;
+    QPushButton *pushButtonAdd;
     QWidget *ConvertAlgo_TitleBar;
     QGridLayout *gridLayout_4;
     QToolButton *Close;
     QLabel *label_2;
     QSpacerItem *horizontalSpacer_2;
-    QWidget *widget_2;
-    QGridLayout *gridLayout_2;
-    QPushButton *pushButtonAdd;
-    QComboBox *comboBox_AlgoType;
-    QWidget *widget;
-    QGridLayout *gridLayout_3;
-    QLabel *label;
-    QTableWidget *tableWidget;
-    QPushButton *pushButtonSelectAll;
-    QPushButton *pushButton_Reset;
-    QPushButton *pushButtonDelete;
-    QLineEdit *lineEdit_Start_strike;
-    QLineEdit *lineEdit_EndStrike;
-    QLineEdit *lineEdit_StrikeDifference;
-    QHBoxLayout *horizontalLayout_2;
-    QSpacerItem *horizontalSpacer_3;
-    QPushButton *pushButton_Cancel;
-    QPushButton *pushButtonUpload;
-    QSpacerItem *verticalSpacer_2;
-    QLineEdit *lineEdit_Fut;
-    QSpacerItem *verticalSpacer;
-    QSpacerItem *horizontalSpacer;
-    QSpacerItem *verticalSpacer_3;
 
     void setupUi(QDialog *ConvertAlgo_Win)
     {
@@ -78,52 +77,6 @@ public:
         gridLayout->setSpacing(0);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
-        ConvertAlgo_TitleBar = new QWidget(ConvertAlgo_Win);
-        ConvertAlgo_TitleBar->setObjectName(QString::fromUtf8("ConvertAlgo_TitleBar"));
-        sizePolicy.setHeightForWidth(ConvertAlgo_TitleBar->sizePolicy().hasHeightForWidth());
-        ConvertAlgo_TitleBar->setSizePolicy(sizePolicy);
-        ConvertAlgo_TitleBar->setMinimumSize(QSize(800, 32));
-        ConvertAlgo_TitleBar->setMaximumSize(QSize(1000, 32));
-        ConvertAlgo_TitleBar->setStyleSheet(QString::fromUtf8("#ConvertAlgo_TitleBar{\n"
-"background: #314458;\n"
-"}"));
-        gridLayout_4 = new QGridLayout(ConvertAlgo_TitleBar);
-        gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
-        gridLayout_4->setHorizontalSpacing(15);
-        gridLayout_4->setContentsMargins(-1, 7, -1, 8);
-        Close = new QToolButton(ConvertAlgo_TitleBar);
-        Close->setObjectName(QString::fromUtf8("Close"));
-        Close->setMinimumSize(QSize(14, 14));
-        Close->setMaximumSize(QSize(14, 14));
-        Close->setFocusPolicy(Qt::NoFocus);
-        Close->setStyleSheet(QString::fromUtf8("#Close{\n"
-"background: transparent;\n"
-"}"));
-
-        gridLayout_4->addWidget(Close, 0, 2, 1, 1);
-
-        label_2 = new QLabel(ConvertAlgo_TitleBar);
-        label_2->setObjectName(QString::fromUtf8("label_2"));
-        label_2->setMinimumSize(QSize(0, 17));
-        label_2->setMaximumSize(QSize(108, 17));
-        label_2->setStyleSheet(QString::fromUtf8("#label_2{\n"
-"color: #F8F9FA;\n"
-"font-family: Inter;\n"
-"font-size: 14px;\n"
-"font-style: normal;\n"
-"font-weight: 700;\n"
-"line-height: normal;\n"
-"}"));
-
-        gridLayout_4->addWidget(label_2, 0, 0, 1, 1);
-
-        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
-
-        gridLayout_4->addItem(horizontalSpacer_2, 0, 1, 1, 1);
-
-
-        gridLayout->addWidget(ConvertAlgo_TitleBar, 0, 0, 1, 1);
-
         widget_2 = new QWidget(ConvertAlgo_Win);
         widget_2->setObjectName(QString::fromUtf8("widget_2"));
         widget_2->setStyleSheet(QString::fromUtf8("#widget_2{\n"
@@ -134,38 +87,6 @@ public:
         gridLayout_2->setHorizontalSpacing(9);
         gridLayout_2->setVerticalSpacing(0);
         gridLayout_2->setContentsMargins(12, 0, 12, 14);
-        pushButtonAdd = new QPushButton(widget_2);
-        pushButtonAdd->setObjectName(QString::fromUtf8("pushButtonAdd"));
-        sizePolicy.setHeightForWidth(pushButtonAdd->sizePolicy().hasHeightForWidth());
-        pushButtonAdd->setSizePolicy(sizePolicy);
-        pushButtonAdd->setMinimumSize(QSize(90, 28));
-        pushButtonAdd->setMaximumSize(QSize(90, 28));
-        pushButtonAdd->setStyleSheet(QString::fromUtf8(""));
-        pushButtonAdd->setFlat(true);
-
-        gridLayout_2->addWidget(pushButtonAdd, 1, 9, 1, 1);
-
-        comboBox_AlgoType = new QComboBox(widget_2);
-        comboBox_AlgoType->setObjectName(QString::fromUtf8("comboBox_AlgoType"));
-        comboBox_AlgoType->setMinimumSize(QSize(85, 28));
-        comboBox_AlgoType->setMaximumSize(QSize(16777215, 28));
-        comboBox_AlgoType->setStyleSheet(QString::fromUtf8("QComboBox{\n"
-"border-radius: 6px;\n"
-"border: 0.5px solid #343A40;\n"
-"background: #FFF;\n"
-" text-align: center;\n"
-"}\n"
-"\n"
-"QComboBox::drop-down{\n"
-"border-radius: 6px;\n"
-"background: #FFF;\n"
-" text-align: center;\n"
-"\n"
-"}\n"
-""));
-
-        gridLayout_2->addWidget(comboBox_AlgoType, 1, 0, 1, 3);
-
         widget = new QWidget(widget_2);
         widget->setObjectName(QString::fromUtf8("widget"));
         widget->setFocusPolicy(Qt::NoFocus);
@@ -181,6 +102,15 @@ public:
         label->setStyleSheet(QString::fromUtf8(""));
 
         gridLayout_3->addWidget(label, 0, 0, 1, 1);
+
+        pushButtonSelectAll = new QPushButton(widget);
+        pushButtonSelectAll->setObjectName(QString::fromUtf8("pushButtonSelectAll"));
+        pushButtonSelectAll->setMaximumSize(QSize(58, 16));
+        pushButtonSelectAll->setFocusPolicy(Qt::TabFocus);
+        pushButtonSelectAll->setStyleSheet(QString::fromUtf8(""));
+        pushButtonSelectAll->setFlat(true);
+
+        gridLayout_3->addWidget(pushButtonSelectAll, 0, 1, 1, 1);
 
         tableWidget = new QTableWidget(widget);
         tableWidget->setObjectName(QString::fromUtf8("tableWidget"));
@@ -209,15 +139,6 @@ public:
 
         gridLayout_3->addWidget(tableWidget, 1, 0, 1, 4);
 
-        pushButtonSelectAll = new QPushButton(widget);
-        pushButtonSelectAll->setObjectName(QString::fromUtf8("pushButtonSelectAll"));
-        pushButtonSelectAll->setMaximumSize(QSize(58, 16));
-        pushButtonSelectAll->setFocusPolicy(Qt::TabFocus);
-        pushButtonSelectAll->setStyleSheet(QString::fromUtf8(""));
-        pushButtonSelectAll->setFlat(true);
-
-        gridLayout_3->addWidget(pushButtonSelectAll, 0, 1, 1, 1);
-
         pushButton_Reset = new QPushButton(widget);
         pushButton_Reset->setObjectName(QString::fromUtf8("pushButton_Reset"));
         pushButton_Reset->setMaximumSize(QSize(58, 16));
@@ -237,6 +158,10 @@ public:
 
         gridLayout_2->addWidget(widget, 3, 0, 1, 10);
 
+        verticalSpacer_3 = new QSpacerItem(20, 16, QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+        gridLayout_2->addItem(verticalSpacer_3, 4, 0, 1, 10);
+
         lineEdit_Start_strike = new QLineEdit(widget_2);
         lineEdit_Start_strike->setObjectName(QString::fromUtf8("lineEdit_Start_strike"));
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Fixed);
@@ -250,6 +175,20 @@ public:
 
         gridLayout_2->addWidget(lineEdit_Start_strike, 1, 4, 1, 1);
 
+        verticalSpacer_2 = new QSpacerItem(20, 16, QSizePolicy::Minimum, QSizePolicy::Fixed);
+
+        gridLayout_2->addItem(verticalSpacer_2, 2, 0, 1, 10);
+
+        lineEdit_StrikeDifference = new QLineEdit(widget_2);
+        lineEdit_StrikeDifference->setObjectName(QString::fromUtf8("lineEdit_StrikeDifference"));
+        sizePolicy1.setHeightForWidth(lineEdit_StrikeDifference->sizePolicy().hasHeightForWidth());
+        lineEdit_StrikeDifference->setSizePolicy(sizePolicy1);
+        lineEdit_StrikeDifference->setMinimumSize(QSize(90, 28));
+        lineEdit_StrikeDifference->setMaximumSize(QSize(90, 28));
+        lineEdit_StrikeDifference->setStyleSheet(QString::fromUtf8(""));
+
+        gridLayout_2->addWidget(lineEdit_StrikeDifference, 1, 6, 1, 1);
+
         lineEdit_EndStrike = new QLineEdit(widget_2);
         lineEdit_EndStrike->setObjectName(QString::fromUtf8("lineEdit_EndStrike"));
         sizePolicy1.setHeightForWidth(lineEdit_EndStrike->sizePolicy().hasHeightForWidth());
@@ -260,15 +199,9 @@ public:
 
         gridLayout_2->addWidget(lineEdit_EndStrike, 1, 5, 1, 1);
 
-        lineEdit_StrikeDifference = new QLineEdit(widget_2);
-        lineEdit_StrikeDifference->setObjectName(QString::fromUtf8("lineEdit_StrikeDifference"));
-        sizePolicy1.setHeightForWidth(lineEdit_StrikeDifference->sizePolicy().hasHeightForWidth());
-        lineEdit_StrikeDifference->setSizePolicy(sizePolicy1);
-        lineEdit_StrikeDifference->setMinimumSize(QSize(0, 28));
-        lineEdit_StrikeDifference->setMaximumSize(QSize(16777215, 28));
-        lineEdit_StrikeDifference->setStyleSheet(QString::fromUtf8(""));
+        verticalSpacer = new QSpacerItem(20, 16, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
-        gridLayout_2->addWidget(lineEdit_StrikeDifference, 1, 6, 1, 1);
+        gridLayout_2->addItem(verticalSpacer, 0, 0, 1, 10);
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setSpacing(17);
@@ -319,10 +252,6 @@ public:
 
         gridLayout_2->addLayout(horizontalLayout_2, 5, 0, 1, 10);
 
-        verticalSpacer_2 = new QSpacerItem(20, 16, QSizePolicy::Minimum, QSizePolicy::Fixed);
-
-        gridLayout_2->addItem(verticalSpacer_2, 2, 0, 1, 10);
-
         lineEdit_Fut = new QLineEdit(widget_2);
         lineEdit_Fut->setObjectName(QString::fromUtf8("lineEdit_Fut"));
         sizePolicy1.setHeightForWidth(lineEdit_Fut->sizePolicy().hasHeightForWidth());
@@ -331,27 +260,92 @@ public:
 
         gridLayout_2->addWidget(lineEdit_Fut, 1, 3, 1, 1);
 
-        verticalSpacer = new QSpacerItem(20, 16, QSizePolicy::Minimum, QSizePolicy::Fixed);
+        comboBox_AlgoType = new QComboBox(widget_2);
+        comboBox_AlgoType->setObjectName(QString::fromUtf8("comboBox_AlgoType"));
+        comboBox_AlgoType->setMinimumSize(QSize(92, 28));
+        comboBox_AlgoType->setMaximumSize(QSize(90, 28));
+        comboBox_AlgoType->setStyleSheet(QString::fromUtf8("QComboBox{\n"
+"border-radius: 6px;\n"
+"border: 0.5px solid #343A40;\n"
+"background: #FFF;\n"
+" text-align: center;\n"
+"}\n"
+"\n"
+"QComboBox::drop-down{\n"
+"border-radius: 6px;\n"
+"background: #FFF;\n"
+" text-align: center;\n"
+"\n"
+"}\n"
+""));
 
-        gridLayout_2->addItem(verticalSpacer, 0, 0, 1, 10);
+        gridLayout_2->addWidget(comboBox_AlgoType, 1, 0, 1, 3);
 
-        horizontalSpacer = new QSpacerItem(15, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        pushButtonAdd = new QPushButton(widget_2);
+        pushButtonAdd->setObjectName(QString::fromUtf8("pushButtonAdd"));
+        sizePolicy.setHeightForWidth(pushButtonAdd->sizePolicy().hasHeightForWidth());
+        pushButtonAdd->setSizePolicy(sizePolicy);
+        pushButtonAdd->setMinimumSize(QSize(90, 28));
+        pushButtonAdd->setMaximumSize(QSize(90, 28));
+        pushButtonAdd->setStyleSheet(QString::fromUtf8(""));
+        pushButtonAdd->setFlat(true);
 
-        gridLayout_2->addItem(horizontalSpacer, 1, 8, 1, 1);
-
-        verticalSpacer_3 = new QSpacerItem(20, 16, QSizePolicy::Minimum, QSizePolicy::Fixed);
-
-        gridLayout_2->addItem(verticalSpacer_3, 4, 0, 1, 10);
+        gridLayout_2->addWidget(pushButtonAdd, 1, 8, 1, 1);
 
 
         gridLayout->addWidget(widget_2, 1, 0, 1, 1);
+
+        ConvertAlgo_TitleBar = new QWidget(ConvertAlgo_Win);
+        ConvertAlgo_TitleBar->setObjectName(QString::fromUtf8("ConvertAlgo_TitleBar"));
+        sizePolicy.setHeightForWidth(ConvertAlgo_TitleBar->sizePolicy().hasHeightForWidth());
+        ConvertAlgo_TitleBar->setSizePolicy(sizePolicy);
+        ConvertAlgo_TitleBar->setMinimumSize(QSize(800, 32));
+        ConvertAlgo_TitleBar->setMaximumSize(QSize(1000, 32));
+        ConvertAlgo_TitleBar->setStyleSheet(QString::fromUtf8("#ConvertAlgo_TitleBar{\n"
+"background: #314458;\n"
+"}"));
+        gridLayout_4 = new QGridLayout(ConvertAlgo_TitleBar);
+        gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
+        gridLayout_4->setHorizontalSpacing(15);
+        gridLayout_4->setContentsMargins(-1, 7, -1, 8);
+        Close = new QToolButton(ConvertAlgo_TitleBar);
+        Close->setObjectName(QString::fromUtf8("Close"));
+        Close->setMinimumSize(QSize(14, 14));
+        Close->setMaximumSize(QSize(14, 14));
+        Close->setFocusPolicy(Qt::NoFocus);
+        Close->setStyleSheet(QString::fromUtf8("#Close{\n"
+"background: transparent;\n"
+"}"));
+
+        gridLayout_4->addWidget(Close, 0, 2, 1, 1);
+
+        label_2 = new QLabel(ConvertAlgo_TitleBar);
+        label_2->setObjectName(QString::fromUtf8("label_2"));
+        label_2->setMinimumSize(QSize(0, 17));
+        label_2->setMaximumSize(QSize(108, 17));
+        label_2->setStyleSheet(QString::fromUtf8("#label_2{\n"
+"color: #F8F9FA;\n"
+"font-family: Inter;\n"
+"font-size: 14px;\n"
+"font-style: normal;\n"
+"font-weight: 700;\n"
+"line-height: normal;\n"
+"}"));
+
+        gridLayout_4->addWidget(label_2, 0, 0, 1, 1);
+
+        horizontalSpacer_2 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
+
+        gridLayout_4->addItem(horizontalSpacer_2, 0, 1, 1, 1);
+
+
+        gridLayout->addWidget(ConvertAlgo_TitleBar, 0, 0, 1, 1);
 
         QWidget::setTabOrder(comboBox_AlgoType, lineEdit_Fut);
         QWidget::setTabOrder(lineEdit_Fut, lineEdit_Start_strike);
         QWidget::setTabOrder(lineEdit_Start_strike, lineEdit_EndStrike);
         QWidget::setTabOrder(lineEdit_EndStrike, lineEdit_StrikeDifference);
-        QWidget::setTabOrder(lineEdit_StrikeDifference, pushButtonAdd);
-        QWidget::setTabOrder(pushButtonAdd, pushButton_Cancel);
+        QWidget::setTabOrder(lineEdit_StrikeDifference, pushButton_Cancel);
         QWidget::setTabOrder(pushButton_Cancel, pushButtonUpload);
         QWidget::setTabOrder(pushButtonUpload, pushButtonSelectAll);
         QWidget::setTabOrder(pushButtonSelectAll, pushButton_Reset);
@@ -367,20 +361,21 @@ public:
     void retranslateUi(QDialog *ConvertAlgo_Win)
     {
         ConvertAlgo_Win->setWindowTitle(QCoreApplication::translate("ConvertAlgo_Win", "Dialog", nullptr));
-        Close->setText(QString());
-        label_2->setText(QCoreApplication::translate("ConvertAlgo_Win", "Add Algo", nullptr));
-        pushButtonAdd->setText(QCoreApplication::translate("ConvertAlgo_Win", "Add Algo", nullptr));
         label->setText(QCoreApplication::translate("ConvertAlgo_Win", "Algo List", nullptr));
         pushButtonSelectAll->setText(QCoreApplication::translate("ConvertAlgo_Win", "Select All", nullptr));
         pushButton_Reset->setText(QCoreApplication::translate("ConvertAlgo_Win", "Reset", nullptr));
         pushButtonDelete->setText(QCoreApplication::translate("ConvertAlgo_Win", "Delete", nullptr));
-        lineEdit_Start_strike->setPlaceholderText(QCoreApplication::translate("ConvertAlgo_Win", "Start Instrument", nullptr));
-        lineEdit_EndStrike->setPlaceholderText(QCoreApplication::translate("ConvertAlgo_Win", "End Instrument", nullptr));
+        lineEdit_Start_strike->setText(QString());
+        lineEdit_Start_strike->setPlaceholderText(QCoreApplication::translate("ConvertAlgo_Win", "Start Instrument (min 3 letters)", nullptr));
         lineEdit_StrikeDifference->setPlaceholderText(QCoreApplication::translate("ConvertAlgo_Win", "Strike Difference", nullptr));
+        lineEdit_EndStrike->setPlaceholderText(QCoreApplication::translate("ConvertAlgo_Win", "End  Instrument", nullptr));
         pushButton_Cancel->setText(QCoreApplication::translate("ConvertAlgo_Win", "Cancel", nullptr));
         pushButtonUpload->setText(QCoreApplication::translate("ConvertAlgo_Win", "Add", nullptr));
         lineEdit_Fut->setText(QString());
         lineEdit_Fut->setPlaceholderText(QCoreApplication::translate("ConvertAlgo_Win", "FUT Instrument", nullptr));
+        pushButtonAdd->setText(QCoreApplication::translate("ConvertAlgo_Win", "Create Algo", nullptr));
+        Close->setText(QString());
+        label_2->setText(QCoreApplication::translate("ConvertAlgo_Win", "Add Algo", nullptr));
     } // retranslateUi
 
 };

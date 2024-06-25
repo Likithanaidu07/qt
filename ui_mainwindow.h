@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'mainwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 6.3.1
+** Created by: Qt User Interface Compiler version 6.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -184,7 +184,7 @@ public:
     QSpacerItem *horizontalSpacer_4;
     QWidget *widget_31;
     QHBoxLayout *horizontalLayout_151;
-    QPushButton *toggle_Button1;
+    QPushButton *toggle_Button_1;
     QWidget *widget_41;
     QHBoxLayout *horizontalLayout_181;
     QGridLayout *gridLayout_21;
@@ -1238,12 +1238,20 @@ public:
         horizontalLayout_151 = new QHBoxLayout(widget_31);
         horizontalLayout_151->setObjectName(QString::fromUtf8("horizontalLayout_151"));
         horizontalLayout_151->setContentsMargins(-1, -1, 0, -1);
-        toggle_Button1 = new QPushButton(widget_31);
-        toggle_Button1->setObjectName(QString::fromUtf8("toggle_Button1"));
-        toggle_Button1->setMaximumSize(QSize(13, 40));
-        toggle_Button1->setStyleSheet(QString::fromUtf8(""));
+        toggle_Button_1 = new QPushButton(widget_31);
+        toggle_Button_1->setObjectName(QString::fromUtf8("toggle_Button_1"));
+        toggle_Button_1->setMaximumSize(QSize(13, 40));
+        toggle_Button_1->setStyleSheet(QString::fromUtf8(""));
+        QIcon icon1;
+        iconThemeName = QString::fromUtf8("call-start");
+        if (QIcon::hasThemeIcon(iconThemeName)) {
+            icon1 = QIcon::fromTheme(iconThemeName);
+        } else {
+            icon1.addFile(QString::fromUtf8("."), QSize(), QIcon::Normal, QIcon::Off);
+        }
+        toggle_Button_1->setIcon(icon1);
 
-        horizontalLayout_151->addWidget(toggle_Button1);
+        horizontalLayout_151->addWidget(toggle_Button_1);
 
 
         gridLayout->addWidget(widget_31, 4, 1, 2, 1);
@@ -1287,9 +1295,9 @@ public:
     void retranslateUi(QMainWindow *MainWindow)
     {
         MainWindow->setWindowTitle(QCoreApplication::translate("MainWindow", "MainWindow", nullptr));
-        label_17->setText(QCoreApplication::translate("MainWindow", "Summary", nullptr));
+        label_17->setText(QCoreApplication::translate("MainWindow", "User Summary", nullptr));
         groupBox->setTitle(QString());
-        label_2->setText(QCoreApplication::translate("MainWindow", "Margin Allocated", nullptr));
+        label_2->setText(QCoreApplication::translate("MainWindow", "Algo Count ", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "<html>\n"
 "<head/>\n"
 "<body>\n"
@@ -1302,7 +1310,7 @@ public:
 "</html>\n"
 "", nullptr));
         groupBox_4->setTitle(QString());
-        label_6->setText(QCoreApplication::translate("MainWindow", "Profit", nullptr));
+        label_6->setText(QCoreApplication::translate("MainWindow", "Buy value", nullptr));
         label_23->setText(QCoreApplication::translate("MainWindow", "<html>\n"
 "<head/>\n"
 "<body>\n"
@@ -1315,7 +1323,7 @@ public:
 "</html>\n"
 "", nullptr));
         groupBox_2->setTitle(QString());
-        label_20->setText(QCoreApplication::translate("MainWindow", "Blank Trade", nullptr));
+        label_20->setText(QCoreApplication::translate("MainWindow", "Buy Lot", nullptr));
         label_24->setText(QCoreApplication::translate("MainWindow", "<html>\n"
 "<head/>\n"
 "<body>\n"
@@ -1328,7 +1336,7 @@ public:
 "</html>\n"
 "", nullptr));
         groupBox_12->setTitle(QString());
-        label_15->setText(QCoreApplication::translate("MainWindow", "Market Protection", nullptr));
+        label_15->setText(QCoreApplication::translate("MainWindow", "M2M", nullptr));
         label_33->setText(QCoreApplication::translate("MainWindow", "<html>\n"
 "<head/>\n"
 "<body>\n"
@@ -1341,7 +1349,7 @@ public:
 "</html>\n"
 "", nullptr));
         groupBox_10->setTitle(QString());
-        label_7->setText(QCoreApplication::translate("MainWindow", "Margin Used", nullptr));
+        label_7->setText(QCoreApplication::translate("MainWindow", "Order Count", nullptr));
         label_25->setText(QCoreApplication::translate("MainWindow", "<html>\n"
 "<head/>\n"
 "<body>\n"
@@ -1354,7 +1362,7 @@ public:
 "</html>\n"
 "", nullptr));
         groupBox_9->setTitle(QString());
-        label_8->setText(QCoreApplication::translate("MainWindow", "Total Order", nullptr));
+        label_8->setText(QCoreApplication::translate("MainWindow", "Sell Value", nullptr));
         label_26->setText(QCoreApplication::translate("MainWindow", "<html>\n"
 "<head/>\n"
 "<body>\n"
@@ -1367,7 +1375,7 @@ public:
 "</html>\n"
 "", nullptr));
         groupBox_6->setTitle(QString());
-        label_9->setText(QCoreApplication::translate("MainWindow", "Active Strategies", nullptr));
+        label_9->setText(QCoreApplication::translate("MainWindow", "Sell Lot", nullptr));
         label_27->setText(QCoreApplication::translate("MainWindow", "<html>\n"
 "<head/>\n"
 "<body>\n"
@@ -1380,7 +1388,7 @@ public:
 "</html>\n"
 "", nullptr));
         groupBox_7->setTitle(QString());
-        label_10->setText(QCoreApplication::translate("MainWindow", "Enabled Strategy", nullptr));
+        label_10->setText(QCoreApplication::translate("MainWindow", "Avl Margin", nullptr));
         label_28->setText(QCoreApplication::translate("MainWindow", "<html>\n"
 "<head/>\n"
 "<body>\n"
@@ -1393,7 +1401,7 @@ public:
 "</html>\n"
 "", nullptr));
         groupBox_16->setTitle(QString());
-        m2mlabel->setText(QCoreApplication::translate("MainWindow", "M2M", nullptr));
+        m2mlabel->setText(QCoreApplication::translate("MainWindow", "Trade Count", nullptr));
         label_30->setText(QCoreApplication::translate("MainWindow", "<html>\n"
 "<head/>\n"
 "<body>\n"
@@ -1406,7 +1414,7 @@ public:
 "</html>\n"
 "", nullptr));
         groupBox_15->setTitle(QString());
-        label_13->setText(QCoreApplication::translate("MainWindow", "Total Trades", nullptr));
+        label_13->setText(QCoreApplication::translate("MainWindow", "Profit", nullptr));
         label_31->setText(QCoreApplication::translate("MainWindow", "<html>\n"
 "<head/>\n"
 "<body>\n"
@@ -1419,7 +1427,7 @@ public:
 "</html>\n"
 "", nullptr));
         groupBox_14->setTitle(QString());
-        label_14->setText(QCoreApplication::translate("MainWindow", "Rejected Orders", nullptr));
+        label_14->setText(QCoreApplication::translate("MainWindow", "Net Lot", nullptr));
         label_32->setText(QCoreApplication::translate("MainWindow", "<html>\n"
 "<head/>\n"
 "<body>\n"
@@ -1432,7 +1440,7 @@ public:
 "</html>\n"
 "", nullptr));
         groupBox_11->setTitle(QString());
-        label_16->setText(QCoreApplication::translate("MainWindow", "Span Margin", nullptr));
+        label_16->setText(QCoreApplication::translate("MainWindow", "Used Margin", nullptr));
         label_34->setText(QCoreApplication::translate("MainWindow", "<html>\n"
 "<head/>\n"
 "<body>\n"
@@ -1489,7 +1497,7 @@ public:
         HP_Close->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         Templates_Button->setText(QCoreApplication::translate("MainWindow", "Templates", nullptr));
         Templates_Close->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
-        toggle_Button1->setText(QString());
+        toggle_Button_1->setText(QString());
         label_4->setText(QCoreApplication::translate("MainWindow", "1.1 20-05-2024_11_00_PM", nullptr));
     } // retranslateUi
 

@@ -12,6 +12,8 @@
 #include "qpen.h"
 #include <QAbstractTableModel>
 #include <QPainter>
+#include "qtableview.h"
+
 
 
 #include "defines.h"
@@ -26,6 +28,14 @@ public:
    explicit Table_OrderBook_Delegate(QObject *parent = nullptr);
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 //   QList<OrderBookObject*> OrderBook_Data_List;
+private:
+
+
+    double price_diff_incrementer = 0.05;
+    double quantity_incrementer = 1.0;
+    QString market_type;
+    QPen pen;
+    QTableView* view;
 };
 
 #endif // TABLE_ORDERBOOK_DELEGATE_H
