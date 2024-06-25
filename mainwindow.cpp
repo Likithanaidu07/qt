@@ -17,11 +17,13 @@
 #include "OrderBook/table_orderbook_delegate.h"
 #include "mysql_conn.h"
 #include "watch_data_list_item.h"
+
+#define ENABLE_BACKEND_DEBUG_MSG
+
 static const char stylesheetvis[]= "background: #596167;" "border-radius: 10px;";
 
 extern MainWindow *MainWindowObj;
 
-#define ENABLE_BACKEND_DEBUG_MSG;
 
 
 MainWindow::MainWindow(QWidget *parent)
