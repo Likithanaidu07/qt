@@ -130,6 +130,15 @@ LIBS += -L"$$_PRO_FILE_PWD_/lzo-2.10" -llzo2
 INCLUDEPATH += ./lzo-2.10/include/
 INCLUDEPATH += ./lzo-2.10/
 
+
+
+ADS_OUT_ROOT = $${OUT_PWD}/Qt-Advanced-Docking-System
+LIBS += -L$${ADS_OUT_ROOT}/lib
+include($${ADS_OUT_ROOT}/ads.pri)
+INCLUDEPATH += $${ADS_OUT_ROOT}/src
+DEPENDPATH += $${ADS_OUT_ROOT}/src
+
+
 DISTFILES += \
     Res/Style_Login.qss \
     Resources/ALGO METHODS.png \
