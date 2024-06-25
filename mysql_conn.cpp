@@ -1341,8 +1341,8 @@ void mysql_conn::getNetPosTableData(Net_Position_Table_Model* model,QString user
                         net_pos_dataList[key].Buy_Total_Lot = net_pos_dataList[key].Buy_Total_Lot + Qty;
                     }
                     else{
-                        net_pos_dataList[key].Sell_Avg_Price =AvgPrice;
-                        net_pos_dataList[key].Sell_Total_Lot = Qty;
+                        net_pos_dataList[key].Sell_Avg_Price = net_pos_dataList[key].Sell_Avg_Price+ AvgPrice;
+                        net_pos_dataList[key].Sell_Total_Lot = net_pos_dataList[key].Sell_Total_Lot + Qty;
                     }
                 }
                 else{
