@@ -156,3 +156,20 @@ int table_portfolios_custom::findNextEditableCell(int currentColIdx, nav_directi
 
     return idx;
 }
+
+void table_portfolios_custom::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
+    // Call the base class implementation (important)
+    QTableView::selectionChanged(selected, deselected);
+
+    // Implement your custom logic here
+   /* qDebug() << "Selection changed";
+    qDebug() << "Selected:" << selected.indexes();
+    qDebug() << "Deselected:" << deselected.indexes();*/
+    int currentRow = -1;
+    //int prevRow = -1;
+    QModelIndexList indexes = selected.indexes();
+    if (!indexes.isEmpty())
+        currentRow= indexes.last().row();
+
+    emit selectionChangedSignal(currentRow);
+}

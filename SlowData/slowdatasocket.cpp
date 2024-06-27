@@ -1,4 +1,5 @@
 #include "slowdatasocket.h"
+//#define ENABLE_DEBUG_MSG
 
 
 /************Socket server receive data from slowdata exchange**********************/
@@ -194,11 +195,14 @@ void SlowDataSocket::run()
 
         exit(EXIT_FAILURE);
     }
+#ifdef ENABLE_DEBUG_MSG
     qDebug()<<("Initialised slow data socket.\n");
-
+#endif
     if ((sock = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)) < 0)
     {
+#ifdef ENABLE_DEBUG_MSG
         qDebug()<<("socket() failed");
+#endif
         wchar_t *s = NULL;
         FormatMessageW(FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
                        NULL, WSAGetLastError(),
@@ -215,7 +219,9 @@ void SlowDataSocket::run()
 
     if ((setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char*)&flag_on, sizeof(flag_on))) < 0)
     {
+#ifdef ENABLE_DEBUG_MSG
         qDebug()<<("setsockopt() failed");
+#endif
         emit socket_conn_info_Signal("setsockopt() failed");
 
         return;
@@ -228,7 +234,9 @@ void SlowDataSocket::run()
 
     if((bind(sock,(struct sockaddr *) &mc_addr,sizeof(mc_addr))) < 0)
     {
+#ifdef ENABLE_DEBUG_MSG
         qDebug()<<("bind() failed");
+#endif
         emit socket_conn_info_Signal("Error: bind() failed");
         return;
     }
@@ -238,7 +246,9 @@ void SlowDataSocket::run()
 
     if((setsockopt(sock,IPPROTO_IP,IP_ADD_MEMBERSHIP,(const char*) &mc_req,sizeof(mc_req))) < 0)
     {
+#ifdef ENABLE_DEBUG_MSG
         qDebug()<<("setsockopt() failed");
+#endif
         emit socket_conn_info_Signal("Error: setsockopt() failed");
 
         return;
@@ -259,7 +269,9 @@ void SlowDataSocket::run()
 
         if((recv_len = recvfrom(sock, recv_str,1024,0,(struct sockaddr*)&mc_addr, &from_len))<0)
         {
+#ifdef ENABLE_DEBUG_MSG
             qDebug()<<("recvfrom() failed");
+#endif
             emit socket_conn_info_Signal("Error: recvfrom() failed");
 
             break;
@@ -394,7 +406,9 @@ void SlowDataSocket::run()
 
     if((setsockopt(sock, IPPROTO_IP, IP_DROP_MEMBERSHIP,(const char*)&mc_req, sizeof(mc_req))) < 0)
     {
+#ifdef ENABLE_DEBUG_MSG
         qDebug()<<("setsocketopt() failed");
+#endif
         emit socket_conn_info_Signal("Error: setsocketopt() failed");
 
         return;
