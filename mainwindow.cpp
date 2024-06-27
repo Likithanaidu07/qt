@@ -1586,7 +1586,7 @@ void MainWindow::loadDataAndUpdateTable(int table){
 
     case T_Table::NET_POS:{
         QHash<QString,int> PortFoliosLotSizeHash = T_Portfolio_Model->getPortFoliosLotSize();
-        db_conn->getNetPosTableData(BuyValue,SellValue,Profit,BuyQty,SellQty,BuyQty_summary,SellQty_summary,NetQty,net_pos_model,QString::number(userData.UserId),PortFoliosLotSizeHash);
+        db_conn->getNetPosTableData(BuyValue,SellValue,Profit,BuyQty_summary,SellQty_summary,NetQty,net_pos_model,QString::number(userData.UserId),PortFoliosLotSizeHash);
         emit data_loded_signal(T_Table::NET_POS);
         emit data_summary_update_signal();
         break;
@@ -1611,7 +1611,7 @@ void MainWindow::updateSummaryLabels()
     ui->label_26->setAlignment(Qt::AlignCenter);
     ui->label_31->setText(QString::number(Profit));
     ui->label_31->setAlignment(Qt::AlignCenter);
-    ui->label_24->setText(QString::number(BuyQty));
+    ui->label_24->setText(QString::number(BuyQty_summary));
     ui->label_24->setAlignment(Qt::AlignCenter);
     ui->label_27->setText(QString::number(SellQty_summary));
     ui->label_27->setAlignment(Qt::AlignCenter);

@@ -49,75 +49,65 @@ void add_algo_btfly_bid::selectedAction(){
     connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
     connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),this, SLOT(slotStartHide(QString)));
     connect(lineEdit_EndStrike, SIGNAL(textChanged(QString)),this, SLOT(slotEndHide(QString)));
-
 }
 
 
-void add_algo_btfly_bid::startStrikeEditFinishedAction() {
+void add_algo_btfly_bid::startStrikeEditFinishedAction(){
+
     lineEdit_EndStrike->clear();
     foo_token_number_end_strike = "";
     strike_priceList.clear();
     token_numebrList.clear();
     expiry_dateList.clear();
-
     QString key = foo_token_number_start_strike;
     QString Instr_Name = sharedData->contract_table_hash[key].InstrumentName;
-    QString Option_Type = sharedData->contract_table_hash[key].OptionType;
+    QString Option_Type =sharedData->contract_table_hash[key].OptionType;
     long long Expiry = sharedData->contract_table_hash[key].Expiry;
     float start_strike = sharedData->contract_table_hash[key].StrikePrice;
 
-    model_end_strike = new QStandardItemModel;
 
-    // Sort sorted_keys_BFLY_BID in ascending order based on StrikePrice
+    model_end_strike = new QStandardItemModel;
     std::sort(sorted_keys_BFLY_BID.begin(), sorted_keys_BFLY_BID.end(),
               [this](const QString &a, const QString &b) {
                   return sharedData->contract_table_hash[a].StrikePrice < sharedData->contract_table_hash[b].StrikePrice;
               });
+    for(int i=0;i<sorted_keys_BFLY_BID.length();i++) {
 
-    for (int i = 0; i < sorted_keys_BFLY_BID.length(); i++) {
         contract_table tmp = sharedData->contract_table_hash[sorted_keys_BFLY_BID[i]];
 
         float end_strike = tmp.StrikePrice;
-        if (start_strike >= end_strike)
+        if(start_strike>=end_strike)
             continue;
 
-        if (tmp.InstrumentName == Instr_Name && tmp.OptionType == Option_Type && Expiry == tmp.Expiry) {
-            unsigned int unix_time = tmp.Expiry;
+        if(tmp.InstrumentName==Instr_Name&&tmp.OptionType==Option_Type&&Expiry==tmp.Expiry){
+
+            unsigned int unix_time= tmp.Expiry;
             QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
             dt = dt.addYears(10);
-            QString ExpiryTmp = dt.toString("MMM dd yyyy").toUpper();
-            QString algo_combination = tmp.InstrumentName + " " +
-                                       ExpiryTmp + " " +
-                                       QString::number(tmp.StrikePrice / sharedData->strike_price_devider, 'f', sharedData->decimal_precision) + " " +
-                                       tmp.OptionType;
+            QString ExpiryTmp=dt.toString("MMM dd yyyy").toUpper();
+            QString algo_combination =
+                tmp.InstrumentName+" "+
+                ExpiryTmp+" "
+                +QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" "+
+                tmp.OptionType;
             QStandardItem *item = new QStandardItem;
             item->setText(algo_combination);
             item->setData(tmp.TokenNumber, Qt::UserRole + 1);
             model_end_strike->appendRow(item);
 
-            if (!strike_priceList.contains(QString::number(tmp.StrikePrice))) {
-                strike_priceList.append(QString::number(tmp.StrikePrice / sharedData->strike_price_devider, 'f', sharedData->decimal_precision)); // store in Rs
+            if(!strike_priceList.contains(QString::number(tmp.StrikePrice))){
+                strike_priceList.append(QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)); // store in Rs
                 token_numebrList.append(QString::number(tmp.TokenNumber));
             }
+
+
         }
     }
 
-    // Create qcompleter and fill with above model
-    CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(endStrikeListView, model_end_strike);
-
-    // Connect textChanged signal of lineEdit_EndStrike to filterItems slot of strikeCustomWidget
-    connect(lineEdit_EndStrike, &QLineEdit::textChanged, strikeCustomWidget, [strikeCustomWidget](const QString &text){
-        // Only trigger filterItems if text length is at least 3 for word-based search
-        if (text.length() >= 3 || text.isEmpty()) {
-            strikeCustomWidget->filterItems(text);
-        }
-    });
-
-    // Connect lineEdit_EndStrike's textChanged signal to slotEndHide for hiding startStrikeListView and endStrikeListView
-    //connect(lineEdit_EndStrike, SIGNAL(textChanged(QString)), this, SLOT(slotEndHide(QString)));
-    //CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike);
+    // create qcompleter and fill with abovie model
+    CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike);
     connect(lineEdit_EndStrike, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
-
+    connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
 }
 
 void add_algo_btfly_bid::generateAlgo()

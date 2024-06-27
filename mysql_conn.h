@@ -26,12 +26,12 @@ struct net_pos_data_{
     QString  token_number;
     QString  Stock_Name;
     //QString  Expiry;
-    double Buy_Total_Lot;
-    double Sell_Total_Lot;
+    QList<double> Buy_Total_Lot;
+    QList<double> Sell_Total_Lot;
     double Buy_Price;
     double Sell_Price;
-    double Buy_Avg_Price;
-    double Sell_Avg_Price;
+    QList<double> Buy_Avg_Price;
+    QList<double> Sell_Avg_Price;
     double Net_Qty;
     QString PortfolioNumber;
     //QString MTM;
@@ -79,7 +79,7 @@ public:
     bool updateDB_Table(QString query_str,QString &msg);
     QString get_Algo_Name(int algo_type,int leg1_token_number,int leg2_token_number,int leg3_token_number,double devicer,int decimal_precision);
     void  getTradeTableData(int &TraderCount,Trade_Table_Model *model,Liners_Model *liners_model ,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
-    void  getNetPosTableData(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty,double &BuyQty_summary,double &SellQty,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash);
+    void  getNetPosTableData(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash);
     void getSummaryTableData(int &OrderCount,QString user_id);
     void getLinersTableData(Liners_Model *model,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
     QString fixDecimal(double num,int decimal_precision);
