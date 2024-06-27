@@ -17,6 +17,9 @@
 #include "OrderBook/table_orderbook_delegate.h"
 #include "mysql_conn.h"
 #include "watch_data_list_item.h"
+#include "style_sheet.h"
+
+
 
 #define ENABLE_BACKEND_DEBUG_MSG
 
@@ -48,17 +51,9 @@ MainWindow::MainWindow(QWidget *parent)
     connect(db_conn,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
 
     connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
-
-
     orderWin = new OrderDetail_Popup();
 
 
-//    QGraphicsDropShadowEffect* effect = new QGraphicsDropShadowEffect(convertalgo);
-//    effect->setBlurRadius(5);
-//    convertalgo->setGraphicsEffect(effect);
-//    convertalgo->update_contract_tableData(QString::number(userData.UserId),userData.MaxPortfolioCount);
-
-    createINIFileIfNotExist();
     QDir dir;
     QString path = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
     if (!dir.exists(path)) {
@@ -68,6 +63,7 @@ MainWindow::MainWindow(QWidget *parent)
             qDebug() << "Failed to create directory! "+path;
         }
     }
+    createINIFileIfNotExist();
     loadSettings();
 
     contractDetailsLoaded.storeRelaxed(0);
@@ -80,438 +76,48 @@ MainWindow::MainWindow(QWidget *parent)
     QPixmap pixmapclose(":/close_window_icon.png");
     QPixmap pixmapminimize(":/minimize_window_icon.png");
     QPixmap pixmapmaximize(":/maximize_window_icon.png");
-
-
-
     QFont headerfont("Work Sans");
 
 
-    const char dock_style[] = "QDockWidget > QWidget{"
-                              "border-bottom-right-radius: 12px;"
-                              "border-bottom-left-radius: 12px;"
-                              "border: 3px solid #F8F8F8;"
-                              "box-shadow: 0px 1px 3px 0px #A8A8A8;"
-                              "background: #FFF;"
-                              "}"
-                              "QDockWidget::title {"
-                              "background-color: #F8F8F8;"
-                              "border-top-left-radius: 12px;"
-                              "border-top-right-radius: 12px;"
-                              "padding: 4px;"
-                              "}";
-    const char DockTitleBar_Style[]="background: #FFF;"
-                                    "border-top-left-radius :12px;"
-                                    "border-top-right-radius : 12px;"
-                                    "border-bottom-left-radius : 0px;"
-                                    "border-bottom-right-radius : 0px;";
-    const char lineedit_dock_SS[]="border-radius: 10px;"
-                                  "border: 1px solid #ADB5BD;"
-                                  "background: #FFF;";
-    const char scroll_bar_SS[]="QTableView {"
-                                 "border-bottom-left-radius : 12px;"
-                                 "border-bottom-right-radius : 12px;"
-                                 "border: 4px solid #DAE1E9;"
-                                 "}"
-                                "QScrollBar:vertical {"
-                                 "    border: 1px solid #FFF;"
-                                 "    background:transparent;"
-                                 "    width:5px;    "
-                                 "    margin: 0px 0px 0px 0px;"
-                                 "}"
-                                 "QScrollBar::handle:vertical {"
-                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
-                                 "    stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(73, 80, 87), stop:1 rgb(73, 80, 87));"
-                                 "    min-height: 0px;"
-                                 "border-radius: 1px;"
-                                 "}"
-                                 "QScrollBar::add-line:vertical {"
-                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
-                                 "    stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(73, 80, 87),  stop:1 rgb(73, 80, 87));"
-                                 "    height: 0px;"
-                                 "    subcontrol-position: bottom;"
-                                 "    subcontrol-origin: margin;"
-                                 "border-radius: 1px;"
-                                 "}"
-                                 "QScrollBar::sub-line:vertical {"
-                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
-                                 "    stop: 0  rgb(73, 80, 87), stop: 0.5 rgb(73, 80, 87),  stop:1 rgb(73, 80, 87));"
-                                 "    height: 0 px;"
-                                 "    subcontrol-position: top;"
-                                 "    subcontrol-origin: margin;"
-                                 "border-radius: 1px;"
-                                 "}"
-                                 "QScrollBar:horizontal {"
-                                 "    border: 1px solid #FFF;"
-                                 "    background: transparent;"
-                                 "    height: 6px;    "
-                                 "    margin: 0px 0px 0px 0px;"
-                                 "}"
-                                 "QScrollBar::handle:horizontal {"
-                                 "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-                                 "    stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(73, 80, 87), stop:1 rgb(73, 80, 87));"
-                                 "    min-width: 0px;"
-                                 "    border-radius: 2px;"
-                                 "}"
-                                 "QScrollBar::add-line:horizontal {"
-                                 "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-                                 "    stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(73, 80, 87), stop:1 rgb(73, 80, 87));"
-                                 "    width: 0px;"
-                                 "    subcontrol-position: right;"
-                                 "    subcontrol-origin: margin;"
-                                 "    border-radius: 2px;"
-                                 "}"
-                                 "QScrollBar::sub-line:horizontal {"
-                                 "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-                                 "    stop: 0  rgb(73, 80, 87), stop: 0.5 rgb(73, 80, 87), stop:1 rgb(73, 80, 87));"
-                                 "    width: 0px;"
-                                 "    subcontrol-position: left;"
-                                 "    subcontrol-origin: margin;"
-                                 "    border-radius: 2px;"
-                                 "}";
-    const char tableview_SS[]=  "QHeaderView::section {"
-                                "   background: #495867;"
-                                "   border: none;"
-                                "   color: #FFFFFF;"
-                                "   text-align: center; "
-                                "   font-size: 12px; "
-                                "   font-style: normal; "
-                                "   font-weight: 600; "
-                                "   line-height: normal;"
-                                "}"
-                                "QTableView {"
-                                 "border-bottom-left-radius : 12px;"
-                                 "border-bottom-right-radius : 12px;"
-                                 "border: 4px solid #DAE1E9;"
-                                 "}"
-                                 "QScrollBar:vertical {"
-                                 "    border: 1px solid #FFF;"
-                                 "    background:transparent;"
-                                 "    width:5px;    "
-                                 "    margin: 0px 0px 0px 0px;"
-                                 "}"
-                                 "QScrollBar::handle:vertical {"
-                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
-                                 "    stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(73, 80, 87), stop:1 rgb(73, 80, 87));"
-                                 "    min-height: 0px;"
-                                 "border-radius: 1px;"
-                                 "}"
-                                 "QScrollBar::add-line:vertical {"
-                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
-                                 "    stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(73, 80, 87),  stop:1 rgb(73, 80, 87));"
-                                 "    height: 0px;"
-                                 "    subcontrol-position: bottom;"
-                                 "    subcontrol-origin: margin;"
-                                 "border-radius: 1px;"
-                                 "}"
-                                 "QScrollBar::sub-line:vertical {"
-                                 "    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,"
-                                 "    stop: 0  rgb(73, 80, 87), stop: 0.5 rgb(73, 80, 87),  stop:1 rgb(73, 80, 87));"
-                                 "    height: 0 px;"
-                                 "    subcontrol-position: top;"
-                                 "    subcontrol-origin: margin;"
-                                 "border-radius: 1px;"
-                                 "}"
-                                 "QScrollBar:horizontal {"
-                                 "    border: 1px solid #FFF;"
-                                 "    background: transparent;"
-                                 "    height: 6px;    "
-                                 "    margin: 0px 0px 0px 0px;"
-                                 "}"
-                                 "QScrollBar::handle:horizontal {"
-                                 "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-                                 "    stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(73, 80, 87), stop:1 rgb(73, 80, 87));"
-                                 "    min-width: 0px;"
-                                 "    border-radius: 2px;"
-                                 "}"
-                                 "QScrollBar::add-line:horizontal {"
-                                 "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-                                 "    stop: 0 rgb(32, 47, 130), stop: 0.5 rgb(73, 80, 87), stop:1 rgb(73, 80, 87));"
-                                 "    width: 0px;"
-                                 "    subcontrol-position: right;"
-                                 "    subcontrol-origin: margin;"
-                                 "    border-radius: 2px;"
-                                 "}"
-                                 "QScrollBar::sub-line:horizontal {"
-                                 "    background: qlineargradient(x1:0, y1:0, x2:0, y2:1,"
-                                 "    stop: 0  rgb(73, 80, 87), stop: 0.5 rgb(73, 80, 87), stop:1 rgb(73, 80, 87));"
-                                 "    width: 0px;"
-                                 "    subcontrol-position: left;"
-                                 "    subcontrol-origin: margin;"
-                                 "    border-radius: 2px;"
-                                 "}";
+
+    CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, true);
+    CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
+    CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
+    CDockManager::setAutoHideConfigFlags(CDockManager::DefaultAutoHideConfig);
+
+    QVBoxLayout* Layout = new QVBoxLayout(ui->mainPanel);
+    Layout->setContentsMargins(QMargins(0, 0, 0, 0));
+
+    DockManager = new CDockManager(ui->mainPanel);
+    Layout->addWidget(DockManager);
 
 
-    QMainWindow *subWindow = new QMainWindow(ui->centralwidget);
+
+  /*  QMainWindow *subWindow = new QMainWindow(ui->centralwidget);
     subWindow->setMinimumHeight(500);
     subWindow->setMinimumWidth(900);
     subWindow->setWindowFlags(Qt::Widget);
     ui->verticalLayout_11->addWidget(subWindow);
-    subWindow->show();
+    subWindow->show();*/
 
 
-//    /***********Init portfolio table Window**************************/
-
-
-//    QPixmap pixmapdock_algorithms_close(":/dock_close.png");
-
-
-//    T_Portfolio_DockWin =  new QDockWidget(tr("Algorithms"), this);
-
-//    //connect(T_Portfolio_DockWin, SIGNAL(WidgetClosed(UiUtils::DockWidgetType)), this, SLOT(OnDockWidgetClose(UiUtils::DockWidgetType)));
-//    connect(T_Portfolio_DockWin, SIGNAL(visibilityChanged(bool)), this, SLOT(OnAlgorithmDockWidgetVisiblityChanged(bool)));
-
-//    subWindow->addDockWidget(Qt::LeftDockWidgetArea, T_Portfolio_DockWin);
-//    T_Portfolio_DockWin->setAllowedAreas(Qt::AllDockWidgetAreas);
-
-//    T_Portfolio_DockWin->setStyleSheet(dock_style);
-
-//    QWidget* titlecontainer = new QWidget;
-//    titlecontainer->setStyleSheet(DockTitleBar_Style);
-//    QHBoxLayout *titleinternalLayout = new QHBoxLayout(titlecontainer);
-//    titleinternalLayout->setSpacing(10);
-//    titleinternalLayout->setContentsMargins(10,8,10,6);
-
-//    QLabel *label = new QLabel("Algorithms");
-//    QFont fontlabel=label->font();
-//    QSpacerItem* titlespc = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-
-//    QToolButton* dockclose=new QToolButton();
-//    connect(dockclose, &QToolButton::clicked, [=](){ T_Portfolio_DockWin->close(); });
-//    dockclose->setIcon(pixmapdock_algorithms_close);
-//    dockclose->setIconSize(QSize(14, 14));
-
-//    fontlabel.setFamily("Work Sans");
-//    label->setFont(fontlabel);
-//    label->setStyleSheet("color: #495057;font-size: 14px;font-style: normal;font-weight: 700;line-height: normal;");
-//    titleinternalLayout->addWidget(label);
-//    titleinternalLayout->addSpacerItem(titlespc);
-//    titleinternalLayout->addWidget(dockclose);
-
-//    T_Portfolio_DockWin->setTitleBarWidget(titlecontainer);
-
-
-//    QWidget* container = new QWidget;
-//    T_Portfolio_DockWin->setWidget(container);
-//    QGridLayout *lay = new QGridLayout(container);
-//    container->setLayout(lay);
-//    lay->setContentsMargins(0, 0, 0, 0);
-//    lay->setSpacing(0);
-//    lay->setRowStretch(0, 0); //set minimum hieght for first row
-//    lay->setRowStretch(1, 1);//set maximum hieght for second row table
-
-
-//    QLineEdit* line_edit_trade_search = new QLineEdit;
-//    line_edit_trade_search->setMaximumWidth(160);
-
-//    line_edit_trade_search->setStyleSheet(lineedit_dock_SS);
-
-//    QToolButton *button = new QToolButton();
-//    //Frame 364.png
-//    button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-//    button->setIcon(QIcon(":/Convert to Algo.png"));
-//    button->setText("Convert to Algo");
-//    button->setLayoutDirection(Qt::LeftToRight);
-//    const char convert_to_algo_button[]="border-radius: 4px;" "border: 1px solid #188CCA;""background: #1585C0;"
-//                                        "color: #FFF;"
-//                                        "font-family: Work Sans;"
-//                                        "font-size: 12px;"
-//                                        "font-style: normal;"
-//                                        "font-weight: 500;"
-//                                        "line-height: normal;";
-//    button->setStyleSheet(convert_to_algo_button);
-////    connect(button, &QPushButton::clicked, this, &MainWindow::tradeTableSerachNext);
-////    connect(line_edit_trade_search, &QLineEdit::textChanged, this, &MainWindow::tradeTableSerachTxtChanged);
-
-//    QWidget *test=new QWidget;
-//    const char layss[]="background: #E9ECEF;";
-//    test->setStyleSheet(layss);
-//    QHBoxLayout *internalLayout = new QHBoxLayout(test);
-//    internalLayout->setContentsMargins(10,-1,-1,-1);
-//    QSpacerItem* spc = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-//    QToolButton* button1=new QToolButton();
-//    button1->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-//    button1->setIcon(QIcon(a1));
-//    button1->setText("Start All");
-//    QToolButton* button2=new QToolButton();
-//    button2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-//    button2->setIcon(QIcon(a2));
-//    button2->setText("Stop All");
-//    QToolButton* button3=new QToolButton();
-//    button3->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-//    button3->setIcon(QIcon(a3));
-//    button3->setText("Import");
-//    QToolButton* button6=new QToolButton();
-//    button6->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-//    button6->setIcon(QIcon(a4));
-//    button6->setText("Export");
-//    QToolButton* button4=new QToolButton();
-//    button4->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-//    button4->setIcon(QIcon(a5));
-//    button4->setText("Reset Sorting");
-//    QToolButton* button5=new QToolButton();
-//    button5->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-//    button5->setIcon(QIcon(a6));
-//    button5->setText("Portfolio Colour");
-//    const char stylesheet_tb[] = "border-radius: 4px;"
-//                                 "border: 1px solid #ADB5BD;"
-//                                 "background: #F3F4F5;"
-//                                 "color: #6C757D;"
-//                                 "font-style: normal;"
-//                                 "font-size: 10px;"
-//                                 "font-weight: 500;"
-//                                 "line-height: normal;";
-//    for (auto w : {button1,button2,button3,button4,button5,button6}){
-//        w->setStyleSheet(stylesheet_tb);
-//        QFont font=w->font();
-//        font.setFamily("Work Sans");
-//        w->setFont(font);
-//    }
-
-
-//    internalLayout->addWidget(button1);
-//    internalLayout->addWidget(button2);
-//    internalLayout->addWidget(button3);
-//    internalLayout->addWidget(button6);
-//    internalLayout->addWidget(button4);
-//    internalLayout->addWidget(button5);
-//    internalLayout->addSpacerItem(spc);
-//    internalLayout->addWidget(line_edit_trade_search);
-//    internalLayout->addWidget(button);
-
-//    test->setLayout(internalLayout);
-//    lay->addWidget(test, 0, 0);
-
-
-////    QObject::connect(T_Portfolio_Table, &table_portfolios_custom::spaceKeySignal, this, &MainWindow::updatePortFolioStatus);
-////    QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::resizePortFolioTableColWidth, this, &MainWindow::resizePortFolioTableColWidthSlot);
-
-//    //
-//    for (int i = 0; i <= 19; i++) {
-//        QList<QStandardItem *> items;
-//        for (int j = 0; j <= 19; j++) {
-//            if(i==19 && j==19){
-//                items.append(new QStandardItem(QString("item(20,20)").arg(18).arg(18)));
-////                continue;
-//            }
-//            items.append(new QStandardItem(QString("item(%1,%2)").arg(i).arg(j)));
-//        }
-//        model.appendRow(items);
-//    }
-//    QWidget *w=new QWidget;
-//    lay->addWidget(w,1,0);
-//    QVBoxLayout *testLayout = new QVBoxLayout(w);
-//    w->setLayout(testLayout);
-
-//    testLayout->setContentsMargins(0,0,0,0);
-//    gridtableview.setStyleSheet(
-//        "QHeaderView::section {"
-//        "   background: #CED4DA;"
-//        "   border: none; "
-//        "   color: #6C757D; "
-//        "   text-align: center; "
-//        "   font-family: Work Sans; "
-//        "   font-size: 12px; "
-//        "   font-style: normal; "
-//        "   font-weight: 600; "
-//        "   line-height: normal;"
-//        "}"
-//        "QTableView::item {"
-//        "   background-color: white;"
-//        "background: transparent;"
-//        "   color: black;"
-//        "}"
-//        );
-//    "QTableView::item {"
-//    "background-color: #FFF;"
-//    "border: none; "
-//    "color: #212529;"
-//    "font-family: Work Sans;"
-//    "font-size: 8px;"
-//    "font-style: normal;"
-//    "font-weight: 600;"
-//    "line-height: normal;"
-//    "}"
-//    "QTableView::item:alternate {"
-//    "border: none; "
-//    "background-color: #F1F1F1; /* Set background color for alternate rows */"
-//    "}"
-
-
-//    gridtableview.setModel(&model);
-//    gridtableview.setGridHeaderview(Qt::Horizontal, 2);
-//    gridtableview.verticalHeader()->setVisible(false);
-//    GridTableHeaderView *hHeader = gridtableview.gridHeaderview(Qt::Horizontal);
-
-//    hHeader->setSpan(0, 0, 1, 3);
-//    hHeader->setSpan(0, 3, 1, 6);
-//    hHeader->setSpan(0, 9, 1, 6);
-//    hHeader->setSpan(0, 15, 1, 5);
-//    hHeader->setSpan(0, 20);
-
-//    hHeader->setCellLabel(0, 0, "Algo");
-//    hHeader->setCellLabel(1, 0, "Status");
-//    hHeader->setCellLabel(1, 1, "Algo ID");
-//    hHeader->setCellLabel(1, 2, "Algo Name");
-//    hHeader->setCellLabel(0, 3, "Buy");
-//    hHeader->setCellLabel(1, 3, "Rate");
-//    hHeader->setCellLabel(1, 4, "Avg");
-//    hHeader->setCellLabel(1, 5, "Diff");
-//    hHeader->setCellLabel(1, 6, "TQ");
-//    hHeader->setCellLabel(1, 7, "TTQ");
-//    hHeader->setCellLabel(1, 8, "RQ");
-//    hHeader->setCellLabel(0, 9, "Sell");
-//    hHeader->setCellLabel(1, 9, "Rate");
-//    hHeader->setCellLabel(1, 10, "Avg");
-//    hHeader->setCellLabel(1, 11, "Diff");
-//    hHeader->setCellLabel(1, 12, "TQ");
-//    hHeader->setCellLabel(1, 13, "TTQ");
-//    hHeader->setCellLabel(1, 14, "RQ");
-//    hHeader->setCellLabel(0, 15, "Details");
-//    hHeader->setCellLabel(1, 15, "Qty Ratio");
-//    hHeader->setCellLabel(1, 16, "Skip/Market Strike");
-//    hHeader->setCellLabel(1, 17, "Bid Leg");
-//    hHeader->setCellLabel(1, 18, "Cost");
-//    hHeader->setCellLabel(1, 19, "Fut Price");
-
-//    testLayout->addWidget(&gridtableview);
-
-//    gridtableview.show();
-
-
-//    //
-
-////    QTableView *trade_table = new QTableView();
-////    trade_table->setShowGrid(false);
-////    trade_table->setAlternatingRowColors(true);
-
-////    lay->addWidget(trade_table, 1, 0, 1, 3);
-
-////    T_Portfolio_Model = new Table_Portfolios_Model();
-
-////    trade_table->setModel(T_Portfolio_Model);
-////    trade_table->horizontalHeader()->setStretchLastSection(true);
-////    trade_table->verticalHeader()->setVisible(false);
-//////    // trade_table->setStyleSheet("QHeaderView { background-color: #111111;} QHeaderView::section { background-color:#555555;color:#eeeeee;font-weight: 400; }");
-////    trade_table->setSelectionBehavior(QAbstractItemView::SelectRows);
-////    trade_table->setSelectionMode(QAbstractItemView::SingleSelection);
-//////    /*trade_table->setStyleSheet("QTableView {selection-background-color: #EFB37F;"
-//////                                            "selection-color: #4D4D4D;"
-//////                                            "color:#3D3D3D;"
-//////                                            "} "
-//////                                            "QHeaderView { background-color: #C0AAE5;color:#3D3D3D;} QHeaderView::section { background-color:#C0AAE5;color:#3D3D3D;font-weight: 400; }");*/
-
-////    trade_table->show();
 
 
     /***********Init portfolio table Window**************************/
     QPixmap pixmapdock_algorithms_close(":/dock_close.png");
 
-    T_Portfolio_DockWin =  new QDockWidget(tr("Algorithms"), this);
+    T_Portfolio_DockWin = new CDockWidget("Algorithms");// new QDockWidget(tr("Algorithms"), this);
     connect(T_Portfolio_DockWin, SIGNAL(visibilityChanged(bool)), this, SLOT(OnAlgorithmDockWidgetVisiblityChanged(bool)));
     T_Portfolio_DockWin->setStyleSheet(dock_style);
-    subWindow->addDockWidget(Qt::TopDockWidgetArea, T_Portfolio_DockWin);
-    T_Portfolio_DockWin->setAllowedAreas(Qt::AllDockWidgetAreas);
+    T_Portfolio_DockWin->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
 
+    T_Portfolio_DockWin->setMinimumSize(200,150);
+   // const auto autoHideContainerPortfolioTable = DockManager->addAutoHideDockWidget(SideBarLocation::SideBarLeft, T_Portfolio_DockWin);
+   // autoHideContainerPortfolioTable->setSize(480);
+    //subWindow->addDockWidget(Qt::TopDockWidgetArea, T_Portfolio_DockWin);
+   // T_Portfolio_DockWin->setAllowedAreas(Qt::AllDockWidgetAreas);
+
+    DockManager->addDockWidget(DockWidgetArea::RightDockWidgetArea, T_Portfolio_DockWin);
 
         //Create Titlebar
         QWidget* titlecontainer = new QWidget;
@@ -532,7 +138,7 @@ MainWindow::MainWindow(QWidget *parent)
         titleinternalLayout->addWidget(label);
         titleinternalLayout->addSpacerItem(titlespc);
         titleinternalLayout->addWidget(dockclose);
-        T_Portfolio_DockWin->setTitleBarWidget(titlecontainer);
+        //T_Portfolio_DockWin->setTitleBarWidget(titlecontainer);
         //Titlebar Created
 
             QWidget* container = new QWidget;
@@ -708,12 +314,16 @@ MainWindow::MainWindow(QWidget *parent)
     /***********Init Order Book Window**************************/
     QPixmap pixmapdock_trade_close(":/dock_close.png");
 
-    dock_win_trade =  new QDockWidget(tr("Order Book"), this);
+    dock_win_trade =  new CDockWidget(tr("Order Book"));
 
     connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookDockWidgetVisiblityChanged(bool)));
-    subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_trade);
-    dock_win_trade->setAllowedAreas(Qt::AllDockWidgetAreas);
+   // subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_trade);
+   // dock_win_trade->setAllowedAreas(Qt::AllDockWidgetAreas);
     dock_win_trade->setStyleSheet(dock_style);
+    dock_win_trade->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
+    dock_win_trade->setMinimumSize(200,150);
+    const auto autoHideContainerTrade = DockManager->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_trade);
+    autoHideContainerTrade->setSize(480);
 
     //create a titlebar
     QWidget *trade_titlebar=new QWidget;
@@ -738,7 +348,7 @@ MainWindow::MainWindow(QWidget *parent)
     trade_title_layout->addSpacerItem(trade_spacer);
     trade_title_layout->addWidget(line_edit_trade);
     trade_title_layout->addWidget(trade_close);
-    dock_win_trade->setTitleBarWidget(trade_titlebar);
+    //dock_win_trade->setTitleBarWidget(trade_titlebar);
 
 
 
@@ -807,11 +417,15 @@ MainWindow::MainWindow(QWidget *parent)
     /************Positions Window********************************/
     QPixmap pixmapdock_position_close(":/dock_close.png");
 
-    dock_win_net_pos =  new QDockWidget(tr("Positions"), this);
+    dock_win_net_pos =  new CDockWidget(tr("Positions"));
     connect(dock_win_net_pos, SIGNAL(visibilityChanged(bool)), this, SLOT(OnPositionsDockWidgetVisiblityChanged(bool)));
-    dock_win_net_pos->setAllowedAreas(Qt::AllDockWidgetAreas );
-    subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_net_pos);
+    //dock_win_net_pos->setAllowedAreas(Qt::AllDockWidgetAreas );
+   // subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_net_pos);
     dock_win_net_pos->setStyleSheet(dock_style);
+    dock_win_net_pos->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
+    dock_win_net_pos->setMinimumSize(200,150);
+    const auto autoHideContainerPos = DockManager->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_net_pos);
+    autoHideContainerPos->setSize(480);
 
     //create a titlebar
     QWidget *position_titlebar=new QWidget;
@@ -836,7 +450,7 @@ MainWindow::MainWindow(QWidget *parent)
     position_title_layout->addSpacerItem(position_spacer);
     position_title_layout->addWidget(line_edit_position);
     position_title_layout->addWidget(position_close);
-    dock_win_net_pos->setTitleBarWidget(position_titlebar);
+    //dock_win_net_pos->setTitleBarWidget(position_titlebar);
 
 
     net_pos_table = new QTableView(dock_win_net_pos);
@@ -866,11 +480,15 @@ MainWindow::MainWindow(QWidget *parent)
     /************Liners Window********************************/
     QPixmap pixmapdock_Liners_close(":/dock_close.png");
 
-    dock_win_liners =  new QDockWidget(tr("Liners"), this);
+    dock_win_liners =  new CDockWidget(tr("Liners"));
     connect(dock_win_liners, SIGNAL(visibilityChanged(bool)), this, SLOT(OnLinersDockWidgetVisiblityChanged(bool)));
-    dock_win_liners->setAllowedAreas(Qt::AllDockWidgetAreas );
-    subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_liners);
+    //dock_win_liners->setAllowedAreas(Qt::AllDockWidgetAreas );
+   // subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_liners);
     dock_win_liners->setStyleSheet(dock_style);
+    dock_win_liners->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
+    dock_win_liners->setMinimumSize(200,150);
+    const auto autoHideContainer_liners = DockManager->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_liners);
+    autoHideContainer_liners->setSize(480);
 
     //create a titlebar
     QWidget *liners_titlebar=new QWidget;
@@ -895,7 +513,7 @@ MainWindow::MainWindow(QWidget *parent)
     liners_title_layout->addSpacerItem(liners_spacer);
     liners_title_layout->addWidget(line_edit_liners);
     liners_title_layout->addWidget(liners_close);
-    dock_win_liners->setTitleBarWidget(liners_titlebar);
+    //dock_win_liners->setTitleBarWidget(liners_titlebar);
 
 
     liners_table = new QTableView(dock_win_liners);
@@ -925,9 +543,13 @@ MainWindow::MainWindow(QWidget *parent)
     /************Historical Positions Window********************************/
     QPixmap pixmapdock_hp_close(":/dock_close.png");
 
-    dock_win_combined_tracker =  new QDockWidget(tr("Historical Positions"), this);
+    dock_win_combined_tracker =  new CDockWidget(tr("Historical Positions"));
     connect(dock_win_combined_tracker, SIGNAL(visibilityChanged(bool)), this, SLOT(OnHPDockWidgetVisiblityChanged(bool)));
-    dock_win_combined_tracker->setAllowedAreas(Qt::AllDockWidgetAreas );
+    //dock_win_combined_tracker->setAllowedAreas(Qt::AllDockWidgetAreas );
+    dock_win_combined_tracker->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
+    dock_win_combined_tracker->setMinimumSize(200,150);
+    const auto autoHideContainer_tracker = DockManager->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_combined_tracker);
+    autoHideContainer_tracker->setSize(480);
 
     //create a titlebar
     QWidget *hp_titlebar=new QWidget;
@@ -952,11 +574,11 @@ MainWindow::MainWindow(QWidget *parent)
     position_hp_layout->addSpacerItem(hp_spacer);
     position_hp_layout->addWidget(line_edit_hp);
     position_hp_layout->addWidget(hp_close);
-    dock_win_combined_tracker->setTitleBarWidget(hp_titlebar);
+    //dock_win_combined_tracker->setTitleBarWidget(hp_titlebar);
 
 
 
-    subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_combined_tracker);
+    //subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_combined_tracker);
 
     combined_tracker_table = new QTableView(dock_win_combined_tracker);
     combined_tracker_table->setStyleSheet(tableview_SS);
@@ -2186,7 +1808,7 @@ void MainWindow::slotAddLogForAddAlgoRecord(QString str)
 {
     // To show the latest log at top
     htmlLogsContent.prepend(str);
-    ui->textEdit->setText(htmlLogsContent);
+     ui->textEdit->setText(htmlLogsContent);
 }
 
 void MainWindow::slotHideProgressBar()

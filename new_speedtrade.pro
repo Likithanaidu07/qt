@@ -104,6 +104,7 @@ HEADERS += \
     mainwindow.h \
     mysql_conn.h \
     order_detail_popup.h \
+    style_sheet.h \
     uidockwidget.h \
     watch_data_list_item.h
 

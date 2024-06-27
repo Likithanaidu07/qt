@@ -36,8 +36,6 @@ public:
     QWidget *widget_4;
     QHBoxLayout *horizontalLayout_18;
     QSpacerItem *verticalSpacer_2;
-    QGridLayout *gridLayout_2;
-    QVBoxLayout *verticalLayout_11;
     QWidget *widget;
     QVBoxLayout *verticalLayout;
     QWidget *summary_widget;
@@ -187,9 +185,8 @@ public:
     QPushButton *toggle_Button_1;
     QWidget *widget_41;
     QHBoxLayout *horizontalLayout_181;
-    QGridLayout *gridLayout_21;
-    QVBoxLayout *verticalLayout_111;
     QLabel *label_4;
+    QWidget *mainPanel;
 
     void setupUi(QMainWindow *MainWindow)
     {
@@ -228,17 +225,6 @@ public:
         verticalSpacer_2 = new QSpacerItem(20, 9, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
         gridLayout->addItem(verticalSpacer_2, 5, 4, 1, 1);
-
-        gridLayout_2 = new QGridLayout();
-        gridLayout_2->setObjectName("gridLayout_2");
-        gridLayout_2->setContentsMargins(8, 8, 0, 0);
-        verticalLayout_11 = new QVBoxLayout();
-        verticalLayout_11->setObjectName("verticalLayout_11");
-
-        gridLayout_2->addLayout(verticalLayout_11, 0, 0, 1, 1);
-
-
-        gridLayout->addLayout(gridLayout_2, 4, 0, 1, 1);
 
         widget = new QWidget(centralwidget);
         widget->setObjectName("widget");
@@ -1268,21 +1254,16 @@ public:
 
         gridLayout->addWidget(widget_41, 4, 2, 2, 1);
 
-        gridLayout_21 = new QGridLayout();
-        gridLayout_21->setObjectName("gridLayout_21");
-        gridLayout_21->setContentsMargins(8, 8, 0, 0);
-        verticalLayout_111 = new QVBoxLayout();
-        verticalLayout_111->setObjectName("verticalLayout_111");
-
-        gridLayout_21->addLayout(verticalLayout_111, 0, 0, 1, 1);
-
-
-        gridLayout->addLayout(gridLayout_21, 4, 0, 1, 1);
-
         label_4 = new QLabel(centralwidget);
         label_4->setObjectName("label_4");
 
         gridLayout->addWidget(label_4, 5, 0, 1, 1);
+
+        mainPanel = new QWidget(centralwidget);
+        mainPanel->setObjectName("mainPanel");
+        mainPanel->setMinimumSize(QSize(500, 0));
+
+        gridLayout->addWidget(mainPanel, 4, 0, 1, 1);
 
         gridLayout->setColumnStretch(0, 1);
         MainWindow->setCentralWidget(centralwidget);
@@ -1475,8 +1456,6 @@ public:
 "<html><head><meta name=\"qrichtext\" content=\"1\" /><meta charset=\"utf-8\" /><style type=\"text/css\">\n"
 "p, li { white-space: pre-wrap; }\n"
 "hr { height: 1px; border-width: 0; }\n"
-"li.unchecked::marker { content: \"\\2610\"; }\n"
-"li.checked::marker { content: \"\\2612\"; }\n"
 "</style></head><body style=\" font-family:'Segoe UI'; font-size:9pt; font-weight:400; font-style:normal;\">\n"
 "<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\">line 1</p></body></html>", nullptr));
         toggle_Button->setText(QString());
