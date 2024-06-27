@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'order_detail_popup.ui'
 **
-** Created by: Qt User Interface Compiler version 6.5.3
+** Created by: Qt User Interface Compiler version 6.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -73,26 +73,26 @@ public:
     void setupUi(QDialog *OrderDetail_Popup)
     {
         if (OrderDetail_Popup->objectName().isEmpty())
-            OrderDetail_Popup->setObjectName("OrderDetail_Popup");
+            OrderDetail_Popup->setObjectName(QString::fromUtf8("OrderDetail_Popup"));
         OrderDetail_Popup->resize(1090, 589);
         OrderDetail_Popup->setStyleSheet(QString::fromUtf8("background-color:#FFF;"));
         gridLayout = new QGridLayout(OrderDetail_Popup);
-        gridLayout->setObjectName("gridLayout");
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         buttonBox = new QDialogButtonBox(OrderDetail_Popup);
-        buttonBox->setObjectName("buttonBox");
+        buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
         buttonBox->setOrientation(Qt::Horizontal);
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
 
         gridLayout->addWidget(buttonBox, 6, 3, 1, 1);
 
         widget_3 = new QWidget(OrderDetail_Popup);
-        widget_3->setObjectName("widget_3");
+        widget_3->setObjectName(QString::fromUtf8("widget_3"));
         widget_3->setMinimumSize(QSize(1, 1));
         widget_3->setStyleSheet(QString::fromUtf8(""));
         gridLayout_3 = new QGridLayout(widget_3);
-        gridLayout_3->setObjectName("gridLayout_3");
+        gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
         label_27 = new QLabel(widget_3);
-        label_27->setObjectName("label_27");
+        label_27->setObjectName(QString::fromUtf8("label_27"));
         label_27->setMinimumSize(QSize(1, 1));
         label_27->setMaximumSize(QSize(100, 100));
         label_27->setFrameShape(QFrame::NoFrame);
@@ -101,7 +101,7 @@ public:
         gridLayout_3->addWidget(label_27, 2, 1, 1, 1);
 
         label_18 = new QLabel(widget_3);
-        label_18->setObjectName("label_18");
+        label_18->setObjectName(QString::fromUtf8("label_18"));
         label_18->setMinimumSize(QSize(1, 1));
         label_18->setMaximumSize(QSize(100, 100));
         QFont font;
@@ -114,7 +114,7 @@ public:
         gridLayout_3->addWidget(label_18, 2, 4, 1, 1);
 
         label_28 = new QLabel(widget_3);
-        label_28->setObjectName("label_28");
+        label_28->setObjectName(QString::fromUtf8("label_28"));
         label_28->setMinimumSize(QSize(1, 1));
         label_28->setMaximumSize(QSize(100, 100));
         label_28->setFrameShape(QFrame::NoFrame);
@@ -123,7 +123,7 @@ public:
         gridLayout_3->addWidget(label_28, 3, 1, 1, 1);
 
         label_25 = new QLabel(widget_3);
-        label_25->setObjectName("label_25");
+        label_25->setObjectName(QString::fromUtf8("label_25"));
         label_25->setMinimumSize(QSize(1, 1));
         label_25->setMaximumSize(QSize(100, 100));
         label_25->setFrameShape(QFrame::NoFrame);
@@ -132,7 +132,7 @@ public:
         gridLayout_3->addWidget(label_25, 0, 1, 1, 1);
 
         label_16 = new QLabel(widget_3);
-        label_16->setObjectName("label_16");
+        label_16->setObjectName(QString::fromUtf8("label_16"));
         label_16->setMinimumSize(QSize(1, 1));
         label_16->setMaximumSize(QSize(100, 100));
         label_16->setFont(font);
@@ -142,7 +142,7 @@ public:
         gridLayout_3->addWidget(label_16, 1, 4, 1, 1);
 
         label_26 = new QLabel(widget_3);
-        label_26->setObjectName("label_26");
+        label_26->setObjectName(QString::fromUtf8("label_26"));
         label_26->setMinimumSize(QSize(1, 1));
         label_26->setMaximumSize(QSize(100, 100));
         label_26->setFrameShape(QFrame::NoFrame);
@@ -151,7 +151,7 @@ public:
         gridLayout_3->addWidget(label_26, 1, 1, 1, 1);
 
         label_11 = new QLabel(widget_3);
-        label_11->setObjectName("label_11");
+        label_11->setObjectName(QString::fromUtf8("label_11"));
         label_11->setMinimumSize(QSize(1, 1));
         label_11->setMaximumSize(QSize(100, 100));
         label_11->setFont(font);
@@ -161,7 +161,7 @@ public:
         gridLayout_3->addWidget(label_11, 0, 0, 1, 1);
 
         label_12 = new QLabel(widget_3);
-        label_12->setObjectName("label_12");
+        label_12->setObjectName(QString::fromUtf8("label_12"));
         label_12->setMinimumSize(QSize(1, 1));
         label_12->setMaximumSize(QSize(100, 100));
         label_12->setFont(font);
@@ -171,7 +171,7 @@ public:
         gridLayout_3->addWidget(label_12, 1, 0, 1, 1);
 
         label_13 = new QLabel(widget_3);
-        label_13->setObjectName("label_13");
+        label_13->setObjectName(QString::fromUtf8("label_13"));
         label_13->setMinimumSize(QSize(1, 1));
         label_13->setMaximumSize(QSize(100, 100));
         label_13->setFont(font);
@@ -181,7 +181,7 @@ public:
         gridLayout_3->addWidget(label_13, 2, 0, 1, 1);
 
         label_15 = new QLabel(widget_3);
-        label_15->setObjectName("label_15");
+        label_15->setObjectName(QString::fromUtf8("label_15"));
         label_15->setMinimumSize(QSize(1, 1));
         label_15->setMaximumSize(QSize(100, 100));
         label_15->setFont(font);
@@ -191,7 +191,7 @@ public:
         gridLayout_3->addWidget(label_15, 0, 4, 1, 1);
 
         label_14 = new QLabel(widget_3);
-        label_14->setObjectName("label_14");
+        label_14->setObjectName(QString::fromUtf8("label_14"));
         label_14->setMinimumSize(QSize(1, 1));
         label_14->setMaximumSize(QSize(100, 100));
         label_14->setFont(font);
@@ -201,7 +201,7 @@ public:
         gridLayout_3->addWidget(label_14, 3, 0, 1, 1);
 
         label_29 = new QLabel(widget_3);
-        label_29->setObjectName("label_29");
+        label_29->setObjectName(QString::fromUtf8("label_29"));
         label_29->setMinimumSize(QSize(1, 1));
         label_29->setMaximumSize(QSize(100, 100));
         label_29->setFrameShape(QFrame::NoFrame);
@@ -210,7 +210,7 @@ public:
         gridLayout_3->addWidget(label_29, 0, 5, 1, 1);
 
         label_30 = new QLabel(widget_3);
-        label_30->setObjectName("label_30");
+        label_30->setObjectName(QString::fromUtf8("label_30"));
         label_30->setMinimumSize(QSize(1, 1));
         label_30->setMaximumSize(QSize(100, 100));
         label_30->setFrameShape(QFrame::NoFrame);
@@ -219,7 +219,7 @@ public:
         gridLayout_3->addWidget(label_30, 1, 5, 1, 1);
 
         label_31 = new QLabel(widget_3);
-        label_31->setObjectName("label_31");
+        label_31->setObjectName(QString::fromUtf8("label_31"));
         label_31->setMinimumSize(QSize(1, 1));
         label_31->setMaximumSize(QSize(100, 100));
         label_31->setFrameShape(QFrame::NoFrame);
@@ -228,7 +228,7 @@ public:
         gridLayout_3->addWidget(label_31, 2, 5, 1, 1);
 
         label_32 = new QLabel(widget_3);
-        label_32->setObjectName("label_32");
+        label_32->setObjectName(QString::fromUtf8("label_32"));
         label_32->setMinimumSize(QSize(1, 1));
         label_32->setMaximumSize(QSize(100, 100));
         label_32->setFrameShape(QFrame::NoFrame);
@@ -237,7 +237,7 @@ public:
         gridLayout_3->addWidget(label_32, 3, 5, 1, 1);
 
         label_17 = new QLabel(widget_3);
-        label_17->setObjectName("label_17");
+        label_17->setObjectName(QString::fromUtf8("label_17"));
         label_17->setFont(font);
 
         gridLayout_3->addWidget(label_17, 3, 4, 1, 1);
@@ -260,7 +260,7 @@ public:
         tableWidget_Buy->setHorizontalHeaderItem(4, __qtablewidgetitem4);
         QTableWidgetItem *__qtablewidgetitem5 = new QTableWidgetItem();
         tableWidget_Buy->setHorizontalHeaderItem(5, __qtablewidgetitem5);
-        tableWidget_Buy->setObjectName("tableWidget_Buy");
+        tableWidget_Buy->setObjectName(QString::fromUtf8("tableWidget_Buy"));
         tableWidget_Buy->setMinimumSize(QSize(50, 50));
         tableWidget_Buy->setStyleSheet(QString::fromUtf8(""));
         tableWidget_Buy->setLineWidth(1);
@@ -271,15 +271,15 @@ public:
         gridLayout->addWidget(tableWidget_Buy, 4, 0, 1, 1);
 
         widget = new QWidget(OrderDetail_Popup);
-        widget->setObjectName("widget");
+        widget->setObjectName(QString::fromUtf8("widget"));
         gridLayout_2 = new QGridLayout(widget);
-        gridLayout_2->setObjectName("gridLayout_2");
+        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         gridLayout_2->setHorizontalSpacing(10);
 
         gridLayout->addWidget(widget, 5, 2, 1, 1);
 
         widget_2 = new QWidget(OrderDetail_Popup);
-        widget_2->setObjectName("widget_2");
+        widget_2->setObjectName(QString::fromUtf8("widget_2"));
         QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
@@ -290,9 +290,9 @@ public:
         widget_2->setAutoFillBackground(false);
         widget_2->setStyleSheet(QString::fromUtf8(""));
         gridLayout_4 = new QGridLayout(widget_2);
-        gridLayout_4->setObjectName("gridLayout_4");
+        gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
         label = new QLabel(widget_2);
-        label->setObjectName("label");
+        label->setObjectName(QString::fromUtf8("label"));
         sizePolicy.setHeightForWidth(label->sizePolicy().hasHeightForWidth());
         label->setSizePolicy(sizePolicy);
         label->setMinimumSize(QSize(1, 1));
@@ -306,7 +306,7 @@ public:
         gridLayout_4->addWidget(label, 0, 0, 1, 1);
 
         label_3 = new QLabel(widget_2);
-        label_3->setObjectName("label_3");
+        label_3->setObjectName(QString::fromUtf8("label_3"));
         label_3->setMaximumSize(QSize(100, 100));
         label_3->setFrameShape(QFrame::NoFrame);
         label_3->setAlignment(Qt::AlignCenter);
@@ -314,7 +314,7 @@ public:
         gridLayout_4->addWidget(label_3, 0, 1, 1, 1);
 
         label_9 = new QLabel(widget_2);
-        label_9->setObjectName("label_9");
+        label_9->setObjectName(QString::fromUtf8("label_9"));
         label_9->setMinimumSize(QSize(1, 1));
         label_9->setMaximumSize(QSize(100, 100));
         label_9->setFont(font);
@@ -324,7 +324,7 @@ public:
         gridLayout_4->addWidget(label_9, 0, 2, 1, 1);
 
         label_21 = new QLabel(widget_2);
-        label_21->setObjectName("label_21");
+        label_21->setObjectName(QString::fromUtf8("label_21"));
         label_21->setMinimumSize(QSize(1, 1));
         label_21->setMaximumSize(QSize(100, 100));
         label_21->setFrameShape(QFrame::NoFrame);
@@ -333,7 +333,7 @@ public:
         gridLayout_4->addWidget(label_21, 0, 3, 1, 1);
 
         label_4 = new QLabel(widget_2);
-        label_4->setObjectName("label_4");
+        label_4->setObjectName(QString::fromUtf8("label_4"));
         sizePolicy.setHeightForWidth(label_4->sizePolicy().hasHeightForWidth());
         label_4->setSizePolicy(sizePolicy);
         label_4->setFont(font);
@@ -345,7 +345,7 @@ public:
         gridLayout_4->addWidget(label_4, 1, 0, 1, 1);
 
         label_20 = new QLabel(widget_2);
-        label_20->setObjectName("label_20");
+        label_20->setObjectName(QString::fromUtf8("label_20"));
         label_20->setMaximumSize(QSize(100, 100));
         label_20->setFrameShape(QFrame::NoFrame);
         label_20->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
@@ -353,7 +353,7 @@ public:
         gridLayout_4->addWidget(label_20, 1, 1, 1, 1);
 
         label_7 = new QLabel(widget_2);
-        label_7->setObjectName("label_7");
+        label_7->setObjectName(QString::fromUtf8("label_7"));
         label_7->setFont(font);
         label_7->setFrameShape(QFrame::NoFrame);
         label_7->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
@@ -361,7 +361,7 @@ public:
         gridLayout_4->addWidget(label_7, 1, 2, 1, 1);
 
         label_22 = new QLabel(widget_2);
-        label_22->setObjectName("label_22");
+        label_22->setObjectName(QString::fromUtf8("label_22"));
         label_22->setMinimumSize(QSize(1, 1));
         label_22->setMaximumSize(QSize(100, 100));
         label_22->setFrameShape(QFrame::NoFrame);
@@ -370,7 +370,7 @@ public:
         gridLayout_4->addWidget(label_22, 1, 3, 1, 1);
 
         label_5 = new QLabel(widget_2);
-        label_5->setObjectName("label_5");
+        label_5->setObjectName(QString::fromUtf8("label_5"));
         sizePolicy.setHeightForWidth(label_5->sizePolicy().hasHeightForWidth());
         label_5->setSizePolicy(sizePolicy);
         label_5->setFont(font);
@@ -382,7 +382,7 @@ public:
         gridLayout_4->addWidget(label_5, 2, 0, 1, 1);
 
         label_19 = new QLabel(widget_2);
-        label_19->setObjectName("label_19");
+        label_19->setObjectName(QString::fromUtf8("label_19"));
         label_19->setMaximumSize(QSize(100, 100));
         label_19->setFrameShape(QFrame::NoFrame);
         label_19->setAlignment(Qt::AlignCenter);
@@ -390,7 +390,7 @@ public:
         gridLayout_4->addWidget(label_19, 2, 1, 1, 1);
 
         label_8 = new QLabel(widget_2);
-        label_8->setObjectName("label_8");
+        label_8->setObjectName(QString::fromUtf8("label_8"));
         label_8->setFont(font);
         label_8->setFrameShape(QFrame::NoFrame);
         label_8->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
@@ -398,7 +398,7 @@ public:
         gridLayout_4->addWidget(label_8, 2, 2, 1, 1);
 
         label_23 = new QLabel(widget_2);
-        label_23->setObjectName("label_23");
+        label_23->setObjectName(QString::fromUtf8("label_23"));
         label_23->setMinimumSize(QSize(1, 1));
         label_23->setMaximumSize(QSize(100, 100));
         label_23->setFrameShape(QFrame::NoFrame);
@@ -407,7 +407,7 @@ public:
         gridLayout_4->addWidget(label_23, 2, 3, 1, 1);
 
         label_6 = new QLabel(widget_2);
-        label_6->setObjectName("label_6");
+        label_6->setObjectName(QString::fromUtf8("label_6"));
         sizePolicy.setHeightForWidth(label_6->sizePolicy().hasHeightForWidth());
         label_6->setSizePolicy(sizePolicy);
         label_6->setFont(font);
@@ -419,7 +419,7 @@ public:
         gridLayout_4->addWidget(label_6, 3, 0, 1, 1);
 
         label_2 = new QLabel(widget_2);
-        label_2->setObjectName("label_2");
+        label_2->setObjectName(QString::fromUtf8("label_2"));
         label_2->setMinimumSize(QSize(100, 10));
         label_2->setMaximumSize(QSize(100, 100));
         label_2->setFrameShape(QFrame::NoFrame);
@@ -428,7 +428,7 @@ public:
         gridLayout_4->addWidget(label_2, 3, 1, 1, 1);
 
         label_10 = new QLabel(widget_2);
-        label_10->setObjectName("label_10");
+        label_10->setObjectName(QString::fromUtf8("label_10"));
         label_10->setFont(font);
         label_10->setFrameShape(QFrame::NoFrame);
         label_10->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
@@ -436,7 +436,7 @@ public:
         gridLayout_4->addWidget(label_10, 3, 2, 1, 1);
 
         label_24 = new QLabel(widget_2);
-        label_24->setObjectName("label_24");
+        label_24->setObjectName(QString::fromUtf8("label_24"));
         label_24->setMinimumSize(QSize(1, 1));
         label_24->setMaximumSize(QSize(100, 100));
         label_24->setFrameShape(QFrame::NoFrame);
@@ -466,7 +466,7 @@ public:
         tableWidget_Sell->setHorizontalHeaderItem(4, __qtablewidgetitem10);
         QTableWidgetItem *__qtablewidgetitem11 = new QTableWidgetItem();
         tableWidget_Sell->setHorizontalHeaderItem(5, __qtablewidgetitem11);
-        tableWidget_Sell->setObjectName("tableWidget_Sell");
+        tableWidget_Sell->setObjectName(QString::fromUtf8("tableWidget_Sell"));
         tableWidget_Sell->setStyleSheet(QString::fromUtf8(""));
         tableWidget_Sell->setFrameShape(QFrame::NoFrame);
 
