@@ -1,0 +1,19 @@
+1. Download the Qt-Advanced-Docking-System project from here https://github.com/githubuser0xFFFF/Qt-Advanced-Docking-System
+2. Place the Project folder in SpeedTrade App source code directory.
+3. Open ads.pro inside the folder Qt-Advanced-Docking-System using Qt creator
+4. In ads.pro comment below line so example will not build
+       #demo \
+       #examples
+    #demo.depends = src
+    #examples.depends = src
+5. Build the project both in Debug and Release mode.
+6. Check the folder 'Qt-Advanced-Docking-System\lib' for the generated library.
+7. Now add follwing lines to new_speedtrade.pro file to integrate Qt-Advanced-Docking-System with main project
+
+    ADS_OUT_ROOT = $${OUT_PWD}/Qt-Advanced-Docking-System
+    LIBS += -L$${ADS_OUT_ROOT}/lib
+    include($${ADS_OUT_ROOT}/ads.pri)
+    INCLUDEPATH += $${ADS_OUT_ROOT}/src
+    DEPENDPATH += $${ADS_OUT_ROOT}/src
+
+8. While deploying copy the project copy "qtadvanceddocking.dll" from 'Qt-Advanced-Docking-System\lib' folder to exe location.
