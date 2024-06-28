@@ -53,7 +53,6 @@ void CustomSearchWidget::filterItems(const QString &text) {
     if (text.isEmpty()) {
         // If the search text is empty, clear the filter and hide the list view
         proxyModel->setFilterRegularExpression("");
-        proxyModel->sort(0, Qt::AscendingOrder);  // Sort by the first column, adjust as needed
         listView->hide();
         return;
     }
@@ -75,10 +74,15 @@ void CustomSearchWidget::filterItems(const QString &text) {
     QRegularExpression startsWithRegex(startsWithPattern, QRegularExpression::CaseInsensitiveOption);
     proxyModel->setFilterRegularExpression(startsWithRegex);
 
+    // Sort after setting the filter
+    proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive); // Optional: set case sensitivity
+    proxyModel->sort(0, Qt::AscendingOrder); // Sort by column 0 (adjust column index as needed) in ascending order
+
     // Show or hide the list view based on the filter result
     if (proxyModel->rowCount() > 0) {
-        proxyModel->sort(0, Qt::AscendingOrder);  // Sort by the first column, adjust as needed
-        listView->show();
+        if (!listView->isVisible()) {
+            listView->show();
+        }
         return;  // If matches are found, exit the function
     }
 
@@ -91,10 +95,15 @@ void CustomSearchWidget::filterItems(const QString &text) {
     QRegularExpression containsRegex(containsPattern, QRegularExpression::CaseInsensitiveOption);
     proxyModel->setFilterRegularExpression(containsRegex);
 
+    // Sort after setting the filter
+    proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive); // Optional: set case sensitivity
+    proxyModel->sort(0, Qt::AscendingOrder); // Sort by column 0 (adjust column index as needed) in ascending order
+
     // Show or hide the list view based on the filter result
     if (proxyModel->rowCount() > 0) {
-        proxyModel->sort(0, Qt::AscendingOrder);  // Sort by the first column, adjust as needed
-        listView->show();
+        if (!listView->isVisible()) {
+            listView->show();
+        }
     } else {
         listView->hide();
     }

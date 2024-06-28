@@ -67,10 +67,6 @@ void add_algo_btfly_bid::startStrikeEditFinishedAction(){
 
 
     model_end_strike = new QStandardItemModel;
-    std::sort(sorted_keys_BFLY_BID.begin(), sorted_keys_BFLY_BID.end(),
-              [this](const QString &a, const QString &b) {
-                  return sharedData->contract_table_hash[a].StrikePrice < sharedData->contract_table_hash[b].StrikePrice;
-              });
     for(int i=0;i<sorted_keys_BFLY_BID.length();i++) {
 
         contract_table tmp = sharedData->contract_table_hash[sorted_keys_BFLY_BID[i]];
@@ -107,13 +103,9 @@ void add_algo_btfly_bid::startStrikeEditFinishedAction(){
     // create qcompleter and fill with abovie model
     CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike);
     connect(lineEdit_EndStrike, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
-    connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
 }
-
 void add_algo_btfly_bid::generateAlgo()
 {
-
-
     if(foo_token_number_start_strike=="" || foo_token_number_end_strike==""){
         QMessageBox msgBox;
         msgBox.setText("Cannot Use current Algo combination.");

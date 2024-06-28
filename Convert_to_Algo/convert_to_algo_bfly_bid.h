@@ -30,6 +30,8 @@ public:
     void startStrikeEditFinishedAction();
     void generateAlgo();
     void endStrikeEditFinishedAction();
+    void initializeUI() ;
+
 
 
 private slots:
@@ -56,6 +58,7 @@ private:
 
     EventFilter *eventFilterStart;
     EventFilter *eventFilterEnd;
+
 };
 
 

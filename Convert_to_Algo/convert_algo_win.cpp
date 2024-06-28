@@ -14,20 +14,19 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     setWindowModality(Qt::ApplicationModal);
 
 
-    ui->tableWidget->setFocusPolicy(Qt::NoFocus);
+  //  ui->tableWidget->setFocusPolicy(Qt::NoFocus);
 
-    //setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Start_strike);
+    setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Start_strike);
     setTabOrder(ui->lineEdit_Start_strike, ui->lineEdit_EndStrike);
     setTabOrder(ui->lineEdit_EndStrike, ui->lineEdit_StrikeDifference);
     setTabOrder(ui->lineEdit_StrikeDifference, ui->pushButtonAdd);
     setTabOrder(ui->pushButtonAdd, ui->pushButtonSelectAll);
     setTabOrder(ui->pushButtonSelectAll, ui->pushButton_Reset);
     setTabOrder(ui->pushButton_Reset, ui->pushButtonDelete);
-    // setTabOrder(ui->pushButtonDelete, ui->tableWidget);
-    // setTabOrder(ui->tableWidget, ui->pushButtonUpload);
-    setTabOrder(ui->pushButtonDelete, ui->pushButtonUpload);
-    setTabOrder(ui->pushButtonUpload, ui->pushButtonUpload);
-    setTabOrder(ui->pushButton_Cancel, ui->lineEdit_Start_strike);
+    setTabOrder(ui->pushButtonDelete, ui->tableWidget);
+    setTabOrder(ui->tableWidget, ui->pushButtonUpload);
+    setTabOrder(ui->pushButtonUpload, ui->pushButton_Cancel);
+    setTabOrder(ui->pushButton_Cancel, ui->comboBox_AlgoType);
     ui->comboBox_AlgoType->setStyleSheet("QComboBox { text-align: center; }");
 
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
@@ -262,6 +261,7 @@ void ConvertAlgo_Win::keyPressEvent(QKeyEvent *event)
         QWidget::keyPressEvent(event); // Pass other key events to the base class
 
     }
+
 }
 
 void ConvertAlgo_Win::update_ui_slot(int type){

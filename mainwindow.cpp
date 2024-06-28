@@ -1324,7 +1324,6 @@ void MainWindow::updatePortFolioStatus(){
             if(status == portfolio_status::Filled || status == portfolio_status::DisabledByUser){
                 int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
                 //check remaing qunatity is greater than 1 lot
-                if(T_Portfolio_Model->portfolio_data_list[index.row()]->BuyRemainingQuantity>=lotSize&&T_Portfolio_Model->portfolio_data_list[index.row()]->SellRemainingQuantity>=lotSize){
                     T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::Active);
                     T_Portfolio_Model->refreshTable();
                     QString Query = "UPDATE Portfolios SET Status='Active' where PortfolioNumber="+PortfolioNumber;
@@ -1339,14 +1338,8 @@ void MainWindow::updatePortFolioStatus(){
                         backend_comm->insertData(msg);
                     }
                 }
-                else{
-                    QMessageBox msgBox;
-                    msgBox.setWindowTitle("Cannot Update Portfolio Status");
-                    msgBox.setIcon(QMessageBox::Warning);
-                    msgBox.setText("Remaining quntity should greater than 1 Lot");
-                    msgBox.exec();
-                }
-            }
+
+
             //status is in check state so make it toggle(uncheck)
             else{
                 T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::DisabledByUser);

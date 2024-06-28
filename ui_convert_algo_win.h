@@ -36,9 +36,9 @@ public:
     QGridLayout *gridLayout_3;
     QLabel *label;
     QPushButton *pushButtonSelectAll;
-    QTableWidget *tableWidget;
     QPushButton *pushButton_Reset;
     QPushButton *pushButtonDelete;
+    QTableWidget *tableWidget;
     QSpacerItem *verticalSpacer_3;
     QLineEdit *lineEdit_Start_strike;
     QSpacerItem *verticalSpacer_2;
@@ -47,8 +47,8 @@ public:
     QSpacerItem *verticalSpacer;
     QHBoxLayout *horizontalLayout_2;
     QSpacerItem *horizontalSpacer_3;
-    QPushButton *pushButton_Cancel;
     QPushButton *pushButtonUpload;
+    QPushButton *pushButton_Cancel;
     QLineEdit *lineEdit_Fut;
     QComboBox *comboBox_AlgoType;
     QPushButton *pushButtonAdd;
@@ -96,7 +96,6 @@ public:
 "}"));
         gridLayout_3 = new QGridLayout(widget);
         gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
-        gridLayout_3->setContentsMargins(12, 8, 12, 12);
         label = new QLabel(widget);
         label->setObjectName(QString::fromUtf8("label"));
         label->setStyleSheet(QString::fromUtf8(""));
@@ -111,6 +110,22 @@ public:
         pushButtonSelectAll->setFlat(true);
 
         gridLayout_3->addWidget(pushButtonSelectAll, 0, 1, 1, 1);
+
+        pushButton_Reset = new QPushButton(widget);
+        pushButton_Reset->setObjectName(QString::fromUtf8("pushButton_Reset"));
+        pushButton_Reset->setMaximumSize(QSize(58, 16));
+        pushButton_Reset->setStyleSheet(QString::fromUtf8(""));
+        pushButton_Reset->setFlat(true);
+
+        gridLayout_3->addWidget(pushButton_Reset, 0, 2, 1, 1);
+
+        pushButtonDelete = new QPushButton(widget);
+        pushButtonDelete->setObjectName(QString::fromUtf8("pushButtonDelete"));
+        pushButtonDelete->setMaximumSize(QSize(58, 16));
+        pushButtonDelete->setStyleSheet(QString::fromUtf8(""));
+        pushButtonDelete->setFlat(true);
+
+        gridLayout_3->addWidget(pushButtonDelete, 0, 3, 1, 1);
 
         tableWidget = new QTableWidget(widget);
         tableWidget->setObjectName(QString::fromUtf8("tableWidget"));
@@ -138,22 +153,6 @@ public:
 ""));
 
         gridLayout_3->addWidget(tableWidget, 1, 0, 1, 4);
-
-        pushButton_Reset = new QPushButton(widget);
-        pushButton_Reset->setObjectName(QString::fromUtf8("pushButton_Reset"));
-        pushButton_Reset->setMaximumSize(QSize(58, 16));
-        pushButton_Reset->setStyleSheet(QString::fromUtf8(""));
-        pushButton_Reset->setFlat(true);
-
-        gridLayout_3->addWidget(pushButton_Reset, 0, 2, 1, 1);
-
-        pushButtonDelete = new QPushButton(widget);
-        pushButtonDelete->setObjectName(QString::fromUtf8("pushButtonDelete"));
-        pushButtonDelete->setMaximumSize(QSize(58, 16));
-        pushButtonDelete->setStyleSheet(QString::fromUtf8(""));
-        pushButtonDelete->setFlat(true);
-
-        gridLayout_3->addWidget(pushButtonDelete, 0, 3, 1, 1);
 
 
         gridLayout_2->addWidget(widget, 3, 0, 1, 10);
@@ -210,25 +209,6 @@ public:
 
         horizontalLayout_2->addItem(horizontalSpacer_3);
 
-        pushButton_Cancel = new QPushButton(widget_2);
-        pushButton_Cancel->setObjectName(QString::fromUtf8("pushButton_Cancel"));
-        pushButton_Cancel->setMinimumSize(QSize(85, 32));
-        pushButton_Cancel->setMaximumSize(QSize(95, 16777215));
-        pushButton_Cancel->setStyleSheet(QString::fromUtf8("QPushButton{\n"
-"border-radius: 7px;\n"
-"background: #1585C0;\n"
-"color: #FFF;\n"
-"box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.25);\n"
-"font-family: Work Sans;\n"
-"font-size: 14px;\n"
-"font-style: normal;\n"
-"font-weight: 600;\n"
-"line-height: normal;\n"
-"}"));
-        pushButton_Cancel->setFlat(true);
-
-        horizontalLayout_2->addWidget(pushButton_Cancel);
-
         pushButtonUpload = new QPushButton(widget_2);
         pushButtonUpload->setObjectName(QString::fromUtf8("pushButtonUpload"));
         sizePolicy.setHeightForWidth(pushButtonUpload->sizePolicy().hasHeightForWidth());
@@ -248,6 +228,25 @@ public:
         pushButtonUpload->setFlat(true);
 
         horizontalLayout_2->addWidget(pushButtonUpload);
+
+        pushButton_Cancel = new QPushButton(widget_2);
+        pushButton_Cancel->setObjectName(QString::fromUtf8("pushButton_Cancel"));
+        pushButton_Cancel->setMinimumSize(QSize(85, 32));
+        pushButton_Cancel->setMaximumSize(QSize(95, 16777215));
+        pushButton_Cancel->setStyleSheet(QString::fromUtf8("QPushButton{\n"
+"border-radius: 7px;\n"
+"background: #1585C0;\n"
+"color: #FFF;\n"
+"box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.25);\n"
+"font-family: Work Sans;\n"
+"font-size: 14px;\n"
+"font-style: normal;\n"
+"font-weight: 600;\n"
+"line-height: normal;\n"
+"}"));
+        pushButton_Cancel->setFlat(true);
+
+        horizontalLayout_2->addWidget(pushButton_Cancel);
 
 
         gridLayout_2->addLayout(horizontalLayout_2, 5, 0, 1, 10);
@@ -341,17 +340,16 @@ public:
 
         gridLayout->addWidget(ConvertAlgo_TitleBar, 0, 0, 1, 1);
 
-        QWidget::setTabOrder(comboBox_AlgoType, lineEdit_Fut);
-        QWidget::setTabOrder(lineEdit_Fut, lineEdit_Start_strike);
+        QWidget::setTabOrder(comboBox_AlgoType, lineEdit_Start_strike);
         QWidget::setTabOrder(lineEdit_Start_strike, lineEdit_EndStrike);
         QWidget::setTabOrder(lineEdit_EndStrike, lineEdit_StrikeDifference);
-        QWidget::setTabOrder(lineEdit_StrikeDifference, pushButton_Cancel);
-        QWidget::setTabOrder(pushButton_Cancel, pushButtonUpload);
-        QWidget::setTabOrder(pushButtonUpload, pushButtonSelectAll);
+        QWidget::setTabOrder(lineEdit_StrikeDifference, pushButtonAdd);
+        QWidget::setTabOrder(pushButtonAdd, pushButtonSelectAll);
         QWidget::setTabOrder(pushButtonSelectAll, pushButton_Reset);
         QWidget::setTabOrder(pushButton_Reset, pushButtonDelete);
-        QWidget::setTabOrder(pushButtonDelete, Close);
-        QWidget::setTabOrder(Close, tableWidget);
+        QWidget::setTabOrder(pushButtonDelete, tableWidget);
+        QWidget::setTabOrder(tableWidget, pushButton_Cancel);
+        QWidget::setTabOrder(pushButton_Cancel, lineEdit_Fut);
 
         retranslateUi(ConvertAlgo_Win);
 
@@ -369,8 +367,8 @@ public:
         lineEdit_Start_strike->setPlaceholderText(QCoreApplication::translate("ConvertAlgo_Win", "Start Instrument (min 3 letters)", nullptr));
         lineEdit_StrikeDifference->setPlaceholderText(QCoreApplication::translate("ConvertAlgo_Win", "Strike Difference", nullptr));
         lineEdit_EndStrike->setPlaceholderText(QCoreApplication::translate("ConvertAlgo_Win", "End  Instrument", nullptr));
-        pushButton_Cancel->setText(QCoreApplication::translate("ConvertAlgo_Win", "Cancel", nullptr));
         pushButtonUpload->setText(QCoreApplication::translate("ConvertAlgo_Win", "Add", nullptr));
+        pushButton_Cancel->setText(QCoreApplication::translate("ConvertAlgo_Win", "Cancel", nullptr));
         lineEdit_Fut->setText(QString());
         lineEdit_Fut->setPlaceholderText(QCoreApplication::translate("ConvertAlgo_Win", "FUT Instrument", nullptr));
         pushButtonAdd->setText(QCoreApplication::translate("ConvertAlgo_Win", "Create Algo", nullptr));
