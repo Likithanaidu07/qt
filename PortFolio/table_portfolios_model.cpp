@@ -9,6 +9,10 @@
 #include <QStandardPaths>
 #include <QFontDatabase>
 #include <QStandardItemModel>
+#include <QTableView>
+#include <QHeaderView>
+#include <QVBoxLayout>
+#include <QWidget>
 
 struct CustomFormatting {
     QColor color;
@@ -783,5 +787,8 @@ void Table_Portfolios_Model::setColumnWidths(QTableView *tableView) const {
 
         // Set the column width directly in the view
         tableView->setColumnWidth(col, maxWidth);
+
+        tableView->setColumnWidth(_Status,45);
+        tableView->horizontalHeader()->setSectionResizeMode(_Status, QHeaderView::Fixed);
     }
 }

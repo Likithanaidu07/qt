@@ -32,6 +32,9 @@ public:
     void update_contract_tableData(QString foo_user_id_,int MaxPortfolioCount_);
     ~ConvertAlgo_Win();
 
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+
 signals:
     void signalStartItemClickedBFLY(QModelIndex);
     void signalStartItemClickedBFLYBID(QModelIndex);
@@ -82,8 +85,7 @@ private:
     QWidget *floatingWidgetSS;
     QListView *listViewStartStrike;
     QListView *listViewEndStrike;
-protected:
-    void keyPressEvent(QKeyEvent *event) override;
+
 signals:
     void update_ui_signal(int);
     void display_log_text_signal(QString);

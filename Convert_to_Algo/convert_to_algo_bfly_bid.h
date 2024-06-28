@@ -26,8 +26,13 @@ public:
     QString foo_token_number_end_strike;// this for start strike input of btfly
     QStandardItemModel *model_start_strike_BFLY_BID;
     QStandardItemModel *model_end_strike;
+     QStandardItemModel *model_start_strike;
     void startStrikeEditFinishedAction();
     void generateAlgo();
+    void endStrikeEditFinishedAction();
+    void initializeUI() ;
+
+
 
 private slots:
     void slotStartHide(QString);
@@ -53,6 +58,7 @@ private:
 
     EventFilter *eventFilterStart;
     EventFilter *eventFilterEnd;
+
 };
 
 

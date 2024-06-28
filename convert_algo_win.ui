@@ -90,18 +90,6 @@ background: #E0E8EE;
 }</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_3">
-         <property name="leftMargin">
-          <number>12</number>
-         </property>
-         <property name="topMargin">
-          <number>8</number>
-         </property>
-         <property name="rightMargin">
-          <number>12</number>
-         </property>
-         <property name="bottomMargin">
-          <number>12</number>
-         </property>
          <item row="0" column="0">
           <widget class="QLabel" name="label">
            <property name="styleSheet">
@@ -131,36 +119,6 @@ background: #E0E8EE;
            </property>
            <property name="flat">
             <bool>true</bool>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0" colspan="4">
-          <widget class="QTableWidget" name="tableWidget">
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QTableView::item {
-    background-color: #FFF;
-    border: none; 
-    color: #495057;
-    font-family: Work Sans;
-    font-size: 8px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
-}
-
-QTableView::item:alternate {
-    border: none; 
-    background-color: #F5FAFD; 
-}
-
-QTableView::item:selected {
-    background-color: #42A5F5;
-    color: white; /* Optionally, set the text color for selected items */
-}
-</string>
            </property>
           </widget>
          </item>
@@ -199,6 +157,36 @@ QTableView::item:selected {
            </property>
            <property name="flat">
             <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0" colspan="4">
+          <widget class="QTableWidget" name="tableWidget">
+           <property name="focusPolicy">
+            <enum>Qt::TabFocus</enum>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">QTableView::item {
+    background-color: #FFF;
+    border: none; 
+    color: #495057;
+    font-family: Work Sans;
+    font-size: 8px;
+    font-style: normal;
+    font-weight: 600;
+    line-height: normal;
+}
+
+QTableView::item:alternate {
+    border: none; 
+    background-color: #F5FAFD; 
+}
+
+QTableView::item:selected {
+    background-color: #42A5F5;
+    color: white; /* Optionally, set the text color for selected items */
+}
+</string>
            </property>
           </widget>
          </item>
@@ -359,41 +347,6 @@ QTableView::item:selected {
          </spacer>
         </item>
         <item>
-         <widget class="QPushButton" name="pushButton_Cancel">
-          <property name="minimumSize">
-           <size>
-            <width>85</width>
-            <height>32</height>
-           </size>
-          </property>
-          <property name="maximumSize">
-           <size>
-            <width>95</width>
-            <height>16777215</height>
-           </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton{
-border-radius: 7px;
-background: #1585C0;
-color: #FFF;
-box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.25);
-font-family: Work Sans;
-font-size: 14px;
-font-style: normal;
-font-weight: 600;
-line-height: normal;
-}</string>
-          </property>
-          <property name="text">
-           <string>Cancel</string>
-          </property>
-          <property name="flat">
-           <bool>true</bool>
-          </property>
-         </widget>
-        </item>
-        <item>
          <widget class="QPushButton" name="pushButtonUpload">
           <property name="sizePolicy">
            <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -422,6 +375,41 @@ line-height: normal;
           </property>
           <property name="text">
            <string>Add</string>
+          </property>
+          <property name="flat">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QPushButton" name="pushButton_Cancel">
+          <property name="minimumSize">
+           <size>
+            <width>85</width>
+            <height>32</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>95</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="styleSheet">
+           <string notr="true">QPushButton{
+border-radius: 7px;
+background: #1585C0;
+color: #FFF;
+box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.25);
+font-family: Work Sans;
+font-size: 14px;
+font-style: normal;
+font-weight: 600;
+line-height: normal;
+}</string>
+          </property>
+          <property name="text">
+           <string>Cancel</string>
           </property>
           <property name="flat">
            <bool>true</bool>
@@ -629,17 +617,16 @@ line-height: normal;
  </widget>
  <tabstops>
   <tabstop>comboBox_AlgoType</tabstop>
-  <tabstop>lineEdit_Fut</tabstop>
   <tabstop>lineEdit_Start_strike</tabstop>
   <tabstop>lineEdit_EndStrike</tabstop>
   <tabstop>lineEdit_StrikeDifference</tabstop>
-  <tabstop>pushButton_Cancel</tabstop>
-  <tabstop>pushButtonUpload</tabstop>
+  <tabstop>pushButtonAdd</tabstop>
   <tabstop>pushButtonSelectAll</tabstop>
   <tabstop>pushButton_Reset</tabstop>
   <tabstop>pushButtonDelete</tabstop>
-  <tabstop>Close</tabstop>
   <tabstop>tableWidget</tabstop>
+  <tabstop>pushButton_Cancel</tabstop>
+  <tabstop>lineEdit_Fut</tabstop>
  </tabstops>
  <resources/>
  <connections/>

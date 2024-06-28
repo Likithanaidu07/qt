@@ -1212,16 +1212,14 @@ void mysql_conn::getLinersTableData(Liners_Model *model,QString user_id,QHash<QS
 }
 
 
-void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty,double &BuyQty_summary,double &SellQty_summary,double &SellQty,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash)
+void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash)
 {
     QMutexLocker lock(&mutex);
      BuyValue_summary=0;
      SellValue = 0;
      Profit_summary = 0 ;
-     BuyQty=0;
      BuyQty_summary = 0;
      SellQty_summary = 0;
-     SellQty = 0;
      NetQty_summary = 0;
     //query: SELECT (order_table.Leg2_Price - order_table.Leg1_Price)/10000000 AS Exch_price , order_table.DesiredRate/10000000 as user_price,order_table.Trader_Data FROM  order_table WHERE order_table.OrderState=7
     /*  QList <QStringList> netPos_data_listTmp;
@@ -1364,33 +1362,38 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,d
                     PortfolioNumber = PortfolioNumber-1500000;
 
 
+
                 QString key = QString::number(TokenNo);
                 if(net_pos_dataList.contains(key)){
                     if(buy_sell=="1"){
-                        net_pos_dataList[key].Buy_Avg_Price = net_pos_dataList[key].Buy_Avg_Price+AvgPrice;
-                        net_pos_dataList[key].Buy_Total_Lot = net_pos_dataList[key].Buy_Total_Lot + Qty;
-                        BuyQty_summary = BuyQty_summary + net_pos_dataList[key].Buy_Total_Lot;
+                        net_pos_dataList[key].Buy_Avg_Price.append(AvgPrice);
+                        net_pos_dataList[key].Buy_Total_Lot.append(Qty);
+                       // BuyQty_summary = BuyQty_summary + net_pos_dataList[key].Buy_Total_Lot;
                     }
                     else{
-                        net_pos_dataList[key].Sell_Avg_Price =AvgPrice;
-                        net_pos_dataList[key].Sell_Total_Lot = Qty;
-                        SellQty_summary = SellQty_summary +  net_pos_dataList[key].Sell_Total_Lot;
+                        net_pos_dataList[key].Sell_Avg_Price.append(AvgPrice);
+                        net_pos_dataList[key].Sell_Total_Lot.append(Qty);
+                       // SellQty_summary = SellQty_summary +  net_pos_dataList[key].Sell_Total_Lot;
                     }
                 }
                 else{
                     net_pos_data_ net_pos;
                     net_pos.Stock_Name = StockName;
                     net_pos.PortfolioNumber = QString::number(PortfolioNumber);
+                  //  net_pos.Buy_Avg_Price = 0;
+                 //   net_pos.Buy_Total_Lot = 0;
+                    net_pos.Buy_Price = 0;
+                  //  net_pos.Sell_Avg_Price = 0;
+                    net_pos.Sell_Price = 0;
+                   // net_pos.Sell_Total_Lot = 0;
 
                     if(buy_sell=="1"){
-                        net_pos.Buy_Avg_Price =AvgPrice;
-                        net_pos.Buy_Total_Lot = Qty;
-                        BuyQty_summary = BuyQty_summary + net_pos.Buy_Total_Lot;
+                        net_pos.Buy_Avg_Price.append(AvgPrice);
+                        net_pos.Buy_Total_Lot.append(Qty);
                     }
                     else{
-                        net_pos.Sell_Avg_Price =AvgPrice;
-                        net_pos.Sell_Total_Lot = Qty;
-                        SellQty_summary = SellQty_summary + net_pos.Sell_Total_Lot;
+                        net_pos.Sell_Avg_Price.append(AvgPrice);
+                        net_pos.Sell_Total_Lot.append(Qty);
 
                     }
                     net_pos_dataList.insert(key,net_pos);
@@ -1419,25 +1422,31 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,d
                 dt = dt.addYears(10);
 
                // QString stock_name=ContractDetail::getInstance().GetStockName(TokenNo.toInt(),portfolio_type);
-                net_pos_dataList[TokenNo].Net_Qty = net_pos_dataList[TokenNo].Buy_Total_Lot-net_pos_dataList[TokenNo].Sell_Total_Lot;
-                net_pos_dataList[TokenNo].Buy_Price =net_pos_dataList[TokenNo].Buy_Avg_Price*net_pos_dataList[TokenNo].Buy_Total_Lot;
-                net_pos_dataList[TokenNo].Sell_Price = net_pos_dataList[TokenNo].Sell_Total_Lot*net_pos_dataList[TokenNo].Sell_Avg_Price;
+                net_pos_dataList[TokenNo].Net_Qty = calculateAverage(net_pos_dataList[TokenNo].Buy_Total_Lot)-calculateAverage(net_pos_dataList[TokenNo].Sell_Total_Lot);
+                net_pos_dataList[TokenNo].Buy_Price =calculateAverage(net_pos_dataList[TokenNo].Buy_Avg_Price)*calculateAverage(net_pos_dataList[TokenNo].Buy_Total_Lot);
+                net_pos_dataList[TokenNo].Sell_Price = calculateAverage(net_pos_dataList[TokenNo].Sell_Total_Lot)*calculateAverage(net_pos_dataList[TokenNo].Sell_Avg_Price);
+
+
                 BuyValue_summary = BuyValue_summary + net_pos_dataList[TokenNo].Buy_Price ;
                 SellValue = SellValue +  net_pos_dataList[TokenNo].Sell_Price ;
+
                 NetQty_summary = NetQty_summary + (net_pos_dataList[TokenNo].Net_Qty / lotSize);
-                BuyQty = BuyQty_summary/lotSize;
-                SellQty =SellQty_summary/lotSize;
+
+                BuyQty_summary = BuyQty_summary + calculateAverage(net_pos_dataList[TokenNo].Buy_Total_Lot)/ lotSize;
+                SellQty_summary = SellQty_summary + calculateAverage(net_pos_dataList[TokenNo].Sell_Total_Lot)/ lotSize;
+
+
                 double Profit = net_pos_dataList[TokenNo].Sell_Price-net_pos_dataList[TokenNo].Buy_Price;
                 Profit_summary = Profit_summary + Profit ;
                 QStringList rowList;
-                rowList.append(QString::number(c));
+                rowList.append(QString::number(c)+"-"+TokenNo);
                 rowList.append(net_pos_dataList[TokenNo].Stock_Name);
-                rowList.append(QString::number(net_pos_dataList[TokenNo].Buy_Total_Lot/lotSize));
-                rowList.append(QString::number(net_pos_dataList[TokenNo].Sell_Total_Lot/lotSize));
+                rowList.append(QString::number(calculateAverage(net_pos_dataList[TokenNo].Buy_Total_Lot)/lotSize));
+                rowList.append(QString::number(calculateAverage(net_pos_dataList[TokenNo].Sell_Total_Lot)/lotSize));
                 rowList.append(fixDecimal(net_pos_dataList[TokenNo].Buy_Price,decimal_precision));
                 rowList.append(fixDecimal(net_pos_dataList[TokenNo].Sell_Price,decimal_precision));
-                rowList.append(fixDecimal(net_pos_dataList[TokenNo].Buy_Avg_Price,decimal_precision));
-                rowList.append(fixDecimal(net_pos_dataList[TokenNo].Sell_Avg_Price,decimal_precision));
+                rowList.append(fixDecimal(calculateAverage(net_pos_dataList[TokenNo].Buy_Avg_Price),decimal_precision));
+                rowList.append(fixDecimal(calculateAverage(net_pos_dataList[TokenNo].Sell_Avg_Price),decimal_precision));
                 rowList.append(QString::number(net_pos_dataList[TokenNo].Net_Qty/lotSize));
                 rowList.append(fixDecimal(Profit,decimal_precision));
                 rowList.append("-");
@@ -1446,6 +1455,8 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,d
                 c++;
 
             }
+
+
             model->setDataList(netPos_data_listTmp);
         }
     }

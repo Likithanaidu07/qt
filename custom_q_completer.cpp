@@ -45,51 +45,66 @@ CustomSearchWidget::CustomSearchWidget(QListView *customListView, QStandardItemM
     listView->hide();
 
 }
-
-void CustomSearchWidget::filterItems(const QString &text)
-{
+void CustomSearchWidget::filterItems(const QString &text) {
     QSortFilterProxyModel *proxyModel = qobject_cast<QSortFilterProxyModel*>(listView->model());
     if (!proxyModel)
         return;
 
     if (text.isEmpty()) {
         // If the search text is empty, clear the filter and hide the list view
-        proxyModel->setFilterWildcard("");
+        proxyModel->setFilterRegularExpression("");
         listView->hide();
         return;
     }
 
+    // Step 1: Perform the "starts with" search
     QStringList searchTerms = text.split(" ", Qt::SkipEmptyParts);
 
-    // Construct a regular expression pattern for each search term
-    QString pattern;
-
-    int index = 0;
-    for (const QString &term : searchTerms)
-    {
-        if (index == 0)
-        {
-            // For the first term, require that it starts with the search text
-            pattern += "^" + QRegularExpression::escape(term);
+    QString startsWithPattern;
+    int i = 0;
+    for (const QString &term : searchTerms) {
+        if (i == 0) {
+            startsWithPattern += "^" + QRegularExpression::escape(term);
+        } else {
+            startsWithPattern += "(?=.*" + QRegularExpression::escape(term) + ")";
         }
-        else
-        {
-            pattern += "(?=.*" + QRegularExpression::escape(term) + ")";
-        }
-        index++;
+        i++;
     }
-    // Combine the patterns with the logical AND operator
-    pattern = "^" + pattern;
 
-    // Create a regular expression for the pattern
-    QRegularExpression regex(pattern, QRegularExpression::CaseInsensitiveOption);
-    proxyModel->setFilterRegularExpression(regex);
-    if (proxyModel->rowCount() > 0)
-    {
-        listView->show();
+    QRegularExpression startsWithRegex(startsWithPattern, QRegularExpression::CaseInsensitiveOption);
+    proxyModel->setFilterRegularExpression(startsWithRegex);
+
+    // Sort after setting the filter
+    proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive); // Optional: set case sensitivity
+    proxyModel->sort(0, Qt::AscendingOrder); // Sort by column 0 (adjust column index as needed) in ascending order
+
+    // Show or hide the list view based on the filter result
+    if (proxyModel->rowCount() > 0) {
+        if (!listView->isVisible()) {
+            listView->show();
+        }
+        return;  // If matches are found, exit the function
     }
-    else
-    {
+
+    // Step 2: Perform the "contains" search if no matches are found
+    QString containsPattern = ".*";
+    for (const QString &term : searchTerms) {
+        containsPattern += QRegularExpression::escape(term) + ".*";
+    }
+
+    QRegularExpression containsRegex(containsPattern, QRegularExpression::CaseInsensitiveOption);
+    proxyModel->setFilterRegularExpression(containsRegex);
+
+    // Sort after setting the filter
+    proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive); // Optional: set case sensitivity
+    proxyModel->sort(0, Qt::AscendingOrder); // Sort by column 0 (adjust column index as needed) in ascending order
+
+    // Show or hide the list view based on the filter result
+    if (proxyModel->rowCount() > 0) {
+        if (!listView->isVisible()) {
+            listView->show();
+        }
+    } else {
         listView->hide();
     }
 }
