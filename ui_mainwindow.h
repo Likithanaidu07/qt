@@ -36,7 +36,7 @@ public:
     QWidget *widget_4;
     QHBoxLayout *horizontalLayout_18;
     QSpacerItem *verticalSpacer_2;
-    QWidget *widget;
+    QWidget *sidePanel;
     QVBoxLayout *verticalLayout;
     QWidget *summary_widget;
     QVBoxLayout *verticalLayout_2;
@@ -97,7 +97,7 @@ public:
     QVBoxLayout *verticalLayout_22;
     QLabel *label_16;
     QLabel *label_34;
-    QWidget *widget_13;
+    QWidget *watchWidget;
     QVBoxLayout *verticalLayout_8;
     QWidget *widget_15;
     QHBoxLayout *horizontalLayout_11;
@@ -226,22 +226,24 @@ public:
 
         gridLayout->addItem(verticalSpacer_2, 5, 4, 1, 1);
 
-        widget = new QWidget(centralwidget);
-        widget->setObjectName(QString::fromUtf8("widget"));
+
+        sidePanel = new QWidget(centralwidget);
+        sidePanel->setObjectName("sidePanel");
         QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Expanding);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
-        sizePolicy1.setHeightForWidth(widget->sizePolicy().hasHeightForWidth());
-        widget->setSizePolicy(sizePolicy1);
-        widget->setMaximumSize(QSize(335, 16777215));
-        widget->setStyleSheet(QString::fromUtf8("#widget{\n"
+        sizePolicy1.setHeightForWidth(sidePanel->sizePolicy().hasHeightForWidth());
+        sidePanel->setSizePolicy(sizePolicy1);
+        sidePanel->setMaximumSize(QSize(335, 16777215));
+        sidePanel->setStyleSheet(QString::fromUtf8("#widget{\n"
 "background: #94B3C3;\n"
 "}"));
-        verticalLayout = new QVBoxLayout(widget);
-        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
+
+        verticalLayout = new QVBoxLayout(sidePanel);
+        verticalLayout->setObjectName("verticalLayout");
         verticalLayout->setContentsMargins(4, 5, 4, 0);
-        summary_widget = new QWidget(widget);
-        summary_widget->setObjectName(QString::fromUtf8("summary_widget"));
+        summary_widget = new QWidget(sidePanel);
+        summary_widget->setObjectName("summary_widget");
         sizePolicy1.setHeightForWidth(summary_widget->sizePolicy().hasHeightForWidth());
         summary_widget->setSizePolicy(sizePolicy1);
         summary_widget->setMinimumSize(QSize(0, 0));
@@ -557,24 +559,26 @@ public:
 
         verticalLayout->addWidget(summary_widget);
 
-        widget_13 = new QWidget(widget);
-        widget_13->setObjectName(QString::fromUtf8("widget_13"));
-        sizePolicy1.setHeightForWidth(widget_13->sizePolicy().hasHeightForWidth());
-        widget_13->setSizePolicy(sizePolicy1);
-        widget_13->setMinimumSize(QSize(0, 0));
-        widget_13->setMaximumSize(QSize(380, 310));
-        widget_13->setStyleSheet(QString::fromUtf8("#widget_13{\n"
+
+        watchWidget = new QWidget(sidePanel);
+        watchWidget->setObjectName("watchWidget");
+        sizePolicy1.setHeightForWidth(watchWidget->sizePolicy().hasHeightForWidth());
+        watchWidget->setSizePolicy(sizePolicy1);
+        watchWidget->setMinimumSize(QSize(0, 0));
+        watchWidget->setMaximumSize(QSize(380, 310));
+        watchWidget->setStyleSheet(QString::fromUtf8("#widget_13{\n"
 "border-radius: 12px;\n"
 "border: 0px solid #B9D4CE;\n"
 "background: #F3FEFF;\n"
 "box-shadow: 0px 1px 3px 0px #92B2B7;\n"
 "}"));
-        verticalLayout_8 = new QVBoxLayout(widget_13);
+        verticalLayout_8 = new QVBoxLayout(watchWidget);
         verticalLayout_8->setSpacing(0);
         verticalLayout_8->setObjectName(QString::fromUtf8("verticalLayout_8"));
         verticalLayout_8->setContentsMargins(3, 3, 3, 3);
-        widget_15 = new QWidget(widget_13);
-        widget_15->setObjectName(QString::fromUtf8("widget_15"));
+
+        widget_15 = new QWidget(watchWidget);
+        widget_15->setObjectName("widget_15");
         widget_15->setMaximumSize(QSize(16777215, 30));
         widget_15->setStyleSheet(QString::fromUtf8("background-color: rgba(43, 107, 111, 1);\n"
 ""));
@@ -610,8 +614,9 @@ public:
         verticalLayout_12->setSpacing(5);
         verticalLayout_12->setObjectName(QString::fromUtf8("verticalLayout_12"));
         verticalLayout_12->setContentsMargins(0, 10, 0, -1);
-        lineEditWatchSearch = new QLineEdit(widget_13);
-        lineEditWatchSearch->setObjectName(QString::fromUtf8("lineEditWatchSearch"));
+
+        lineEditWatchSearch = new QLineEdit(watchWidget);
+        lineEditWatchSearch->setObjectName("lineEditWatchSearch");
         lineEditWatchSearch->setMinimumSize(QSize(0, 30));
         lineEditWatchSearch->setStyleSheet(QString::fromUtf8("   background-image: url(:/search.png);\n"
 "    background-repeat: no-repeat;\n"
@@ -630,8 +635,9 @@ public:
 
         verticalLayout_12->addWidget(lineEditWatchSearch);
 
-        listWidgetWatch = new QListWidget(widget_13);
-        listWidgetWatch->setObjectName(QString::fromUtf8("listWidgetWatch"));
+
+        listWidgetWatch = new QListWidget(watchWidget);
+        listWidgetWatch->setObjectName("listWidgetWatch");
         listWidgetWatch->setStyleSheet(QString::fromUtf8("#listWidgetWatch{\n"
 "background: #F3FEFF;\n"
 "border-bottom: 21px solid gray; /* Adjust border width for desired shadow size */\n"
@@ -660,8 +666,9 @@ public:
 
         verticalLayout_8->addItem(verticalSpacer);
 
-        watchListSelectedDetails_Parent = new QWidget(widget_13);
-        watchListSelectedDetails_Parent->setObjectName(QString::fromUtf8("watchListSelectedDetails_Parent"));
+
+        watchListSelectedDetails_Parent = new QWidget(watchWidget);
+        watchListSelectedDetails_Parent->setObjectName("watchListSelectedDetails_Parent");
         watchListSelectedDetails_Parent->setStyleSheet(QString::fromUtf8("#widget_17{\n"
 "	border-top-left-radius: 0px;\n"
 "    border-top-right-radius: 0px;\n"
@@ -869,10 +876,11 @@ public:
         verticalLayout_8->addWidget(watchListSelectedDetails_Parent);
 
 
-        verticalLayout->addWidget(widget_13);
+        verticalLayout->addWidget(watchWidget);
 
-        Logs_Widget = new QWidget(widget);
-        Logs_Widget->setObjectName(QString::fromUtf8("Logs_Widget"));
+
+        Logs_Widget = new QWidget(sidePanel);
+        Logs_Widget->setObjectName("Logs_Widget");
         sizePolicy.setHeightForWidth(Logs_Widget->sizePolicy().hasHeightForWidth());
         Logs_Widget->setSizePolicy(sizePolicy);
         Logs_Widget->setMinimumSize(QSize(0, 0));
@@ -941,7 +949,7 @@ public:
         verticalLayout->addWidget(Logs_Widget);
 
 
-        gridLayout->addWidget(widget, 4, 4, 1, 1);
+        gridLayout->addWidget(sidePanel, 4, 4, 1, 1);
 
         widget_3 = new QWidget(centralwidget);
         widget_3->setObjectName(QString::fromUtf8("widget_3"));

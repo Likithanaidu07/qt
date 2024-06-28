@@ -85,7 +85,7 @@ background: #86A2B1;
      </spacer>
     </item>
     <item row="4" column="4">
-     <widget class="QWidget" name="widget" native="true">
+     <widget class="QWidget" name="sidePanel" native="true">
       <property name="sizePolicy">
        <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
         <horstretch>0</horstretch>
@@ -838,7 +838,7 @@ line-height: normal;
         </widget>
        </item>
        <item>
-        <widget class="QWidget" name="widget_13" native="true">
+        <widget class="QWidget" name="watchWidget" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
            <horstretch>0</horstretch>
