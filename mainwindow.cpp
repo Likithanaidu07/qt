@@ -83,24 +83,46 @@ MainWindow::MainWindow(QWidget *parent)
     CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, true);
     CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
     CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
+   // CDockManager::setConfigFlag(CDockManager::ActiveTabHasCloseButton, false);
     CDockManager::setAutoHideConfigFlags(CDockManager::DefaultAutoHideConfig);
+
+    /***********************Move Side Panel items to dock Widget**********************/
+
+    DockManagerSidePanel = new CDockManager(ui->sidePanel);
+    ui->sidePanel->layout()->addWidget(DockManagerSidePanel);
+    CDockWidget* watchWidgetDockWidget = new CDockWidget("Watch");
+    watchWidgetDockWidget->setWidget(ui->watchWidget);
+    watchWidgetDockWidget->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
+    watchWidgetDockWidget->resize(250, 150);
+    watchWidgetDockWidget->setMinimumSize(200,150);
+    DockManagerSidePanel->addDockWidget(DockWidgetArea::TopDockWidgetArea, watchWidgetDockWidget);
+
+    ui->sidePanel->layout()->addWidget(DockManagerSidePanel);
+    CDockWidget* summaryhWidgetDockWidget = new CDockWidget("Summary");
+    summaryhWidgetDockWidget->setWidget(ui->summary_widget);
+    summaryhWidgetDockWidget->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
+    summaryhWidgetDockWidget->resize(250, 150);
+    summaryhWidgetDockWidget->setMinimumSize(200,150);
+    DockManagerSidePanel->addDockWidget(DockWidgetArea::CenterDockWidgetArea, summaryhWidgetDockWidget);
+
+    ui->sidePanel->layout()->addWidget(DockManagerSidePanel);
+    CDockWidget* loghWidgetDockWidget = new CDockWidget("Logs");
+    loghWidgetDockWidget->setWidget(ui->Logs_Widget);
+    loghWidgetDockWidget->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
+    loghWidgetDockWidget->resize(250, 150);
+    loghWidgetDockWidget->setMinimumSize(200,150);
+    DockManagerSidePanel->addDockWidget(DockWidgetArea::BottomDockWidgetArea, loghWidgetDockWidget);
+
+
+
+    /**********************************************************************************/
+
 
     QVBoxLayout* Layout = new QVBoxLayout(ui->mainPanel);
     Layout->setContentsMargins(QMargins(0, 0, 0, 0));
 
-    DockManager = new CDockManager(ui->mainPanel);
-    Layout->addWidget(DockManager);
-
-
-
-  /*  QMainWindow *subWindow = new QMainWindow(ui->centralwidget);
-    subWindow->setMinimumHeight(500);
-    subWindow->setMinimumWidth(900);
-    subWindow->setWindowFlags(Qt::Widget);
-    ui->verticalLayout_11->addWidget(subWindow);
-    subWindow->show();*/
-
-
+    DockManagerMainPanel = new CDockManager(ui->mainPanel);
+    Layout->addWidget(DockManagerMainPanel);
 
 
     /***********Init portfolio table Window**************************/
@@ -114,10 +136,8 @@ MainWindow::MainWindow(QWidget *parent)
     T_Portfolio_DockWin->setMinimumSize(200,150);
    // const auto autoHideContainerPortfolioTable = DockManager->addAutoHideDockWidget(SideBarLocation::SideBarLeft, T_Portfolio_DockWin);
    // autoHideContainerPortfolioTable->setSize(480);
-    //subWindow->addDockWidget(Qt::TopDockWidgetArea, T_Portfolio_DockWin);
-   // T_Portfolio_DockWin->setAllowedAreas(Qt::AllDockWidgetAreas);
 
-    DockManager->addDockWidget(DockWidgetArea::RightDockWidgetArea, T_Portfolio_DockWin);
+    DockManagerMainPanel->addDockWidget(DockWidgetArea::RightDockWidgetArea, T_Portfolio_DockWin);
 
         //Create Titlebar
         QWidget* titlecontainer = new QWidget;
@@ -322,7 +342,7 @@ MainWindow::MainWindow(QWidget *parent)
     dock_win_trade->setStyleSheet(dock_style);
     dock_win_trade->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
     dock_win_trade->setMinimumSize(200,150);
-    const auto autoHideContainerTrade = DockManager->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_trade);
+    const auto autoHideContainerTrade = DockManagerMainPanel->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_trade);
     autoHideContainerTrade->setSize(480);
 
     //create a titlebar
@@ -424,7 +444,7 @@ MainWindow::MainWindow(QWidget *parent)
     dock_win_net_pos->setStyleSheet(dock_style);
     dock_win_net_pos->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
     dock_win_net_pos->setMinimumSize(200,150);
-    const auto autoHideContainerPos = DockManager->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_net_pos);
+    const auto autoHideContainerPos = DockManagerMainPanel->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_net_pos);
     autoHideContainerPos->setSize(480);
 
     //create a titlebar
@@ -487,7 +507,7 @@ MainWindow::MainWindow(QWidget *parent)
     dock_win_liners->setStyleSheet(dock_style);
     dock_win_liners->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
     dock_win_liners->setMinimumSize(200,150);
-    const auto autoHideContainer_liners = DockManager->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_liners);
+    const auto autoHideContainer_liners = DockManagerMainPanel->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_liners);
     autoHideContainer_liners->setSize(480);
 
     //create a titlebar
@@ -548,7 +568,7 @@ MainWindow::MainWindow(QWidget *parent)
     //dock_win_combined_tracker->setAllowedAreas(Qt::AllDockWidgetAreas );
     dock_win_combined_tracker->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
     dock_win_combined_tracker->setMinimumSize(200,150);
-    const auto autoHideContainer_tracker = DockManager->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_combined_tracker);
+    const auto autoHideContainer_tracker = DockManagerMainPanel->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_combined_tracker);
     autoHideContainer_tracker->setSize(480);
 
     //create a titlebar
@@ -596,6 +616,10 @@ MainWindow::MainWindow(QWidget *parent)
     dock_win_combined_tracker->setWidget(combined_tracker_table);
     combined_tracker_table->show();
     /************Historical Positions********************************/
+
+
+
+
 
 
 
@@ -698,6 +722,8 @@ MainWindow::MainWindow(QWidget *parent)
     // connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
    //loadContract();
     initWatchWindow();
+    // this should be called after all dock widget are set
+    restoreDockManagerState();
 }
 
 
@@ -1439,7 +1465,9 @@ void MainWindow::add_logs(QString str){
 void MainWindow::on_OrderBook_Button_clicked()
 {
     //8
-    dock_win_trade->show();
+    //dock_win_trade->show();
+    dock_win_trade->toggleView(true);
+
     ui->OrderBook_Widget->setStyleSheet(stylesheetvis);
     ui->OrderBook_Close->setVisible(true);
 }
@@ -1448,7 +1476,7 @@ void MainWindow::on_OrderBook_Button_clicked()
 void MainWindow::on_OrderBook_Close_clicked()
 {
     //8
-    dock_win_trade->close();
+    dock_win_trade->toggleView(false);
     ui->OrderBook_Widget->setStyleSheet("");
     ui->OrderBook_Close->setVisible(false);
 }
@@ -1457,7 +1485,8 @@ void MainWindow::on_OrderBook_Close_clicked()
 void MainWindow::on_Positions_Button_clicked()
 {
     //9
-    dock_win_net_pos->show();
+    dock_win_net_pos->toggleView(true);
+
     ui->Positions_Widget->setStyleSheet(stylesheetvis);
     ui->Positions_Close->setVisible(true);
 }
@@ -1466,14 +1495,14 @@ void MainWindow::on_Positions_Button_clicked()
 void MainWindow::on_Positions_Close_clicked()
 {
     //9
-    dock_win_net_pos->close();
+    dock_win_net_pos->toggleView(false);
     ui->Positions_Widget->setStyleSheet("");
     ui->Positions_Close->setVisible(false);
 }
 void MainWindow::on_Liners_Button_clicked()
 {
     //10
-    dock_win_liners->show();
+    dock_win_liners->toggleView(true);
     ui->Liners_Widget->setStyleSheet(stylesheetvis);
     ui->Liners_Close->setVisible(true);
 }
@@ -1482,7 +1511,7 @@ void MainWindow::on_Liners_Button_clicked()
 void MainWindow::on_Liners_Close_clicked()
 {
     //10
-    dock_win_liners->close();
+    dock_win_liners->toggleView(false);
     ui->Liners_Widget->setStyleSheet("");
     ui->Liners_Close->setVisible(false);
 }
@@ -1491,7 +1520,7 @@ void MainWindow::on_Liners_Close_clicked()
 void MainWindow::on_HP_Button_clicked()
 {
     //11
-    dock_win_combined_tracker->show();
+    dock_win_combined_tracker->toggleView(true);
     ui->HP_Widget->setStyleSheet(stylesheetvis);
     ui->HP_Close->setVisible(true);
 }
@@ -1500,7 +1529,7 @@ void MainWindow::on_HP_Button_clicked()
 void MainWindow::on_HP_Close_clicked()
 {
     //11
-    dock_win_combined_tracker->close();
+    dock_win_combined_tracker->toggleView(false);
     ui->HP_Widget->setStyleSheet("");
     ui->HP_Close->setVisible(false);
 }
@@ -1684,7 +1713,7 @@ void MainWindow::OnHPDockWidgetVisiblityChanged(bool p_Visible)
 
 void MainWindow::on_Algorithms_Button_clicked()
 {
-    T_Portfolio_DockWin->show();
+    T_Portfolio_DockWin->toggleView(true);
     //7
     ui->Algorithms_Widget->setStyleSheet(stylesheetvis);
     ui->Algorithms_Close->setVisible(true);
@@ -1693,7 +1722,7 @@ void MainWindow::on_Algorithms_Button_clicked()
 
 void MainWindow::on_Algorithms_Close_clicked()
 {
-    T_Portfolio_DockWin->close();
+    T_Portfolio_DockWin->toggleView(false);
     ui->Algorithms_Widget->setStyleSheet("");
     ui->Algorithms_Close->setVisible(false);
 }
@@ -2159,16 +2188,69 @@ void MainWindow::on_listWidgetWatch_itemSelectionChanged()
 
 void MainWindow::on_toggle_Button_1_clicked()
 {
-    bool currentVisibility = ui->widget->isVisible();
+    bool currentVisibility = ui->sidePanel->isVisible();
     if (currentVisibility) {
-        ui->widget->setVisible(false);
+        ui->sidePanel->setVisible(false);
         QPixmap pixmapRight(":/right_arrow.png");
         ui->toggle_Button_1->setIcon(pixmapRight);
 
     } else {
-        ui->widget->setVisible(true);
+        ui->sidePanel->setVisible(true);
         QPixmap pixmapLeft(":/left_arrow.png");
         ui->toggle_Button_1->setIcon(pixmapLeft);
     }
 }
 
+
+void MainWindow::saveDockManagerState()
+{
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
+    QByteArray state1 = DockManagerMainPanel->saveState();
+    QFile file1(appDataPath+"/dock_state_main_panel.dat");
+    if (file1.open(QIODevice::WriteOnly)) {
+        QDataStream out1(&file1);
+        out1 << state1;
+        file1.close();
+    }
+
+    QByteArray state2 = DockManagerSidePanel->saveState();
+    QFile file2(appDataPath+"/dock_state_side_panel.dat");
+    if (file2.open(QIODevice::WriteOnly)) {
+        QDataStream out2(&file2);
+        out2 << state2;
+        file2.close();
+    }
+}
+
+void MainWindow::restoreDockManagerState()
+{
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
+    QFile file1(appDataPath+"/dock_state_main_panel.dat");
+    if (file1.open(QIODevice::ReadOnly)) {
+        QByteArray state1;
+        QDataStream in1(&file1);
+        in1 >> state1;
+        DockManagerMainPanel->restoreState(state1);
+        file1.close();
+    }
+
+
+    QFile file2(appDataPath+"/dock_state_side_panel.dat");
+    if (file2.open(QIODevice::ReadOnly)) {
+        QByteArray state2;
+        QDataStream in2(&file2);
+        in2 >> state2;
+        DockManagerSidePanel->restoreState(state2);
+        file2.close();
+    }
+}
+void MainWindow::closeEvent(QCloseEvent* event)
+{
+    // Delete dock manager here to delete all floating widgets. This ensures
+    // that all top level windows of the dock manager are properly closed
+    saveDockManagerState();
+
+    DockManagerSidePanel->deleteLater();
+    DockManagerMainPanel->deleteLater();
+    QMainWindow::closeEvent(event);
+}

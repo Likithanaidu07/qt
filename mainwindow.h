@@ -110,8 +110,8 @@ private:
     double SellQty_summary;
 
 
-    ads::CDockManager* DockManager;
-
+    ads::CDockManager* DockManagerMainPanel;
+    ads::CDockManager *DockManagerSidePanel;
 
 
     void createINIFileIfNotExist();
@@ -201,6 +201,8 @@ private:
     void saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList);
     void loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList);
 
+    void saveDockManagerState();
+     void restoreDockManagerState();
 public slots:
     void profolioTableEditFinshedSlot(QString val,QModelIndex);
 //    void edit_Started_PortFolio_Table(int row,int col);
@@ -265,5 +267,11 @@ private slots:
     void on_listWidgetWatch_itemSelectionChanged();
 
     void on_toggle_Button_1_clicked();
+
+
+protected:
+    virtual void closeEvent(QCloseEvent* event) override;
+
+
 };
 #endif // MAINWINDOW_H
