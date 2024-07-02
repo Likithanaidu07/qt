@@ -380,7 +380,7 @@ public:
         lineEditUsername->setText(QString());
         lineEditUsername->setPlaceholderText(QCoreApplication::translate("loginwindow", "Username", nullptr));
         footer->setText(QCoreApplication::translate("loginwindow", "ALGO METHODS SOFTWARE & SERVICES PVT LTD", nullptr));
-        label->setText(QCoreApplication::translate("loginwindow", "1.1 20-05-2024_11_00_PM", nullptr));
+        label->setText(QString());
         lineEdit_Password->setText(QString());
         lineEdit_Password->setPlaceholderText(QCoreApplication::translate("loginwindow", "Password", nullptr));
         minimize->setText(QCoreApplication::translate("loginwindow", "_", nullptr));

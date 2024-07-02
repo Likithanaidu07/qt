@@ -236,8 +236,27 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     enable_disable_UIElement(false);
     resetTableWidget();
     ui->comboBox_AlgoType->setFocus();
-}
 
+  //  ui->tableWidget->installEventFilter(this);
+
+}
+bool ConvertAlgo_Win::eventFilter(QObject *watched, QEvent *event) {
+
+    if (watched == ui->tableWidget && event->type() == QEvent::KeyPress) {
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if (keyEvent->key() == Qt::Key_Tab) {
+            int row = ui->tableWidget->currentRow();
+            int column = ui->tableWidget->currentColumn();
+            if (row == ui->tableWidget->rowCount() - 1 && column == ui->tableWidget->columnCount() - 1) {
+                // Move focus to button2 and reset the focus to the first cell
+                ui->pushButtonUpload->setFocus();
+                ui->tableWidget->setCurrentCell(0, 0);
+                return true; // Event handled
+            }
+        }
+    }
+    return ConvertAlgo_Win::eventFilter(watched, event);
+}
 ConvertAlgo_Win::~ConvertAlgo_Win()
 {
     delete ui;
@@ -254,6 +273,8 @@ void ConvertAlgo_Win::keyPressEvent(QKeyEvent *event)
     {
         ui->lineEdit_Start_strike->clear(); // Clear the text in the start strike line edit
         ui->lineEdit_EndStrike->clear();    // Clear the text in the end strike line edit
+        ui->lineEdit_StrikeDifference->clear();
+
         event->accept();                    // Accept the event to indicate it was handled
     }
     else

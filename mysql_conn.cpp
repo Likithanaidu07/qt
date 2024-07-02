@@ -13,7 +13,9 @@
 #include "contractdetail.h"
 #include "PortFolio/PortfolioParser.h"
 #include "mainwindow.h"
+#include "ui_convert_algo_win.h"
 
+#define DISABLE_MULTI_USER_LOGIN_CHECK
 extern MainWindow *MainWindowObj;
 
 //#include "CombinedTracker/combined_tracker_table_model.h"
@@ -129,6 +131,38 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                 QSqlRecord rec = query.record();
                 QString storedPassword = query.value(rec.indexOf("Password")).toString();
                 if (storedPassword == password) {
+
+#ifndef DISABLE_MULTI_USER_LOGIN_CHECK
+                    // check user already logged in from different system
+                    QString query_str = "SELECT CASE WHEN NOT EXISTS (SELECT 1 FROM Logs) THEN 'No Logs' WHEN EXISTS (SELECT 1 FROM Logs l WHERE l.Log_ID > (SELECT Log_ID FROM Logs WHERE UserName = '"+UserName_+"' AND LogMessage LIKE '%User:"+UserName_+" logged in from%' ORDER BY Log_ID DESC LIMIT 1) AND l.UserName = '"+UserName_+"' AND l.LogMessage LIKE '%Logged Out%') THEN 'Logged Out' ELSE 'Still Logged In' END AS LoginStatus;";
+                 //   qDebug()<<query_str;
+
+                    QSqlQuery query2(query_str, db);
+
+                    if (query2.exec()) {
+                        if (query2.next()) {
+                            QString loginStatus = query2.value("LoginStatus").toString();
+                            if(loginStatus=="Logged Out"||loginStatus=="No Logs"){
+
+                            }
+                            else{
+                                userLoginInfo.dbError = true;
+                                userLoginInfo.loginResponse=  "User already logged in";
+                                userLoginInfo.errorCode = T_LoginErroCode::DB_ERROR;
+                                return userLoginInfo;
+                            }
+
+
+                            qDebug() << "Login Status:" << loginStatus;
+                        } else {
+                            qDebug() << "No results found.";
+                        }
+                    } else {
+                        qDebug() << "Query execution error:" << query2.lastError().text();
+                    }
+#endif
+
+
                     userLoginInfo.UserName = query.value(rec.indexOf("UserName")).toString();
                     userNameLogged=userLoginInfo.UserName;
                     userLoginInfo.algoFilterMap[PortfolioType::BFLY_BID] = query.value(rec.indexOf("BFLY_BIDInFilter")).toString();
@@ -167,7 +201,8 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                         qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
                         qDebug() << "Query Str: " << qryStr;
                     }
-                }
+              }
+
                 else
                 {
                     userLoginInfo.loginResponse = "Wrong password";
@@ -745,7 +780,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
 QList <QStringList> liners_listTmp;
     QHash<QString, Liners_Data> Liners_Data_Hash;
     QString msg;
-
+    TraderCount = 0;
     bool ok = checkDBOpened(msg);
     if(ok)
     {
@@ -1366,13 +1401,13 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,d
                 QString key = QString::number(TokenNo);
                 if(net_pos_dataList.contains(key)){
                     if(buy_sell=="1"){
-                        net_pos_dataList[key].Buy_Avg_Price.append(AvgPrice);
-                        net_pos_dataList[key].Buy_Total_Lot.append(Qty);
+                        net_pos_dataList[key].Buy_Avg_Price = net_pos_dataList[key].Buy_Avg_Price+AvgPrice;
+                        net_pos_dataList[key].Buy_Total_Lot = net_pos_dataList[key].Buy_Total_Lot + Qty;
                        // BuyQty_summary = BuyQty_summary + net_pos_dataList[key].Buy_Total_Lot;
                     }
                     else{
-                        net_pos_dataList[key].Sell_Avg_Price.append(AvgPrice);
-                        net_pos_dataList[key].Sell_Total_Lot.append(Qty);
+                        net_pos_dataList[key].Sell_Avg_Price = net_pos_dataList[key].Sell_Avg_Price+ AvgPrice;
+                        net_pos_dataList[key].Sell_Total_Lot = net_pos_dataList[key].Sell_Total_Lot + Qty;
                        // SellQty_summary = SellQty_summary +  net_pos_dataList[key].Sell_Total_Lot;
                     }
                 }
@@ -1380,20 +1415,20 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,d
                     net_pos_data_ net_pos;
                     net_pos.Stock_Name = StockName;
                     net_pos.PortfolioNumber = QString::number(PortfolioNumber);
-                  //  net_pos.Buy_Avg_Price = 0;
-                 //   net_pos.Buy_Total_Lot = 0;
+                    net_pos.Buy_Avg_Price = 0;
+                    net_pos.Buy_Total_Lot = 0;
                     net_pos.Buy_Price = 0;
-                  //  net_pos.Sell_Avg_Price = 0;
+                    net_pos.Sell_Avg_Price = 0;
                     net_pos.Sell_Price = 0;
-                   // net_pos.Sell_Total_Lot = 0;
+                    net_pos.Sell_Total_Lot = 0;
 
                     if(buy_sell=="1"){
-                        net_pos.Buy_Avg_Price.append(AvgPrice);
-                        net_pos.Buy_Total_Lot.append(Qty);
+                        net_pos.Buy_Avg_Price = (AvgPrice);
+                        net_pos.Buy_Total_Lot = (Qty);
                     }
                     else{
-                        net_pos.Sell_Avg_Price.append(AvgPrice);
-                        net_pos.Sell_Total_Lot.append(Qty);
+                        net_pos.Sell_Avg_Price = (AvgPrice);
+                        net_pos.Sell_Total_Lot = (Qty);
 
                     }
                     net_pos_dataList.insert(key,net_pos);
@@ -1422,9 +1457,9 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,d
                 dt = dt.addYears(10);
 
                // QString stock_name=ContractDetail::getInstance().GetStockName(TokenNo.toInt(),portfolio_type);
-                net_pos_dataList[TokenNo].Net_Qty = calculateAverage(net_pos_dataList[TokenNo].Buy_Total_Lot)-calculateAverage(net_pos_dataList[TokenNo].Sell_Total_Lot);
-                net_pos_dataList[TokenNo].Buy_Price =calculateAverage(net_pos_dataList[TokenNo].Buy_Avg_Price)*calculateAverage(net_pos_dataList[TokenNo].Buy_Total_Lot);
-                net_pos_dataList[TokenNo].Sell_Price = calculateAverage(net_pos_dataList[TokenNo].Sell_Total_Lot)*calculateAverage(net_pos_dataList[TokenNo].Sell_Avg_Price);
+                net_pos_dataList[TokenNo].Net_Qty = (net_pos_dataList[TokenNo].Buy_Total_Lot)-(net_pos_dataList[TokenNo].Sell_Total_Lot);
+                net_pos_dataList[TokenNo].Buy_Price =(net_pos_dataList[TokenNo].Buy_Avg_Price)*(net_pos_dataList[TokenNo].Buy_Total_Lot);
+                net_pos_dataList[TokenNo].Sell_Price = (net_pos_dataList[TokenNo].Sell_Total_Lot)*(net_pos_dataList[TokenNo].Sell_Avg_Price);
 
 
                 BuyValue_summary = BuyValue_summary + net_pos_dataList[TokenNo].Buy_Price ;
@@ -1432,8 +1467,8 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,d
 
                 NetQty_summary = NetQty_summary + (net_pos_dataList[TokenNo].Net_Qty / lotSize);
 
-                BuyQty_summary = BuyQty_summary + calculateAverage(net_pos_dataList[TokenNo].Buy_Total_Lot)/ lotSize;
-                SellQty_summary = SellQty_summary + calculateAverage(net_pos_dataList[TokenNo].Sell_Total_Lot)/ lotSize;
+                BuyQty_summary = BuyQty_summary + (net_pos_dataList[TokenNo].Buy_Total_Lot)/ lotSize;
+                SellQty_summary = SellQty_summary + (net_pos_dataList[TokenNo].Sell_Total_Lot)/ lotSize;
 
 
                 double Profit = net_pos_dataList[TokenNo].Sell_Price-net_pos_dataList[TokenNo].Buy_Price;
@@ -1441,12 +1476,12 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,d
                 QStringList rowList;
                 rowList.append(QString::number(c)+"-"+TokenNo);
                 rowList.append(net_pos_dataList[TokenNo].Stock_Name);
-                rowList.append(QString::number(calculateAverage(net_pos_dataList[TokenNo].Buy_Total_Lot)/lotSize));
-                rowList.append(QString::number(calculateAverage(net_pos_dataList[TokenNo].Sell_Total_Lot)/lotSize));
+                rowList.append(QString::number((net_pos_dataList[TokenNo].Buy_Total_Lot)/lotSize));
+                rowList.append(QString::number((net_pos_dataList[TokenNo].Sell_Total_Lot)/lotSize));
                 rowList.append(fixDecimal(net_pos_dataList[TokenNo].Buy_Price,decimal_precision));
                 rowList.append(fixDecimal(net_pos_dataList[TokenNo].Sell_Price,decimal_precision));
-                rowList.append(fixDecimal(calculateAverage(net_pos_dataList[TokenNo].Buy_Avg_Price),decimal_precision));
-                rowList.append(fixDecimal(calculateAverage(net_pos_dataList[TokenNo].Sell_Avg_Price),decimal_precision));
+                rowList.append(fixDecimal((net_pos_dataList[TokenNo].Buy_Avg_Price),decimal_precision));
+                rowList.append(fixDecimal((net_pos_dataList[TokenNo].Sell_Avg_Price),decimal_precision));
                 rowList.append(QString::number(net_pos_dataList[TokenNo].Net_Qty/lotSize));
                 rowList.append(fixDecimal(Profit,decimal_precision));
                 rowList.append("-");

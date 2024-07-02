@@ -1441,6 +1441,9 @@ void MainWindow::loggedInSucessful(userInfo userData)
 }
 
 void MainWindow::loggedOut(){
+
+
+
     loggedInFlg.storeRelaxed(0);
     stop_slowdata_worker();
     stop_slowdata_indices_worker();
@@ -1547,6 +1550,9 @@ void MainWindow::on_Templates_Close_clicked()
 
 void MainWindow::on_close_clicked()
 {
+    db_conn->logToDB("Logged Out");
+
+    //loggedOut();
     close();
 }
 

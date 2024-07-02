@@ -385,6 +385,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         QColor color("#42A5F5");
         op.palette.setColor(QPalette::Highlight , color);
 
+
         if(portfolio->StatusVal.toInt()==portfolio_status::Active){
             QColor color("#E0F1FF");
             painter->fillRect(option.rect, color);
