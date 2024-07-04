@@ -20,7 +20,7 @@
 #include "CombinedTracker/combined_tracker_table_model.h"
 #include "Liners/liners_model.h"
 //class MainWindow;
-
+#include "PortFolio/portfoliocustomsorting.h"
 
 struct net_pos_data_{
     QString  token_number;
@@ -107,7 +107,7 @@ private:
     userInfo userLoginInfo;
     double calculateAverage(const QList<double> &list);
     int calculateSum(const QList<int> &list);
-
+    portfolioCustomSorting *portfolioCustomSort;
 
 
 //    MainWindow MainWindow;

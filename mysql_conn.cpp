@@ -26,7 +26,7 @@ mysql_conn::mysql_conn(QObject *parent,QString conne_name):
 {
    // MainWindowObj = (MainWindow*)parent;
     //connect(this,SIGNAL(display_log_text_signal(QString)),MainWindowObj,SLOT(slotAddLogForAddAlgoRecord(QString)));
-
+    portfolioCustomSort = new portfolioCustomSorting();
 
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
@@ -59,6 +59,7 @@ mysql_conn::mysql_conn(QObject *parent,QString conne_name):
     loadSettings();
 }
 mysql_conn::~mysql_conn(){
+    delete portfolioCustomSort;
     if (db.isOpen()) {
         db.close();
     }
@@ -299,12 +300,17 @@ void  mysql_conn::getSummaryTableData(int &OrderCount,QString user_id)
         }
     }
 }
+
+
+
 void mysql_conn::getPortfoliosTableData(int &AlgoCount,Table_Portfolios_Model *model, Combined_Tracker_Table_Model *comb_tracker_model, QHash<QString, PortfolioAvgPrice> &averagePriceList, QString user_id, QStringList TradedPortFolioList )
 {
     QMutexLocker lock(&mutex);
     // int editing_state = portfolio_table_editing.loadRelaxed();
     PortfolioParser p;
     QList<PortfolioObject*> PortfolioObjectList;
+    QStringList algoNameList;
+
     QList<QStringList> Combined_TrackerDataList;
     QString msg;
     SlowData slowData;
@@ -365,6 +371,9 @@ void mysql_conn::getPortfoliosTableData(int &AlgoCount,Table_Portfolios_Model *m
                     o->TradedHighlight = true;
                 PortfolioObjectList.append(o);
 
+                QString sort_string = QString::number(o->Status)+"-"+o->AlgoName;
+                algoNameList.append(sort_string);
+
                 //add to combined Tracker
                 if(o->BuyTradedQuantity>0||o->SellTradedQuantity>0){
                     QStringList combineTrackerDataTmp(CombinedTrackerData_Length, "");
@@ -405,8 +414,22 @@ void mysql_conn::getPortfoliosTableData(int &AlgoCount,Table_Portfolios_Model *m
 
             //if table is not editing, then only update data. Alos make sure table not edited while data is loading from sql
             //if(portfolio_table_editing.loadRelaxed()==0&&editing_state==portfolio_table_editing.loadRelaxed())
-            if(portfolio_table_updating_db.loadRelaxed()==0)
-                model->setDataList(PortfolioObjectList);
+
+            //sort PortfolioObjectList based on the custom sort order
+
+            if(portfolio_table_updating_db.loadRelaxed()==0){
+                QVector<int> sortRank = portfolioCustomSort->sortPortFolio(algoNameList);
+                QList<PortfolioObject*> PortfolioObjectList_Sorted(PortfolioObjectList.size(), nullptr);
+
+                   for (int i = 0; i < sortRank.size(); ++i) {
+                       int newIndex = sortRank[i];
+                       PortfolioObjectList_Sorted[newIndex] = PortfolioObjectList[i];
+                   }
+                PortfolioObjectList.clear();
+
+
+                model->setDataList(PortfolioObjectList_Sorted);
+            }
         }
     }
     // qDebug()<<"getPortfoliosTableData ----------------mutex unlocked";
