@@ -32,6 +32,8 @@ public:
     int switchstatetest() const;
 
     void setColumnWidths(QTableView *tableView) const;
+    QStringList getTradedHighlight_ExcludeList();
+    QStringList  TradedHighlight_ExcludeList;
 
 
 private:

@@ -13,7 +13,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         obj.PortfolioNumber = query.value("PortfolioNumber").toInt();
         obj.decimal_precision = decimal_precision_;
         obj.devicer = devicer_;
-
+        obj.TradedHighlight = false;
 
 
         PortfolioType type = static_cast<PortfolioType>(query.value("PortfolioType").toInt());

@@ -199,6 +199,13 @@ void Trade_Table_Model::search_action(QString txt){
 
 }
 
+QStringList Trade_Table_Model::getTradedPortFolioList(){
+    QStringList tradedPortFolios;
+    for(int j=0;j<trade_data_list.length();j++){
+        tradedPortFolios.append(trade_data_list[j][12]);
+    }
+    return tradedPortFolios;
+}
 
 
 QVariant Trade_Table_Model::headerData(int section, Qt::Orientation orientation,   int role) const

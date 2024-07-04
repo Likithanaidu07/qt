@@ -373,6 +373,9 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
         }
 
+        //
+
+
     }
 
     if (/*c == PortfolioData_Idx::_Status ||*/ c==PortfolioData_Idx::_PortfolioNumber || c==PortfolioData_Idx::_AlgoName)
@@ -422,6 +425,23 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             pen.setWidthF(borderWidth);
             painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
+        }
+
+
+        if(portfolio->TradedHighlight== true ){
+            QColor color("#FFFF00");
+            painter->fillRect(option.rect, color);
+
+            double borderWidth = 0.5;
+            QColor myColor(108, 117, 125);
+            QPen pen(myColor);
+            pen.setWidthF(borderWidth);
+            painter->setPen(pen);
+            QPoint p1= option.rect.bottomLeft();
+            QPoint p2= option.rect.bottomRight();
+            p1.setX(p1.x()-5);
+            p2.setX(p2.x()+5);
+            painter->drawLine(p1,p2);
         }
 
         QStyledItemDelegate::paint(painter, op, index);
@@ -600,6 +620,22 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             pen.setWidthF(borderWidth);
             painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
+        }
+
+        if(portfolio->TradedHighlight== true ){
+            QColor color("#FFFF00");
+            painter->fillRect(option.rect, color);
+
+            double borderWidth = 0.5;
+            QColor myColor(108, 117, 125);
+            QPen pen(myColor);
+            pen.setWidthF(borderWidth);
+            painter->setPen(pen);
+            QPoint p1= option.rect.bottomLeft();
+            QPoint p2= option.rect.bottomRight();
+            p1.setX(p1.x()-5);
+            p2.setX(p2.x()+5);
+            painter->drawLine(p1,p2);
         }
         QStyledItemDelegate::paint(painter, op, index);
     }
