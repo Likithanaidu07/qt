@@ -203,6 +203,8 @@ private:
 
     void saveDockManagerState();
      void restoreDockManagerState();
+     void restoreTableViewColumnState(QTableView *tableView);
+     void saveTableViewColumnState(QTableView *tableView);
 public slots:
     void profolioTableEditFinshedSlot(QString val,QModelIndex);
 //    void edit_Started_PortFolio_Table(int row,int col);
@@ -224,8 +226,8 @@ public slots:
     void on_startall_Button_clicked();
     void on_stopall_Button_clicked();
     void updateSummaryLabels();
-
-
+    void on_sorting_Button_clicked();
+    void onPortFolioTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
 
 private slots:
     void on_close_clicked();

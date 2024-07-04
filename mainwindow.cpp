@@ -18,7 +18,7 @@
 #include "mysql_conn.h"
 #include "watch_data_list_item.h"
 #include "style_sheet.h"
-
+#include "sortsettingpopup.h"
 
 
 #define ENABLE_BACKEND_DEBUG_MSG
@@ -39,6 +39,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->setupUi(this);
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+
 
     connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
     connect(this,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
@@ -230,7 +231,9 @@ MainWindow::MainWindow(QWidget *parent)
             QToolButton* button4=new QToolButton();
             button4->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             //button4->setIcon(QIcon(a5));
-            button4->setText("Reset Sorting");
+            button4->setText("Sorting");
+            connect(button4, SIGNAL(clicked()), this, SLOT(on_sorting_Button_clicked()));
+
             QToolButton* button5=new QToolButton();
             button5->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             //button5->setIcon(QIcon(a6));
@@ -314,6 +317,8 @@ MainWindow::MainWindow(QWidget *parent)
         "   font-weight: 600; "
         "   line-height: normal;"
         );
+    connect(headerView, &QHeaderView::sectionMoved, this, &MainWindow::onPortFolioTableHeader_Rearranged);
+
     T_Portfolio_Table->setHorizontalHeader(headerView);
     T_Portfolio_Table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     T_Portfolio_Table->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
@@ -327,6 +332,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     lay->addWidget(T_Portfolio_Table,1,0);
     T_Portfolio_Table->show();
+    restoreTableViewColumnState(T_Portfolio_Table);
     /***********Init portfolio table Window**************************/
 
 
@@ -2215,6 +2221,9 @@ void MainWindow::saveDockManagerState()
     }
 }
 
+
+
+
 void MainWindow::restoreDockManagerState()
 {
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
@@ -2236,6 +2245,36 @@ void MainWindow::restoreDockManagerState()
         DockManagerSidePanel->restoreState(state2);
         file2.close();
     }
+}
+
+
+void MainWindow::onPortFolioTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex){
+     saveTableViewColumnState(T_Portfolio_Table);
+}
+
+void MainWindow::saveTableViewColumnState(QTableView *tableView){
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
+    QSettings settings(appDataPath+"/table_view_sett.dat", QSettings::IniFormat);
+    QString key =tableView->objectName()+ "_HeaderState";
+
+    // Save the state of the table view headers
+   settings.setValue(key,tableView->horizontalHeader()->saveState());
+
+}
+void MainWindow::restoreTableViewColumnState(QTableView *tableView){
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
+    QSettings settings(appDataPath+"/table_view_sett.dat", QSettings::IniFormat);
+
+       // Restore the state of the table view headers if available
+     QString key =tableView->objectName()+ "_HeaderState";
+     if (settings.contains(key))
+     {
+       tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
+     }
+}
+void MainWindow::on_sorting_Button_clicked(){
+   SortSettingPopUp *sertWin = new SortSettingPopUp();
+   sertWin->show();
 }
 void MainWindow::closeEvent(QCloseEvent* event)
 {

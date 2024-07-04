@@ -4,7 +4,11 @@
 #include "QPainter"
 #include "defines.h"
 
-PortfolioHeaderView::PortfolioHeaderView(Qt::Orientation orientation, QWidget* parent) : QHeaderView(orientation, parent) {}
+PortfolioHeaderView::PortfolioHeaderView(Qt::Orientation orientation, QWidget* parent) : QHeaderView(orientation, parent) {
+
+    setSectionsMovable(true);
+
+}
 
 void PortfolioHeaderView::paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const {
     // Create the portfolio header delegate
