@@ -64,6 +64,7 @@ bool PortfolioObject::operator==(const PortfolioObject &other) const
         AdditionalData3 == other.AdditionalData3 &&
         AdditionalData4 == other.AdditionalData4 &&
         Highlight == other.Highlight &&
+        TradedHighlight == other.TradedHighlight &&
         IsHighlighted == other.IsHighlighted &&
         Leg1Multiplier == other.Leg1Multiplier &&
         Leg2Multiplier == other.Leg2Multiplier &&

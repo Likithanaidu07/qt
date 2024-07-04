@@ -8,7 +8,7 @@ class CustomTableWidget : public QTableWidget {
     Q_OBJECT
 
 public:
-    CustomTableWidget(QPushButton *pushButtonUpload, QWidget *parent = nullptr);
+    CustomTableWidget(QPushButton *button2, QWidget *parent = nullptr);
 
 protected:
     void keyPressEvent(QKeyEvent *event) override;

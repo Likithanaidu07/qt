@@ -20,6 +20,8 @@ public:
     QVariant headerData(int section, Qt::Orientation ,   int role) const override;
     QList <QStringList> trade_data_list;
     void search_action(QString searchTxt);
+    QStringList getTradedPortFolioList();
+
 private:
     int col_count;
 

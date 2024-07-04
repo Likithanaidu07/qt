@@ -1206,12 +1206,18 @@ void MainWindow::stop_slowdata_indices_worker(){
 
 void MainWindow::loadDataAndUpdateTable(int table){
     switch (table) {
-    case T_Table::PORTFOLIO:
-        db_conn->getPortfoliosTableData(AlgoCount,T_Portfolio_Model,combined_tracker_model,averagePriceList,QString::number(userData.UserId));
+    case T_Table::PORTFOLIO:{
+        QStringList TradedPortFolioList =  trade_model->getTradedPortFolioList();
+        QStringList TradedHighlight_ExcludeList = T_Portfolio_Model->getTradedHighlight_ExcludeList();
+        for (const QString &item : TradedHighlight_ExcludeList) {
+            TradedPortFolioList.removeAll(item);
+        }
+
+        db_conn->getPortfoliosTableData(AlgoCount,T_Portfolio_Model,combined_tracker_model,averagePriceList,QString::number(userData.UserId),TradedPortFolioList);
         emit data_loded_signal(T_Table::PORTFOLIO);
         emit data_summary_update_signal();
-
         break;
+       }
 
     case T_Table::SUMMARY:
         db_conn->getSummaryTableData(OrderCount,QString::number(userData.UserId) );  // Correctly get the count
@@ -1441,6 +1447,9 @@ void MainWindow::loggedInSucessful(userInfo userData)
 }
 
 void MainWindow::loggedOut(){
+
+
+
     loggedInFlg.storeRelaxed(0);
     stop_slowdata_worker();
     stop_slowdata_indices_worker();
@@ -1547,6 +1556,9 @@ void MainWindow::on_Templates_Close_clicked()
 
 void MainWindow::on_close_clicked()
 {
+    db_conn->logToDB("Logged Out");
+
+    //loggedOut();
     close();
 }
 

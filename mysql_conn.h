@@ -26,14 +26,17 @@ struct net_pos_data_{
     QString  token_number;
     QString  Stock_Name;
     //QString  Expiry;
-    QList<double> Buy_Total_Lot;
-    QList<double> Sell_Total_Lot;
+    double Buy_Total_Lot;
+    double Sell_Total_Lot;
     double Buy_Price;
     double Sell_Price;
-    QList<double> Buy_Avg_Price;
-    QList<double> Sell_Avg_Price;
+    double Buy_Avg_Price;
+    double Sell_Avg_Price;
+    double BuyValue_summary;
+    double SellValue;
     double Net_Qty;
-    QString PortfolioNumber;
+  int lotSize;
+
     //QString MTM;
 };
 struct Liners_Data{
@@ -72,7 +75,7 @@ public:
     QString InstrumentTypeFilter;
 
     userInfo login( QString user_name,  QString password);
-    void  getPortfoliosTableData(int &AlgoCount,Table_Portfolios_Model* model,Combined_Tracker_Table_Model *comb_tracker_model,QHash<QString, PortfolioAvgPrice> &averagePriceList,QString user_id);
+    void  getPortfoliosTableData(int &AlgoCount,Table_Portfolios_Model* model,Combined_Tracker_Table_Model *comb_tracker_model,QHash<QString, PortfolioAvgPrice> &averagePriceList,QString user_id, QStringList TradedPortFolioList );
     QMap<int, QHash<QString, contract_table>> getContractTable(QHash<QString, QStringList> &_m_ContractDetailsFiltered, QStringList &F2F_data_list_Sorted_Key, QStringList &BFLY_data_list_Sorted_Key, QStringList &BFLY_BID_data_list_Sorted_Key, userInfo userData);
 
     QSqlQuery runQuery(QString qry_str);
@@ -80,6 +83,8 @@ public:
     QString get_Algo_Name(int algo_type,int leg1_token_number,int leg2_token_number,int leg3_token_number,double devicer,int decimal_precision);
     void  getTradeTableData(int &TraderCount,Trade_Table_Model *model,Liners_Model *liners_model ,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
     void  getNetPosTableData(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash);
+    void  getNetPosTableData_BackUp(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash);
+
     void getSummaryTableData(int &OrderCount,QString user_id);
     void getLinersTableData(Liners_Model *model,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
     QString fixDecimal(double num,int decimal_precision);

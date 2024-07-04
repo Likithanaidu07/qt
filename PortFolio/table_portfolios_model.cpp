@@ -25,6 +25,12 @@ Table_Portfolios_Model::Table_Portfolios_Model(QObject *parent) : QAbstractTable
     decimal_precision = FO_DECIMAL_PRECISION;
    // loadSettings();
     current_editingRow = -1;
+
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
+    QSettings settings(appDataPath + "/tradedHighlight_ExcludeList.dat", QSettings::IniFormat);
+    TradedHighlight_ExcludeList = settings.value("tradedHighlight_ExcludeList").toStringList();
+
+
 }
 
 void Table_Portfolios_Model::loadSettings(){
@@ -59,6 +65,18 @@ void Table_Portfolios_Model::onItemChanged(const QModelIndex &index)
 }
 
 void Table_Portfolios_Model::selectionChangedSlot(int currentIdx){
+
+    if(currentIdx!=-1){
+        if(portfolio_data_list[currentIdx]->TradedHighlight == true){
+            portfolio_data_list[currentIdx]->TradedHighlight = false; // make this flag false when click on portfolio row so it will un-highlight
+            if(!TradedHighlight_ExcludeList.contains(QString::number(portfolio_data_list[currentIdx]->PortfolioNumber))){
+                TradedHighlight_ExcludeList.append(QString::number(portfolio_data_list[currentIdx]->PortfolioNumber));
+                QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
+                QSettings settings(appDataPath + "/tradedHighlight_ExcludeList.dat", QSettings::IniFormat);
+                settings.setValue("tradedHighlight_ExcludeList", TradedHighlight_ExcludeList);
+            }
+        }
+    }
     //editing row swithced, make previous row flg not editing
     if(current_editingRow!=currentIdx){
         if(current_editingRow!=-1)
@@ -66,10 +84,14 @@ void Table_Portfolios_Model::selectionChangedSlot(int currentIdx){
         else if(currentIdx == -1)
             current_editingRow = -1;
         editingDataHash.clear();
+
     }
 
 }
-
+//This function retrun what portfolio clicked when it trade
+QStringList Table_Portfolios_Model::getTradedHighlight_ExcludeList(){
+    return TradedHighlight_ExcludeList;
+}
 
 int Table_Portfolios_Model::rowCount(const QModelIndex & /*parent*/) const
 {
@@ -638,6 +660,7 @@ void Table_Portfolios_Model::setDataList(QList <PortfolioObject*> portfolio_data
             if(newData){
                 beginInsertRows(QModelIndex(), row_new, row_new);
                 PortfolioObject* clonedObject = new PortfolioObject(*portfolio_data_list_new[row_new]);
+
                 portfolio_data_list.insert(row_new,clonedObject);
                 //  portfolio_data_list.insert(row_new,portfolio_data_list_new[row_new]);
                 endInsertRows();
@@ -792,3 +815,5 @@ void Table_Portfolios_Model::setColumnWidths(QTableView *tableView) const {
         tableView->horizontalHeader()->setSectionResizeMode(_Status, QHeaderView::Fixed);
     }
 }
+
+
