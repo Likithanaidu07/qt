@@ -625,6 +625,7 @@ line-height: normal;
   <tabstop>pushButton_Reset</tabstop>
   <tabstop>pushButtonDelete</tabstop>
   <tabstop>tableWidget</tabstop>
+  <tabstop>pushButtonUpload</tabstop>
   <tabstop>pushButton_Cancel</tabstop>
   <tabstop>lineEdit_Fut</tabstop>
  </tabstops>

@@ -1,37 +1,20 @@
-#include "CustomTableWidget.h"
+#ifndef CUSTOMTABLEWIDGET_H
+#define CUSTOMTABLEWIDGET_H
 
-void CustomTableWidget::keyPressEvent(QKeyEvent *event)
-{
-    if (event->key() == Qt::Key_Tab || event->key() == Qt::Key_Backtab)
-    {
-        int currentRow = currentRow();
-        int currentColumn = currentColumn();
-        int totalRows = rowCount();
-        int totalColumns = columnCount();
+#include <QTableWidget>
+#include <QPushButton>
 
-        if (currentRow == totalRows - 1 && currentColumn == totalColumns - 1)
-        {
-            // Move focus to the next widget, e.g., pushButtonUpload
-            QWidget *nextWidget = findNextWidget();
-            if (nextWidget)
-            {
-                nextWidget->setFocus();
-                return; // Stop further event processing
-            }
-        }
-    }
-    // Call the base class implementation for other keys
-    QTableWidget::keyPressEvent(event);
-}
+class CustomTableWidget : public QTableWidget {
+    Q_OBJECT
 
-QWidget* CustomTableWidget::findNextWidget()
-{
-    // Implement logic to find and return the next widget
-    // For example, return the widget you want to focus on after the table widget
-    // Assuming `parentWidget` is the parent widget containing the pushButtonUpload
-    if (auto parentWidget = parentWidget())
-    {
-        return parentWidget->findChild<QPushButton*>("pushButtonUpload");
-    }
-    return nullptr; // Replace with actual logic if needed
-}
+public:
+    CustomTableWidget(QPushButton *pushButtonUpload, QWidget *parent = nullptr);
+
+protected:
+    void keyPressEvent(QKeyEvent *event) override;
+
+private:
+    QPushButton *pushButtonUpload;
+};
+
+#endif // CUSTOMTABLEWIDGET_H

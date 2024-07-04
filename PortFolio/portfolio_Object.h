@@ -57,6 +57,8 @@ public:
     QString QuantityRatio;
     /***********************************************************************************/
 
+    bool TradedHighlight; // this used to hilight portfolio table row if trade happens for that portfolio.
+
     QDateTime AverageUpdateTime;
     int FutToken;
 

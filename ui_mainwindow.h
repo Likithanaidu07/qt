@@ -227,7 +227,7 @@ public:
         gridLayout->addItem(verticalSpacer_2, 5, 4, 1, 1);
 
         sidePanel = new QWidget(centralwidget);
-        sidePanel->setObjectName("sidePanel");
+        sidePanel->setObjectName(QString::fromUtf8("sidePanel"));
         QSizePolicy sizePolicy1(QSizePolicy::Preferred, QSizePolicy::Expanding);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
@@ -238,10 +238,10 @@ public:
 "background: #94B3C3;\n"
 "}"));
         verticalLayout = new QVBoxLayout(sidePanel);
-        verticalLayout->setObjectName("verticalLayout");
+        verticalLayout->setObjectName(QString::fromUtf8("verticalLayout"));
         verticalLayout->setContentsMargins(4, 5, 4, 0);
         summary_widget = new QWidget(sidePanel);
-        summary_widget->setObjectName("summary_widget");
+        summary_widget->setObjectName(QString::fromUtf8("summary_widget"));
         sizePolicy1.setHeightForWidth(summary_widget->sizePolicy().hasHeightForWidth());
         summary_widget->setSizePolicy(sizePolicy1);
         summary_widget->setMinimumSize(QSize(0, 0));
@@ -558,7 +558,7 @@ public:
         verticalLayout->addWidget(summary_widget);
 
         watchWidget = new QWidget(sidePanel);
-        watchWidget->setObjectName("watchWidget");
+        watchWidget->setObjectName(QString::fromUtf8("watchWidget"));
         sizePolicy1.setHeightForWidth(watchWidget->sizePolicy().hasHeightForWidth());
         watchWidget->setSizePolicy(sizePolicy1);
         watchWidget->setMinimumSize(QSize(0, 0));
@@ -574,7 +574,7 @@ public:
         verticalLayout_8->setObjectName("verticalLayout_8");
         verticalLayout_8->setContentsMargins(3, 3, 3, 3);
         widget_15 = new QWidget(watchWidget);
-        widget_15->setObjectName("widget_15");
+        widget_15->setObjectName(QString::fromUtf8("widget_15"));
         widget_15->setMaximumSize(QSize(16777215, 30));
         widget_15->setStyleSheet(QString::fromUtf8("background-color: rgba(43, 107, 111, 1);\n"
 ""));
@@ -611,7 +611,7 @@ public:
         verticalLayout_12->setObjectName("verticalLayout_12");
         verticalLayout_12->setContentsMargins(0, 10, 0, -1);
         lineEditWatchSearch = new QLineEdit(watchWidget);
-        lineEditWatchSearch->setObjectName("lineEditWatchSearch");
+        lineEditWatchSearch->setObjectName(QString::fromUtf8("lineEditWatchSearch"));
         lineEditWatchSearch->setMinimumSize(QSize(0, 30));
         lineEditWatchSearch->setStyleSheet(QString::fromUtf8("   background-image: url(:/search.png);\n"
 "    background-repeat: no-repeat;\n"
@@ -631,7 +631,7 @@ public:
         verticalLayout_12->addWidget(lineEditWatchSearch);
 
         listWidgetWatch = new QListWidget(watchWidget);
-        listWidgetWatch->setObjectName("listWidgetWatch");
+        listWidgetWatch->setObjectName(QString::fromUtf8("listWidgetWatch"));
         listWidgetWatch->setStyleSheet(QString::fromUtf8("#listWidgetWatch{\n"
 "background: #F3FEFF;\n"
 "border-bottom: 21px solid gray; /* Adjust border width for desired shadow size */\n"
@@ -661,7 +661,7 @@ public:
         verticalLayout_8->addItem(verticalSpacer);
 
         watchListSelectedDetails_Parent = new QWidget(watchWidget);
-        watchListSelectedDetails_Parent->setObjectName("watchListSelectedDetails_Parent");
+        watchListSelectedDetails_Parent->setObjectName(QString::fromUtf8("watchListSelectedDetails_Parent"));
         watchListSelectedDetails_Parent->setStyleSheet(QString::fromUtf8("#widget_17{\n"
 "	border-top-left-radius: 0px;\n"
 "    border-top-right-radius: 0px;\n"
@@ -872,7 +872,7 @@ public:
         verticalLayout->addWidget(watchWidget);
 
         Logs_Widget = new QWidget(sidePanel);
-        Logs_Widget->setObjectName("Logs_Widget");
+        Logs_Widget->setObjectName(QString::fromUtf8("Logs_Widget"));
         sizePolicy.setHeightForWidth(Logs_Widget->sizePolicy().hasHeightForWidth());
         Logs_Widget->setSizePolicy(sizePolicy);
         Logs_Widget->setMinimumSize(QSize(0, 0));

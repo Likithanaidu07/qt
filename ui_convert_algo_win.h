@@ -348,7 +348,8 @@ public:
         QWidget::setTabOrder(pushButtonSelectAll, pushButton_Reset);
         QWidget::setTabOrder(pushButton_Reset, pushButtonDelete);
         QWidget::setTabOrder(pushButtonDelete, tableWidget);
-        QWidget::setTabOrder(tableWidget, pushButton_Cancel);
+        QWidget::setTabOrder(tableWidget, pushButtonUpload);
+        QWidget::setTabOrder(pushButtonUpload, pushButton_Cancel);
         QWidget::setTabOrder(pushButton_Cancel, lineEdit_Fut);
 
         retranslateUi(ConvertAlgo_Win);
