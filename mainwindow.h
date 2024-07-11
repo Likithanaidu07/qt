@@ -44,7 +44,7 @@
 #include "AutoHideDockContainer.h"
 #include "DockAreaWidget.h"
 #include "DockAreaTitleBar.h"
-
+#include "sortsettingpopup.h"
 
 using namespace ads;
 
@@ -93,6 +93,7 @@ private:
     Ui::MainWindow *ui;
 
     loadingdatawindow *loadingDataWinodw;
+    SortSettingPopUp *sortWin; // Add this line
 
     int AlgoCount;
     int OrderCount;
@@ -133,6 +134,10 @@ private:
     QAtomicInt data_loading_thread_running;
     QAtomicInt contractDetailsLoaded;
     QAtomicInt loggedInFlg;
+    QAtomicInt reloadSortSettFlg;
+    QAtomicInt deletingPortFolioFlg; // this flag is used to prevent portfolio table re-load while deleting.
+
+
     BackendComm *backend_comm;
     QThread *backend_comm_thread;
 

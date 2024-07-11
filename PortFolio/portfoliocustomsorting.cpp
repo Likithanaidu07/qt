@@ -1,11 +1,20 @@
 #include "portfoliocustomsorting.h"
 #include "QStandardPaths"
 #include "QSettings"
+#include <QDate>
 
 
 portfolioCustomSorting::portfolioCustomSorting(QObject *parent,QString conne_name):
         QObject(parent)
-    {
+{
+    //loadSortConfig();
+}
+
+void portfolioCustomSorting::loadSortConfig(){
+
+    priorityColumnIdxs.clear();
+    sortOrders.clear();
+
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
     QSettings settings(appDataPath+"/sort_data.dat", QSettings::IniFormat);
     if (settings.contains("portfolio_sort_data"))
@@ -55,22 +64,21 @@ portfolioCustomSorting::portfolioCustomSorting(QObject *parent,QString conne_nam
     }
 }
 int portfolioCustomSorting::columnNameToIDx(QString colStr){
+
     if(colStr=="Algo Status")
         return 0;
-    else if(colStr=="Algo Status")
+    else if(colStr=="Algo Type")
         return 1;
-    else if(colStr=="Algo Name")
+    else if(colStr=="Instrument Name")
         return 2;
-    else if(colStr=="Strategy")
-        return 3;
     else if(colStr=="Expiry")
+        return 3;
+    else if(colStr=="Middle Strike")
         return 4;
-    else if(colStr=="Start Strike")
+    else if(colStr=="Strike Difference")
         return 5;
-    else if(colStr=="End Strike")
-        return 6;
     else if(colStr=="Option Type")
-        return 7;
+        return 6;
     else
      return -1;
 }
@@ -83,20 +91,113 @@ bool portfolioCustomSorting::customComparator(const QString &a, const QString &b
         int colIndex = priorityColumnIdxs[i];
         QString order = sortOrders[i];
 
+
         if (aParts.size() > colIndex && bParts.size() > colIndex) {
+
+            auto aVal = aParts[colIndex];
+            auto bVal = bParts[colIndex];
+            //means its "algostatus", "Middle Strike" or "strike diff" so it shold consider as number sorting, rest all should be
+            // alphabetical sort
+            bool isNumaric = false;
+            if(colIndex==0 ||colIndex==4 || colIndex==5){
+               isNumaric = true;
+            }
+
             if (order == "Ascending") {
+                // if number convert to double and compare
+                if(isNumaric){
+                    if (aParts[colIndex].toDouble() < bParts[colIndex].toDouble()) {
+                        return true;
+                    } else if (aParts[colIndex].toDouble() > bParts[colIndex].toDouble()) {
+                        return false;
+                    }
+                }
+                // else do alpahabetci compare.
+                else{
+                    if (aParts[colIndex] < bParts[colIndex]) {
+                        return true;
+                    } else if (aParts[colIndex] > bParts[colIndex]) {
+                        return false;
+                    }
+                }
+
+            }
+            else if (order == "Descending") {
+                if(isNumaric){
+                    if (aParts[colIndex].toDouble() > bParts[colIndex].toDouble()) {
+                        return true;
+                    } else if (aParts[colIndex].toDouble() < bParts[colIndex].toDouble()) {
+                        return false;
+                    }
+                }
+                else{
+                    if (aParts[colIndex] > bParts[colIndex]) {
+                        return true;
+                    } else if (aParts[colIndex] < bParts[colIndex]) {
+                        return false;
+                    }
+                }
+
+            }
+
+
+            //CE should come first so sort Ascending order
+            if (order == "CE") {
                 if (aParts[colIndex] < bParts[colIndex]) {
                     return true;
                 } else if (aParts[colIndex] > bParts[colIndex]) {
                     return false;
                 }
-            } else if (order == "Descending") {
+            }
+            //PE should come first so sort Descending order
+            else if (order == "PE") {
                 if (aParts[colIndex] > bParts[colIndex]) {
                     return true;
                 } else if (aParts[colIndex] < bParts[colIndex]) {
                     return false;
                 }
             }
+            //Disabled algo(status=0) should come first so sort Ascending order
+            if (order == "Disabled") {
+
+                if (aParts[colIndex].toDouble() < bParts[colIndex].toDouble()) {
+                    return true;
+                } else if (aParts[colIndex].toDouble() > bParts[colIndex].toDouble()) {
+                    return false;
+                }
+            }
+            //Enabled algo(status=01) should come first so sort Descending order
+            else if (order == "Enabled") {
+                if (aParts[colIndex].toDouble() > bParts[colIndex].toDouble()) {
+                    return true;
+                } else if (aParts[colIndex].toDouble() < bParts[colIndex].toDouble()) {
+                    return false;
+                }
+            }
+            else if (order == "Sort by Latest Date" || order == "Sort by Oldest Date") {
+                 QDate dateA = QDate::fromString(aParts[colIndex], "ddMMMyyyy");
+                 QDate dateB = QDate::fromString(bParts[colIndex], "ddMMMyyyy");
+                 if (dateA.isValid() && dateB.isValid()) {
+                    if (order == "Sort by Latest Date") {
+                        if (dateA > dateB) {
+                            return true;
+                        }
+                        else if (dateA < dateB) {
+                             return false;
+                         }
+                    }
+                    else if (order == "Sort by Oldest Date") {
+                        if (dateA < dateB) {
+                            return true;
+                        }
+                        else if (dateA > dateB) {
+                            return false;
+                        }
+                    }
+                 }
+          }
+
+
         }
     }
 

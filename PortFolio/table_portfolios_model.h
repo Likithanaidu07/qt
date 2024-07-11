@@ -26,6 +26,7 @@ public:
     QHash<QString,PortFolioData_Less> getPortFolioDataLess();
     QHash<QString,int> getPortFoliosLotSize();
     QHash<int,QString> editingDataHash; //data to store editing cell
+    void clearTable();
 
     QMutex mutex; // Define a QMutex to protect shared data
     void refreshTable();

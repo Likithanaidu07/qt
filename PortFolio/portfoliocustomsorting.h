@@ -17,6 +17,7 @@ class portfolioCustomSorting: public QObject
 public:
     explicit portfolioCustomSorting(QObject *parent = 0,QString conne_name="main_db_conn");
     QVector<int> sortPortFolio(const QStringList &list);
+    void loadSortConfig();
 
  private:
     QVector<int> priorityColumnIdxs;

@@ -27,6 +27,7 @@ public:
     QString StatusVal;
     int PortfolioNumber; // "P.No";
     QString AlgoName; // new column added on Qt
+
     double SellMarketRate; //"-MR";
     QString SellAveragePrice; //"-APD"
     double SellPriceDifference; // "Price Diff";
@@ -58,6 +59,7 @@ public:
     /***********************************************************************************/
 
     bool TradedHighlight; // this used to hilight portfolio table row if trade happens for that portfolio.
+    QString AlgoNameForSorting; // this variable is used for custom soring algorithm
 
     QDateTime AverageUpdateTime;
     int FutToken;

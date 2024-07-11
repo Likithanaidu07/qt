@@ -24,7 +24,8 @@ private slots:
 
     void on_pushButtonAdd_clicked();
 
-
+signals:
+    void reloadSortSettingSignal();
 
 private:
     Ui::SortSettingPopUp *ui;

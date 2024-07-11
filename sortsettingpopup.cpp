@@ -10,7 +10,7 @@ SortSettingPopUp::SortSettingPopUp(QWidget *parent) :
     ui->setupUi(this);
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
-    QStringList list{"Algo Status","Algo Name", "Strategy","Expiry","Start Strike","End Strike","Option Type"};
+    QStringList list{"Algo Status","Instrument Name", "Algo Type","Expiry","Middle Strike","Strike Difference","Option Type"};
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
     QSettings settings(appDataPath+"/sort_data.dat", QSettings::IniFormat);
     if (settings.contains("portfolio_sort_data"))
@@ -23,21 +23,40 @@ SortSettingPopUp::SortSettingPopUp(QWidget *parent) :
               if(list.contains(tok[0]))
                  list.removeAll(tok[0]);
 
-              QString selectedText = tok[0];
+              QString sortItemTxt = tok[0];
+              QString sortOrderTxt = tok[1];
+
 
               int row = ui->tableWidget->rowCount();
               ui->tableWidget->insertRow(row);
 
               // First column with text
-              QTableWidgetItem *item = new QTableWidgetItem(selectedText);
+              QTableWidgetItem *item = new QTableWidgetItem(sortItemTxt);
               ui->tableWidget->setItem(row, 0, item);
 
               // Second column with ComboBox
               QComboBox *comboBox = new QComboBox();
-              comboBox->addItem("Ascending");
-              comboBox->addItem("Descending");
+              if(sortItemTxt == "Algo Status"){
+                  comboBox->addItem("Enabled");
+                  comboBox->addItem("Disabled");
+                  comboBox->setCurrentText(sortOrderTxt);
+              }
+              else if(sortItemTxt == "Option Type"){
+                  comboBox->addItem("CE");
+                  comboBox->addItem("PE");
+                  comboBox->setCurrentText(sortOrderTxt);
+              }
+              else if(sortItemTxt == "Expiry"){
+                  comboBox->addItem("Sort by Latest Date");
+                  comboBox->addItem("Sort by Oldest Date");
+                  comboBox->setCurrentText(sortOrderTxt);
+              }
+              else{
+                  comboBox->addItem("Ascending");
+                  comboBox->addItem("Descending");
+                  comboBox->setCurrentText(sortOrderTxt);
+              }
               ui->tableWidget->setCellWidget(row, 1, comboBox);
-              comboBox->setCurrentText(tok[1]);
           }
 
       }
@@ -59,8 +78,7 @@ SortSettingPopUp::~SortSettingPopUp()
 void SortSettingPopUp::on_buttonBox_accepted()
 {
 
-       QStringList saveStr;
-
+        QStringList saveStr;
         for (int row = 0; row < ui->tableWidget->rowCount(); ++row) {
             QTableWidgetItem *itemText = ui->tableWidget->item(row, 0);
             QWidget *itemCombo = ui->tableWidget->cellWidget(row, 1);
@@ -70,16 +88,13 @@ void SortSettingPopUp::on_buttonBox_accepted()
                 QString sortItemText = itemText->text();
                 saveStr.append(sortItemText+":"+sortOrder);
             }
-
-
-
         }
 
         QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
         QSettings settings(appDataPath+"/sort_data.dat", QSettings::IniFormat);
         settings.setValue("portfolio_sort_data",saveStr.join(";"));
 
-
+        emit reloadSortSettingSignal();
 }
 
 
@@ -126,8 +141,22 @@ void SortSettingPopUp::on_pushButtonAdd_clicked()
 
       // Second column with ComboBox
       QComboBox *comboBox = new QComboBox();
-      comboBox->addItem("Ascending");
-      comboBox->addItem("Descending");
+      if(selectedText == "Algo Status"){
+          comboBox->addItem("Enabled");
+          comboBox->addItem("Disabled"); 
+      }
+      else if(selectedText == "Option Type"){
+          comboBox->addItem("CE");
+          comboBox->addItem("PE");
+      }
+      else if(selectedText == "Expiry"){
+          comboBox->addItem("Sort by Latest Date");
+          comboBox->addItem("Sort by Oldest Date");
+      }
+      else{
+         comboBox->addItem("Ascending");
+         comboBox->addItem("Descending");
+      }
       ui->tableWidget->setCellWidget(row, 1, comboBox);
 }
 

@@ -303,7 +303,7 @@ void  mysql_conn::getSummaryTableData(int &OrderCount,QString user_id)
 
 
 
-void mysql_conn::getPortfoliosTableData(int &AlgoCount,Table_Portfolios_Model *model, Combined_Tracker_Table_Model *comb_tracker_model, QHash<QString, PortfolioAvgPrice> &averagePriceList, QString user_id, QStringList TradedPortFolioList )
+void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount,Table_Portfolios_Model *model, Combined_Tracker_Table_Model *comb_tracker_model, QHash<QString, PortfolioAvgPrice> &averagePriceList, QString user_id, QStringList TradedPortFolioList )
 {
     QMutexLocker lock(&mutex);
     // int editing_state = portfolio_table_editing.loadRelaxed();
@@ -371,7 +371,7 @@ void mysql_conn::getPortfoliosTableData(int &AlgoCount,Table_Portfolios_Model *m
                     o->TradedHighlight = true;
                 PortfolioObjectList.append(o);
 
-                QString sort_string = QString::number(o->Status)+"-"+o->AlgoName;
+                QString sort_string = QString::number(o->Status)+"-"+o->AlgoNameForSorting;
                 algoNameList.append(sort_string);
 
                 //add to combined Tracker
@@ -418,6 +418,11 @@ void mysql_conn::getPortfoliosTableData(int &AlgoCount,Table_Portfolios_Model *m
             //sort PortfolioObjectList based on the custom sort order
 
             if(portfolio_table_updating_db.loadRelaxed()==0){
+                if(reloadSortSettFlg.loadRelaxed()==1){
+                    reloadSortSettFlg.storeRelaxed(0);
+                    portfolioCustomSort->loadSortConfig();
+                    model->clearTable();
+                }
                 QVector<int> sortRank = portfolioCustomSort->sortPortFolio(algoNameList);
                 QList<PortfolioObject*> PortfolioObjectList_Sorted(PortfolioObjectList.size(), nullptr);
 
