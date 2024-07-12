@@ -39,8 +39,10 @@ protected:
 signals:
     void signalStartItemClickedBFLY(QModelIndex);
     void signalStartItemClickedBFLYBID(QModelIndex);
+    void signalStartItemClickedF2F(QModelIndex);
     void signalEndItemClickedBFLY(QModelIndex);
     void signalEndItemClickedBFLYBID(QModelIndex);
+    void signalEndItemClickedF2F(QModelIndex);
 
 private slots:
     void on_Close_clicked();
@@ -74,7 +76,7 @@ private:
     AddAlgoSharedVar *sharedData;
     QAtomicInt dataSorted;
     mysql_conn *db_conn;
-    //add_algo_btfly *algoBtFly;
+    add_algo_btfly *algoBtFly;
     add_algo_f2f *algoF2F;
     add_algo_con_rev *algoConRev;
     add_algo_btfly_bid *algoBtFlyBid;

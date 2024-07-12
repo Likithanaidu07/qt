@@ -9,10 +9,17 @@ add_algo_f2f::add_algo_f2f(QObject *parent)
     sharedData = &AddAlgoSharedVar::getInstance();
 
 }
-void add_algo_f2f::copyUIElement(QTableWidget *tableWidget_,QLineEdit *lineEdit_searchInstrument_leg1_,QLineEdit *lineEdit_searchInstrument_leg2_){
+void add_algo_f2f::copyUIElement(QTableWidget *tableWidget_,QLineEdit *lineEdit_searchInstrument_leg1_,QLineEdit *lineEdit_searchInstrument_leg2_, QListView *sView, QListView *eView){
     lineEdit_searchInstrument_leg1 = lineEdit_searchInstrument_leg1_;
     lineEdit_searchInstrument_leg2 = lineEdit_searchInstrument_leg2_;
     tableWidget = tableWidget_;
+
+    startStrikeListView = sView;
+    endStrikeListView = eView;
+
+
+    startStrikeListView->hide();
+    endStrikeListView->hide();
 }
 
 void add_algo_f2f::create_AutoFillModel_SearchInstrument(){
@@ -40,18 +47,45 @@ void add_algo_f2f::selectedAction(){
     foo_token_number_start_strike = "";
     foo_token_number_end_strike = "";
 
+    // Install event filter on the QLineEdit and QListView
+    eventFilterStart = new EventFilter(lineEdit_searchInstrument_leg1, startStrikeListView);
+    connect(eventFilterStart, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelected(QModelIndex)));
+    lineEdit_searchInstrument_leg1->installEventFilter(eventFilterStart);
+    startStrikeListView->installEventFilter(eventFilterStart);
+
+    eventFilterEnd = new EventFilter(lineEdit_searchInstrument_leg2, endStrikeListView);
+    connect(eventFilterEnd, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
+    lineEdit_searchInstrument_leg2->installEventFilter(eventFilterEnd);
+    endStrikeListView->installEventFilter(eventFilterEnd);
+
+
+
     //create qcompleter and fill with abovie model
-    custom_q_completer *Start_strike_combination_Completer = new custom_q_completer( this);
+    CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_searchInstrument_F2F_Leg1);
+    connect(lineEdit_searchInstrument_leg1, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
+    connect(lineEdit_searchInstrument_leg1, SIGNAL(textChanged(QString)),this, SLOT(slotStartHide(QString)));
+    connect(lineEdit_searchInstrument_leg2, SIGNAL(textChanged(QString)),this, SLOT(slotEndHide(QString)));
+
+
+    //create qcompleter and fill with abovie model
+  /*  custom_q_completer *Start_strike_combination_Completer = new custom_q_completer( this);
     Start_strike_combination_Completer->setModel(model_searchInstrument_F2F_Leg1);
     Start_strike_combination_Completer->setCaseSensitivity(Qt::CaseInsensitive);
+    Start_strike_combination_Completer->setCompletionMode(QCompleter::PopupCompletion);
+    Start_strike_combination_Completer->setModelSorting(QCompleter::CaseSensitivelySortedModel);
+    QListView *viewLeg1 = (QListView *)Start_strike_combination_Completer->popup();
+    viewLeg1->setUniformItemSizes(true);
+    viewLeg1->setLayoutMode(QListView::Batched);
+    lineEdit_searchInstrument_leg1->setCompleter(Start_strike_combination_Completer);
     connect(lineEdit_searchInstrument_leg1, SIGNAL(textChanged(QString)),Start_strike_combination_Completer, SLOT(newfilterItems(QString)));
     lineEdit_searchInstrument_leg1->setCompleter(Start_strike_combination_Completer);
+
 
     //foo_token_number assined for currently selected algo combination.
     connect(Start_strike_combination_Completer, QOverload<const QModelIndex &>::of(&QCompleter::activated), [=](const QModelIndex &index){
         foo_token_number_start_strike = Start_strike_combination_Completer->get_foo_token_number_for_selected(index);
         //qDebug()<<"foo_token_number_start_strike: "<<foo_token_number_start_strike;
-    });
+    });*/
 
     //create qcompleter and fill with abovie model
     /*custom_q_completer *completerLeg2 = new custom_q_completer(this);
@@ -70,9 +104,19 @@ void add_algo_f2f::selectedAction(){
        qDebug()<<"foo_token_number_end_strike: "<<foo_token_number_end_strike;
     });*/
 
-    lineEdit_searchInstrument_leg1->setPlaceholderText("Search Leg1 Instrument");
-    lineEdit_searchInstrument_leg2->setPlaceholderText("Search Leg2 Instrument");
+   // lineEdit_searchInstrument_leg1->setPlaceholderText("Search Leg1 Instrument");
+   // lineEdit_searchInstrument_leg2->setPlaceholderText("Search Leg2 Instrument");
 
+}
+
+void add_algo_f2f::slotStartHide(QString)
+{
+    endStrikeListView->hide();
+}
+
+void add_algo_f2f::slotEndHide(QString)
+{
+    startStrikeListView->hide();
 }
 
 
@@ -92,11 +136,13 @@ void add_algo_f2f::instrumentEditFinishedAction(){
     //QStandardItemModel *model_end_strike = new QStandardItemModel;
     model_searchInstrument_F2F_Leg2->clear();
     for(int i=0;i<sorted_keys_F2F.length();i++) {
+        if(!sharedData->contract_table_hash.contains(sorted_keys_F2F[i]))
+            continue;
         contract_table tmp = sharedData->contract_table_hash[sorted_keys_F2F[i]];
 
-        //  float end_strike = tmp.StrikePrice;
-        //if(start_strike>end_strike)
-        //  continue;
+//          float end_strike = tmp.StrikePrice;
+//        if(start_strike>end_strike)
+//          continue;
         if(tmp.InstrumentName==Instr_Name&&tmp.Expiry>startExpiry){
 
             unsigned int unix_time= tmp.Expiry;
@@ -113,8 +159,11 @@ void add_algo_f2f::instrumentEditFinishedAction(){
 
         }
     }
+    // create qcompleter and fill with abovie model
+    CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_searchInstrument_F2F_Leg2);
+    connect(lineEdit_searchInstrument_leg2, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
 
-    custom_q_completer *completerLeg2 = new custom_q_completer(this);
+    /*custom_q_completer *completerLeg2 = new custom_q_completer(this);
     completerLeg2->setModel(model_searchInstrument_F2F_Leg2);
     completerLeg2->setCaseSensitivity(Qt::CaseInsensitive);
     completerLeg2->setCompletionMode(QCompleter::PopupCompletion);
@@ -129,7 +178,7 @@ void add_algo_f2f::instrumentEditFinishedAction(){
     connect(completerLeg2, QOverload<const QModelIndex &>::of(&QCompleter::activated), [=](const QModelIndex &index){
         foo_token_number_end_strike = completerLeg2->get_foo_token_number_for_selected(index);
         //qDebug()<<"foo_token_number_end_strike: "<<foo_token_number_end_strike;
-    });
+    });*/
 
 
 }
@@ -378,4 +427,76 @@ void add_algo_f2f::generateAlgo(){
         msgBox.setIcon(QMessageBox::Warning);
         msgBox.exec();
     }
+}
+
+
+void add_algo_f2f::itemSelected(QModelIndex index)
+{
+    if(index.isValid())
+    {
+        QVariant dData = index.data(Qt::DisplayRole);
+        if (dData.isValid())
+        {
+            for (int row = 0; row < model_searchInstrument_F2F_Leg1->rowCount(); ++row)
+            {
+                QModelIndex index = model_searchInstrument_F2F_Leg1->index(row, 0);
+                // Check if the item's display role value matches
+                QVariant displayData = model_searchInstrument_F2F_Leg1->data(index, Qt::DisplayRole);
+                if (displayData.isValid() && displayData.toString() == dData)
+                {
+                    QVariant userData = model_searchInstrument_F2F_Leg1->data(index, Qt::UserRole + 1);
+                    if (userData.isValid())
+                    {
+                        foo_token_number_start_strike = userData.toString();
+                        lineEdit_searchInstrument_leg1->setText(index.data(Qt::DisplayRole).toString());
+                        lineEdit_searchInstrument_leg1->setCursorPosition(0);
+                        instrumentEditFinishedAction();
+                        startStrikeListView->hide();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        qInfo() << "Not a start strike vaild index";
+
+    }
+}
+
+void add_algo_f2f::itemSelectedEndStrike(QModelIndex index)
+{
+    if(index.isValid())
+    {
+        QVariant dData = index.data(Qt::DisplayRole);
+        if (dData.isValid())
+        {
+            for (int row = 0; row < model_searchInstrument_F2F_Leg2->rowCount(); ++row)
+            {
+                QModelIndex index = model_searchInstrument_F2F_Leg2->index(row, 0);
+                // Check if the item's display role value matches
+                QVariant displayData = model_searchInstrument_F2F_Leg2->data(index, Qt::DisplayRole);
+                if (displayData.isValid() && displayData.toString() == dData)
+                {
+                    QVariant userData = model_searchInstrument_F2F_Leg2->data(index, Qt::UserRole + 1);
+                    if (userData.isValid())
+                    {
+                        foo_token_number_end_strike = userData.toString();
+                        lineEdit_searchInstrument_leg2->setText(index.data(Qt::DisplayRole).toString());
+                        lineEdit_searchInstrument_leg2->setCursorPosition(0);
+                        startStrikeListView->hide();
+                        endStrikeListView->hide();
+                        break;
+                    }
+                }
+            }
+
+        }
+    }
+    else
+    {
+        qInfo() << "Not an end strike vaild index";
+    }
+
 }

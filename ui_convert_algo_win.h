@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'convert_algo_win.ui'
 **
-** Created by: Qt User Interface Compiler version 6.5.3
+** Created by: Qt User Interface Compiler version 6.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -61,7 +61,7 @@ public:
     void setupUi(QDialog *ConvertAlgo_Win)
     {
         if (ConvertAlgo_Win->objectName().isEmpty())
-            ConvertAlgo_Win->setObjectName("ConvertAlgo_Win");
+            ConvertAlgo_Win->setObjectName(QString::fromUtf8("ConvertAlgo_Win"));
         ConvertAlgo_Win->resize(1000, 410);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
@@ -75,35 +75,35 @@ public:
 "}"));
         gridLayout = new QGridLayout(ConvertAlgo_Win);
         gridLayout->setSpacing(0);
-        gridLayout->setObjectName("gridLayout");
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
         widget_2 = new QWidget(ConvertAlgo_Win);
-        widget_2->setObjectName("widget_2");
+        widget_2->setObjectName(QString::fromUtf8("widget_2"));
         widget_2->setStyleSheet(QString::fromUtf8("#widget_2{\n"
 "background: #F2F5F8;\n"
 "}"));
         gridLayout_2 = new QGridLayout(widget_2);
-        gridLayout_2->setObjectName("gridLayout_2");
+        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         gridLayout_2->setHorizontalSpacing(9);
         gridLayout_2->setVerticalSpacing(0);
         gridLayout_2->setContentsMargins(12, 0, 12, 14);
         widget = new QWidget(widget_2);
-        widget->setObjectName("widget");
+        widget->setObjectName(QString::fromUtf8("widget"));
         widget->setFocusPolicy(Qt::NoFocus);
         widget->setStyleSheet(QString::fromUtf8("#widget{\n"
 "border-radius: 8px;\n"
 "background: #E0E8EE;\n"
 "}"));
         gridLayout_3 = new QGridLayout(widget);
-        gridLayout_3->setObjectName("gridLayout_3");
+        gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
         label = new QLabel(widget);
-        label->setObjectName("label");
+        label->setObjectName(QString::fromUtf8("label"));
         label->setStyleSheet(QString::fromUtf8(""));
 
         gridLayout_3->addWidget(label, 0, 0, 1, 1);
 
         pushButtonSelectAll = new QPushButton(widget);
-        pushButtonSelectAll->setObjectName("pushButtonSelectAll");
+        pushButtonSelectAll->setObjectName(QString::fromUtf8("pushButtonSelectAll"));
         pushButtonSelectAll->setMaximumSize(QSize(58, 16));
         pushButtonSelectAll->setFocusPolicy(Qt::TabFocus);
         pushButtonSelectAll->setStyleSheet(QString::fromUtf8(""));
@@ -112,7 +112,7 @@ public:
         gridLayout_3->addWidget(pushButtonSelectAll, 0, 1, 1, 1);
 
         pushButton_Reset = new QPushButton(widget);
-        pushButton_Reset->setObjectName("pushButton_Reset");
+        pushButton_Reset->setObjectName(QString::fromUtf8("pushButton_Reset"));
         pushButton_Reset->setMaximumSize(QSize(58, 16));
         pushButton_Reset->setStyleSheet(QString::fromUtf8(""));
         pushButton_Reset->setFlat(true);
@@ -120,7 +120,7 @@ public:
         gridLayout_3->addWidget(pushButton_Reset, 0, 2, 1, 1);
 
         pushButtonDelete = new QPushButton(widget);
-        pushButtonDelete->setObjectName("pushButtonDelete");
+        pushButtonDelete->setObjectName(QString::fromUtf8("pushButtonDelete"));
         pushButtonDelete->setMaximumSize(QSize(58, 16));
         pushButtonDelete->setStyleSheet(QString::fromUtf8(""));
         pushButtonDelete->setFlat(true);
@@ -128,7 +128,7 @@ public:
         gridLayout_3->addWidget(pushButtonDelete, 0, 3, 1, 1);
 
         tableWidget = new QTableWidget(widget);
-        tableWidget->setObjectName("tableWidget");
+        tableWidget->setObjectName(QString::fromUtf8("tableWidget"));
         tableWidget->setFocusPolicy(Qt::TabFocus);
         tableWidget->setStyleSheet(QString::fromUtf8("QTableView::item {\n"
 "    background-color: #FFF;\n"
@@ -162,7 +162,7 @@ public:
         gridLayout_2->addItem(verticalSpacer_3, 4, 0, 1, 10);
 
         lineEdit_Start_strike = new QLineEdit(widget_2);
-        lineEdit_Start_strike->setObjectName("lineEdit_Start_strike");
+        lineEdit_Start_strike->setObjectName(QString::fromUtf8("lineEdit_Start_strike"));
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
@@ -179,7 +179,7 @@ public:
         gridLayout_2->addItem(verticalSpacer_2, 2, 0, 1, 10);
 
         lineEdit_StrikeDifference = new QLineEdit(widget_2);
-        lineEdit_StrikeDifference->setObjectName("lineEdit_StrikeDifference");
+        lineEdit_StrikeDifference->setObjectName(QString::fromUtf8("lineEdit_StrikeDifference"));
         sizePolicy1.setHeightForWidth(lineEdit_StrikeDifference->sizePolicy().hasHeightForWidth());
         lineEdit_StrikeDifference->setSizePolicy(sizePolicy1);
         lineEdit_StrikeDifference->setMinimumSize(QSize(90, 28));
@@ -189,7 +189,7 @@ public:
         gridLayout_2->addWidget(lineEdit_StrikeDifference, 1, 6, 1, 1);
 
         lineEdit_EndStrike = new QLineEdit(widget_2);
-        lineEdit_EndStrike->setObjectName("lineEdit_EndStrike");
+        lineEdit_EndStrike->setObjectName(QString::fromUtf8("lineEdit_EndStrike"));
         sizePolicy1.setHeightForWidth(lineEdit_EndStrike->sizePolicy().hasHeightForWidth());
         lineEdit_EndStrike->setSizePolicy(sizePolicy1);
         lineEdit_EndStrike->setMinimumSize(QSize(0, 28));
@@ -204,13 +204,13 @@ public:
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setSpacing(17);
-        horizontalLayout_2->setObjectName("horizontalLayout_2");
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer_3);
 
         pushButtonUpload = new QPushButton(widget_2);
-        pushButtonUpload->setObjectName("pushButtonUpload");
+        pushButtonUpload->setObjectName(QString::fromUtf8("pushButtonUpload"));
         sizePolicy.setHeightForWidth(pushButtonUpload->sizePolicy().hasHeightForWidth());
         pushButtonUpload->setSizePolicy(sizePolicy);
         pushButtonUpload->setMinimumSize(QSize(95, 32));
@@ -230,7 +230,7 @@ public:
         horizontalLayout_2->addWidget(pushButtonUpload);
 
         pushButton_Cancel = new QPushButton(widget_2);
-        pushButton_Cancel->setObjectName("pushButton_Cancel");
+        pushButton_Cancel->setObjectName(QString::fromUtf8("pushButton_Cancel"));
         pushButton_Cancel->setMinimumSize(QSize(85, 32));
         pushButton_Cancel->setMaximumSize(QSize(95, 16777215));
         pushButton_Cancel->setStyleSheet(QString::fromUtf8("QPushButton{\n"
@@ -252,7 +252,7 @@ public:
         gridLayout_2->addLayout(horizontalLayout_2, 5, 0, 1, 10);
 
         lineEdit_Fut = new QLineEdit(widget_2);
-        lineEdit_Fut->setObjectName("lineEdit_Fut");
+        lineEdit_Fut->setObjectName(QString::fromUtf8("lineEdit_Fut"));
         sizePolicy1.setHeightForWidth(lineEdit_Fut->sizePolicy().hasHeightForWidth());
         lineEdit_Fut->setSizePolicy(sizePolicy1);
         lineEdit_Fut->setMinimumSize(QSize(0, 28));
@@ -260,7 +260,7 @@ public:
         gridLayout_2->addWidget(lineEdit_Fut, 1, 3, 1, 1);
 
         comboBox_AlgoType = new QComboBox(widget_2);
-        comboBox_AlgoType->setObjectName("comboBox_AlgoType");
+        comboBox_AlgoType->setObjectName(QString::fromUtf8("comboBox_AlgoType"));
         comboBox_AlgoType->setMinimumSize(QSize(92, 28));
         comboBox_AlgoType->setMaximumSize(QSize(90, 28));
         comboBox_AlgoType->setStyleSheet(QString::fromUtf8("QComboBox{\n"
@@ -281,7 +281,7 @@ public:
         gridLayout_2->addWidget(comboBox_AlgoType, 1, 0, 1, 3);
 
         pushButtonAdd = new QPushButton(widget_2);
-        pushButtonAdd->setObjectName("pushButtonAdd");
+        pushButtonAdd->setObjectName(QString::fromUtf8("pushButtonAdd"));
         sizePolicy.setHeightForWidth(pushButtonAdd->sizePolicy().hasHeightForWidth());
         pushButtonAdd->setSizePolicy(sizePolicy);
         pushButtonAdd->setMinimumSize(QSize(90, 28));
@@ -295,7 +295,7 @@ public:
         gridLayout->addWidget(widget_2, 1, 0, 1, 1);
 
         ConvertAlgo_TitleBar = new QWidget(ConvertAlgo_Win);
-        ConvertAlgo_TitleBar->setObjectName("ConvertAlgo_TitleBar");
+        ConvertAlgo_TitleBar->setObjectName(QString::fromUtf8("ConvertAlgo_TitleBar"));
         sizePolicy.setHeightForWidth(ConvertAlgo_TitleBar->sizePolicy().hasHeightForWidth());
         ConvertAlgo_TitleBar->setSizePolicy(sizePolicy);
         ConvertAlgo_TitleBar->setMinimumSize(QSize(800, 32));
@@ -304,11 +304,11 @@ public:
 "background: #314458;\n"
 "}"));
         gridLayout_4 = new QGridLayout(ConvertAlgo_TitleBar);
-        gridLayout_4->setObjectName("gridLayout_4");
+        gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
         gridLayout_4->setHorizontalSpacing(15);
         gridLayout_4->setContentsMargins(-1, 7, -1, 8);
         Close = new QToolButton(ConvertAlgo_TitleBar);
-        Close->setObjectName("Close");
+        Close->setObjectName(QString::fromUtf8("Close"));
         Close->setMinimumSize(QSize(14, 14));
         Close->setMaximumSize(QSize(14, 14));
         Close->setFocusPolicy(Qt::NoFocus);
@@ -319,7 +319,7 @@ public:
         gridLayout_4->addWidget(Close, 0, 2, 1, 1);
 
         label_2 = new QLabel(ConvertAlgo_TitleBar);
-        label_2->setObjectName("label_2");
+        label_2->setObjectName(QString::fromUtf8("label_2"));
         label_2->setMinimumSize(QSize(0, 17));
         label_2->setMaximumSize(QSize(108, 17));
         label_2->setStyleSheet(QString::fromUtf8("#label_2{\n"

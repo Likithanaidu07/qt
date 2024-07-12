@@ -789,10 +789,9 @@ QList <QStringList> liners_listTmp;
     {
 
        // QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and (Leg1_OrderState=7 and Leg2_OrderState=7 and Leg3_OrderState=7) ORDER BY Trader_Data DESC";
-        QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and Leg2_OrderState=7  ORDER BY Trader_Data DESC";
+        QString query_str = "SELECT * FROM Order_Table_bid WHERE Trader_ID='"+user_id+"' and Leg2_OrderState=7  ORDER BY Trader_Data DESC";
         //QString sqlquery ="SELECT COUNT(*) FROM Order_Table_Bid WHERE Order_Table_Bid.Trader_ID='"+user_id+"'";
         //QString query_str = "SELECT COUNT(*) FROM (SELECT * FROM Order_Table_Bid WHERE Trader_ID='" + user_id + "' AND Leg2_OrderState=7 ORDER BY Trader_Data DESC) AS SubQuery";
-
 
         QSqlQuery query(query_str,db);
         if( !query.exec() )

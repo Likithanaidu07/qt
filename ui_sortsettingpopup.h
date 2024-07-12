@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'sortsettingpopup.ui'
 **
-** Created by: Qt User Interface Compiler version 6.5.3
+** Created by: Qt User Interface Compiler version 6.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -38,19 +38,19 @@ public:
     void setupUi(QDialog *SortSettingPopUp)
     {
         if (SortSettingPopUp->objectName().isEmpty())
-            SortSettingPopUp->setObjectName("SortSettingPopUp");
+            SortSettingPopUp->setObjectName(QString::fromUtf8("SortSettingPopUp"));
         SortSettingPopUp->resize(359, 401);
         gridLayout = new QGridLayout(SortSettingPopUp);
-        gridLayout->setObjectName("gridLayout");
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         pushButtonAdd = new QPushButton(SortSettingPopUp);
-        pushButtonAdd->setObjectName("pushButtonAdd");
+        pushButtonAdd->setObjectName(QString::fromUtf8("pushButtonAdd"));
         pushButtonAdd->setMinimumSize(QSize(50, 0));
         pushButtonAdd->setMaximumSize(QSize(50, 16777215));
 
         gridLayout->addWidget(pushButtonAdd, 0, 1, 1, 1);
 
         buttonBox = new QDialogButtonBox(SortSettingPopUp);
-        buttonBox->setObjectName("buttonBox");
+        buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
         buttonBox->setOrientation(Qt::Horizontal);
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
 
@@ -61,7 +61,7 @@ public:
         gridLayout->addItem(horizontalSpacer_3, 0, 3, 1, 1);
 
         pushButtonRemove = new QPushButton(SortSettingPopUp);
-        pushButtonRemove->setObjectName("pushButtonRemove");
+        pushButtonRemove->setObjectName(QString::fromUtf8("pushButtonRemove"));
 
         gridLayout->addWidget(pushButtonRemove, 0, 2, 1, 1);
 
@@ -72,14 +72,14 @@ public:
         tableWidget->setHorizontalHeaderItem(0, __qtablewidgetitem);
         QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
         tableWidget->setHorizontalHeaderItem(1, __qtablewidgetitem1);
-        tableWidget->setObjectName("tableWidget");
+        tableWidget->setObjectName(QString::fromUtf8("tableWidget"));
         tableWidget->horizontalHeader()->setStretchLastSection(true);
         tableWidget->verticalHeader()->setStretchLastSection(false);
 
         gridLayout->addWidget(tableWidget, 1, 0, 2, 4);
 
         comboBoxSortItems = new QComboBox(SortSettingPopUp);
-        comboBoxSortItems->setObjectName("comboBoxSortItems");
+        comboBoxSortItems->setObjectName(QString::fromUtf8("comboBoxSortItems"));
 
         gridLayout->addWidget(comboBoxSortItems, 0, 0, 1, 1);
 

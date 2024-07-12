@@ -28,7 +28,7 @@ void add_algo_btfly::copyUIElement(QTableWidget *tableWidget_, QLineEdit *lineEd
 }
 
 void add_algo_btfly::create_AutoFillModel_StartStrike(){
-    /* model_start_strike_BFLY->clear();
+     model_start_strike_BFLY->clear();
     // create model for BFLY_data_list to autfill
 
     QElapsedTimer timer;
@@ -46,7 +46,7 @@ void add_algo_btfly::create_AutoFillModel_StartStrike(){
         itemBFLY->setData(contract.TokenNumber, Qt::UserRole + 1);
         model_start_strike_BFLY->appendRow(itemBFLY);
     }
-    qDebug() << "btfly------" << timer.elapsed()/1000 << " seconds";*/
+    qDebug() << "btfly------" << timer.elapsed()/1000 << " seconds";
 
 }
 void add_algo_btfly::selectedAction(){
