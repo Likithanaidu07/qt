@@ -17,21 +17,21 @@ void add_algo_con_rev::copyUIElement(QTableWidget *tableWidget_,QLineEdit *lineE
 }
 
 void add_algo_con_rev::create_AutoFillModel_FutInstrument(){
-    /*model_FUT_CON_REV->clear();
-    for(int i=0;i<sorted_keys_F2F.length();i++){
-        const auto& contract = sharedData->contract_table_hash[sorted_keys_F2F[i]];
+//    model_FUT_CON_REV->clear();
+//    for(int i=0;i<sorted_keys_F2F.length();i++){
+//        const auto& contract = sharedData->contract_table_hash[sorted_keys_F2F[i]];
 
-        QString instrument_name = contract.InstrumentName;//" "+Expiry;
-        unsigned int unix_time= contract.Expiry;
-        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-        dt = dt.addYears(10);
-        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
+//        QString instrument_name = contract.InstrumentName;//" "+Expiry;
+//        unsigned int unix_time= contract.Expiry;
+//        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//        dt = dt.addYears(10);
+//        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
 
-        QStandardItem *itemFut = new QStandardItem;
-        itemFut->setText(instrument_name+" "+Expiry);
-        itemFut->setData(contract.TokenNumber, Qt::UserRole + 1);
-        model_FUT_CON_REV->appendRow(itemFut);
-    }*/
+//        QStandardItem *itemFut = new QStandardItem;
+//        itemFut->setText(instrument_name+" "+Expiry);
+//        itemFut->setData(contract.TokenNumber, Qt::UserRole + 1);
+//        model_FUT_CON_REV->appendRow(itemFut);
+//    }
 }
 
 void add_algo_con_rev::create_AutoFillModel_StartStrike(){
@@ -93,8 +93,14 @@ void add_algo_con_rev::selectedAction(){
     custom_q_completer *Start_strike_combination_Completer = new custom_q_completer( this);
     Start_strike_combination_Completer->setModel(model_FUT_CON_REV);
     Start_strike_combination_Completer->setCaseSensitivity(Qt::CaseInsensitive);
+    Start_strike_combination_Completer->setCompletionMode(QCompleter::PopupCompletion);
+    Start_strike_combination_Completer->setModelSorting(QCompleter::CaseSensitivelySortedModel);
     connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),Start_strike_combination_Completer, SLOT(newfilterItems(QString)));
     lineEdit_Start_strike->setCompleter(Start_strike_combination_Completer);
+    QListView *view = (QListView *)Start_strike_combination_Completer->popup();
+    view->setUniformItemSizes(true);
+    view->setLayoutMode(QListView::Batched);
+    lineEdit_Fut->setCompleter(Start_strike_combination_Completer);
 
     //foo_token_number assined for currently selected algo combination.
     connect(Start_strike_combination_Completer, QOverload<const QModelIndex &>::of(&QCompleter::activated), [=](const QModelIndex &index){
@@ -225,9 +231,9 @@ void add_algo_con_rev::generateAlgo(){
             int leg2 = sharedData->contract_table_hash[filteredKeys[i]].StrikePrice;
             for(int j=i+1;j<filteredKeys.length();j++){
                 if(leg2==sharedData->contract_table_hash[filteredKeys[j]].StrikePrice&&sharedData->contract_table_hash[filteredKeys[j]].OptionType=="PE"){
-                    QDateTime dt2 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
-                    dt2 = dt2.addYears(10);
-                    QString Leg2_date=dt2.toString("MMM dd yyyy").toUpper();
+                    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
+                    dt1 = dt1.addYears(10);
+                    QString Leg2_date=dt1.toString("MMM dd yyyy").toUpper();
                     QString leg2=Leg2_date+" "+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" CE";
 
                     QDateTime dt3 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
@@ -252,7 +258,14 @@ void add_algo_con_rev::generateAlgo(){
 //                    //            StockName.chop(2);
 //                    Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM")+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number);
 
-                    QString Algo_Name ="CR-"+Instr_Name+"-"+dt.toString("ddMMM").toUpper()+"-"+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+"-"+dt2.toString("ddMMM").toUpper();
+//                    QString Algo_Name ="CR-"+Instr_Name+"-"+dt.toString("ddMMM").toUpper()+"-"+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+"-"+dt2.toString("ddMMM").toUpper();
+//                    Algo_Name_list.append(Algo_Name);
+
+
+                    QString Algo_Name ="CR- "+Instr_Name+" "+dt1.toString("yyyy MMM").toUpper()+" "+
+                                        QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)
+                                        +" "+optionType+" - "+QString::number(((endStrike-startStrike)/sharedData->strike_price_devider),'f',sharedData->decimal_precision)+" - "
+                                        +" "+Instr_Name+" "+dt3.toString("yyyy MMM").toUpper();
                     Algo_Name_list.append(Algo_Name);
 
 
@@ -296,7 +309,10 @@ void add_algo_con_rev::generateAlgo(){
     }
 
     //populate table and algo data.
-
+//    unsigned int unix_time= sharedData->contract_table_hash[keyFut].Expiry;
+//    QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//    dt = dt.addYears(10);
+//    QString Leg1_val=dt.toString("MMM dd yyyy").toUpper();
 
     QStringList duplicateList;
 

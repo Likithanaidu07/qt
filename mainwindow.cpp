@@ -85,10 +85,10 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, true);
+    //CDockManager::setConfigFlag(CDockManager::OpaqueSplitterResize, true);
     CDockManager::setConfigFlag(CDockManager::XmlCompressionEnabled, false);
-    CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
-   // CDockManager::setConfigFlag(CDockManager::ActiveTabHasCloseButton, false);
+    //CDockManager::setConfigFlag(CDockManager::FocusHighlighting, true);
+    CDockManager::setConfigFlag(CDockManager::ActiveTabHasCloseButton, false);
     CDockManager::setAutoHideConfigFlags(CDockManager::DefaultAutoHideConfig);
 
     /***********************Move Side Panel items to dock Widget**********************/
@@ -189,7 +189,7 @@ MainWindow::MainWindow(QWidget *parent)
             ConvertAlgo_button->setStyleSheet("text-align: center;");
 
             const char convert_to_algo_button[]="QToolButton {"
-                                                  "border-radius: 4px;" "border: 1px solid #188CCA;"
+                                                //  "border-radius: 4px;" "border: 1px solid #188CCA;"
                                                   "background: #1585C0;"
                                                   "color: #FFF;"
                                                   "font-size: 12px;"
@@ -1111,8 +1111,6 @@ void MainWindow::loadContract(){
         QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
                               "<span>" + QTime::currentTime().toString("hh:mm:ss")
                               + "&nbsp;</span><span style='font-weight:400;color: black;'> file loading... </span></p>";
-
-
 
         emit display_log_text_signal(htmlContent);
 

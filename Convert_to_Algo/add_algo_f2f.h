@@ -11,13 +11,14 @@
 #include "QListView"
 #include "QMessageBox"
 #include "QDateTime"
+#include "eventfilterlistview.h"
 
 class add_algo_f2f : public QObject
 {
     Q_OBJECT
 public:
     explicit add_algo_f2f(QObject *parent = nullptr);
-    void copyUIElement(QTableWidget *tableWidget_,QLineEdit *lineEdit_searchInstrument_leg1_,QLineEdit *lineEdit_searchInstrument_leg2_);
+    void copyUIElement(QTableWidget *tableWidget_,QLineEdit *lineEdit_searchInstrument_leg1_,QLineEdit *lineEdit_searchInstrument_leg2_, QListView *sView, QListView *eView);
     QStringList sorted_keys_F2F; // sorted keys for contract_table hash table
     void create_AutoFillModel_SearchInstrument();
     void selectedAction();
@@ -32,6 +33,8 @@ private:
     QLineEdit *lineEdit_searchInstrument_leg1;
     QLineEdit *lineEdit_searchInstrument_leg2;
     QTableWidget *tableWidget;
+    QListView *startStrikeListView;
+    QListView *endStrikeListView;
     QStandardItemModel *model_searchInstrument_F2F_Leg2;
 
     QStringList expiry_dateList;
@@ -39,6 +42,18 @@ private:
     AddAlgoSharedVar *sharedData;
     QString   get_Algo_Name(PortfolioType algo_type,int leg1_token_number,int leg2_token_number,int leg3_token_number,double devicer,int decimal_precision);
     QString fixDecimal(double num,int decimal_precision);
+
+    EventFilter *eventFilterStart;
+    EventFilter *eventFilterEnd;
+
+private slots:
+    void slotStartHide(QString);
+    void slotEndHide(QString);
+
+public slots:
+    void itemSelected(QModelIndex);
+    void itemSelectedEndStrike(QModelIndex index);
+
 };
 
 #endif // ADD_ALGO_F2F_H

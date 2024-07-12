@@ -10,6 +10,7 @@
 #include "QMessageBox"
 #include "QDateTime"
 #include "eventfilterlistview.h"
+#include "QSpinBox"
 
 class add_algo_btfly : public QObject
 {
@@ -17,7 +18,7 @@ class add_algo_btfly : public QObject
 
 public:
     explicit add_algo_btfly(QObject *parent = nullptr);
-    void copyUIElement(QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_StrikeDifference_,QListView *sView, QListView *eView);
+   void copyUIElement(QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_StrikeDifference_,QListView *sView, QListView *eView);
     QStringList sorted_keys_BFLY; // sorted keys for contract_table hash table
     void create_AutoFillModel_StartStrike();
     void selectedAction();
@@ -25,6 +26,7 @@ public:
     QString foo_token_number_end_strike;// this for start strike input of btfly
     QStandardItemModel *model_start_strike_BFLY;
     QStandardItemModel *model_end_strike;
+
 
     void startStrikeEditFinishedAction();
     void generateAlgo();
@@ -43,6 +45,9 @@ private:
     QLineEdit *lineEdit_Start_strike;
     QLineEdit *lineEdit_EndStrike;
     QLineEdit *lineEdit_StrikeDifference;
+    QSpinBox  *mkt_qty1;
+    QSpinBox  *mkt_qty2;
+    QSpinBox  *mkt_qty3;
 
     QTableWidget *tableWidget;
     QListView *startStrikeListView;
