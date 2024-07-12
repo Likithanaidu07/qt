@@ -8,6 +8,7 @@ SortSettingPopUp::SortSettingPopUp(QWidget *parent) :
     ui(new Ui::SortSettingPopUp)
 {
     ui->setupUi(this);
+    saveFlg = false;
     ui->tableWidget->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
 
     QStringList list{"Algo Status","Instrument Name", "Algo Type","Expiry","Middle Strike","Strike Difference","Option Type"};
@@ -36,6 +37,7 @@ SortSettingPopUp::SortSettingPopUp(QWidget *parent) :
 
               // Second column with ComboBox
               QComboBox *comboBox = new QComboBox();
+
               if(sortItemTxt == "Algo Status"){
                   comboBox->addItem("Enabled");
                   comboBox->addItem("Disabled");
@@ -47,8 +49,9 @@ SortSettingPopUp::SortSettingPopUp(QWidget *parent) :
                   comboBox->setCurrentText(sortOrderTxt);
               }
               else if(sortItemTxt == "Expiry"){
-                  comboBox->addItem("Sort by Latest Date");
-                  comboBox->addItem("Sort by Oldest Date");
+                  comboBox->addItem("Sort by Far Date");
+
+                  comboBox->addItem("Sort By Near Date");
                   comboBox->setCurrentText(sortOrderTxt);
               }
               else{
@@ -57,6 +60,9 @@ SortSettingPopUp::SortSettingPopUp(QWidget *parent) :
                   comboBox->setCurrentText(sortOrderTxt);
               }
               ui->tableWidget->setCellWidget(row, 1, comboBox);
+              QObject::connect(comboBox, &QComboBox::currentTextChanged, [=](const QString &text) {
+                  saveFlg = true;
+                 });
           }
 
       }
@@ -75,26 +81,30 @@ SortSettingPopUp::~SortSettingPopUp()
     delete ui;
 }
 
+
+void SortSettingPopUp::saveConfig()
+{
+    QStringList saveStr;
+    for (int row = 0; row < ui->tableWidget->rowCount(); ++row) {
+        QTableWidgetItem *itemText = ui->tableWidget->item(row, 0);
+        QWidget *itemCombo = ui->tableWidget->cellWidget(row, 1);
+        if (itemCombo&&itemText) {
+            QComboBox *comboBox = qobject_cast<QComboBox*>(itemCombo);
+            QString sortOrder = comboBox->currentText();
+            QString sortItemText = itemText->text();
+            saveStr.append(sortItemText+":"+sortOrder);
+        }
+    }
+
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
+    QSettings settings(appDataPath+"/sort_data.dat", QSettings::IniFormat);
+    settings.setValue("portfolio_sort_data",saveStr.join(";"));
+
+    emit reloadSortSettingSignal();
+}
 void SortSettingPopUp::on_buttonBox_accepted()
 {
-
-        QStringList saveStr;
-        for (int row = 0; row < ui->tableWidget->rowCount(); ++row) {
-            QTableWidgetItem *itemText = ui->tableWidget->item(row, 0);
-            QWidget *itemCombo = ui->tableWidget->cellWidget(row, 1);
-            if (itemCombo&&itemText) {
-                QComboBox *comboBox = qobject_cast<QComboBox*>(itemCombo);
-                QString sortOrder = comboBox->currentText();
-                QString sortItemText = itemText->text();
-                saveStr.append(sortItemText+":"+sortOrder);
-            }
-        }
-
-        QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
-        QSettings settings(appDataPath+"/sort_data.dat", QSettings::IniFormat);
-        settings.setValue("portfolio_sort_data",saveStr.join(";"));
-
-        emit reloadSortSettingSignal();
+    saveConfig();
 }
 
 
@@ -107,6 +117,7 @@ void SortSettingPopUp::on_buttonBox_rejected()
 
 void SortSettingPopUp::on_pushButtonRemove_clicked()
 {
+     saveFlg = true;
     int row = ui->tableWidget->currentRow();
         if (row != -1) {
             // Get the text from the first column
@@ -126,6 +137,7 @@ void SortSettingPopUp::on_pushButtonRemove_clicked()
 
 void SortSettingPopUp::on_pushButtonAdd_clicked()
 {
+      saveFlg = true;
       QString selectedText = ui->comboBoxSortItems->currentText();
       ui->comboBoxSortItems->removeItem(ui->comboBoxSortItems->currentIndex());
       if(ui->comboBoxSortItems->currentText()==""){
@@ -150,8 +162,8 @@ void SortSettingPopUp::on_pushButtonAdd_clicked()
           comboBox->addItem("PE");
       }
       else if(selectedText == "Expiry"){
-          comboBox->addItem("Sort by Latest Date");
-          comboBox->addItem("Sort by Oldest Date");
+          comboBox->addItem("Sort by Far Date");
+          comboBox->addItem("Sort By Near Date");
       }
       else{
          comboBox->addItem("Ascending");
@@ -160,5 +172,29 @@ void SortSettingPopUp::on_pushButtonAdd_clicked()
       ui->tableWidget->setCellWidget(row, 1, comboBox);
 }
 
+
+
+void SortSettingPopUp::closeEvent(QCloseEvent *event) {
+
+    if(saveFlg){
+        QMessageBox::StandardButton reply;
+                reply = QMessageBox::question(this, "Save Changes", "Do you want to save your changes?",
+                                              QMessageBox::Yes | QMessageBox::No | QMessageBox::Cancel);
+
+                if (reply == QMessageBox::Yes) {
+                    // Call the function to save data
+                    saveConfig();
+                    event->accept();
+                } else if (reply == QMessageBox::No) {
+                    event->accept();
+                } else {
+                    event->ignore();
+                }
+    }
+    else{
+        event->accept();
+    }
+
+}
 
 

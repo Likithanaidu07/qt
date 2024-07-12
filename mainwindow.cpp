@@ -956,6 +956,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 bool success = db_conn->updateDB_Table(Query,msg);
                 if(success){
                     db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));
+                    //refresh sorting
+                    reloadSortSettFlg.storeRelaxed(1);
                 }
                 else{
                     QMessageBox msgBox;
@@ -972,6 +974,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                 if(success){
                     db_conn->logToDB(QString("Activated  portfolio ["+PortfolioNumber+"]"));
+                    //refresh sorting
+                    reloadSortSettFlg.storeRelaxed(1);
                 }
                 else{
                     QMessageBox msgBox;
@@ -1375,6 +1379,8 @@ void MainWindow::updatePortFolioStatus(){
                     QString msg;
                     bool success = db_conn->updateDB_Table(Query,msg);
                     if(success){
+                        //refresh sorting
+                        reloadSortSettFlg.storeRelaxed(1);
                         db_conn->logToDB(QString("Activated portfolio ["+PortfolioNumber+"]"));
                         quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
                         const unsigned char dataBytes[] = { 0x01};
@@ -1393,7 +1399,8 @@ void MainWindow::updatePortFolioStatus(){
                 QString msg;
                 bool success = db_conn->updateDB_Table(Query,msg);
                 if(success){
-
+                    //refresh sorting
+                    reloadSortSettFlg.storeRelaxed(1);
                     db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));
 
                     quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
@@ -2297,12 +2304,19 @@ void MainWindow::restoreTableViewColumnState(QTableView *tableView){
 void MainWindow::on_sorting_Button_clicked(){
 
 
-   if (!sortWin) {
+      if (!sortWin) {
            sortWin = new SortSettingPopUp();
            connect(sortWin, &SortSettingPopUp::reloadSortSettingSignal, [this]() {
                reloadSortSettFlg.storeRelaxed(1);
            });
        }
+      else{
+          delete sortWin;
+          sortWin = new SortSettingPopUp();
+          connect(sortWin, &SortSettingPopUp::reloadSortSettingSignal, [this]() {
+              reloadSortSettFlg.storeRelaxed(1);
+          });
+      }
        sortWin->show();
        sortWin->raise();  // Bring the window to the front
        sortWin->activateWindow(); // Give focus to the window

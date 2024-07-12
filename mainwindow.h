@@ -134,7 +134,7 @@ private:
     QAtomicInt data_loading_thread_running;
     QAtomicInt contractDetailsLoaded;
     QAtomicInt loggedInFlg;
-    QAtomicInt reloadSortSettFlg;
+    QAtomicInt reloadSortSettFlg; // this flag is used for reloading sorting config
     QAtomicInt deletingPortFolioFlg; // this flag is used to prevent portfolio table re-load while deleting.
 
 

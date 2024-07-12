@@ -174,11 +174,11 @@ bool portfolioCustomSorting::customComparator(const QString &a, const QString &b
                     return false;
                 }
             }
-            else if (order == "Sort by Latest Date" || order == "Sort by Oldest Date") {
+            else if (order == "Sort by Far Date" || order == "Sort By Near Date") {
                  QDate dateA = QDate::fromString(aParts[colIndex], "ddMMMyyyy");
                  QDate dateB = QDate::fromString(bParts[colIndex], "ddMMMyyyy");
                  if (dateA.isValid() && dateB.isValid()) {
-                    if (order == "Sort by Latest Date") {
+                    if (order == "Sort by Far Date") {
                         if (dateA > dateB) {
                             return true;
                         }
@@ -186,7 +186,7 @@ bool portfolioCustomSorting::customComparator(const QString &a, const QString &b
                              return false;
                          }
                     }
-                    else if (order == "Sort by Oldest Date") {
+                    else if (order == "Sort By Near Date") {
                         if (dateA < dateB) {
                             return true;
                         }

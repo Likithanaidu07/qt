@@ -39,7 +39,10 @@ public:
     {
         if (SortSettingPopUp->objectName().isEmpty())
             SortSettingPopUp->setObjectName("SortSettingPopUp");
-        SortSettingPopUp->resize(359, 401);
+        SortSettingPopUp->setWindowModality(Qt::ApplicationModal);
+        SortSettingPopUp->resize(245, 352);
+        SortSettingPopUp->setMinimumSize(QSize(245, 352));
+        SortSettingPopUp->setMaximumSize(QSize(245, 352));
         gridLayout = new QGridLayout(SortSettingPopUp);
         gridLayout->setObjectName("gridLayout");
         pushButtonAdd = new QPushButton(SortSettingPopUp);
@@ -52,7 +55,7 @@ public:
         buttonBox = new QDialogButtonBox(SortSettingPopUp);
         buttonBox->setObjectName("buttonBox");
         buttonBox->setOrientation(Qt::Horizontal);
-        buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Ok);
+        buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Save);
 
         gridLayout->addWidget(buttonBox, 4, 0, 1, 5);
 
@@ -97,7 +100,7 @@ public:
 
     void retranslateUi(QDialog *SortSettingPopUp)
     {
-        SortSettingPopUp->setWindowTitle(QCoreApplication::translate("SortSettingPopUp", "Dialog", nullptr));
+        SortSettingPopUp->setWindowTitle(QCoreApplication::translate("SortSettingPopUp", "Algo Sort Settings", nullptr));
         pushButtonAdd->setText(QCoreApplication::translate("SortSettingPopUp", "Add", nullptr));
         pushButtonRemove->setText(QCoreApplication::translate("SortSettingPopUp", "Remove", nullptr));
         QTableWidgetItem *___qtablewidgetitem = tableWidget->horizontalHeaderItem(0);
