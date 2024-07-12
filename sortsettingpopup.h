@@ -2,6 +2,8 @@
 #define SORTSETTINGPOPUP_H
 
 #include <QDialog>
+#include <QCloseEvent>
+#include <QMessageBox>
 
 namespace Ui {
 class SortSettingPopUp;
@@ -24,10 +26,17 @@ private slots:
 
     void on_pushButtonAdd_clicked();
 
-
+signals:
+    void reloadSortSettingSignal();
 
 private:
     Ui::SortSettingPopUp *ui;
+    void saveConfig();
+    bool saveFlg;
+
+protected:
+    void closeEvent(QCloseEvent *event) override;
+
 };
 
 #endif // SORTSETTINGPOPUP_H

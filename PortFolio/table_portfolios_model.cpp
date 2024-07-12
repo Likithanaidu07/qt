@@ -716,6 +716,20 @@ void Table_Portfolios_Model::setDataList(QList <PortfolioObject*> portfolio_data
     portfolio_data_list_new.clear();
 }
 
+void Table_Portfolios_Model::clearTable(){
+    QList <int> portfolio_ids_ToRemove;
+    for(int i=0;i<portfolio_data_list.length();i++){
+       portfolio_ids_ToRemove.append(i);
+    }
+    for(int i = 0;i<portfolio_ids_ToRemove.length();i++){
+        beginRemoveRows(QModelIndex(), portfolio_ids_ToRemove[i]-i, portfolio_ids_ToRemove[i]-i); //substract i means each time one item removed the index need to be decrement by 1
+        PortfolioObject* portfolio = portfolio_data_list[portfolio_ids_ToRemove[i]-i];
+        portfolio_data_list.removeOne(portfolio);//substract i means each time one item removed the index need to be decrement by 1
+        delete portfolio;
+        endRemoveRows();
+    }
+}
+
 
 
 

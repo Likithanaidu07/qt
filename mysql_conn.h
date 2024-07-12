@@ -20,7 +20,7 @@
 #include "CombinedTracker/combined_tracker_table_model.h"
 #include "Liners/liners_model.h"
 //class MainWindow;
-
+#include "PortFolio/portfoliocustomsorting.h"
 
 struct net_pos_data_{
     QString  token_number;
@@ -75,7 +75,8 @@ public:
     QString InstrumentTypeFilter;
 
     userInfo login( QString user_name,  QString password);
-    void  getPortfoliosTableData(int &AlgoCount,Table_Portfolios_Model* model,Combined_Tracker_Table_Model *comb_tracker_model,QHash<QString, PortfolioAvgPrice> &averagePriceList,QString user_id, QStringList TradedPortFolioList );
+    void  getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount,Table_Portfolios_Model* model,Combined_Tracker_Table_Model *comb_tracker_model,QHash<QString, PortfolioAvgPrice> &averagePriceList,QString user_id, QStringList TradedPortFolioList );
+
     QMap<int, QHash<QString, contract_table>> getContractTable(QHash<QString, QStringList> &_m_ContractDetailsFiltered, QStringList &F2F_data_list_Sorted_Key, QStringList &BFLY_data_list_Sorted_Key, QStringList &BFLY_BID_data_list_Sorted_Key, userInfo userData);
 
     QSqlQuery runQuery(QString qry_str);
@@ -107,7 +108,7 @@ private:
     userInfo userLoginInfo;
     double calculateAverage(const QList<double> &list);
     int calculateSum(const QList<int> &list);
-
+    portfolioCustomSorting *portfolioCustomSort;
 
 
 //    MainWindow MainWindow;

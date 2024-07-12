@@ -30,6 +30,7 @@ SOURCES += \
     OrderBook/table_orderbook_delegate.cpp \
     PortFolio/PortfolioParser.cpp \
     PortFolio/portfolio_Object.cpp \
+    PortFolio/portfoliocustomsorting.cpp \
     PortFolio/portfolioheaderdelegate.cpp \
     PortFolio/portfolioheaderview.cpp \
     PortFolio/table_portfolios_custom.cpp \
@@ -78,6 +79,7 @@ HEADERS += \
     OrderBook/table_orderbook_delegate.h \
     PortFolio/PortfolioParser.h \
     PortFolio/portfolio_Object.h \
+    PortFolio/portfoliocustomsorting.h \
     PortFolio/portfolioheaderdelegate.h \
     PortFolio/portfolioheaderview.h \
     PortFolio/table_portfolios_custom.h \

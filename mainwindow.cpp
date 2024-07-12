@@ -31,7 +31,9 @@ extern MainWindow *MainWindowObj;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , ui(new Ui::MainWindow),
+     sortWin(nullptr) // Initialize the pointer to nullptr
+
 {
 
     QFontDatabase::addApplicationFont(":/WorkSans-Bold.ttf");
@@ -68,6 +70,8 @@ MainWindow::MainWindow(QWidget *parent)
     loadSettings();
 
     contractDetailsLoaded.storeRelaxed(0);
+    reloadSortSettFlg.storeRelaxed(1);
+    deletingPortFolioFlg.storeRelaxed(0);
     quit_db_data_load_thread.storeRelaxed(0);
     portfolio_table_updating_db.storeRelaxed(0);
     portfolio_table_slected_idx_for_editing.store(-1);
@@ -736,6 +740,9 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
     delete ui;
+    if (sortWin) {
+            delete sortWin; // Ensure the window is deleted
+    }
 }
 
 void MainWindow::update_ui_slot(int type){
@@ -949,6 +956,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 bool success = db_conn->updateDB_Table(Query,msg);
                 if(success){
                     db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));
+                    //refresh sorting
+                    reloadSortSettFlg.storeRelaxed(1);
                 }
                 else{
                     QMessageBox msgBox;
@@ -965,6 +974,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                 if(success){
                     db_conn->logToDB(QString("Activated  portfolio ["+PortfolioNumber+"]"));
+                    //refresh sorting
+                    reloadSortSettFlg.storeRelaxed(1);
                 }
                 else{
                     QMessageBox msgBox;
@@ -1155,10 +1166,10 @@ void MainWindow::refreshTableIn_Intervel(){
         QElapsedTimer timer;
         timer.start();
 
-        //load alog table only when it's not editing.
-        //if(portfolio_table_editing.loadRelaxed()==0){
-        loadDataAndUpdateTable(T_Table::PORTFOLIO);
-//        //}
+        //check algos are deleting if so do not load.
+        if(deletingPortFolioFlg.loadRelaxed()==0){
+            loadDataAndUpdateTable(T_Table::PORTFOLIO);
+        }
         loadDataAndUpdateTable(T_Table::TRADE);
         loadDataAndUpdateTable(T_Table::NET_POS);
         loadDataAndUpdateTable(T_Table::SUMMARY);
@@ -1217,7 +1228,7 @@ void MainWindow::loadDataAndUpdateTable(int table){
             TradedPortFolioList.removeAll(item);
         }
 
-        db_conn->getPortfoliosTableData(AlgoCount,T_Portfolio_Model,combined_tracker_model,averagePriceList,QString::number(userData.UserId),TradedPortFolioList);
+        db_conn->getPortfoliosTableData(reloadSortSettFlg,AlgoCount,T_Portfolio_Model,combined_tracker_model,averagePriceList,QString::number(userData.UserId),TradedPortFolioList);
         emit data_loded_signal(T_Table::PORTFOLIO);
         emit data_summary_update_signal();
         break;
@@ -1366,6 +1377,8 @@ void MainWindow::updatePortFolioStatus(){
                     QString msg;
                     bool success = db_conn->updateDB_Table(Query,msg);
                     if(success){
+                        //refresh sorting
+                        reloadSortSettFlg.storeRelaxed(1);
                         db_conn->logToDB(QString("Activated portfolio ["+PortfolioNumber+"]"));
                         quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
                         const unsigned char dataBytes[] = { 0x01};
@@ -1384,7 +1397,8 @@ void MainWindow::updatePortFolioStatus(){
                 QString msg;
                 bool success = db_conn->updateDB_Table(Query,msg);
                 if(success){
-
+                    //refresh sorting
+                    reloadSortSettFlg.storeRelaxed(1);
                     db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));
 
                     quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
@@ -1760,6 +1774,7 @@ void MainWindow::Delete_clicked_slot()
         // Multiple rows can be selected
         QString logs;
         QStringList activeAlgoList;
+        deletingPortFolioFlg.storeRelaxed(1);
         for(int i=0; i< selection.count(); i++)
         {
             QModelIndex index = selection.at(i);
@@ -1788,6 +1803,8 @@ void MainWindow::Delete_clicked_slot()
             }
 
         }
+        deletingPortFolioFlg.storeRelaxed(0);
+
 
         if(!activeAlgoList.empty())
         {
@@ -2283,8 +2300,25 @@ void MainWindow::restoreTableViewColumnState(QTableView *tableView){
      }
 }
 void MainWindow::on_sorting_Button_clicked(){
-   SortSettingPopUp *sertWin = new SortSettingPopUp();
-   sertWin->show();
+
+
+      if (!sortWin) {
+           sortWin = new SortSettingPopUp();
+           connect(sortWin, &SortSettingPopUp::reloadSortSettingSignal, [this]() {
+               reloadSortSettFlg.storeRelaxed(1);
+           });
+       }
+      else{
+          delete sortWin;
+          sortWin = new SortSettingPopUp();
+          connect(sortWin, &SortSettingPopUp::reloadSortSettingSignal, [this]() {
+              reloadSortSettFlg.storeRelaxed(1);
+          });
+      }
+       sortWin->show();
+       sortWin->raise();  // Bring the window to the front
+       sortWin->activateWindow(); // Give focus to the window
+
 }
 void MainWindow::closeEvent(QCloseEvent* event)
 {
