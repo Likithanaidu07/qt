@@ -429,7 +429,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
 
         if(portfolio->TradedHighlight== true ){
-            QColor color("#FFFF00");
+            QColor color("#ffbdd3");
             painter->fillRect(option.rect, color);
 
             double borderWidth = 0.5;
@@ -623,7 +623,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         }
 
         if(portfolio->TradedHighlight== true ){
-            QColor color("#FFFF00");
+            QColor color("#ffbdd3");
             painter->fillRect(option.rect, color);
 
             double borderWidth = 0.5;

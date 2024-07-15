@@ -60,7 +60,15 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
 
     // to make floating window
-
+    listViewFut = new QListView(this);
+    connect(listViewFut, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
+    QPoint lineEditPosF = ui->lineEdit_EndStrike->mapToGlobal(ui->lineEdit_EndStrike->geometry().bottomRight());
+    listViewFut->setSizePolicy(sizePolicy);
+    listViewFut->setFixedSize(230, 200);
+    listViewFut->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    // Set the position of the QListView just below lineEdit_EndStrike
+    listViewFut->move(lineEditPosES.x()+270, lineEditPosSS.y()+55);
+    listViewFut->hide();
     QPixmap pixmapclose(":/close_window_icon.png");
     ui->Close->setIcon(pixmapclose);
 
@@ -132,7 +140,9 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
     /*******Class to generate con_rev algos************/
     algoConRev= new add_algo_con_rev();
-    algoConRev->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_Fut);
+    connect(this, &ConvertAlgo_Win::signalStartItemClickedCR,algoConRev, &add_algo_con_rev::itemSelectedStartStrike);
+    connect(this, &ConvertAlgo_Win::signalEndItemClickedCR,algoConRev, &add_algo_con_rev::itemSelectedEndStrike);
+    algoConRev->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_Fut,listViewStartStrike,listViewEndStrike,listViewFut);
     /*******Class to generate con_rev algos************/
 
     /*******Class to generate BtFly-bid algos************/
@@ -198,7 +208,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
         ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
         ui->comboBox_AlgoType->addItem("F2F");
         ui->comboBox_AlgoType->addItem("BFLY");
-        //ui->comboBox_AlgoType->addItem("CON-REV");
+        ui->comboBox_AlgoType->addItem("CON-REV");
 //        ui->comboBox_AlgoType->addItem("BOX");
 //        ui->comboBox_AlgoType->addItem("Open-BFLY");
 //        ui->comboBox_AlgoType->addItem("Open-BOX");
@@ -365,7 +375,7 @@ void ConvertAlgo_Win::update_contract_tableData(QString foo_user_id_,int MaxPort
 
     algoConRev->sorted_keys_CON_REV = sharedData->FO_BFLY_data_list_Sorted_Key;
     algoConRev->sorted_keys_F2F = sharedData->FO_F2F_data_list_Sorted_Key;
-    algoConRev->model_FUT_CON_REV = ContractDetail::getInstance().Get_model_FUT_CON_REV();  //get the model generated from contract class
+    algoConRev->model_start_strike_CR = ContractDetail::getInstance().Get_model_FUT_CON_REV();  //get the model generated from contract class
 
     /*algoBOX->sorted_keys_BOX = sharedData->FO_BFLY_data_list_Sorted_Key;
     algoBOX->model_searchInstrument_BOX_Leg1 = ContractDetail::getInstance().Get_model_searchInstrument_BOX_Leg1(); //get the model generated from contract class for leg1
