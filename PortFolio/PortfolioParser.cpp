@@ -447,7 +447,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         CalculateAveragePrice(obj,averagePriceList,devicer_,decimal_precision_);
         obj.AlgoName = get_Algo_Name(obj.PortfolioTypeEnum,obj.Leg1TokenNo,obj.Leg2TokenNo,obj.Leg3TokenNo,devicer_,decimal_precision_,obj.AlgoNameForSorting);
 
-        obj.AlgoName = obj.AlgoNameForSorting;// this should remove
+        //obj.AlgoName = obj.AlgoNameForSorting;// this should remove
         return true;
     }
     catch (const std::exception& ex)
