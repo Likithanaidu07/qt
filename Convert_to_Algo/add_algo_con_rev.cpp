@@ -9,11 +9,18 @@ add_algo_con_rev::add_algo_con_rev(QObject *parent)
     sharedData = &AddAlgoSharedVar::getInstance();
 
 }
-void add_algo_con_rev::copyUIElement(QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_){
+void add_algo_con_rev::copyUIElement(QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_,QListView *sView, QListView *eView,QListView *fView){
     lineEdit_Start_strike = lineEdit_Start_strike_;
     lineEdit_EndStrike = lineEdit_EndStrike_;
     lineEdit_Fut = lineEdit_Fut_;
     tableWidget = tableWidget_;
+    startStrikeListView = sView;
+    endStrikeListView = eView;
+    futListView = fView;
+
+
+    startStrikeListView->hide();
+    endStrikeListView->hide();
 }
 
 void add_algo_con_rev::create_AutoFillModel_FutInstrument(){
@@ -84,29 +91,57 @@ void add_algo_con_rev::create_AutoFillModel_StartStrike(){
 
 }
 void add_algo_con_rev::selectedAction(){
-
     foo_token_number_start_strike = "";
     foo_token_number_end_strike = "";
     foo_token_number_fut="";
 
-    //create qcompleter and fill with CON_REV model
-    custom_q_completer *Start_strike_combination_Completer = new custom_q_completer( this);
-    Start_strike_combination_Completer->setModel(model_FUT_CON_REV);
-    Start_strike_combination_Completer->setCaseSensitivity(Qt::CaseInsensitive);
-    Start_strike_combination_Completer->setCompletionMode(QCompleter::PopupCompletion);
-    Start_strike_combination_Completer->setModelSorting(QCompleter::CaseSensitivelySortedModel);
-    connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),Start_strike_combination_Completer, SLOT(newfilterItems(QString)));
-    lineEdit_Start_strike->setCompleter(Start_strike_combination_Completer);
-    QListView *view = (QListView *)Start_strike_combination_Completer->popup();
-    view->setUniformItemSizes(true);
-    view->setLayoutMode(QListView::Batched);
-    lineEdit_Fut->setCompleter(Start_strike_combination_Completer);
+   // Install event filter on the QLineEdit and QListView
+    eventFilterFUT = new EventFilter(lineEdit_Fut, futListView);
+    connect(eventFilterFUT, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedFut(QModelIndex)));
+    lineEdit_Fut->installEventFilter(eventFilterFUT);
+    futListView->installEventFilter(eventFilterFUT);
 
-    //foo_token_number assined for currently selected algo combination.
-    connect(Start_strike_combination_Completer, QOverload<const QModelIndex &>::of(&QCompleter::activated), [=](const QModelIndex &index){
-        foo_token_number_fut = Start_strike_combination_Completer->get_foo_token_number_for_selected(index);
-        //qDebug()<<"foo_token_number_fut: "<<foo_token_number_fut;
-    });
+    eventFilterStart = new EventFilter(lineEdit_Start_strike, startStrikeListView);
+    connect(eventFilterStart, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedStartStrike(QModelIndex)));
+    lineEdit_Start_strike->installEventFilter(eventFilterStart);
+    startStrikeListView->installEventFilter(eventFilterStart);
+
+    eventFilterEnd = new EventFilter(lineEdit_EndStrike, endStrikeListView);
+    connect(eventFilterEnd, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
+    lineEdit_EndStrike->installEventFilter(eventFilterEnd);
+    endStrikeListView->installEventFilter(eventFilterEnd);
+
+
+
+    //create qcompleter and fill with abovie model
+    CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_CR);
+    connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
+    connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),this, SLOT(slotStartHide(QString)));
+    connect(lineEdit_EndStrike, SIGNAL(textChanged(QString)),this, SLOT(slotEndHide(QString)));
+    connect(lineEdit_Fut, SIGNAL(textChanged(QString)),this, SLOT(slotFutHide(QString)));
+
+//    foo_token_number_start_strike = "";
+//    foo_token_number_end_strike = "";
+//    foo_token_number_fut="";
+
+//    //create qcompleter and fill with CON_REV model
+//    custom_q_completer *Start_strike_combination_Completer = new custom_q_completer( this);
+//    Start_strike_combination_Completer->setModel(model_start_strike_CR);
+//    Start_strike_combination_Completer->setCaseSensitivity(Qt::CaseInsensitive);
+//    Start_strike_combination_Completer->setCompletionMode(QCompleter::PopupCompletion);
+//    Start_strike_combination_Completer->setModelSorting(QCompleter::CaseSensitivelySortedModel);
+//    connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),Start_strike_combination_Completer, SLOT(newfilterItems(QString)));
+//    lineEdit_Start_strike->setCompleter(Start_strike_combination_Completer);
+//    QListView *view = (QListView *)Start_strike_combination_Completer->popup();
+//    view->setUniformItemSizes(true);
+//    view->setLayoutMode(QListView::Batched);
+//    lineEdit_Fut->setCompleter(Start_strike_combination_Completer);
+
+//    //foo_token_number assined for currently selected algo combination.
+//    connect(Start_strike_combination_Completer, QOverload<const QModelIndex &>::of(&QCompleter::activated), [=](const QModelIndex &index){
+//        foo_token_number_fut = Start_strike_combination_Completer->get_foo_token_number_for_selected(index);
+//        //qDebug()<<"foo_token_number_fut: "<<foo_token_number_fut;
+//    });
 }
 
 
@@ -437,8 +472,109 @@ void add_algo_con_rev::generateAlgo(){
 
 
 }
+void add_algo_con_rev::itemSelectedFut(QModelIndex index)
+{
+    if(index.isValid())
+    {
+        QVariant dData = index.data(Qt::DisplayRole);
+        if (dData.isValid())
+        {
+            for (int row = 0; row < model_Fut_CR->rowCount(); ++row)
+            {
+                QModelIndex index = model_Fut_CR->index(row, 0);
+                // Check if the item's display role value matches
+                QVariant displayData = model_Fut_CR->data(index, Qt::DisplayRole);
+                if (displayData.isValid() && displayData.toString() == dData)
+                {
+                    QVariant userData = model_Fut_CR->data(index, Qt::UserRole + 1);
+                    if (userData.isValid())
+                    {
+                        foo_token_number_fut = userData.toString();
+                        lineEdit_Fut->setText(index.data(Qt::DisplayRole).toString());
+                        lineEdit_Fut->setCursorPosition(0);
+                        startStrikeEditFinishedAction();
+                        futListView->hide();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        qInfo() << "Not a Fut vaild index";
 
+    }
+}
 
+void add_algo_con_rev::itemSelectedStartStrike(QModelIndex index)
+{
+    if(index.isValid())
+    {
+        QVariant dData = index.data(Qt::DisplayRole);
+        if (dData.isValid())
+        {
+            for (int row = 0; row < model_start_strike_CR->rowCount(); ++row)
+            {
+                QModelIndex index = model_start_strike_CR->index(row, 0);
+                // Check if the item's display role value matches
+                QVariant displayData = model_start_strike_CR->data(index, Qt::DisplayRole);
+                if (displayData.isValid() && displayData.toString() == dData)
+                {
+                    QVariant userData = model_start_strike_CR->data(index, Qt::UserRole + 1);
+                    if (userData.isValid())
+                    {
+                        foo_token_number_start_strike = userData.toString();
+                        lineEdit_Start_strike->setText(index.data(Qt::DisplayRole).toString());
+                        lineEdit_Start_strike->setCursorPosition(0);
+                        startStrikeEditFinishedAction();
+                        startStrikeListView->hide();
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    else
+    {
+        qInfo() << "Not a start strike vaild index";
 
+    }
+}
 
+void add_algo_con_rev::itemSelectedEndStrike(QModelIndex index)
+{
+    if(index.isValid())
+    {
+        QVariant dData = index.data(Qt::DisplayRole);
+        if (dData.isValid())
+        {
+            for (int row = 0; row < model_end_strike_CR->rowCount(); ++row)
+            {
+                QModelIndex index = model_end_strike_CR->index(row, 0);
+                // Check if the item's display role value matches
+                QVariant displayData = model_end_strike_CR->data(index, Qt::DisplayRole);
+                if (displayData.isValid() && displayData.toString() == dData)
+                {
+                    QVariant userData = model_end_strike_CR->data(index, Qt::UserRole + 1);
+                    if (userData.isValid())
+                    {
+                        foo_token_number_end_strike = userData.toString();
+                        lineEdit_EndStrike->setText(index.data(Qt::DisplayRole).toString());
+                        lineEdit_EndStrike->setCursorPosition(0);
+                        startStrikeListView->hide();
+                        endStrikeListView->hide();
+                        break;
+                    }
+                }
+            }
+
+        }
+    }
+    else
+    {
+        qInfo() << "Not an end strike vaild index";
+    }
+
+}
 

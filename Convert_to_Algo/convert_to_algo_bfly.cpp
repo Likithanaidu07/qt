@@ -75,11 +75,13 @@ void add_algo_btfly::selectedAction(){
 void add_algo_btfly::slotStartHide(QString)
 {
     endStrikeListView->hide();
+
 }
 
 void add_algo_btfly::slotEndHide(QString)
 {
     startStrikeListView->hide();
+
 }
 
 

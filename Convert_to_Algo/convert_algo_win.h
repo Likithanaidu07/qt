@@ -40,9 +40,11 @@ signals:
     void signalStartItemClickedBFLY(QModelIndex);
     void signalStartItemClickedBFLYBID(QModelIndex);
     void signalStartItemClickedF2F(QModelIndex);
+    void signalStartItemClickedCR(QModelIndex);
     void signalEndItemClickedBFLY(QModelIndex);
     void signalEndItemClickedBFLYBID(QModelIndex);
     void signalEndItemClickedF2F(QModelIndex);
+    void signalEndItemClickedCR(QModelIndex);
 
 private slots:
     void on_Close_clicked();
@@ -88,6 +90,7 @@ private:
     QWidget *floatingWidgetSS;
     QListView *listViewStartStrike;
     QListView *listViewEndStrike;
+    QListView *listViewFut;
 
 signals:
     void update_ui_signal(int);
