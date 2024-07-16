@@ -7,6 +7,33 @@
 #include <QSortFilterProxyModel>
 #include <ui_convert_algo_win.h>
 #include <QStandardItemModel>
+#include "QSortFilterProxyModel"
+#include "QDate"
+
+class CustomSortFilterProxyModel : public QSortFilterProxyModel {
+    Q_OBJECT
+
+public:
+    CustomSortFilterProxyModel(QObject *parent = nullptr) : QSortFilterProxyModel(parent) {}
+
+protected:
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
+        QString leftText = sourceModel()->data(left, Qt::DisplayRole).toString();
+           QString rightText = sourceModel()->data(right, Qt::DisplayRole).toString();
+
+           QString leftPrefix = leftText.split(" ").first();
+           QString rightPrefix = rightText.split(" ").first();
+
+           if (leftPrefix == rightPrefix) {
+               QDate leftDate = sourceModel()->data(left, Qt::UserRole + 2).toDate();
+               QDate rightDate = sourceModel()->data(right, Qt::UserRole + 2).toDate();
+               return leftDate < rightDate;
+           } else {
+               return leftPrefix < rightPrefix;
+           }
+    }
+
+};
 
 class CustomSearchWidget : public QWidget
 {

@@ -148,11 +148,14 @@ void add_algo_f2f::instrumentEditFinishedAction(){
             unsigned int unix_time= tmp.Expiry;
             QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
             dt = dt.addYears(10);
+
             QString Expiry=dt.toString("MMM dd yyyy").toUpper();
             QStandardItem *itemF2FL2 = new QStandardItem;
             itemF2FL2->setText(Instr_Name+" "+Expiry);
             itemF2FL2->setData(tmp.TokenNumber, Qt::UserRole + 1);
+            itemF2FL2->setData(dt, Qt::UserRole + 2); // Store the date in Qt::UserRole + 2
             model_searchInstrument_F2F_Leg2->appendRow(itemF2FL2);
+
 
             // qDebug()<<"Leg2: "<<Instr_Name+" "+Expiry;
 

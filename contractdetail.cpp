@@ -241,6 +241,7 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
         QStandardItem *itemBFLY = new QStandardItem;
         itemBFLY->setText(algo_combination);
         itemBFLY->setData(contract.TokenNumber, Qt::UserRole + 1);
+        itemBFLY->setData(dt, Qt::UserRole + 2);
 
 
         model_start_strike_BFLY_BID->appendRow(itemBFLY);
@@ -265,6 +266,7 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
         QStandardItem *itemF2FL1 = new QStandardItem;
         itemF2FL1->setText(instrument_name+" "+Expiry);
         itemF2FL1->setData(contract.TokenNumber, Qt::UserRole + 1);
+        itemF2FL1->setData(dt, Qt::UserRole + 2);
         model_searchInstrument_F2F_Leg1->appendRow(itemF2FL1);
         /********************************************************************/
 
