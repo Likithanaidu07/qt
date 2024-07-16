@@ -19,11 +19,11 @@ QString custom_q_completer::get_foo_token_number_for_selected(const QModelIndex 
     return code;
 }
 
-
-CustomSearchWidget::CustomSearchWidget(QListView *customListView, QStandardItemModel *_model, QWidget *parent):
-    QWidget(parent), listView(customListView),model(_model)
+CustomSearchWidget::CustomSearchWidget(QListView *customListView, QStandardItemModel *_model, QWidget *parent)
+    : QWidget(parent), listView(customListView), model(_model)
 {
-    // ... rest of the constructor remains unchanged
+    // Fill the completionData with initial data
+    QStringList completionData;
     for (int row = 0; row < model->rowCount(); ++row) {
         for (int column = 0; column < model->columnCount(); ++column) {
             QModelIndex index = model->index(row, column);
@@ -34,19 +34,21 @@ CustomSearchWidget::CustomSearchWidget(QListView *customListView, QStandardItemM
         }
     }
 
+    // Use QStringListModel if necessary
     stringListModel = new QStringListModel(completionData, this);
 
-    QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
+    // Instantiate the custom proxy model
+    CustomSortFilterProxyModel *proxyModel = new CustomSortFilterProxyModel(this);
     proxyModel->setFilterCaseSensitivity(Qt::CaseInsensitive);  // Set case insensitivity
-    proxyModel->setSourceModel(stringListModel);
+    proxyModel->setSourceModel(model); // Use the original model
 
-    // proxyModel->setSourceModel(model);
+    // Set the proxy model to the list view
     listView->setModel(proxyModel);
     listView->hide();
-
 }
+
 void CustomSearchWidget::filterItems(const QString &text) {
-    QSortFilterProxyModel *proxyModel = qobject_cast<QSortFilterProxyModel*>(listView->model());
+    CustomSortFilterProxyModel *proxyModel = qobject_cast<CustomSortFilterProxyModel*>(listView->model());
     if (!proxyModel)
         return;
 
@@ -73,6 +75,8 @@ void CustomSearchWidget::filterItems(const QString &text) {
 
     QRegularExpression startsWithRegex(startsWithPattern, QRegularExpression::CaseInsensitiveOption);
     proxyModel->setFilterRegularExpression(startsWithRegex);
+
+    proxyModel->setSortRole(Qt::UserRole + 2); // Sort by custom date role
 
     // Sort after setting the filter
     proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive); // Optional: set case sensitivity
@@ -108,3 +112,4 @@ void CustomSearchWidget::filterItems(const QString &text) {
         listView->hide();
     }
 }
+

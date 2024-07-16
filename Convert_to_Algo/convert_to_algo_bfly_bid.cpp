@@ -89,6 +89,7 @@ void add_algo_btfly_bid::startStrikeEditFinishedAction(){
             QStandardItem *item = new QStandardItem;
             item->setText(algo_combination);
             item->setData(tmp.TokenNumber, Qt::UserRole + 1);
+            item->setData(dt, Qt::UserRole + 2);
             model_end_strike->appendRow(item);
 
             if(!strike_priceList.contains(QString::number(tmp.StrikePrice))){
