@@ -91,6 +91,8 @@ MainWindow::MainWindow(QWidget *parent)
     CDockManager::setConfigFlag(CDockManager::ActiveTabHasCloseButton, false);
     CDockManager::setAutoHideConfigFlags(CDockManager::DefaultAutoHideConfig);
 
+
+
     /***********************Move Side Panel items to dock Widget**********************/
 
     DockManagerSidePanel = new CDockManager(ui->sidePanel);
@@ -176,8 +178,13 @@ MainWindow::MainWindow(QWidget *parent)
             lay->setRowStretch(1, 1);//set maximum hieght for second row table
 
             QLineEdit* line_edit_trade_search = new QLineEdit;
-            line_edit_trade_search->setMaximumWidth(160);
+            line_edit_trade_search->setMaximumWidth(360);
+            line_edit_trade_search->setMaximumHeight(1500);
+            line_edit_trade_search->setPlaceholderText("Search Algo");
+            QAction* search_action = new QAction(QIcon(":/search.png"), "", line_edit_trade_search);
 
+            // Add the action to the QLineEdit
+            line_edit_trade_search->addAction(search_action, QLineEdit::LeadingPosition);
             line_edit_trade_search->setStyleSheet(lineedit_dock_SS);
 
             QToolButton *ConvertAlgo_button = new QToolButton();
@@ -190,7 +197,7 @@ MainWindow::MainWindow(QWidget *parent)
 
             const char convert_to_algo_button[]="QToolButton {"
                                                 //  "border-radius: 4px;" "border: 1px solid #188CCA;"
-                                                  "background: #1585C0;"
+                                                  "background: #495057;"
                                                   "color: #FFF;"
                                                   "font-size: 12px;"
                                                   "font-style: normal;"
@@ -217,7 +224,7 @@ MainWindow::MainWindow(QWidget *parent)
             QToolButton* button1=new QToolButton();
             connect(button1, SIGNAL(clicked()), this, SLOT(on_startall_Button_clicked()));
             button1->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            //button1->setIcon(QIcon(a1));
+            //button1->setIcon(QIcon(":/done_all.png"));
             button1->setText("Start All");
             QToolButton* button2=new QToolButton();
             connect(button2, SIGNAL(clicked()), this, SLOT(on_stopall_Button_clicked()));
@@ -270,15 +277,20 @@ MainWindow::MainWindow(QWidget *parent)
                 w->setFont(font);
             }
 
+
+
                 internalLayout->addWidget(ConvertAlgo_button);
+                internalLayout->addSpacerItem(spc);
+                internalLayout->addWidget(line_edit_trade_search);
+                //internalLayout->addSpacerItem(spc);
                 internalLayout->addWidget(button1);
                 internalLayout->addWidget(button2);
                 internalLayout->addWidget(button3);
                 internalLayout->addWidget(button6);
                 internalLayout->addWidget(button4);
                 //internalLayout->addWidget(button5);
-                internalLayout->addSpacerItem(spc);
-                internalLayout->addWidget(line_edit_trade_search);
+              //  internalLayout->addSpacerItem(spc);
+                //internalLayout->addWidget(line_edit_trade_search);
                 lay->addWidget(test, 0, 0);
 
     T_Portfolio_Table = new table_portfolios_custom(T_Portfolio_DockWin);
@@ -344,7 +356,7 @@ MainWindow::MainWindow(QWidget *parent)
     /***********Init Order Book Window**************************/
     QPixmap pixmapdock_trade_close(":/dock_close.png");
 
-    dock_win_trade =  new CDockWidget(tr("Order Book"));
+    dock_win_trade =  new CDockWidget(tr("Trades"));
 
     connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookDockWidgetVisiblityChanged(bool)));
    // subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_trade);
@@ -361,11 +373,11 @@ MainWindow::MainWindow(QWidget *parent)
     QHBoxLayout *trade_title_layout=new QHBoxLayout(trade_titlebar);
     trade_title_layout->setSpacing(10);
     trade_title_layout->setContentsMargins(17,8,10,6);
-    QLabel *trade_label=new QLabel("Order Book");
+    QLabel *trade_label=new QLabel("Trades");
     QFont font_trade_label=trade_label->font();
     font_trade_label.setFamily("Work Sans");
     trade_label->setFont(font_trade_label);
-    trade_label->setStyleSheet("color: #495057;font-size: 16px;font-style: normal;font-weight: 700;line-height: normal;");
+    trade_label->setStyleSheet("color: #495057; font-size: 16px; font-style: normal; font-weight: bold; line-height: normal;");
     QSpacerItem* trade_spacer=new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
     QLineEdit* line_edit_trade = new QLineEdit;
     line_edit_trade->setMaximumWidth(160);
@@ -381,11 +393,8 @@ MainWindow::MainWindow(QWidget *parent)
     //dock_win_trade->setTitleBarWidget(trade_titlebar);
 
 
-
-
     QWidget* container_trade = new QWidget;
     dock_win_trade->setWidget(container_trade);
-
     QGridLayout *lay_Trade_Window = new QGridLayout(container_trade);
     lay_Trade_Window->setContentsMargins(0, 0, 0, 0);
     lay_Trade_Window->setSpacing(3);
@@ -483,8 +492,11 @@ MainWindow::MainWindow(QWidget *parent)
     //dock_win_net_pos->setTitleBarWidget(position_titlebar);
 
 
+
+
     net_pos_table = new QTableView(dock_win_net_pos);
     net_pos_table->setStyleSheet(scroll_bar_SS);
+
     net_pos_table->horizontalHeader()->setFixedHeight(32);
     net_pos_table->horizontalHeader()->setFont(headerfont);
     net_pos_table->setStyleSheet(tableview_SS);
@@ -545,7 +557,6 @@ MainWindow::MainWindow(QWidget *parent)
     liners_title_layout->addWidget(liners_close);
     //dock_win_liners->setTitleBarWidget(liners_titlebar);
 
-
     liners_table = new QTableView(dock_win_liners);
     liners_table->setStyleSheet(scroll_bar_SS);
     liners_table->horizontalHeader()->setFixedHeight(32);
@@ -553,6 +564,22 @@ MainWindow::MainWindow(QWidget *parent)
     liners_table->setStyleSheet(tableview_SS);
     liners_table->setShowGrid(false);
     liners_table->setAlternatingRowColors(true);
+
+    linersheaderview* headerViewrs = new linersheaderview(Qt::Horizontal, liners_table);
+    headerViewrs->setFixedHeight(32);
+    headerViewrs->setFont(headerfont);
+    headerViewrs->setStyleSheet(
+        "   background: #495867;"
+        "   border: none;"
+        "   color: #FFF; "
+        "   text-align: center; "
+        "   font-size: 12px; "
+        "   font-style: normal; "
+        "   font-weight: 600; "
+        "   line-height: normal;"
+        );
+    liners_table->setHorizontalHeader(headerViewrs);
+
     liners_model = new Liners_Model();
     liners_table->setModel(liners_model);
     liners_table->horizontalHeader()->setStretchLastSection(true);
@@ -996,47 +1023,52 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 int columnIdx = i.key();
                 QString valStr = i.value();
                 switch (columnIdx) {
-                    case PortfolioData_Idx::_OrderQuantity:{
-                        int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
-                        double val = valStr.toDouble();
-                        val=val*lotSize;
-                        double vfq = T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
-                        if(val > vfq){
+                case PortfolioData_Idx::_OrderQuantity:{
+                    int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                    double val = valStr.toDouble();
+                    val=val*lotSize;
+                    double vfq = T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
+
+                    if(val > vfq){
+                        QMessageBox msgBox;
+                        msgBox.setText("Cannot update OrderQuantity");
+                        msgBox.setText("OrderQuantity cannot be greater than VolumeFreezeQty "+QString::number(vfq));
+                        msgBox.setIcon(QMessageBox::Warning);
+                        msgBox.exec();
+                    }
+                    else{
+                        //write
+                        int val1 = valStr.toInt();
+                        int qty = T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity;
+                        if(qty>T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity)
+                            qty = T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity;
+                        //check the condtion
+                        if(val1 >qty){
                             QMessageBox msgBox;
                             msgBox.setText("Cannot update OrderQuantity");
-                            msgBox.setText("OrderQuantity cannot be greater than VolumeFreezeQty "+QString::number(vfq));
+                            msgBox.setText("OrderQuantity cannot be greater than totalQty "+QString::number(qty));
                             msgBox.setIcon(QMessageBox::Warning);
                             msgBox.exec();
                         }
                         else{
-                            //write
-                            int val1 = valStr.toInt();
-                            int qty = T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity;
-                            if(qty>T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity)
-                                qty = T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity;
-                            //check the condtion
-                            if(val1 >qty){
-                                QMessageBox msgBox;
-                                msgBox.setText("Cannot update OrderQuantity");
-                                msgBox.setText("OrderQuantity cannot be greater than totalQty "+QString::number(qty));
-                                msgBox.setIcon(QMessageBox::Warning);
-                                msgBox.exec();
-                            }
-                            else{
                             updateQueryList.append("OrderQuantity="+QString::number(val));
                             logMsg = logMsg+"OrderQuantity ["+QString::number(val)+"], ";
                         }
-                        }
-
-
-
                     }
+                }
+
+
+
+
                     break;
 
                     case PortfolioData_Idx::_BuyTotalQuantity:{
                         int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
                         double val = valStr.toDouble();
                         val=val*lotSize;
+                        if(T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity==0){
+                        updateQueryList.append("OrderQuantity="+QString::number(lotSize));
+                        }
                         updateQueryList.append("BuyTotalQuantity="+QString::number(val));
                         logMsg = logMsg+"BuyTotalQuantity ["+QString::number(val)+"], ";
                     }
@@ -1046,6 +1078,9 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                         int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
                         double val = valStr.toDouble();
                         val=val*lotSize;
+                        if(T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity==0){
+                        updateQueryList.append("OrderQuantity="+QString::number(lotSize));
+                        }
                         updateQueryList.append("SellTotalQuantity="+QString::number(val));
                         logMsg = logMsg+"SellTotalQuantity ["+QString::number(val)+"], ";
                     }
@@ -1268,31 +1303,46 @@ void MainWindow::loadDataAndUpdateTable(int table){
         break;
     }
 }
-
+QString MainWindow::fixDecimal(double num,int decimal_precision){
+    QString str = QString::number(num, 'f', decimal_precision+1);
+    return str;
+}
 void MainWindow::updateSummaryLabels()
 {
     ui->label_3->setText(QString::number(AlgoCount));
     ui->label_3->setAlignment(Qt::AlignCenter);
+
     ui->label_25->setText(QString::number(OrderCount));
     ui->label_25->setAlignment(Qt::AlignCenter);
+
     ui->label_30->setText(QString::number(TraderCount));
     ui->label_30->setAlignment(Qt::AlignCenter);
-    ui->label_23->setText(QString::number(BuyValue));
+
+    int decimal_precision = 1;
+    ui->label_23->setText(fixDecimal(BuyValue, decimal_precision));
     ui->label_23->setAlignment(Qt::AlignCenter);
-    ui->label_26->setText(QString::number(SellValue));
+
+    ui->label_26->setText(fixDecimal(SellValue, decimal_precision));
     ui->label_26->setAlignment(Qt::AlignCenter);
-    ui->label_31->setText(QString::number(Profit));
+
+    ui->label_31->setText(fixDecimal(Profit, decimal_precision));
     ui->label_31->setAlignment(Qt::AlignCenter);
+
     ui->label_24->setText(QString::number(BuyQty_summary));
     ui->label_24->setAlignment(Qt::AlignCenter);
+
     ui->label_27->setText(QString::number(SellQty_summary));
     ui->label_27->setAlignment(Qt::AlignCenter);
+
     ui->label_32->setText(QString::number(NetQty));
     ui->label_32->setAlignment(Qt::AlignCenter);
+
     ui->label_33->setText("-");
     ui->label_33->setAlignment(Qt::AlignCenter);
+
     ui->label_28->setText("-");
     ui->label_28->setAlignment(Qt::AlignCenter);
+
     ui->label_34->setText("-");
     ui->label_34->setAlignment(Qt::AlignCenter);
 }

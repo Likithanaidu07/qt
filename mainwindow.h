@@ -36,6 +36,7 @@
 #include "loadingdatawindow.h"
 #include "order_detail_popup.h"
 #include "Liners/liners_model.h"
+#include "Liners/linersheaderview.h"
 
 
 #include "DockManager.h"
@@ -80,6 +81,8 @@ public:
     QString foo_token_number_end_strike;// this for start strike input of F2F
     // QDockWidget *T_Algorithm_DockWin;
     // ContractDetail* contracts;
+
+    QString fixDecimal(double num,int decimal_precision);
 signals:
     void data_loded_signal(int table);
     void logoutRequested();

@@ -58,9 +58,24 @@ QVariant Net_Position_Table_Model::data(const QModelIndex &index, int role) cons
 //        else
             return font;
     }
+    case Qt::BackgroundRole :
+
+            if(c==NET_POS::BuyAvgPrice_NP ||
+                c==NET_POS::BuyTotalLot_NP ||
+                c==NET_POS::BuyValue_NP) {
+                return QVariant::fromValue(QColor("#F0FFFA"));
+            }
+            else if(c==NET_POS::SellValue_NP ||
+                       c==NET_POS::SellAvgPrice_NP ||
+                       c==NET_POS::SellTotalLot_NP) {
+                return QVariant::fromValue(QColor("#FEE"));
+            }
+            else
+                return QVariant();
+    }
     }
 
-}
+
 
 void Net_Position_Table_Model::setDataList(QList <QStringList> net_pos_data_listNew){
     if(net_pos_data_list.size()==0){

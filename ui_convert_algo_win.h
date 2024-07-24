@@ -20,6 +20,7 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
+
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QToolButton>
@@ -33,6 +34,7 @@ public:
     QGridLayout *gridLayout;
     QWidget *widget_2;
     QGridLayout *gridLayout_2;
+
     QSpacerItem *verticalSpacer_2;
     QPushButton *pushButtonAdd;
     QSpacerItem *verticalSpacer_3;
@@ -47,6 +49,7 @@ public:
     QSpacerItem *horizontalSpacer_3;
     QPushButton *pushButtonUpload;
     QPushButton *pushButton_Cancel;
+
     QSpacerItem *verticalSpacer;
     QComboBox *comboBox_AlgoType;
     QStackedWidget *stackedWidget;
@@ -79,7 +82,9 @@ public:
     void setupUi(QDialog *ConvertAlgo_Win)
     {
         if (ConvertAlgo_Win->objectName().isEmpty())
+
             ConvertAlgo_Win->setObjectName("ConvertAlgo_Win");
+
         ConvertAlgo_Win->resize(1000, 410);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
@@ -93,6 +98,7 @@ public:
 "}"));
         gridLayout = new QGridLayout(ConvertAlgo_Win);
         gridLayout->setSpacing(0);
+
         gridLayout->setObjectName("gridLayout");
         gridLayout->setContentsMargins(0, 0, 0, 0);
         widget_2 = new QWidget(ConvertAlgo_Win);
@@ -101,6 +107,7 @@ public:
 "background: #F2F5F8;\n"
 "}"));
         gridLayout_2 = new QGridLayout(widget_2);
+
         gridLayout_2->setObjectName("gridLayout_2");
         gridLayout_2->setHorizontalSpacing(9);
         gridLayout_2->setVerticalSpacing(0);
@@ -142,6 +149,7 @@ public:
         gridLayout_3->addWidget(pushButtonDelete, 0, 3, 1, 1);
 
         tableWidget = new QTableWidget(widget);
+
         tableWidget->setObjectName("tableWidget");
         tableWidget->setFocusPolicy(Qt::TabFocus);
         tableWidget->setStyleSheet(QString::fromUtf8("QTableView::item {\n"
@@ -202,6 +210,7 @@ public:
         horizontalLayout_2->addItem(horizontalSpacer_3);
 
         pushButtonUpload = new QPushButton(widget_2);
+
         pushButtonUpload->setObjectName("pushButtonUpload");
         sizePolicy.setHeightForWidth(pushButtonUpload->sizePolicy().hasHeightForWidth());
         pushButtonUpload->setSizePolicy(sizePolicy);
@@ -222,6 +231,7 @@ public:
         horizontalLayout_2->addWidget(pushButtonUpload);
 
         pushButton_Cancel = new QPushButton(widget_2);
+
         pushButton_Cancel->setObjectName("pushButton_Cancel");
         pushButton_Cancel->setMinimumSize(QSize(85, 32));
         pushButton_Cancel->setMaximumSize(QSize(95, 16777215));
@@ -419,6 +429,7 @@ public:
         gridLayout->addWidget(widget_2, 1, 0, 1, 1);
 
         ConvertAlgo_TitleBar = new QWidget(ConvertAlgo_Win);
+
         ConvertAlgo_TitleBar->setObjectName("ConvertAlgo_TitleBar");
         sizePolicy.setHeightForWidth(ConvertAlgo_TitleBar->sizePolicy().hasHeightForWidth());
         ConvertAlgo_TitleBar->setSizePolicy(sizePolicy);
@@ -428,6 +439,7 @@ public:
 "background: #314458;\n"
 "}"));
         gridLayout_4 = new QGridLayout(ConvertAlgo_TitleBar);
+
         gridLayout_4->setObjectName("gridLayout_4");
         gridLayout_4->setHorizontalSpacing(15);
         gridLayout_4->setContentsMargins(-1, 7, -1, 8);
@@ -443,6 +455,7 @@ public:
         gridLayout_4->addWidget(Close, 0, 2, 1, 1);
 
         label_2 = new QLabel(ConvertAlgo_TitleBar);
+
         label_2->setObjectName("label_2");
         label_2->setMinimumSize(QSize(0, 17));
         label_2->setMaximumSize(QSize(108, 17));
@@ -471,6 +484,7 @@ public:
         QWidget::setTabOrder(pushButtonDelete, tableWidget);
         QWidget::setTabOrder(tableWidget, pushButtonUpload);
         QWidget::setTabOrder(pushButtonUpload, pushButton_Cancel);
+
 
         retranslateUi(ConvertAlgo_Win);
 

@@ -40,9 +40,23 @@ QVariant Liners_Model::data(const QModelIndex &index, int role) const
         QFont font("Work Sans");
         return font;
     }
+    case Qt::BackgroundRole :
+
+        if(c==Liners_Idx::BuyAvgPrice ||
+            c==Liners_Idx::BuyQtyinLots) {
+                return QVariant::fromValue(QColor("#F0FFFA"));
+        }
+        else if(c==Liners_Idx::SellAvgPrice ||
+            c==Liners_Idx::SellQtyinLots) {
+                return QVariant::fromValue(QColor("#FEE"));
+        }
+            else
+              return QVariant();
+        }
+
     }
 
-}
+
 
 void Liners_Model::setDataList(QList <QStringList> liners_data_listNew){
     if(liners_data_list.size()==0){

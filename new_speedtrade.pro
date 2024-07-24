@@ -28,6 +28,7 @@ SOURCES += \
     Convert_to_Algo/customtablewidget.cpp \
     Convert_to_Algo/eventfilterlistview.cpp \
     Liners/liners_model.cpp \
+    Liners/linersheaderview.cpp \
     NetPosition/net_position_table_model.cpp \
     OrderBook/table_orderbook_delegate.cpp \
     PortFolio/PortfolioParser.cpp \
@@ -77,6 +78,7 @@ HEADERS += \
     Convert_to_Algo/customtablewidget.h \
     Convert_to_Algo/eventfilterlistview.h \
     Liners/liners_model.h \
+    Liners/linersheaderview.h \
     NetPosition/net_position_table_model.h \
     OrderBook/table_orderbook_delegate.h \
     PortFolio/PortfolioParser.h \
@@ -160,15 +162,20 @@ DISTFILES += \
     Resources/WorkSans-Medium.ttf \
     Resources/button_close.png \
     Resources/close_window_icon.png \
+    Resources/export.png \
+    Resources/import.png \
     Resources/left_arrow.png \
     Resources/maximize_window_icon.png \
     Resources/menu.png \
     Resources/minimize_window_group.png \
     Resources/minimize_window_icon.png \
     Resources/minimize_window_icon_background.png \
+    Resources/reset.png \
     Resources/right_arrow.png \
     Resources/search.ico \
     Resources/search.png \
+    Resources/start_all.png \
+    Resources/stop_all.png \
     Resources/test.png
 
 RC_ICONS = Resources/logo.ico
