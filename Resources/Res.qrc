@@ -34,6 +34,11 @@
         <file>enable.png</file>
         <file>arrow_green.png</file>
         <file>arrow_red.png</file>
+        <file>start_all.png</file>
+        <file>export.png</file>
+        <file>stop_all.png</file>
+        <file>reset.png</file>
+        <file>import.png</file>
     </qresource>
     <qresource prefix="/style">
         <file>Style_Home.qss</file>

@@ -119,6 +119,32 @@ enum OrderBook_Idx{
 
 };
 
+enum Liners_Idx{
+    AlgoId = 0,
+    AlgoName,
+    BuyAvgPrice,
+    BuyQtyinLots,
+    SellAvgPrice,
+    SellQtyinLots,
+    NetQty,
+    Profit,
+};
+
+enum NET_POS
+{
+    SNo_NP = 0,
+    StockName_NP,
+    BuyTotalLot_NP,
+    SellTotalLot_NP,
+    BuyValue_NP,
+    SellValue_NP,
+    BuyAvgPrice_NP,
+    SellAvgPrice_NP,
+    NetQty_NP,
+    Profit_NP,
+    MTM,
+};
+
 enum PortfolioType
 {
     F2F = 1,

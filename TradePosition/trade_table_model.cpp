@@ -27,32 +27,37 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
 
     switch (role) {
 
-    case Qt::ForegroundRole :
-        //jackpot text color
-//        if(c==OrderBook_Idx::Jackpot_OB){
-//            int jackPot =  trade_data_list[r][c].toInt();
-//            if(jackPot>0)
-//                return QVariant::fromValue(QColor(Qt::green));
-//            else
-//                return QVariant::fromValue(QColor(Qt::red));
-
-//        }
+    case Qt::BackgroundRole :
+        //jackpot background color
+        //    if(c==OrderBook_Idx::Jackpot_OB){
+        //        int jackPot =  trade_data_list[r][c].toInt();
+        //        if(jackPot>0)
+        //            return QVariant::fromValue(QColor(Qt::green));
+        //        else
+        //            return QVariant::fromValue(QColor(Qt::red));
+        //    }
         if(c==OrderBook_Idx::BuyorSell_OB ||
-          c==OrderBook_Idx::ExchPrice_OB ||
-           c==OrderBook_Idx::UserPrice_OB ||
-           c==OrderBook_Idx::Jackpot_OB ||
-           c==OrderBook_Idx::TradedLot_OB ||
-           c==OrderBook_Idx::RemainingLot_OB ||
-           c==OrderBook_Idx::TradeTime_OB ){
-          //  QString buy_sell =  trade_data_list[r][c];
-            QString buy_sell =  trade_data_list[r][OrderBook_Idx::BuyorSell_OB];
+            c==OrderBook_Idx::ExchPrice_OB ||
+            c==OrderBook_Idx::UserPrice_OB ||
+            c==OrderBook_Idx::Jackpot_OB ||
+            c==OrderBook_Idx::TradedLot_OB ||
+            c==OrderBook_Idx::RemainingLot_OB ||
+            c==OrderBook_Idx::TradeTime_OB ||
+            c==OrderBook_Idx::AlgoName_OB ||
+            c==OrderBook_Idx::AlgoNo_OB ||
+            c==OrderBook_Idx::OrderId_OB ||
+            c==OrderBook_Idx::BidLegState_OB ||
+            c==OrderBook_Idx::Leg1State_OB ||
+            c==OrderBook_Idx::Leg3State_OB) {
 
-          //  QString Exch_Price =  trade_data_list[r][c];
-            if(buy_sell=="Sell")
-                return QVariant::fromValue(QColor(203,5,5));
+            QString buy_sell = trade_data_list[r][OrderBook_Idx::BuyorSell_OB];
+
+            if(buy_sell == "Sell")
+                return QVariant::fromValue(QColor("#FEE"));
             else
-                return QVariant::fromValue(QColor(0,122,0));
+                return QVariant::fromValue(QColor("#F0FFFA"));
         }
+
 
 
         //
