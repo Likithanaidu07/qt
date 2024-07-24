@@ -18,9 +18,9 @@ class add_algo_btfly : public QObject
 
 public:
     explicit add_algo_btfly(QObject *parent = nullptr);
-   void copyUIElement(QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_StrikeDifference_,QListView *sView, QListView *eView);
+   void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_StrikeDifference_);
     QStringList sorted_keys_BFLY; // sorted keys for contract_table hash table
-    void create_AutoFillModel_StartStrike();
+    //void create_AutoFillModel_StartStrike();
     void selectedAction();
     QString foo_token_number_start_strike;// this for start strike input of btfly
     QString foo_token_number_end_strike;// this for start strike input of btfly
@@ -34,12 +34,13 @@ public:
 signals:
 
 private slots:
-    void slotStartHide(QString);
-    void slotEndHide(QString);
+
 
 public slots:
-    void itemSelected(QModelIndex);
+    void itemSelectedStartStrike(QModelIndex);
     void itemSelectedEndStrike(QModelIndex index);
+    void slotStartHide(QString);
+    void slotEndHide(QString);
 
 private:
     QLineEdit *lineEdit_Start_strike;

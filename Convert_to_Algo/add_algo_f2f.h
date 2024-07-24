@@ -18,7 +18,7 @@ class add_algo_f2f : public QObject
     Q_OBJECT
 public:
     explicit add_algo_f2f(QObject *parent = nullptr);
-    void copyUIElement(QTableWidget *tableWidget_,QLineEdit *lineEdit_searchInstrument_leg1_,QLineEdit *lineEdit_searchInstrument_leg2_, QListView *sView, QListView *eView);
+    void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_searchInstrument_leg1_,QLineEdit *lineEdit_searchInstrument_leg2_);
     QStringList sorted_keys_F2F; // sorted keys for contract_table hash table
     void create_AutoFillModel_SearchInstrument();
     void selectedAction();
@@ -47,12 +47,13 @@ private:
     EventFilter *eventFilterEnd;
 
 private slots:
-    void slotStartHide(QString);
-    void slotEndHide(QString);
+
 
 public slots:
-    void itemSelected(QModelIndex);
+    void itemSelectedStartStrike(QModelIndex);
     void itemSelectedEndStrike(QModelIndex index);
+    void slotStartHide(QString);
+    void slotEndHide(QString);
 
 };
 

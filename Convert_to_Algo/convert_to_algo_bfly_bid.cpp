@@ -1,6 +1,6 @@
 ﻿#include "Convert_to_Algo/convert_to_algo_bfly_bid.h"
 #include "custom_q_completer.h"
-
+#include "contractdetail.h"
 #include "QElapsedTimer"
 
 add_algo_btfly_bid::add_algo_btfly_bid(QObject *parent)
@@ -8,33 +8,42 @@ add_algo_btfly_bid::add_algo_btfly_bid(QObject *parent)
 {
     //  model_start_strike_BFLY = new QStandardItemModel;
     sharedData = &AddAlgoSharedVar::getInstance();
+    model_end_strike = new QStandardItemModel;
+
 }
 
-void add_algo_btfly_bid::copyUIElement(QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_, QListView *sView, QListView *eView){
+void add_algo_btfly_bid::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_){
+
     lineEdit_Start_strike = lineEdit_Start_strike_;
     lineEdit_EndStrike = lineEdit_EndStrike_;
     lineEdit_StrikeDifference = lineEdit_StrikeDifference_;
     tableWidget = tableWidget_;
-    startStrikeListView = sView;
-    endStrikeListView = eView;
+
+    QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    // to make floating window
+    startStrikeListView = new QListView(parentWidget);
+    connect(startStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedStartStrike(QModelIndex)));
+    startStrikeListView->setSizePolicy(sizePolicy);
+    startStrikeListView->setFixedSize(230, 200);
+    startStrikeListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+
+
+
+     endStrikeListView = new QListView(parentWidget);
+     connect(endStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
+     endStrikeListView->setSizePolicy(sizePolicy);
+     endStrikeListView->setFixedSize(230, 200);
+     endStrikeListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 
     startStrikeListView->hide();
     endStrikeListView->hide();
 
-}
-
-void add_algo_btfly_bid::create_AutoFillModel_StartStrike(){
-
-}
-
-void add_algo_btfly_bid::selectedAction(){
-    foo_token_number_start_strike = "";
-    foo_token_number_end_strike = "";
 
     // Install event filter on the QLineEdit and QListView
     eventFilterStart = new EventFilter(lineEdit_Start_strike, startStrikeListView);
-    connect(eventFilterStart, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelected(QModelIndex)));
+    connect(eventFilterStart, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedStartStrike(QModelIndex)));
     lineEdit_Start_strike->installEventFilter(eventFilterStart);
     startStrikeListView->installEventFilter(eventFilterStart);
 
@@ -44,16 +53,57 @@ void add_algo_btfly_bid::selectedAction(){
     endStrikeListView->installEventFilter(eventFilterEnd);
 
 
+    model_start_strike_BFLY_BID = ContractDetail::getInstance().Get_model_start_strike_BFLY_BID();
     //create qcompleter and fill with abovie model
-    CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_BFLY_BID);
-    connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
+    CustomSearchWidget *startstrikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_BFLY_BID);
+    startstrikeCustomWidget->name = "startStrike";
+    connect(lineEdit_Start_strike, SIGNAL(textEdited(QString)),startstrikeCustomWidget, SLOT(filterItems(QString)));
     connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),this, SLOT(slotStartHide(QString)));
     connect(lineEdit_EndStrike, SIGNAL(textChanged(QString)),this, SLOT(slotEndHide(QString)));
+
+
+
+
+
+    // create qcompleter and fill with above model
+    CustomSearchWidget *endstrikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike);
+    endstrikeCustomWidget->name = "endStrike";
+    connect(lineEdit_EndStrike, SIGNAL(textEdited(QString)),endstrikeCustomWidget, SLOT(filterItems(QString)));
+
+}
+
+
+void add_algo_btfly_bid::selectedAction(){
+
+    foo_token_number_start_strike = "";
+    foo_token_number_end_strike = "";
+
+    lineEdit_Start_strike->clear();
+    lineEdit_EndStrike->clear();
+    lineEdit_StrikeDifference->clear();
+
+    startStrikeListView->hide();
+    endStrikeListView->hide();
+
+
+
+    // Get the global position of lineEdit_Start_strike
+    QPoint globalPos = lineEdit_Start_strike->mapToGlobal(lineEdit_Start_strike->geometry().bottomLeft());
+    // Convert the global position to the dialog's coordinate system
+    QPoint posSS = startStrikeListView->parentWidget()->mapFromGlobal(globalPos);
+    // Move the startStrikeListView to the new position
+    startStrikeListView->move(posSS.x(), posSS.y());
+
+    globalPos = lineEdit_Start_strike->mapToGlobal(lineEdit_EndStrike->geometry().bottomLeft());
+    QPoint posES = startStrikeListView->parentWidget()->mapFromGlobal(globalPos);
+    endStrikeListView->move(posES.x(), posES.y());
 }
 
 
 void add_algo_btfly_bid::startStrikeEditFinishedAction(){
 
+
+    model_end_strike->clear();
     lineEdit_EndStrike->clear();
     foo_token_number_end_strike = "";
     strike_priceList.clear();
@@ -66,13 +116,12 @@ void add_algo_btfly_bid::startStrikeEditFinishedAction(){
     float start_strike = sharedData->contract_table_hash[key].StrikePrice;
 
 
-    model_end_strike = new QStandardItemModel;
     for(int i=0;i<sorted_keys_BFLY_BID.length();i++) {
 
         contract_table tmp = sharedData->contract_table_hash[sorted_keys_BFLY_BID[i]];
 
         float end_strike = tmp.StrikePrice;
-        if(start_strike>=end_strike)
+        if(start_strike>end_strike)
             continue;
 
         if(tmp.InstrumentName==Instr_Name&&tmp.OptionType==Option_Type&&Expiry==tmp.Expiry){
@@ -81,15 +130,17 @@ void add_algo_btfly_bid::startStrikeEditFinishedAction(){
             QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
             dt = dt.addYears(10);
             QString ExpiryTmp=dt.toString("MMM dd yyyy").toUpper();
+            QString strik_price = QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
             QString algo_combination =
                 tmp.InstrumentName+" "+
                 ExpiryTmp+" "
-                +QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" "+
+                +strik_price+" "+
                 tmp.OptionType;
             QStandardItem *item = new QStandardItem;
             item->setText(algo_combination);
             item->setData(tmp.TokenNumber, Qt::UserRole + 1);
-            item->setData(dt, Qt::UserRole + 2);
+            QString compositeKey = tmp.InstrumentName + "-" + dt.toString("yyyyMMdd") + "-" + strik_price;
+            item->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
             model_end_strike->appendRow(item);
 
             if(!strike_priceList.contains(QString::number(tmp.StrikePrice))){
@@ -101,9 +152,9 @@ void add_algo_btfly_bid::startStrikeEditFinishedAction(){
         }
     }
 
-    // create qcompleter and fill with abovie model
-    CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike);
-    connect(lineEdit_EndStrike, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
+
+
+
 }
 void add_algo_btfly_bid::generateAlgo()
 {
@@ -379,11 +430,11 @@ void add_algo_btfly_bid::slotStartHide(QString)
 }
 
 void add_algo_btfly_bid::slotEndHide(QString)
-{
-    startStrikeListView->hide();
+{    startStrikeListView->hide();
+
 }
 
-void add_algo_btfly_bid::itemSelected(QModelIndex index)
+void add_algo_btfly_bid::itemSelectedStartStrike(QModelIndex index)
 {
     if(index.isValid())
     {
@@ -405,6 +456,7 @@ void add_algo_btfly_bid::itemSelected(QModelIndex index)
                         lineEdit_Start_strike->setCursorPosition(0);
                         startStrikeEditFinishedAction();
                         startStrikeListView->hide();
+                        qDebug()<<"ListView->hide(): ListView->hide()";
                         break;
                     }
                 }

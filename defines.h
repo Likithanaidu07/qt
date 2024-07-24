@@ -356,5 +356,8 @@ enum NOTIFICATION_TYPE
 };
 
 
+enum ConvertAlog_Model_Roles {
+    CustomSortingDataRole = Qt::UserRole + 2, // This should be 2, 1 is already used.
+};
 
 #endif // DEFINES_H

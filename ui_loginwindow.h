@@ -1,7 +1,8 @@
 /********************************************************************************
 ** Form generated from reading UI file 'loginwindow.ui'
 **
-** Created by: Qt User Interface Compiler version 6.3.2
+
+** Created by: Qt User Interface Compiler version 6.5.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -64,7 +65,8 @@ public:
     void setupUi(QWidget *loginwindow)
     {
         if (loginwindow->objectName().isEmpty())
-            loginwindow->setObjectName(QString::fromUtf8("loginwindow"));
+
+            loginwindow->setObjectName("loginwindow");
         loginwindow->resize(424, 665);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
@@ -78,21 +80,23 @@ public:
 "}"));
         gridLayout = new QGridLayout(loginwindow);
         gridLayout->setSpacing(0);
-        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+
+        gridLayout->setObjectName("gridLayout");
         gridLayout->setContentsMargins(-1, 9, -1, -1);
         widget = new QWidget(loginwindow);
-        widget->setObjectName(QString::fromUtf8("widget"));
+        widget->setObjectName("widget");
         widget->setMinimumSize(QSize(104, 14));
         widget->setMaximumSize(QSize(16777215, 40));
         horizontalLayout_3 = new QHBoxLayout(widget);
-        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
+        horizontalLayout_3->setObjectName("horizontalLayout_3");
         horizontalLayout_3->setContentsMargins(-1, 0, -1, 0);
         horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_3->addItem(horizontalSpacer_3);
 
         label_forgot = new QLabel(widget);
-        label_forgot->setObjectName(QString::fromUtf8("label_forgot"));
+
+        label_forgot->setObjectName("label_forgot");
         label_forgot->setEnabled(true);
         sizePolicy.setHeightForWidth(label_forgot->sizePolicy().hasHeightForWidth());
         label_forgot->setSizePolicy(sizePolicy);
@@ -114,7 +118,8 @@ public:
         horizontalLayout_3->addItem(horizontalSpacer_5);
 
         label_contact = new QLabel(widget);
-        label_contact->setObjectName(QString::fromUtf8("label_contact"));
+
+        label_contact->setObjectName("label_contact");
         sizePolicy.setHeightForWidth(label_contact->sizePolicy().hasHeightForWidth());
         label_contact->setSizePolicy(sizePolicy);
         label_contact->setMinimumSize(QSize(98, 14));
@@ -147,7 +152,8 @@ public:
         gridLayout->addItem(verticalSpacer_5, 13, 1, 1, 1);
 
         label_wron_input = new QLabel(loginwindow);
-        label_wron_input->setObjectName(QString::fromUtf8("label_wron_input"));
+
+        label_wron_input->setObjectName("label_wron_input");
         label_wron_input->setLayoutDirection(Qt::RightToLeft);
         label_wron_input->setStyleSheet(QString::fromUtf8("#label_wron_input{\n"
 "color: #98282E;\n"
@@ -162,7 +168,8 @@ public:
         gridLayout->addWidget(label_wron_input, 10, 1, 1, 1);
 
         lineEditUsername = new QLineEdit(loginwindow);
-        lineEditUsername->setObjectName(QString::fromUtf8("lineEditUsername"));
+
+        lineEditUsername->setObjectName("lineEditUsername");
         sizePolicy.setHeightForWidth(lineEditUsername->sizePolicy().hasHeightForWidth());
         lineEditUsername->setSizePolicy(sizePolicy);
         lineEditUsername->setMinimumSize(QSize(310, 40));
@@ -181,14 +188,16 @@ public:
         gridLayout->addItem(horizontalSpacer_2, 3, 2, 1, 1);
 
         verticalLayout_2 = new QVBoxLayout();
-        verticalLayout_2->setObjectName(QString::fromUtf8("verticalLayout_2"));
+
+        verticalLayout_2->setObjectName("verticalLayout_2");
         verticalLayout_2->setSizeConstraint(QLayout::SetDefaultConstraint);
         verticalSpacer_7 = new QSpacerItem(20, 147, QSizePolicy::Minimum, QSizePolicy::Fixed);
 
         verticalLayout_2->addItem(verticalSpacer_7);
 
         footer = new QLabel(loginwindow);
-        footer->setObjectName(QString::fromUtf8("footer"));
+
+        footer->setObjectName("footer");
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
@@ -208,7 +217,8 @@ public:
         verticalLayout_2->addWidget(footer);
 
         label = new QLabel(loginwindow);
-        label->setObjectName(QString::fromUtf8("label"));
+
+        label->setObjectName("label");
 
         verticalLayout_2->addWidget(label);
 
@@ -236,7 +246,8 @@ public:
         gridLayout->addItem(verticalSpacer_4, 9, 1, 1, 1);
 
         lineEdit_Password = new QLineEdit(loginwindow);
-        lineEdit_Password->setObjectName(QString::fromUtf8("lineEdit_Password"));
+
+        lineEdit_Password->setObjectName("lineEdit_Password");
         sizePolicy.setHeightForWidth(lineEdit_Password->sizePolicy().hasHeightForWidth());
         lineEdit_Password->setSizePolicy(sizePolicy);
         lineEdit_Password->setMinimumSize(QSize(310, 40));
@@ -253,10 +264,11 @@ public:
 
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setSpacing(20);
-        horizontalLayout_6->setObjectName(QString::fromUtf8("horizontalLayout_6"));
+
+        horizontalLayout_6->setObjectName("horizontalLayout_6");
         horizontalLayout_6->setContentsMargins(-1, -1, -1, 9);
         title_bar = new QWidget(loginwindow);
-        title_bar->setObjectName(QString::fromUtf8("title_bar"));
+        title_bar->setObjectName("title_bar");
         QSizePolicy sizePolicy2(QSizePolicy::Expanding, QSizePolicy::Preferred);
         sizePolicy2.setHorizontalStretch(0);
         sizePolicy2.setVerticalStretch(0);
@@ -267,7 +279,8 @@ public:
         horizontalLayout_6->addWidget(title_bar);
 
         minimize = new QToolButton(loginwindow);
-        minimize->setObjectName(QString::fromUtf8("minimize"));
+
+        minimize->setObjectName("minimize");
         minimize->setMaximumSize(QSize(14, 14));
         minimize->setStyleSheet(QString::fromUtf8("#minimize{\n"
 "background: transparent;\n"
@@ -276,7 +289,8 @@ public:
         horizontalLayout_6->addWidget(minimize);
 
         close = new QToolButton(loginwindow);
-        close->setObjectName(QString::fromUtf8("close"));
+
+        close->setObjectName("close");
         close->setMaximumSize(QSize(14, 14));
         close->setStyleSheet(QString::fromUtf8("#close{\n"
 "background: transparent;\n"
@@ -292,7 +306,8 @@ public:
         gridLayout->addItem(verticalSpacer, 2, 0, 1, 1);
 
         progressBar = new QProgressBar(loginwindow);
-        progressBar->setObjectName(QString::fromUtf8("progressBar"));
+
+        progressBar->setObjectName("progressBar");
         progressBar->setMinimumSize(QSize(0, 10));
         progressBar->setMaximumSize(QSize(16777215, 10));
         progressBar->setStyleSheet(QString::fromUtf8("#progressBar {\n"
@@ -309,7 +324,8 @@ public:
         gridLayout->addWidget(progressBar, 8, 1, 1, 1);
 
         pushButtonlogin = new QPushButton(loginwindow);
-        pushButtonlogin->setObjectName(QString::fromUtf8("pushButtonlogin"));
+
+        pushButtonlogin->setObjectName("pushButtonlogin");
         sizePolicy1.setHeightForWidth(pushButtonlogin->sizePolicy().hasHeightForWidth());
         pushButtonlogin->setSizePolicy(sizePolicy1);
         pushButtonlogin->setMinimumSize(QSize(310, 40));
@@ -332,10 +348,11 @@ public:
 
         horizontalLayout = new QHBoxLayout();
         horizontalLayout->setSpacing(0);
-        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
+
+        horizontalLayout->setObjectName("horizontalLayout");
         horizontalLayout->setSizeConstraint(QLayout::SetDefaultConstraint);
         logo = new QLabel(loginwindow);
-        logo->setObjectName(QString::fromUtf8("logo"));
+        logo->setObjectName("logo");
         sizePolicy.setHeightForWidth(logo->sizePolicy().hasHeightForWidth());
         logo->setSizePolicy(sizePolicy);
         logo->setMinimumSize(QSize(28, 29));
@@ -344,7 +361,8 @@ public:
         horizontalLayout->addWidget(logo);
 
         name = new QLabel(loginwindow);
-        name->setObjectName(QString::fromUtf8("name"));
+
+        name->setObjectName("name");
         sizePolicy.setHeightForWidth(name->sizePolicy().hasHeightForWidth());
         name->setSizePolicy(sizePolicy);
         name->setMinimumSize(QSize(231, 23));
@@ -377,11 +395,12 @@ public:
         label_forgot->setText(QCoreApplication::translate("loginwindow", "Forgot Password?", nullptr));
         label_contact->setText(QCoreApplication::translate("loginwindow", "Contact Support", nullptr));
         label_wron_input->setText(QString());
-        lineEditUsername->setText(QCoreApplication::translate("loginwindow", "stm101", nullptr));
+
+        lineEditUsername->setText(QString());
         lineEditUsername->setPlaceholderText(QCoreApplication::translate("loginwindow", "Username", nullptr));
         footer->setText(QCoreApplication::translate("loginwindow", "ALGO METHODS SOFTWARE & SERVICES PVT LTD", nullptr));
         label->setText(QString());
-        lineEdit_Password->setText(QCoreApplication::translate("loginwindow", "123", nullptr));
+        lineEdit_Password->setText(QString());
         lineEdit_Password->setPlaceholderText(QCoreApplication::translate("loginwindow", "Password", nullptr));
         minimize->setText(QCoreApplication::translate("loginwindow", "_", nullptr));
         close->setText(QString());

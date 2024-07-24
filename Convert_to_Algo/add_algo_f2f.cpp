@@ -9,17 +9,57 @@ add_algo_f2f::add_algo_f2f(QObject *parent)
     sharedData = &AddAlgoSharedVar::getInstance();
 
 }
-void add_algo_f2f::copyUIElement(QTableWidget *tableWidget_,QLineEdit *lineEdit_searchInstrument_leg1_,QLineEdit *lineEdit_searchInstrument_leg2_, QListView *sView, QListView *eView){
+void add_algo_f2f::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_searchInstrument_leg1_,QLineEdit *lineEdit_searchInstrument_leg2_){
     lineEdit_searchInstrument_leg1 = lineEdit_searchInstrument_leg1_;
     lineEdit_searchInstrument_leg2 = lineEdit_searchInstrument_leg2_;
     tableWidget = tableWidget_;
 
-    startStrikeListView = sView;
-    endStrikeListView = eView;
+    //startStrikeListView = sView;
+   // endStrikeListView = eView;
 
 
-    startStrikeListView->hide();
-    endStrikeListView->hide();
+    QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    // to make floating window
+    startStrikeListView = new QListView(parentWidget);
+    connect(startStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedStartStrike(QModelIndex)));
+    startStrikeListView->setSizePolicy(sizePolicy);
+    startStrikeListView->setFixedSize(230, 200);
+    startStrikeListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+
+
+
+     endStrikeListView = new QListView(parentWidget);
+     connect(endStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
+     endStrikeListView->setSizePolicy(sizePolicy);
+     endStrikeListView->setFixedSize(230, 200);
+     endStrikeListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+     startStrikeListView->hide();
+     endStrikeListView->hide();
+
+     // Install event filter on the QLineEdit and QListView
+     eventFilterStart = new EventFilter(lineEdit_searchInstrument_leg1, startStrikeListView);
+     connect(eventFilterStart, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedStartStrike(QModelIndex)));
+     lineEdit_searchInstrument_leg1->installEventFilter(eventFilterStart);
+     startStrikeListView->installEventFilter(eventFilterStart);
+
+     eventFilterEnd = new EventFilter(lineEdit_searchInstrument_leg2, endStrikeListView);
+     connect(eventFilterEnd, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
+     lineEdit_searchInstrument_leg2->installEventFilter(eventFilterEnd);
+     endStrikeListView->installEventFilter(eventFilterEnd);
+
+
+
+     model_searchInstrument_F2F_Leg1 =  ContractDetail::getInstance().Get_model_searchInstrument_F2F_Leg1();
+     CustomSearchWidget *startstrikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_searchInstrument_F2F_Leg1);
+     connect(lineEdit_searchInstrument_leg1, SIGNAL(textEdited(QString)),startstrikeCustomWidget, SLOT(filterItems(QString)));
+     connect(lineEdit_searchInstrument_leg1, SIGNAL(textChanged(QString)),this, SLOT(slotStartHide(QString)));
+     connect(lineEdit_searchInstrument_leg2, SIGNAL(textChanged(QString)),this, SLOT(slotEndHide(QString)));
+
+
+     CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_searchInstrument_F2F_Leg2);
+     connect(lineEdit_searchInstrument_leg2, SIGNAL(textEdited(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
 }
 
 void add_algo_f2f::create_AutoFillModel_SearchInstrument(){
@@ -46,25 +86,21 @@ void add_algo_f2f::create_AutoFillModel_SearchInstrument(){
 void add_algo_f2f::selectedAction(){
     foo_token_number_start_strike = "";
     foo_token_number_end_strike = "";
-
-    // Install event filter on the QLineEdit and QListView
-    eventFilterStart = new EventFilter(lineEdit_searchInstrument_leg1, startStrikeListView);
-    connect(eventFilterStart, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelected(QModelIndex)));
-    lineEdit_searchInstrument_leg1->installEventFilter(eventFilterStart);
-    startStrikeListView->installEventFilter(eventFilterStart);
-
-    eventFilterEnd = new EventFilter(lineEdit_searchInstrument_leg2, endStrikeListView);
-    connect(eventFilterEnd, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
-    lineEdit_searchInstrument_leg2->installEventFilter(eventFilterEnd);
-    endStrikeListView->installEventFilter(eventFilterEnd);
+    lineEdit_searchInstrument_leg1->clear();
+    lineEdit_searchInstrument_leg2->clear();
+    startStrikeListView->hide();
+    endStrikeListView->hide();
 
 
+    // Position startStrikeListView below lineEdit_searchInstrument_leg1
+    QPoint globalPosSS = lineEdit_searchInstrument_leg1->mapToGlobal(lineEdit_searchInstrument_leg1->geometry().bottomLeft());
+    QPoint posSS = startStrikeListView->parentWidget()->mapFromGlobal(globalPosSS);
+    startStrikeListView->move(posSS.x(), posSS.y());
 
-    //create qcompleter and fill with abovie model
-    CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_searchInstrument_F2F_Leg1);
-    connect(lineEdit_searchInstrument_leg1, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
-    connect(lineEdit_searchInstrument_leg1, SIGNAL(textChanged(QString)),this, SLOT(slotStartHide(QString)));
-    connect(lineEdit_searchInstrument_leg2, SIGNAL(textChanged(QString)),this, SLOT(slotEndHide(QString)));
+    // Position endStrikeListView below lineEdit_searchInstrument_leg2
+    QPoint globalPosES(globalPosSS.x()+360,globalPosSS.y());
+    QPoint posES = endStrikeListView->parentWidget()->mapFromGlobal(globalPosES);
+    endStrikeListView->move(posES.x(), posES.y());
 
 
     //create qcompleter and fill with abovie model
@@ -153,7 +189,9 @@ void add_algo_f2f::instrumentEditFinishedAction(){
             QStandardItem *itemF2FL2 = new QStandardItem;
             itemF2FL2->setText(Instr_Name+" "+Expiry);
             itemF2FL2->setData(tmp.TokenNumber, Qt::UserRole + 1);
-            itemF2FL2->setData(dt, Qt::UserRole + 2); // Store the date in Qt::UserRole + 2
+
+            QString compositeKey = Instr_Name + "-" + dt.toString("yyyyMMdd");
+            itemF2FL2->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
             model_searchInstrument_F2F_Leg2->appendRow(itemF2FL2);
 
 
@@ -162,9 +200,7 @@ void add_algo_f2f::instrumentEditFinishedAction(){
 
         }
     }
-    // create qcompleter and fill with abovie model
-    CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_searchInstrument_F2F_Leg2);
-    connect(lineEdit_searchInstrument_leg2, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
+
 
     /*custom_q_completer *completerLeg2 = new custom_q_completer(this);
     completerLeg2->setModel(model_searchInstrument_F2F_Leg2);
@@ -433,7 +469,7 @@ void add_algo_f2f::generateAlgo(){
 }
 
 
-void add_algo_f2f::itemSelected(QModelIndex index)
+void add_algo_f2f::itemSelectedStartStrike(QModelIndex index)
 {
     if(index.isValid())
     {

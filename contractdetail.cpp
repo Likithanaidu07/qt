@@ -186,6 +186,9 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
         QStandardItem *itemBFLY = new QStandardItem;
         itemBFLY->setText(algo_combination);
         itemBFLY->setData(contract.TokenNumber, Qt::UserRole + 1);
+        QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd") + "-" + QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract);
+        // Set the composite key as data for sorting
+        itemBFLY->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
         model_start_strike_BFLY->appendRow(itemBFLY);
 
         /********************************************************************/
@@ -241,9 +244,11 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
         QStandardItem *itemBFLY = new QStandardItem;
         itemBFLY->setText(algo_combination);
         itemBFLY->setData(contract.TokenNumber, Qt::UserRole + 1);
-        itemBFLY->setData(dt, Qt::UserRole + 2);
 
-
+        // Create custom data for sorting
+        QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd") + "-" + strik_price;
+        // Set the composite key as data for sorting
+        itemBFLY->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
         model_start_strike_BFLY_BID->appendRow(itemBFLY);
 
         /********************************************************************/
@@ -266,7 +271,9 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
         QStandardItem *itemF2FL1 = new QStandardItem;
         itemF2FL1->setText(instrument_name+" "+Expiry);
         itemF2FL1->setData(contract.TokenNumber, Qt::UserRole + 1);
-        itemF2FL1->setData(dt, Qt::UserRole + 2);
+        QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd");
+        // Set the composite key as data for sorting
+        itemF2FL1->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
         model_searchInstrument_F2F_Leg1->appendRow(itemF2FL1);
         /********************************************************************/
 
@@ -282,6 +289,9 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
         QStandardItem *itemFut = new QStandardItem;
         itemFut->setText(instrument_name+" "+Expiry);
         itemFut->setData(contract.TokenNumber, Qt::UserRole + 1);
+        compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd");
+        // Set the composite key as data for sorting
+        itemFut->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
         model_FUT_CON_REV->appendRow(itemFut);
 
         /********************************************************************/

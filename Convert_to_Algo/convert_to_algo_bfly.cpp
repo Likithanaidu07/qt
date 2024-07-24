@@ -2,31 +2,72 @@
 #include "custom_q_completer.h"
 
 #include "QElapsedTimer"
+#include "contractdetail.h"
 
 add_algo_btfly::add_algo_btfly(QObject *parent)
     : QObject{parent}
 {
     //  model_start_strike_BFLY = new QStandardItemModel;
     sharedData = &AddAlgoSharedVar::getInstance();
+    model_end_strike = new QStandardItemModel;
 
 }
 
-void add_algo_btfly::copyUIElement(QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_, QListView *sView, QListView *eView)
+void add_algo_btfly::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_)
 {
     lineEdit_Start_strike = lineEdit_Start_strike_;
     lineEdit_EndStrike = lineEdit_EndStrike_;
     lineEdit_StrikeDifference = lineEdit_StrikeDifference_;
     tableWidget = tableWidget_;
-    startStrikeListView = sView;
-    endStrikeListView = eView;
+
     lineEdit_Start_strike->setCursorPosition(0);
     lineEdit_EndStrike->setCursorPosition(0);
+
+    QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    // to make floating window
+    startStrikeListView = new QListView(parentWidget);
+    connect(startStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedStartStrike(QModelIndex)));
+    startStrikeListView->setSizePolicy(sizePolicy);
+    startStrikeListView->setFixedSize(230, 200);
+    startStrikeListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+
+
+     endStrikeListView = new QListView(parentWidget);
+     connect(endStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
+     endStrikeListView->setSizePolicy(sizePolicy);
+     endStrikeListView->setFixedSize(230, 200);
+     endStrikeListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+     // Set the position of the QListView just below lineEdit_EndStrike
 
     startStrikeListView->hide();
     endStrikeListView->hide();
 
-}
+    // Install event filter on the QLineEdit and QListView
+    eventFilterStart = new EventFilter(lineEdit_Start_strike, startStrikeListView);
+    connect(eventFilterStart, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedStartStrike(QModelIndex)));
+    lineEdit_Start_strike->installEventFilter(eventFilterStart);
+    startStrikeListView->installEventFilter(eventFilterStart);
 
+    eventFilterEnd = new EventFilter(lineEdit_EndStrike, endStrikeListView);
+    connect(eventFilterEnd, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
+    lineEdit_EndStrike->installEventFilter(eventFilterEnd);
+    endStrikeListView->installEventFilter(eventFilterEnd);
+
+
+    model_start_strike_BFLY = ContractDetail::getInstance().Get_model_start_strike_BFLY();
+    CustomSearchWidget *start_strikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_BFLY);
+    connect(lineEdit_Start_strike, SIGNAL(textEdited(QString)),start_strikeCustomWidget, SLOT(filterItems(QString)));
+    connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),this, SLOT(slotStartHide(QString)));
+    connect(lineEdit_EndStrike, SIGNAL(textChanged(QString)),this, SLOT(slotEndHide(QString)));
+
+    // create qcompleter and fill with abovie model
+    CustomSearchWidget *endstrikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike);
+    connect(lineEdit_EndStrike, SIGNAL(textEdited(QString)),endstrikeCustomWidget, SLOT(filterItems(QString)));
+
+
+}
+/*
 void add_algo_btfly::create_AutoFillModel_StartStrike(){
      model_start_strike_BFLY->clear();
     // create model for BFLY_data_list to autfill
@@ -44,32 +85,36 @@ void add_algo_btfly::create_AutoFillModel_StartStrike(){
         QStandardItem *itemBFLY = new QStandardItem;
         itemBFLY->setText(algo_combination);
         itemBFLY->setData(contract.TokenNumber, Qt::UserRole + 1);
+        QString compositeKey = contract.InstrumentName + "-" + dt.toString("yyyyMMdd") + "-" + QString::number(contract.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
+                // Set the composite key as data for sorting
+        itemBFLY->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
         model_start_strike_BFLY->appendRow(itemBFLY);
     }
     qDebug() << "btfly------" << timer.elapsed()/1000 << " seconds";
 
-}
+}*/
 void add_algo_btfly::selectedAction(){
     foo_token_number_start_strike = "";
     foo_token_number_end_strike = "";
 
-    // Install event filter on the QLineEdit and QListView
-    eventFilterStart = new EventFilter(lineEdit_Start_strike, startStrikeListView);
-    connect(eventFilterStart, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelected(QModelIndex)));
-    lineEdit_Start_strike->installEventFilter(eventFilterStart);
-    startStrikeListView->installEventFilter(eventFilterStart);
+    lineEdit_Start_strike->clear();
+    lineEdit_EndStrike->clear();
+    lineEdit_StrikeDifference->clear();
 
-    eventFilterEnd = new EventFilter(lineEdit_EndStrike, endStrikeListView);
-    connect(eventFilterEnd, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
-    lineEdit_EndStrike->installEventFilter(eventFilterEnd);
-    endStrikeListView->installEventFilter(eventFilterEnd);
+    startStrikeListView->hide();
+    endStrikeListView->hide();
 
 
-    //create qcompleter and fill with abovie model
-    CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_BFLY);
-    connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
-    connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),this, SLOT(slotStartHide(QString)));
-    connect(lineEdit_EndStrike, SIGNAL(textChanged(QString)),this, SLOT(slotEndHide(QString)));
+    // Get the global position of lineEdit_Start_strike
+    QPoint globalPos = lineEdit_Start_strike->mapToGlobal(lineEdit_Start_strike->geometry().bottomLeft());
+    // Convert the global position to the dialog's coordinate system
+    QPoint posSS = startStrikeListView->parentWidget()->mapFromGlobal(globalPos);
+    // Move the startStrikeListView to the new position
+    startStrikeListView->move(posSS.x(), posSS.y());
+
+    globalPos = lineEdit_Start_strike->mapToGlobal(lineEdit_EndStrike->geometry().bottomLeft());
+    QPoint posES = startStrikeListView->parentWidget()->mapFromGlobal(globalPos);
+    endStrikeListView->move(posES.x(), posES.y());
 }
 
 void add_algo_btfly::slotStartHide(QString)
@@ -100,7 +145,7 @@ void add_algo_btfly::startStrikeEditFinishedAction()
     float start_strike = sharedData->contract_table_hash[key].StrikePrice;
 
 
-    model_end_strike = new QStandardItemModel;
+    model_end_strike->clear();
 
     for(int i=0;i<sorted_keys_BFLY.length();i++) {
         contract_table tmp = sharedData->contract_table_hash[sorted_keys_BFLY[i]];
@@ -118,6 +163,8 @@ void add_algo_btfly::startStrikeEditFinishedAction()
             QStandardItem *item = new QStandardItem;
             item->setText(algo_combination);
             item->setData(tmp.TokenNumber, Qt::UserRole + 1);
+            QString compositeKey = tmp.InstrumentName + "-" + dt.toString("yyyyMMdd") + "-" + QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
+            item->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
             model_end_strike->appendRow(item);
 
 
@@ -130,9 +177,7 @@ void add_algo_btfly::startStrikeEditFinishedAction()
         }
     }
 
-    // create qcompleter and fill with abovie model
-    CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike);
-    connect(lineEdit_EndStrike, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
+
 
 }
 
@@ -407,7 +452,7 @@ void add_algo_btfly::generateAlgo()
 
 }
 
-void add_algo_btfly::itemSelected(QModelIndex index)
+void add_algo_btfly::itemSelectedStartStrike(QModelIndex index)
 {
     if(index.isValid())
     {
