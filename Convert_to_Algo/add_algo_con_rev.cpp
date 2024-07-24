@@ -1,4 +1,5 @@
 #include "add_algo_con_rev.h"
+#include "contractdetail.h"
 
 
 add_algo_con_rev::add_algo_con_rev(QObject *parent)
@@ -7,41 +8,130 @@ add_algo_con_rev::add_algo_con_rev(QObject *parent)
 
     // model_FUT_CON_REV = new QStandardItemModel;
     sharedData = &AddAlgoSharedVar::getInstance();
+    model_start_strike_CR = new QStandardItemModel;
+    model_end_strike_CR = new QStandardItemModel;
+
 
 }
-void add_algo_con_rev::copyUIElement(QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_,QListView *sView, QListView *eView,QListView *fView){
+void add_algo_con_rev::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_,QLineEdit *lineEdit_StrikeDifference_){
     lineEdit_Start_strike = lineEdit_Start_strike_;
     lineEdit_EndStrike = lineEdit_EndStrike_;
     lineEdit_Fut = lineEdit_Fut_;
     tableWidget = tableWidget_;
-    startStrikeListView = sView;
-    endStrikeListView = eView;
-    futListView = fView;
+    lineEdit_StrikeDifference = lineEdit_StrikeDifference_;
+//    startStrikeListView = sView;
+//    endStrikeListView = eView;
+//    futListView = fView;
 
 
+
+    QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+
+
+    // to make floating window
+    futListView = new QListView(parentWidget);
+    connect(futListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedFut(QModelIndex)));
+    futListView->setSizePolicy(sizePolicy);
+    futListView->setFixedSize(230, 200);
+    futListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    // to make floating window
+    startStrikeListView = new QListView(parentWidget);
+    connect(startStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedStartStrike(QModelIndex)));
+    startStrikeListView->setSizePolicy(sizePolicy);
+    startStrikeListView->setFixedSize(230, 200);
+    startStrikeListView->setEditTriggers(QAbstractItemView::NoEditTriggers);   
+    startStrikeListView->hide();
+
+
+
+     endStrikeListView = new QListView(parentWidget);
+     connect(endStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
+     endStrikeListView->setSizePolicy(sizePolicy);
+     endStrikeListView->setFixedSize(230, 200);
+     endStrikeListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+     // Set the position of the QListView just below lineEdit_EndStrike
+     endStrikeListView->hide();
+
+     startStrikeListView->hide();
+     endStrikeListView->hide();
+     futListView->hide();
+
+     // Install event filter on the QLineEdit and QListView
+      eventFilterFUT = new EventFilter(lineEdit_Fut, futListView);
+      connect(eventFilterFUT, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedFut(QModelIndex)));
+      lineEdit_Fut->installEventFilter(eventFilterFUT);
+      futListView->installEventFilter(eventFilterFUT);
+
+      eventFilterStart = new EventFilter(lineEdit_Start_strike, startStrikeListView);
+      connect(eventFilterStart, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedStartStrike(QModelIndex)));
+      lineEdit_Start_strike->installEventFilter(eventFilterStart);
+      startStrikeListView->installEventFilter(eventFilterStart);
+
+      eventFilterEnd = new EventFilter(lineEdit_EndStrike, endStrikeListView);
+      connect(eventFilterEnd, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
+      lineEdit_EndStrike->installEventFilter(eventFilterEnd);
+      endStrikeListView->installEventFilter(eventFilterEnd);
+
+
+
+      model_Fut_CR =   ContractDetail::getInstance().Get_model_FUT_CON_REV();
+      CustomSearchWidget *futCustomWidget = new CustomSearchWidget(futListView,model_Fut_CR);
+      connect(lineEdit_Fut, SIGNAL(textEdited(QString)),futCustomWidget, SLOT(filterItems(QString)));
+
+
+      connect(lineEdit_Start_strike, SIGNAL(textEdited(QString)),this, SLOT(slotStartHide(QString)));
+      connect(lineEdit_EndStrike, SIGNAL(textEdited(QString)),this, SLOT(slotEndHide(QString)));
+      connect(lineEdit_Fut, SIGNAL(textEdited(QString)),this, SLOT(slotFutHide(QString)));
+
+
+
+
+      CustomSearchWidget *startstrikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_CR);
+      connect(lineEdit_Start_strike, SIGNAL(textEdited(QString)),startstrikeCustomWidget, SLOT(filterItems(QString)));
+
+      CustomSearchWidget *endstrikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike_CR);
+      connect(lineEdit_EndStrike, SIGNAL(textEdited(QString)),endstrikeCustomWidget, SLOT(filterItems(QString)));
+
+}
+
+void add_algo_con_rev::selectedAction(){
+
+    foo_token_number_start_strike = "";
+    foo_token_number_end_strike = "";
+    foo_token_number_fut="";
+
+    lineEdit_Fut->clear();
+    lineEdit_Start_strike->clear();
+    lineEdit_EndStrike->clear();
+    lineEdit_StrikeDifference->clear();
+
+
+    futListView->hide();
     startStrikeListView->hide();
     endStrikeListView->hide();
+
+    // Get the global position of lineEdit_Start_strike
+    QPoint globalPos = lineEdit_Fut->mapToGlobal(lineEdit_Fut->geometry().bottomLeft());
+    QPoint posFut = futListView->parentWidget()->mapFromGlobal(globalPos);
+    futListView->move(posFut.x(), posFut.y());
+
+
+    QPoint globalPosSS(globalPos.x()+210,globalPos.y());
+    QPoint posSS = startStrikeListView->parentWidget()->mapFromGlobal(globalPosSS);
+    // Move the startStrikeListView to the new position
+    startStrikeListView->move(posSS.x(), posSS.y());
+
+    QPoint globalPosES(globalPos.x()+420,globalPos.y());
+    QPoint posES = endStrikeListView->parentWidget()->mapFromGlobal(globalPosES);
+    endStrikeListView->move(posES.x(), posES.y());
+
 }
 
-void add_algo_con_rev::create_AutoFillModel_FutInstrument(){
-//    model_FUT_CON_REV->clear();
-//    for(int i=0;i<sorted_keys_F2F.length();i++){
-//        const auto& contract = sharedData->contract_table_hash[sorted_keys_F2F[i]];
 
-//        QString instrument_name = contract.InstrumentName;//" "+Expiry;
-//        unsigned int unix_time= contract.Expiry;
-//        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-//        dt = dt.addYears(10);
-//        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
-
-//        QStandardItem *itemFut = new QStandardItem;
-//        itemFut->setText(instrument_name+" "+Expiry);
-//        itemFut->setData(contract.TokenNumber, Qt::UserRole + 1);
-//        model_FUT_CON_REV->appendRow(itemFut);
-//    }
-}
 
 void add_algo_con_rev::create_AutoFillModel_StartStrike(){
+
     lineEdit_Start_strike->clear();
     lineEdit_EndStrike->clear();
     foo_token_number_start_strike="";
@@ -49,9 +139,8 @@ void add_algo_con_rev::create_AutoFillModel_StartStrike(){
     QString key = foo_token_number_fut;
 
     QString Instr_Name = sharedData->contract_table_hash[key].InstrumentName;
-    QStandardItemModel *model_start_strike = new QStandardItemModel;
 
-
+    model_start_strike_CR->clear();
     //create list based on the Fut input and populate start strike model the data is of same as butterfly
     for(int i=0;i<sorted_keys_CON_REV.length();i++) {
         contract_table tmp = sharedData->contract_table_hash[sorted_keys_CON_REV[i]];
@@ -65,14 +154,17 @@ void add_algo_con_rev::create_AutoFillModel_StartStrike(){
             QStandardItem *item = new QStandardItem;
             item->setText(algo_combination);
             item->setData(tmp.TokenNumber, Qt::UserRole + 1);
-            model_start_strike->appendRow(item);
+            QString compositeKey = tmp.InstrumentName + "-" + dt.toString("yyyyMMdd") + "-" + QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
+            // Set the composite key as data for sorting
+            item->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+            model_start_strike_CR->appendRow(item);
             //qDebug()<<"Instr_Name: "<<Instr_Name;
 
         }
     }
 
-    custom_q_completer *end_strike_combination_Completer = new custom_q_completer(this);
-    end_strike_combination_Completer->setModel(model_start_strike);
+  /*  custom_q_completer *end_strike_combination_Completer = new custom_q_completer(this);
+    end_strike_combination_Completer->setModel(model_start_strike_CR);
     end_strike_combination_Completer->setCaseSensitivity(Qt::CaseInsensitive);
     end_strike_combination_Completer->setCompletionMode(QCompleter::PopupCompletion);
     end_strike_combination_Completer->setModelSorting(QCompleter::CaseSensitivelySortedModel);
@@ -86,63 +178,11 @@ void add_algo_con_rev::create_AutoFillModel_StartStrike(){
     connect(end_strike_combination_Completer, QOverload<const QModelIndex &>::of(&QCompleter::activated), [=](const QModelIndex &index){
         foo_token_number_start_strike = end_strike_combination_Completer->get_foo_token_number_for_selected(index);
         //qDebug()<<"foo_token_number_end_strike: "<<foo_token_number_start_strike;
-    });
+    });*/
 
 
 }
-void add_algo_con_rev::selectedAction(){
-    foo_token_number_start_strike = "";
-    foo_token_number_end_strike = "";
-    foo_token_number_fut="";
 
-   // Install event filter on the QLineEdit and QListView
-    eventFilterFUT = new EventFilter(lineEdit_Fut, futListView);
-    connect(eventFilterFUT, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedFut(QModelIndex)));
-    lineEdit_Fut->installEventFilter(eventFilterFUT);
-    futListView->installEventFilter(eventFilterFUT);
-
-    eventFilterStart = new EventFilter(lineEdit_Start_strike, startStrikeListView);
-    connect(eventFilterStart, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedStartStrike(QModelIndex)));
-    lineEdit_Start_strike->installEventFilter(eventFilterStart);
-    startStrikeListView->installEventFilter(eventFilterStart);
-
-    eventFilterEnd = new EventFilter(lineEdit_EndStrike, endStrikeListView);
-    connect(eventFilterEnd, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
-    lineEdit_EndStrike->installEventFilter(eventFilterEnd);
-    endStrikeListView->installEventFilter(eventFilterEnd);
-
-
-
-    //create qcompleter and fill with abovie model
-    CustomSearchWidget *strikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_CR);
-    connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),strikeCustomWidget, SLOT(filterItems(QString)));
-    connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),this, SLOT(slotStartHide(QString)));
-    connect(lineEdit_EndStrike, SIGNAL(textChanged(QString)),this, SLOT(slotEndHide(QString)));
-    connect(lineEdit_Fut, SIGNAL(textChanged(QString)),this, SLOT(slotFutHide(QString)));
-
-//    foo_token_number_start_strike = "";
-//    foo_token_number_end_strike = "";
-//    foo_token_number_fut="";
-
-//    //create qcompleter and fill with CON_REV model
-//    custom_q_completer *Start_strike_combination_Completer = new custom_q_completer( this);
-//    Start_strike_combination_Completer->setModel(model_start_strike_CR);
-//    Start_strike_combination_Completer->setCaseSensitivity(Qt::CaseInsensitive);
-//    Start_strike_combination_Completer->setCompletionMode(QCompleter::PopupCompletion);
-//    Start_strike_combination_Completer->setModelSorting(QCompleter::CaseSensitivelySortedModel);
-//    connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),Start_strike_combination_Completer, SLOT(newfilterItems(QString)));
-//    lineEdit_Start_strike->setCompleter(Start_strike_combination_Completer);
-//    QListView *view = (QListView *)Start_strike_combination_Completer->popup();
-//    view->setUniformItemSizes(true);
-//    view->setLayoutMode(QListView::Batched);
-//    lineEdit_Fut->setCompleter(Start_strike_combination_Completer);
-
-//    //foo_token_number assined for currently selected algo combination.
-//    connect(Start_strike_combination_Completer, QOverload<const QModelIndex &>::of(&QCompleter::activated), [=](const QModelIndex &index){
-//        foo_token_number_fut = Start_strike_combination_Completer->get_foo_token_number_for_selected(index);
-//        //qDebug()<<"foo_token_number_fut: "<<foo_token_number_fut;
-//    });
-}
 
 
 void add_algo_con_rev::startStrikeEditFinishedAction(){
@@ -158,8 +198,7 @@ void add_algo_con_rev::startStrikeEditFinishedAction(){
     float start_strike = sharedData->contract_table_hash[key].StrikePrice;
 
     // float expiry_date_start = contract_table_hash[key].expiry_date.toFloat();
-
-    QStandardItemModel *model_end_strike = new QStandardItemModel;
+    model_end_strike_CR->clear();
     for(int i=0;i<sorted_keys_CON_REV.length();i++) {
         contract_table tmp = sharedData->contract_table_hash[sorted_keys_CON_REV[i]];
         float end_strike = tmp.StrikePrice;
@@ -175,11 +214,14 @@ void add_algo_con_rev::startStrikeEditFinishedAction(){
             QStandardItem *item = new QStandardItem;
             item->setText(algo_combination);
             item->setData(tmp.TokenNumber, Qt::UserRole + 1);
-            model_end_strike->appendRow(item);
+            QString compositeKey = tmp.InstrumentName + "-" + dt.toString("yyyyMMdd") + "-" + QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
+              // Set the composite key as data for sorting
+            item->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+            model_end_strike_CR->appendRow(item);
 
         }
     }
-    custom_q_completer *end_strike_combination_Completer = new custom_q_completer(this);
+   /* custom_q_completer *end_strike_combination_Completer = new custom_q_completer(this);
     end_strike_combination_Completer->setModel(model_end_strike);
     end_strike_combination_Completer->setCaseSensitivity(Qt::CaseInsensitive);
     end_strike_combination_Completer->setCompletionMode(QCompleter::PopupCompletion);
@@ -194,7 +236,7 @@ void add_algo_con_rev::startStrikeEditFinishedAction(){
     connect(end_strike_combination_Completer, QOverload<const QModelIndex &>::of(&QCompleter::activated), [=](const QModelIndex &index){
         foo_token_number_end_strike = end_strike_combination_Completer->get_foo_token_number_for_selected(index);
         // qDebug()<<"foo_token_number_end_strike: "<<foo_token_number_end_strike;
-    });
+    });*/
 
 }
 void add_algo_con_rev::generateAlgo(){
@@ -492,7 +534,7 @@ void add_algo_con_rev::itemSelectedFut(QModelIndex index)
                         foo_token_number_fut = userData.toString();
                         lineEdit_Fut->setText(index.data(Qt::DisplayRole).toString());
                         lineEdit_Fut->setCursorPosition(0);
-                        startStrikeEditFinishedAction();
+                        create_AutoFillModel_StartStrike();
                         futListView->hide();
                         break;
                     }
@@ -576,5 +618,28 @@ void add_algo_con_rev::itemSelectedEndStrike(QModelIndex index)
         qInfo() << "Not an end strike vaild index";
     }
 
+}
+
+
+void add_algo_con_rev::slotStartHide(QString)
+{
+    endStrikeListView->hide();
+    futListView->hide();
+
+
+}
+
+void add_algo_con_rev::slotEndHide(QString)
+{
+    startStrikeListView->hide();
+    futListView->hide();
+
+}
+
+
+void add_algo_con_rev::slotFutHide(QString)
+{
+    endStrikeListView->hide();
+    endStrikeListView->hide();
 }
 

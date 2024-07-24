@@ -16,10 +16,29 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
   //  ui->tableWidget->setFocusPolicy(Qt::NoFocus);
 
-    setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Start_strike);
-    setTabOrder(ui->lineEdit_Start_strike, ui->lineEdit_EndStrike);
-    setTabOrder(ui->lineEdit_EndStrike, ui->lineEdit_StrikeDifference);
-    setTabOrder(ui->lineEdit_StrikeDifference, ui->pushButtonAdd);
+    setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Start_strike_Btfy);
+    setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Start_strike_BtfyBid);
+    setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Start_strike_f2f);
+    setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Fut_ConvRev);
+
+
+    setTabOrder(ui->lineEdit_Start_strike_Btfy,ui->lineEdit_EndStrike_Btfy);
+    setTabOrder(ui->lineEdit_EndStrike_Btfy,ui->lineEdit_StrikeDifference_Btfy);
+    setTabOrder(ui->lineEdit_StrikeDifference_Btfy,ui->pushButtonAdd);
+
+    setTabOrder(ui->lineEdit_Start_strike_BtfyBid,ui->lineEdit_EndStrike_BtfyBid);
+    setTabOrder(ui->lineEdit_EndStrike_BtfyBid,ui->lineEdit_StrikeDifference_BtfyBid);
+    setTabOrder(ui->lineEdit_StrikeDifference_BtfyBid,ui->pushButtonAdd);
+
+    setTabOrder(ui->lineEdit_Start_strike_f2f,ui->lineEdit_EndStrike_f2f);
+    setTabOrder(ui->lineEdit_EndStrike_f2f,ui->pushButtonAdd);
+
+    setTabOrder(ui->lineEdit_Fut_ConvRev,ui->lineEdit_Start_strike_ConvRev);
+    setTabOrder(ui->lineEdit_Start_strike_ConvRev,ui->lineEdit_EndStrike_ConvRev);
+    setTabOrder(ui->lineEdit_EndStrike_ConvRev,ui->lineEdit_StrikeDifference_ConvRev);
+    setTabOrder(ui->lineEdit_StrikeDifference_ConvRev,ui->pushButtonAdd);
+
+
     setTabOrder(ui->pushButtonAdd, ui->pushButtonSelectAll);
     setTabOrder(ui->pushButtonSelectAll, ui->pushButton_Reset);
     setTabOrder(ui->pushButton_Reset, ui->pushButtonDelete);
@@ -31,54 +50,29 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
 
-    // to make floating window
-    listViewStartStrike = new QListView(this);
-    connect(listViewStartStrike, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelected(QModelIndex)));
-
-
-    QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    listViewStartStrike->setSizePolicy(sizePolicy);
-    listViewStartStrike->setFixedSize(230, 200);
-    listViewStartStrike->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    // Get the geometry of lineEdit_EndStrike
-    QPoint lineEditPosSS = ui->lineEdit_Start_strike->mapToGlobal(ui->lineEdit_Start_strike->geometry().bottomRight());
-    // Set the position of the QListView just below lineEdit_EndStrike
-    listViewStartStrike->move(lineEditPosSS.x()+20, lineEditPosSS.y()+55);
-    listViewStartStrike->hide();
-
-    // to make floating window
-    listViewEndStrike = new QListView(this);
-    connect(listViewEndStrike, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
-    QPoint lineEditPosES = ui->lineEdit_EndStrike->mapToGlobal(ui->lineEdit_EndStrike->geometry().bottomRight());
-    listViewEndStrike->setSizePolicy(sizePolicy);
-    listViewEndStrike->setFixedSize(230, 200);
-    listViewEndStrike->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    // Set the position of the QListView just below lineEdit_EndStrike
-    listViewEndStrike->move(lineEditPosES.x()+270, lineEditPosSS.y()+55);
-    listViewEndStrike->hide();
-
-
-
-    // to make floating window
-    listViewFut = new QListView(this);
-    connect(listViewFut, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
-    QPoint lineEditPosF = ui->lineEdit_EndStrike->mapToGlobal(ui->lineEdit_EndStrike->geometry().bottomRight());
-    listViewFut->setSizePolicy(sizePolicy);
-    listViewFut->setFixedSize(230, 200);
-    listViewFut->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    // Set the position of the QListView just below lineEdit_EndStrike
-    listViewFut->move(lineEditPosES.x()+270, lineEditPosSS.y()+55);
-    listViewFut->hide();
     QPixmap pixmapclose(":/close_window_icon.png");
     ui->Close->setIcon(pixmapclose);
 
     const char LineEdit_SS[]="border-radius: 6px;""border: 0.5px solid #343A40;""background: #FFF;""color: #6C757D;""font-size: 12px;""font-style: normal;""font-weight: 400;""line-height: normal;" "padding: 4px 10px 4px 10px;";
-    for(auto w: {ui->lineEdit_StrikeDifference, ui->lineEdit_EndStrike, ui->lineEdit_Start_strike,ui->lineEdit_Fut}){
+    for(auto w: {ui->lineEdit_StrikeDifference_Btfy,
+        ui->lineEdit_StrikeDifference_BtfyBid,
+        ui->lineEdit_StrikeDifference_ConvRev,
+        ui->lineEdit_Start_strike_Btfy,
+        ui->lineEdit_Start_strike_BtfyBid,
+        ui->lineEdit_Start_strike_ConvRev,
+        ui->lineEdit_Start_strike_f2f,
+        ui->lineEdit_EndStrike_Btfy,
+        ui->lineEdit_EndStrike_BtfyBid,
+        ui->lineEdit_EndStrike_ConvRev,
+        ui->lineEdit_EndStrike_f2f,
+        ui->lineEdit_Fut_ConvRev}){
         w->setStyleSheet(LineEdit_SS);
         QFont font=w->font();
         font.setFamily("Work Sans");
         w->setFont(font);
     }
+
+
     const char pushButton_SS[]="border-radius: 8px;""border: 1px solid #485F6B;""background: #485F6B;""box-shadow: 5px 4px 4.2px 0px rgba(0, 0, 0, 0.10);""color: #FFF;""    text-align: center;""    font-size: 14px;""    font-style: normal;""    font-weight: 500;""    line-height: normal;";
     ui->pushButtonAdd->setStyleSheet(pushButton_SS);
     QFont font=ui->pushButtonAdd->font();
@@ -123,57 +117,33 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     ui->tableWidget->verticalHeader()->setVisible(false);
 
     /*******Class to generate F2F algos************/
-    algoF2F = new add_algo_f2f();
-    connect(this, &ConvertAlgo_Win::signalStartItemClickedF2F,algoF2F, &add_algo_f2f::itemSelected);
-    connect(this, &ConvertAlgo_Win::signalEndItemClickedF2F,algoF2F, &add_algo_f2f::itemSelectedEndStrike);
-    algoF2F->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,listViewStartStrike,listViewEndStrike);
+   algoF2F = new add_algo_f2f();
+   algoF2F->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_f2f,ui->lineEdit_EndStrike_f2f);
     // /*******Class to generate F2F algos************/
 
     /*******Class to generate BtFly algos************/
     algoBtFly= new add_algo_btfly();
-    connect(this, &ConvertAlgo_Win::signalStartItemClickedBFLY,algoBtFly, &add_algo_btfly::itemSelected);
-    connect(this, &ConvertAlgo_Win::signalEndItemClickedBFLY,algoBtFly, &add_algo_btfly::itemSelectedEndStrike);
-    algoBtFly->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference,listViewStartStrike,listViewEndStrike);
-   // algoBtFly= new add_algo_btfly();
-    //algoBtFly->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference);
+    algoBtFly->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_Btfy,ui->lineEdit_EndStrike_Btfy,ui->lineEdit_StrikeDifference_Btfy);
     /*******Class to generate BtFly algos************/
 
     /*******Class to generate con_rev algos************/
     algoConRev= new add_algo_con_rev();
-    connect(this, &ConvertAlgo_Win::signalStartItemClickedCR,algoConRev, &add_algo_con_rev::itemSelectedStartStrike);
-    connect(this, &ConvertAlgo_Win::signalEndItemClickedCR,algoConRev, &add_algo_con_rev::itemSelectedEndStrike);
-    algoConRev->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_Fut,listViewStartStrike,listViewEndStrike,listViewFut);
+    algoConRev->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_ConvRev,ui->lineEdit_EndStrike_ConvRev,ui->lineEdit_Fut_ConvRev,ui->lineEdit_StrikeDifference_ConvRev);
     /*******Class to generate con_rev algos************/
 
     /*******Class to generate BtFly-bid algos************/
     algoBtFlyBid= new add_algo_btfly_bid();
-    connect(this, &ConvertAlgo_Win::signalStartItemClickedBFLYBID,algoBtFlyBid, &add_algo_btfly_bid::itemSelected);
-    connect(this, &ConvertAlgo_Win::signalEndItemClickedBFLYBID,algoBtFlyBid, &add_algo_btfly_bid::itemSelectedEndStrike);
-    algoBtFlyBid->copyUIElement(ui->tableWidget,ui->lineEdit_Start_strike,ui->lineEdit_EndStrike,ui->lineEdit_StrikeDifference,listViewStartStrike,listViewEndStrike);
+    algoBtFlyBid->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_BtfyBid,ui->lineEdit_EndStrike_BtfyBid,ui->lineEdit_StrikeDifference_BtfyBid);
     /*******Class to generate BtFly-bid algos************/
 
     QDoubleValidator *val = new QDoubleValidator();
     val->setLocale(QLocale::C);
     val->setNotation(QDoubleValidator::StandardNotation);
-    ui->lineEdit_StrikeDifference->setValidator(val);
+    ui->lineEdit_StrikeDifference_Btfy->setValidator(val);
+    ui->lineEdit_StrikeDifference_ConvRev->setValidator(val);
+    ui->lineEdit_StrikeDifference_BtfyBid->setValidator(val);
 
-    // ui->comboBox_AlgoType->clear();
-    // ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
-    //ui->comboBox_AlgoType->addItem("F2F");
-    // ui->comboBox_AlgoType->addItem("BFLY");
-    // ui->comboBox_AlgoType->addItem("CON-REV");
-    // ui->comboBox_AlgoType->addItem("BOX");
-    // ui->comboBox_AlgoType->addItem("Open-BFLY");
-    // ui->comboBox_AlgoType->addItem("Open-BOX");
 
-    // // not implemented yet so disabled
-    // ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_F2F, QVariant(0), Qt::UserRole-1);
-    // ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_BFLY, QVariant(0), Qt::UserRole-1);
-    // ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_CON_REV, QVariant(0), Qt::UserRole-1);
-    // ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_Open_BFLY, QVariant(0), Qt::UserRole-1);
-    // ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_BOX, QVariant(0), Qt::UserRole-1);
-    // ui->comboBox_AlgoType->setItemData(BID_TYPE::INDEX_ALGO_Open_BOX, QVariant(0), Qt::UserRole-1);
-    // // not implemented yet so disabled
 
     sharedData->unique_id = 0; // this used to identyfy table row and algo_data to upload
 
@@ -276,8 +246,27 @@ ConvertAlgo_Win::~ConvertAlgo_Win()
     delete ui;
 }
 
+void ConvertAlgo_Win::hideAnyListViewVisible(){
+    algoF2F->slotStartHide("");
+    algoF2F->slotEndHide("");
+
+    algoBtFly->slotStartHide("");
+    algoBtFly->slotEndHide("");
+
+    algoBtFlyBid->slotStartHide("");
+    algoBtFlyBid->slotEndHide("");
+
+    algoConRev->slotStartHide("");
+    algoConRev->slotEndHide("");
+    algoConRev->slotFutHide("");
+
+
+}
+
+
 void ConvertAlgo_Win::on_Close_clicked()
 {
+    hideAnyListViewVisible();
     close();
 }
 
@@ -285,9 +274,21 @@ void ConvertAlgo_Win::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Escape)
     {
-        ui->lineEdit_Start_strike->clear(); // Clear the text in the start strike line edit
-        ui->lineEdit_EndStrike->clear();    // Clear the text in the end strike line edit
-        ui->lineEdit_StrikeDifference->clear();
+
+        ui->lineEdit_StrikeDifference_Btfy->clear();
+        ui->lineEdit_StrikeDifference_BtfyBid->clear();
+        ui->lineEdit_StrikeDifference_ConvRev->clear();
+        ui->lineEdit_Start_strike_Btfy->clear();
+        ui->lineEdit_Start_strike_BtfyBid->clear();
+        ui->lineEdit_Start_strike_ConvRev->clear();
+        ui->lineEdit_Start_strike_f2f->clear();
+        ui->lineEdit_EndStrike_Btfy->clear();
+        ui->lineEdit_EndStrike_BtfyBid->clear();
+        ui->lineEdit_EndStrike_ConvRev->clear();
+        ui->lineEdit_EndStrike_f2f->clear();
+        ui->lineEdit_Fut_ConvRev->clear();
+        on_comboBox_AlgoType_currentTextChanged(ui->comboBox_AlgoType->currentText());
+
 
         event->accept();                    // Accept the event to indicate it was handled
     }
@@ -314,43 +315,6 @@ void ConvertAlgo_Win::update_ui_slot(int type){
 }
 
 
-void ConvertAlgo_Win::itemSelected(QModelIndex index)
-{
-    QString algo_type  = ui->comboBox_AlgoType->currentText();
-
-    if(algo_type==BFLY_BID_TYPE)
-    {
-        emit signalStartItemClickedBFLYBID(index);
-    }
-    else if(algo_type=="BFLY")
-    {
-        emit signalStartItemClickedBFLY(index);
-    }
-    else if(algo_type=="F2F")
-    {
-        emit signalStartItemClickedF2F(index);
-    }
-}
-
-void ConvertAlgo_Win::itemSelectedEndStrike(QModelIndex index)
-{
-    QString algo_type  = ui->comboBox_AlgoType->currentText();
-    if(algo_type==BFLY_BID_TYPE)
-    {
-        emit signalEndItemClickedBFLYBID(index);
-
-    }
-    else if(algo_type=="BFLY")
-    {
-        emit signalEndItemClickedBFLY(index);
-
-    }
-    else if(algo_type=="F2F")
-    {
-        emit signalEndItemClickedF2F(index);
-    }
-}
-
 
 void ConvertAlgo_Win::update_contract_tableData(QString foo_user_id_,int MaxPortfolioCount_){
 
@@ -373,9 +337,11 @@ void ConvertAlgo_Win::update_contract_tableData(QString foo_user_id_,int MaxPort
     algoBtFlyBid->sorted_keys_BFLY_BID = sharedData->FO_BFLY_BID_data_list_Sorted_Key;
     algoBtFlyBid->model_start_strike_BFLY_BID = ContractDetail::getInstance().Get_model_start_strike_BFLY_BID();  //get the model generated from contract class for start strike
 
+
+
     algoConRev->sorted_keys_CON_REV = sharedData->FO_BFLY_data_list_Sorted_Key;
     algoConRev->sorted_keys_F2F = sharedData->FO_F2F_data_list_Sorted_Key;
-    algoConRev->model_start_strike_CR = ContractDetail::getInstance().Get_model_FUT_CON_REV();  //get the model generated from contract class
+    algoConRev->model_Fut_CR = ContractDetail::getInstance().Get_model_FUT_CON_REV();  //get the model generated from contract class
 
     /*algoBOX->sorted_keys_BOX = sharedData->FO_BFLY_data_list_Sorted_Key;
     algoBOX->model_searchInstrument_BOX_Leg1 = ContractDetail::getInstance().Get_model_searchInstrument_BOX_Leg1(); //get the model generated from contract class for leg1
@@ -536,15 +502,24 @@ void ConvertAlgo_Win::resetTableWidget(){
 
 void ConvertAlgo_Win::enable_disable_UIElement(bool enable)
 {
+    ui->lineEdit_StrikeDifference_Btfy->setEnabled(enable);
+    ui->lineEdit_StrikeDifference_BtfyBid->setEnabled(enable);
+    ui->lineEdit_StrikeDifference_ConvRev->setEnabled(enable);
+    ui->lineEdit_Start_strike_Btfy->setEnabled(enable);
+    ui->lineEdit_Start_strike_BtfyBid->setEnabled(enable);
+    ui->lineEdit_Start_strike_ConvRev->setEnabled(enable);
+    ui->lineEdit_Start_strike_f2f->setEnabled(enable);
+    ui->lineEdit_EndStrike_Btfy->setEnabled(enable);
+    ui->lineEdit_EndStrike_BtfyBid->setEnabled(enable);
+    ui->lineEdit_EndStrike_ConvRev->setEnabled(enable);
+    ui->lineEdit_EndStrike_f2f->setEnabled(enable);
+    ui->lineEdit_Fut_ConvRev->setEnabled(enable);
+
     ui->comboBox_AlgoType->setEnabled(enable);
-    ui->lineEdit_Start_strike->setEnabled(enable);
-    ui->lineEdit_EndStrike->setEnabled(enable);
-    ui->lineEdit_StrikeDifference->setEnabled(enable);
     ui->pushButtonAdd->setEnabled(enable);
     ui->pushButton_Reset->setEnabled(enable);
     ui->pushButtonDelete->setEnabled(enable);
     ui->pushButtonUpload->setEnabled(enable);
-    ui->lineEdit_Fut->setEnabled(enable);
 }
 
 
@@ -558,32 +533,6 @@ void ConvertAlgo_Win::display_log_text_slot(QString msg)
 
 
 
-void ConvertAlgo_Win::on_lineEdit_Start_strike_editingFinished()
-{
-/*QString algo_type  = ui->comboBox_AlgoType->currentText();
-
-    if(algo_type=="F2F"){
-        algoF2F->instrumentEditFinishedAction();
-    }
-//    else if(algo_type=="BFLY"){
-//        algoBtFly->startStrikeEditFinishedAction();
-//    }
-    else if(algo_type=="CON-REV"){
-        algoConRev->startStrikeEditFinishedAction();
-    }
-    else if(algo_type==BFLY_BID_TYPE){
-        algoBtFlyBid->startStrikeEditFinishedAction();
-    }*/
-//    else if(algo_type=="BOX"){
-//        algoBOX->instrumentEditFinishedAction();
-//    }
-//    else if (algo_type=="Open-BOX"){
-//        algoOPEN_BOX->instrumentEditFinishedAction();
-//    }
-//    else if(algo_type=="Open-BFLY"){
-//        algoOpen_BtFly->startStrikeEditFinishedAction();
-//    }
-}
 
 
 void ConvertAlgo_Win::on_pushButtonAdd_clicked()
@@ -630,55 +579,30 @@ void ConvertAlgo_Win::on_comboBox_AlgoType_currentTextChanged(const QString algo
     if(dataSorted.loadRelaxed()==0)
         return;
 
+    hideAnyListViewVisible();
+
     resetTableWidget();
     sharedData->algo_data_list.clear();
 
-    ui->lineEdit_Start_strike->clear();
-    ui->lineEdit_EndStrike->clear();
-    ui->lineEdit_StrikeDifference->clear();
-    ui->lineEdit_Start_strike->setPlaceholderText("Start Strike (Type Min 3 Char)");
-    ui->lineEdit_EndStrike->setPlaceholderText("End Strike (Type Min 3 Char)");
-
-    ui->lineEdit_Fut->clear();
-
-//    ui->mkt_qty1->setValue(1);
-//    ui->mkt_qty2->setValue(1);
-//    ui->mkt_qty3->setValue(1);
-//    ui->mkt_qty4->setValue(1);
-
     if(algoType=="F2F"){
 
-        ui->lineEdit_StrikeDifference->setVisible(false);
-        ui->lineEdit_Fut->setVisible(false);
-        //  ui->lineEdit_EndStrike->setVisible(false);
-//        ui->qty_widget_parent->setVisible(false);
-//        ui->label_qty_widget_parent->setVisible(false);
-
+        ui->stackedWidget->setCurrentWidget(ui->page_f2f);
         algoF2F->selectedAction();
 
     }
     if(algoType=="BFLY"){
-        ui->lineEdit_StrikeDifference->setVisible(true);
-        ui->lineEdit_EndStrike->setVisible(true);
-        ui->lineEdit_Fut->setVisible(false);
-//        ui->qty_widget_parent->setVisible(false);
-//        ui->label_qty_widget_parent->setVisible(false);
+
+        ui->stackedWidget->setCurrentWidget(ui->pageBtfy);
         algoBtFly->selectedAction();
     }
     else if(algoType=="CON-REV"){
-        ui->lineEdit_Fut->setVisible(true);
-        ui->lineEdit_EndStrike->setVisible(true);
-        ui->lineEdit_StrikeDifference->setVisible(false);
-//        ui->qty_widget_parent->setVisible(false);
-//        ui->label_qty_widget_parent->setVisible(false);
+
+        ui->stackedWidget->setCurrentWidget(ui->pageConvRev);
         algoConRev->selectedAction();
     }
     if(algoType==BFLY_BID_TYPE){
-        ui->lineEdit_StrikeDifference->setVisible(true);
-        ui->lineEdit_EndStrike->setVisible(true);
-        ui->lineEdit_Fut->setVisible(false);
-        //        ui->qty_widget_parent->setVisible(false);
-        //        ui->label_qty_widget_parent->setVisible(false);
+
+        ui->stackedWidget->setCurrentWidget(ui->pageBtfyBid);
         algoBtFlyBid->selectedAction();
     }
 //    else if(algoType=="2L Straddle"){
@@ -836,19 +760,32 @@ void ConvertAlgo_Win::on_pushButton_Reset_clicked()
 
     //ui->lineEdit_Instrument_Name->clear();
     // ui->lineEdit_algo_combination->clear();
-    ui->lineEdit_Start_strike->clear();
-    ui->lineEdit_EndStrike->clear();
-    // ui->lineEdit_OptionType->clear();
-    ui->lineEdit_StrikeDifference->clear();
-    ui->lineEdit_Fut->clear();
-    //ui->lineEdit_Instrument_Name->setCompleter(0);
-    // ui->lineEdit_algo_combination->setCompleter(0);
-    // ui->lineEdit_Start_strike->setCompleter(0);
-    ui->lineEdit_EndStrike->setCompleter(0);
-    ui->lineEdit_Fut->setCompleter(0);
-    // ui->lineEdit_OptionType->setCompleter(0);
+//    ui->lineEdit_Start_strike->clear();
+//    ui->lineEdit_EndStrike->clear();
+//    // ui->lineEdit_OptionType->clear();
+//    ui->lineEdit_StrikeDifference->clear();
+//    ui->lineEdit_Fut->clear();
+//    //ui->lineEdit_Instrument_Name->setCompleter(0);
+//    // ui->lineEdit_algo_combination->setCompleter(0);
+//    // ui->lineEdit_Start_strike->setCompleter(0);
+//    ui->lineEdit_EndStrike->setCompleter(0);
+//    ui->lineEdit_Fut->setCompleter(0);
+//    // ui->lineEdit_OptionType->setCompleter(0);
 
     //update_input_field();
+
+    ui->lineEdit_StrikeDifference_Btfy->clear();
+    ui->lineEdit_StrikeDifference_BtfyBid->clear();
+    ui->lineEdit_StrikeDifference_ConvRev->clear();
+    ui->lineEdit_Start_strike_Btfy->clear();
+    ui->lineEdit_Start_strike_BtfyBid->clear();
+    ui->lineEdit_Start_strike_ConvRev->clear();
+    ui->lineEdit_Start_strike_f2f->clear();
+    ui->lineEdit_EndStrike_Btfy->clear();
+    ui->lineEdit_EndStrike_BtfyBid->clear();
+    ui->lineEdit_EndStrike_ConvRev->clear();
+    ui->lineEdit_EndStrike_f2f->clear();
+    ui->lineEdit_Fut_ConvRev->clear();
 }
 
 
@@ -893,11 +830,6 @@ void ConvertAlgo_Win::on_pushButtonDelete_clicked()
     //algo_data_list.removeAt(row);
 }
 
-
-void ConvertAlgo_Win::on_lineEdit_Fut_editingFinished()
-{
-    algoConRev->create_AutoFillModel_StartStrike();
-}
 
 
 

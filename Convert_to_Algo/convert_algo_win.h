@@ -32,19 +32,14 @@ public:
     void update_contract_tableData(QString foo_user_id_,int MaxPortfolioCount_);
     ~ConvertAlgo_Win();
 
+    void hideAnyListViewVisible();
+
 protected:
     void keyPressEvent(QKeyEvent *event) override;
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 signals:
-    void signalStartItemClickedBFLY(QModelIndex);
-    void signalStartItemClickedBFLYBID(QModelIndex);
-    void signalStartItemClickedF2F(QModelIndex);
-    void signalStartItemClickedCR(QModelIndex);
-    void signalEndItemClickedBFLY(QModelIndex);
-    void signalEndItemClickedBFLYBID(QModelIndex);
-    void signalEndItemClickedF2F(QModelIndex);
-    void signalEndItemClickedCR(QModelIndex);
+
 
 private slots:
     void on_Close_clicked();
@@ -54,7 +49,6 @@ private slots:
     void display_log_text_slot(QString msg);
     void update_ui_slot(int);
 
-    void on_lineEdit_Start_strike_editingFinished();
 
     void on_pushButtonAdd_clicked();
 
@@ -68,8 +62,6 @@ private slots:
     void on_pushButtonSelectAll_clicked();
     void on_pushButton_Reset_clicked();
     void on_pushButtonDelete_clicked();
-
-    void on_lineEdit_Fut_editingFinished();
 
 private:
 
@@ -88,8 +80,8 @@ private:
     void enable_disable_UIElement(bool enable);
     QWidget *floatingWidgetES;
     QWidget *floatingWidgetSS;
-    QListView *listViewStartStrike;
-    QListView *listViewEndStrike;
+  //  QListView *listViewStartStrike;
+  //  QListView *listViewEndStrike;
     QListView *listViewFut;
 
 signals:
@@ -97,8 +89,7 @@ signals:
     void display_log_text_signal(QString);
 
 private slots:
-    void itemSelected(QModelIndex);
-    void itemSelectedEndStrike(QModelIndex index);
+
 
 };
 

@@ -32,7 +32,8 @@ extern MainWindow *MainWindowObj;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow),
-     sortWin(nullptr) // Initialize the pointer to nullptr
+     sortWin(nullptr), // Initialize the pointer to nullptr,
+     convertalgo(nullptr)
 
 {
 
@@ -45,7 +46,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
     connect(this,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
-    convertalgo=new ConvertAlgo_Win(this);
     loadingDataWinodw = new loadingdatawindow(this);
     connect(this,SIGNAL(signalHideProgressBar()),this,SLOT(slotHideProgressBar()));
 
@@ -1750,6 +1750,11 @@ void MainWindow::on_Algorithms_Close_clicked()
     ui->Algorithms_Close->setVisible(false);
 }
 void MainWindow::on_ConvertAlgo_button_clicked(){
+
+    if(!convertalgo){
+        convertalgo=new ConvertAlgo_Win(this);
+        qDebug()<<"Creating convertalgo....";
+    }
 
     convertalgo->update_contract_tableData(QString::number(userData.UserId),userData.MaxPortfolioCount);
     if(!convertalgo->isVisible())
