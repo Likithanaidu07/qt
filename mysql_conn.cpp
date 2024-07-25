@@ -1076,13 +1076,14 @@ QList <QStringList> liners_listTmp;
                 rowList.append(Jackpot);
                 rowList.append(Traded_Lot);
                 rowList.append(Remaining_Lot);
-                rowList.append(Buy_Sell);
+              ///  rowList.append(Buy_Sell);
                 rowList.append(dt.toString("hh:mm:ss"));
                 rowList.append(Leg2_OrderStateStr);
                 rowList.append(Leg1_OrderStateStr);
                 rowList.append(Leg3_OrderStateStr);
                 rowList.append(Algo_ID); // 12 th pos
                 rowList.append(Expiry);
+                rowList.append(Buy_Sell);
 //                rowList.append(Leg1_OrderState); // this should be the 4th last data inserted to the row
  //               rowList.append(Leg3_OrderState); // this should be the 3rd last data inserted to the row
   //              rowList.append(Leg2_OrderState); // this should be the 2nd last data inserted to the row

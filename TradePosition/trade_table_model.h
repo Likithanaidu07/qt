@@ -33,7 +33,7 @@ private:
                           "Jackpot",
                           "Traded Lot",
                           "Remaining Lot",
-                          "Buy/Sell",
+                          //"Buy/Sell",
                           "Time",
                           "BidLeg State",
                           "Leg1 State",
