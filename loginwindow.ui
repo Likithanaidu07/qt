@@ -267,7 +267,7 @@ padding: 4px 10px 4px 10px;
 }</string>
      </property>
      <property name="text">
-      <string>stm101</string>
+      <string/>
      </property>
      <property name="placeholderText">
       <string>Username</string>
@@ -456,7 +456,7 @@ padding: 4px 10px 4px 10px;
 }</string>
      </property>
      <property name="text">
-      <string>123</string>
+      <string/>
      </property>
      <property name="echoMode">
       <enum>QLineEdit::Password</enum>
@@ -598,7 +598,6 @@ background: #212529;
       <string notr="true">#pushButtonlogin{
 border-radius: 4px;
 background: #212529;
-box-shadow: 0px 2px 8px 0px #2D3134;
 
     font-style: normal;
     font-weight: 400;
@@ -680,8 +679,6 @@ box-shadow: 0px 2px 8px 0px #2D3134;
         <string notr="true">#name{
 width: 231.618px;
 height: 23.086px;
-flex-shrink: 0;
-fill: #E8E8E8;
 }</string>
        </property>
        <property name="text">

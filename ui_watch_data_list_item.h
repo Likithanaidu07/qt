@@ -1,7 +1,8 @@
 /********************************************************************************
 ** Form generated from reading UI file 'watch_data_list_item.ui'
 **
-** Created by: Qt User Interface Compiler version 6.3.2
+
+** Created by: Qt User Interface Compiler version 6.5.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -31,7 +32,8 @@ public:
     void setupUi(QWidget *watch_Data_List_Item)
     {
         if (watch_Data_List_Item->objectName().isEmpty())
-            watch_Data_List_Item->setObjectName(QString::fromUtf8("watch_Data_List_Item"));
+
+            watch_Data_List_Item->setObjectName("watch_Data_List_Item");
         watch_Data_List_Item->resize(310, 53);
         horizontalLayout = new QHBoxLayout(watch_Data_List_Item);
         horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
@@ -49,7 +51,8 @@ public:
         horizontalLayout->addItem(horizontalSpacer);
 
         value1 = new QLabel(watch_Data_List_Item);
-        value1->setObjectName(QString::fromUtf8("value1"));
+
+        value1->setObjectName("value1");
         value1->setMinimumSize(QSize(60, 0));
         value1->setMaximumSize(QSize(60, 16777215));
         value1->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
@@ -57,14 +60,16 @@ public:
         horizontalLayout->addWidget(value1);
 
         indicator = new QLabel(watch_Data_List_Item);
-        indicator->setObjectName(QString::fromUtf8("indicator"));
+
+        indicator->setObjectName("indicator");
         indicator->setMinimumSize(QSize(10, 6));
         indicator->setMaximumSize(QSize(10, 6));
 
         horizontalLayout->addWidget(indicator);
 
         value2 = new QLabel(watch_Data_List_Item);
-        value2->setObjectName(QString::fromUtf8("value2"));
+
+        value2->setObjectName("value2");
         value2->setMinimumSize(QSize(80, 0));
         value2->setMaximumSize(QSize(80, 16777215));
 

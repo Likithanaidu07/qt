@@ -1993,7 +1993,7 @@ void MainWindow::loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct>
     QString fileName = appDataPath+"/Data/watch_cache.bin";
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly)) {
-        qWarning("Could not open file for reading.");
+        qWarning("Could not open file for reading--> watch_cache.bin");
         return;
     }
     QDataStream in(&file);
