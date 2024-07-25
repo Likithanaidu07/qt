@@ -32,9 +32,7 @@
    <string>Dialog</string>
   </property>
   <property name="styleSheet">
-   <string notr="true">QDialog{
-box-shadow: 4px 4px 12px 0px rgba(0, 0, 0, 0.25);
-}</string>
+   <string notr="true"/>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <property name="leftMargin">
@@ -55,9 +53,7 @@ box-shadow: 4px 4px 12px 0px rgba(0, 0, 0, 0.25);
    <item row="1" column="0">
     <widget class="QWidget" name="widget_2" native="true">
      <property name="styleSheet">
-      <string notr="true">#widget_2{
-background: #F2F5F8;
-}</string>
+      <string notr="true"/>
      </property>
      <layout class="QGridLayout" name="gridLayout_2">
       <property name="leftMargin">
@@ -292,7 +288,6 @@ QTableView::item:selected {
            <string notr="true">QPushButton{
 border-radius: 7px;
 background: #1585C0;
-box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.75);
 color: #FFF;
 font-family: Work Sans;
 font-size: 14px;
@@ -328,7 +323,6 @@ line-height: normal;
 border-radius: 7px;
 background: #1585C0;
 color: #FFF;
-box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.25);
 font-family: Work Sans;
 font-size: 14px;
 font-style: normal;
@@ -736,34 +730,6 @@ background: #FFF;
             </property>
             <property name="placeholderText">
              <string>End Strike (min 3 letters)</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="QLineEdit" name="lineEdit_StrikeDifference_ConvRev">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="minimumSize">
-             <size>
-              <width>90</width>
-              <height>28</height>
-             </size>
-            </property>
-            <property name="maximumSize">
-             <size>
-              <width>90</width>
-              <height>28</height>
-             </size>
-            </property>
-            <property name="styleSheet">
-             <string notr="true"/>
-            </property>
-            <property name="placeholderText">
-             <string>Strike Difference</string>
             </property>
            </widget>
           </item>

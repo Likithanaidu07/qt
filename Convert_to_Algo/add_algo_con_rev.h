@@ -20,7 +20,7 @@ class add_algo_con_rev : public QObject
 
 public:
     explicit add_algo_con_rev(QObject *parent = nullptr);
-    void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_,QLineEdit *lineEdit_StrikeDifference_);
+    void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_);
     QStringList sorted_keys_CON_REV; // sorted keys for contract_table hash table     // this used for start strike and endstrike
     QStringList sorted_keys_F2F; // sorted keys for contract_table hash table  // this used to full fut instrument
     void create_AutoFillModel_StartStrike();
@@ -41,7 +41,6 @@ private:
     QLineEdit *lineEdit_Start_strike;
     QLineEdit *lineEdit_EndStrike;
     QLineEdit *lineEdit_Fut;
-    QLineEdit *lineEdit_StrikeDifference;
 
 
     QTableWidget *tableWidget;

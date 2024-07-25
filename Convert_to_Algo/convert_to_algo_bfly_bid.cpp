@@ -126,6 +126,14 @@ void add_algo_btfly_bid::startStrikeEditFinishedAction(){
 
         if(tmp.InstrumentName==Instr_Name&&tmp.OptionType==Option_Type&&Expiry==tmp.Expiry){
 
+            if(!strike_priceList.contains(QString::number(tmp.StrikePrice))){
+                strike_priceList.append(QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)); // store in Rs
+                token_numebrList.append(QString::number(tmp.TokenNumber));
+            }
+            // this will prevent adding same algo_combination  in end strike list view as in start strik list view
+            if(start_strike==end_strike)
+                continue;
+
             unsigned int unix_time= tmp.Expiry;
             QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
             dt = dt.addYears(10);
@@ -143,10 +151,7 @@ void add_algo_btfly_bid::startStrikeEditFinishedAction(){
             item->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
             model_end_strike->appendRow(item);
 
-            if(!strike_priceList.contains(QString::number(tmp.StrikePrice))){
-                strike_priceList.append(QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)); // store in Rs
-                token_numebrList.append(QString::number(tmp.TokenNumber));
-            }
+
 
 
         }

@@ -26,13 +26,13 @@ signals:
     void loginStatus(userInfo userData);
 private slots:
     void on_pushButtonlogin_clicked();
-    void on_lineEdit_username_textEdited(const QString &arg1);
-    void on_lineEdit_password_textEdited(const QString &arg1);
     void on_close_clicked();
     void on_minimize_clicked();
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
+    void on_lineEditUsername_textEdited(const QString &arg1);
+    void on_lineEdit_Password_textEdited(const QString &arg1);
 };
 
 #endif // LOGINWINDOW_H

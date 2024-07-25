@@ -35,8 +35,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
     setTabOrder(ui->lineEdit_Fut_ConvRev,ui->lineEdit_Start_strike_ConvRev);
     setTabOrder(ui->lineEdit_Start_strike_ConvRev,ui->lineEdit_EndStrike_ConvRev);
-    setTabOrder(ui->lineEdit_EndStrike_ConvRev,ui->lineEdit_StrikeDifference_ConvRev);
-    setTabOrder(ui->lineEdit_StrikeDifference_ConvRev,ui->pushButtonAdd);
+    setTabOrder(ui->lineEdit_EndStrike_ConvRev,ui->pushButtonAdd);
 
 
     setTabOrder(ui->pushButtonAdd, ui->pushButtonSelectAll);
@@ -56,7 +55,6 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     const char LineEdit_SS[]="border-radius: 6px;""border: 0.5px solid #343A40;""background: #FFF;""color: #6C757D;""font-size: 12px;""font-style: normal;""font-weight: 400;""line-height: normal;" "padding: 4px 10px 4px 10px;";
     for(auto w: {ui->lineEdit_StrikeDifference_Btfy,
         ui->lineEdit_StrikeDifference_BtfyBid,
-        ui->lineEdit_StrikeDifference_ConvRev,
         ui->lineEdit_Start_strike_Btfy,
         ui->lineEdit_Start_strike_BtfyBid,
         ui->lineEdit_Start_strike_ConvRev,
@@ -73,7 +71,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     }
 
 
-    const char pushButton_SS[]="border-radius: 8px;""border: 1px solid #485F6B;""background: #485F6B;""box-shadow: 5px 4px 4.2px 0px rgba(0, 0, 0, 0.10);""color: #FFF;""    text-align: center;""    font-size: 14px;""    font-style: normal;""    font-weight: 500;""    line-height: normal;";
+    const char pushButton_SS[]="border-radius: 8px;""border: 1px solid #485F6B;""background: #485F6B;""color: #FFF;""    text-align: center;""    font-size: 14px;""    font-style: normal;""    font-weight: 500;""    line-height: normal;";
     ui->pushButtonAdd->setStyleSheet(pushButton_SS);
     QFont font=ui->pushButtonAdd->font();
     font.setFamily("Work Sans");
@@ -88,7 +86,6 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     const char toolButton_SS[]="border-radius: 4px; "
                                "border: 0.5px solid #465460; "
                                "background: #FFF; "
-                               "box-shadow: 0px 1px 2px 0px rgba(0, 0, 0, 0.25); "
                                "color: #465460; "
                                "text-align: center; "
                                "font-size: 8px; "
@@ -128,7 +125,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
     /*******Class to generate con_rev algos************/
     algoConRev= new add_algo_con_rev();
-    algoConRev->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_ConvRev,ui->lineEdit_EndStrike_ConvRev,ui->lineEdit_Fut_ConvRev,ui->lineEdit_StrikeDifference_ConvRev);
+    algoConRev->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_ConvRev,ui->lineEdit_EndStrike_ConvRev,ui->lineEdit_Fut_ConvRev);
     /*******Class to generate con_rev algos************/
 
     /*******Class to generate BtFly-bid algos************/
@@ -140,7 +137,6 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     val->setLocale(QLocale::C);
     val->setNotation(QDoubleValidator::StandardNotation);
     ui->lineEdit_StrikeDifference_Btfy->setValidator(val);
-    ui->lineEdit_StrikeDifference_ConvRev->setValidator(val);
     ui->lineEdit_StrikeDifference_BtfyBid->setValidator(val);
 
 
@@ -277,7 +273,6 @@ void ConvertAlgo_Win::keyPressEvent(QKeyEvent *event)
 
         ui->lineEdit_StrikeDifference_Btfy->clear();
         ui->lineEdit_StrikeDifference_BtfyBid->clear();
-        ui->lineEdit_StrikeDifference_ConvRev->clear();
         ui->lineEdit_Start_strike_Btfy->clear();
         ui->lineEdit_Start_strike_BtfyBid->clear();
         ui->lineEdit_Start_strike_ConvRev->clear();
@@ -504,7 +499,6 @@ void ConvertAlgo_Win::enable_disable_UIElement(bool enable)
 {
     ui->lineEdit_StrikeDifference_Btfy->setEnabled(enable);
     ui->lineEdit_StrikeDifference_BtfyBid->setEnabled(enable);
-    ui->lineEdit_StrikeDifference_ConvRev->setEnabled(enable);
     ui->lineEdit_Start_strike_Btfy->setEnabled(enable);
     ui->lineEdit_Start_strike_BtfyBid->setEnabled(enable);
     ui->lineEdit_Start_strike_ConvRev->setEnabled(enable);
@@ -776,7 +770,6 @@ void ConvertAlgo_Win::on_pushButton_Reset_clicked()
 
     ui->lineEdit_StrikeDifference_Btfy->clear();
     ui->lineEdit_StrikeDifference_BtfyBid->clear();
-    ui->lineEdit_StrikeDifference_ConvRev->clear();
     ui->lineEdit_Start_strike_Btfy->clear();
     ui->lineEdit_Start_strike_BtfyBid->clear();
     ui->lineEdit_Start_strike_ConvRev->clear();

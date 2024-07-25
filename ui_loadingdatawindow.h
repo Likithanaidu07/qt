@@ -1,7 +1,6 @@
 /********************************************************************************
 ** Form generated from reading UI file 'loadingdatawindow.ui'
 **
-
 ** Created by: Qt User Interface Compiler version 6.5.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
@@ -34,7 +33,6 @@ public:
     void setupUi(QWidget *loadingdatawindow)
     {
         if (loadingdatawindow->objectName().isEmpty())
-
             loadingdatawindow->setObjectName("loadingdatawindow");
         loadingdatawindow->resize(453, 185);
         loadingdatawindow->setStyleSheet(QString::fromUtf8("  border: 1px solid grey;\n"
@@ -42,7 +40,6 @@ public:
 "  background-color: #6C757D;\n"
 ""));
         horizontalLayout = new QHBoxLayout(loadingdatawindow);
-
         horizontalLayout->setObjectName("horizontalLayout");
         verticalLayout = new QVBoxLayout();
         verticalLayout->setSpacing(0);
@@ -52,7 +49,6 @@ public:
         verticalLayout->addItem(verticalSpacer);
 
         progressBar = new QProgressBar(loadingdatawindow);
-
         progressBar->setObjectName("progressBar");
         progressBar->setStyleSheet(QString::fromUtf8("color: rgb(255, 255, 255);"));
         progressBar->setMaximum(0);
@@ -65,7 +61,6 @@ public:
         verticalLayout->addItem(verticalSpacer_2);
 
         label = new QLabel(loadingdatawindow);
-
         label->setObjectName("label");
 
         verticalLayout->addWidget(label);

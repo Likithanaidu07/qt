@@ -20,7 +20,6 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
-
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QToolButton>
@@ -34,7 +33,6 @@ public:
     QGridLayout *gridLayout;
     QWidget *widget_2;
     QGridLayout *gridLayout_2;
-
     QSpacerItem *verticalSpacer_2;
     QPushButton *pushButtonAdd;
     QSpacerItem *verticalSpacer_3;
@@ -49,7 +47,6 @@ public:
     QSpacerItem *horizontalSpacer_3;
     QPushButton *pushButtonUpload;
     QPushButton *pushButton_Cancel;
-
     QSpacerItem *verticalSpacer;
     QComboBox *comboBox_AlgoType;
     QStackedWidget *stackedWidget;
@@ -72,7 +69,6 @@ public:
     QLineEdit *lineEdit_Fut_ConvRev;
     QLineEdit *lineEdit_Start_strike_ConvRev;
     QLineEdit *lineEdit_EndStrike_ConvRev;
-    QLineEdit *lineEdit_StrikeDifference_ConvRev;
     QWidget *ConvertAlgo_TitleBar;
     QGridLayout *gridLayout_4;
     QToolButton *Close;
@@ -82,9 +78,7 @@ public:
     void setupUi(QDialog *ConvertAlgo_Win)
     {
         if (ConvertAlgo_Win->objectName().isEmpty())
-
             ConvertAlgo_Win->setObjectName("ConvertAlgo_Win");
-
         ConvertAlgo_Win->resize(1000, 410);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
@@ -93,21 +87,15 @@ public:
         ConvertAlgo_Win->setSizePolicy(sizePolicy);
         ConvertAlgo_Win->setMinimumSize(QSize(1000, 410));
         ConvertAlgo_Win->setMaximumSize(QSize(1000, 410));
-        ConvertAlgo_Win->setStyleSheet(QString::fromUtf8("QDialog{\n"
-"box-shadow: 4px 4px 12px 0px rgba(0, 0, 0, 0.25);\n"
-"}"));
+        ConvertAlgo_Win->setStyleSheet(QString::fromUtf8(""));
         gridLayout = new QGridLayout(ConvertAlgo_Win);
         gridLayout->setSpacing(0);
-
         gridLayout->setObjectName("gridLayout");
         gridLayout->setContentsMargins(0, 0, 0, 0);
         widget_2 = new QWidget(ConvertAlgo_Win);
         widget_2->setObjectName("widget_2");
-        widget_2->setStyleSheet(QString::fromUtf8("#widget_2{\n"
-"background: #F2F5F8;\n"
-"}"));
+        widget_2->setStyleSheet(QString::fromUtf8(""));
         gridLayout_2 = new QGridLayout(widget_2);
-
         gridLayout_2->setObjectName("gridLayout_2");
         gridLayout_2->setHorizontalSpacing(9);
         gridLayout_2->setVerticalSpacing(0);
@@ -149,7 +137,6 @@ public:
         gridLayout_3->addWidget(pushButtonDelete, 0, 3, 1, 1);
 
         tableWidget = new QTableWidget(widget);
-
         tableWidget->setObjectName("tableWidget");
         tableWidget->setFocusPolicy(Qt::TabFocus);
         tableWidget->setStyleSheet(QString::fromUtf8("QTableView::item {\n"
@@ -210,7 +197,6 @@ public:
         horizontalLayout_2->addItem(horizontalSpacer_3);
 
         pushButtonUpload = new QPushButton(widget_2);
-
         pushButtonUpload->setObjectName("pushButtonUpload");
         sizePolicy.setHeightForWidth(pushButtonUpload->sizePolicy().hasHeightForWidth());
         pushButtonUpload->setSizePolicy(sizePolicy);
@@ -218,7 +204,6 @@ public:
         pushButtonUpload->setStyleSheet(QString::fromUtf8("QPushButton{\n"
 "border-radius: 7px;\n"
 "background: #1585C0;\n"
-"box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.75);\n"
 "color: #FFF;\n"
 "font-family: Work Sans;\n"
 "font-size: 14px;\n"
@@ -231,7 +216,6 @@ public:
         horizontalLayout_2->addWidget(pushButtonUpload);
 
         pushButton_Cancel = new QPushButton(widget_2);
-
         pushButton_Cancel->setObjectName("pushButton_Cancel");
         pushButton_Cancel->setMinimumSize(QSize(85, 32));
         pushButton_Cancel->setMaximumSize(QSize(95, 16777215));
@@ -239,7 +223,6 @@ public:
 "border-radius: 7px;\n"
 "background: #1585C0;\n"
 "color: #FFF;\n"
-"box-shadow: 0px 2px 4px 0px rgba(0, 0, 0, 0.25);\n"
 "font-family: Work Sans;\n"
 "font-size: 14px;\n"
 "font-style: normal;\n"
@@ -411,16 +394,6 @@ public:
 
         horizontalLayout_5->addWidget(lineEdit_EndStrike_ConvRev);
 
-        lineEdit_StrikeDifference_ConvRev = new QLineEdit(pageConvRev);
-        lineEdit_StrikeDifference_ConvRev->setObjectName("lineEdit_StrikeDifference_ConvRev");
-        sizePolicy1.setHeightForWidth(lineEdit_StrikeDifference_ConvRev->sizePolicy().hasHeightForWidth());
-        lineEdit_StrikeDifference_ConvRev->setSizePolicy(sizePolicy1);
-        lineEdit_StrikeDifference_ConvRev->setMinimumSize(QSize(90, 28));
-        lineEdit_StrikeDifference_ConvRev->setMaximumSize(QSize(90, 28));
-        lineEdit_StrikeDifference_ConvRev->setStyleSheet(QString::fromUtf8(""));
-
-        horizontalLayout_5->addWidget(lineEdit_StrikeDifference_ConvRev);
-
         stackedWidget->addWidget(pageConvRev);
 
         gridLayout_2->addWidget(stackedWidget, 1, 3, 1, 1);
@@ -429,7 +402,6 @@ public:
         gridLayout->addWidget(widget_2, 1, 0, 1, 1);
 
         ConvertAlgo_TitleBar = new QWidget(ConvertAlgo_Win);
-
         ConvertAlgo_TitleBar->setObjectName("ConvertAlgo_TitleBar");
         sizePolicy.setHeightForWidth(ConvertAlgo_TitleBar->sizePolicy().hasHeightForWidth());
         ConvertAlgo_TitleBar->setSizePolicy(sizePolicy);
@@ -439,7 +411,6 @@ public:
 "background: #314458;\n"
 "}"));
         gridLayout_4 = new QGridLayout(ConvertAlgo_TitleBar);
-
         gridLayout_4->setObjectName("gridLayout_4");
         gridLayout_4->setHorizontalSpacing(15);
         gridLayout_4->setContentsMargins(-1, 7, -1, 8);
@@ -455,7 +426,6 @@ public:
         gridLayout_4->addWidget(Close, 0, 2, 1, 1);
 
         label_2 = new QLabel(ConvertAlgo_TitleBar);
-
         label_2->setObjectName("label_2");
         label_2->setMinimumSize(QSize(0, 17));
         label_2->setMaximumSize(QSize(108, 17));
@@ -484,7 +454,6 @@ public:
         QWidget::setTabOrder(pushButtonDelete, tableWidget);
         QWidget::setTabOrder(tableWidget, pushButtonUpload);
         QWidget::setTabOrder(pushButtonUpload, pushButton_Cancel);
-
 
         retranslateUi(ConvertAlgo_Win);
 
@@ -521,7 +490,6 @@ public:
         lineEdit_Start_strike_ConvRev->setText(QString());
         lineEdit_Start_strike_ConvRev->setPlaceholderText(QCoreApplication::translate("ConvertAlgo_Win", "Start Strike (min 3 letters)", nullptr));
         lineEdit_EndStrike_ConvRev->setPlaceholderText(QCoreApplication::translate("ConvertAlgo_Win", "End Strike (min 3 letters)", nullptr));
-        lineEdit_StrikeDifference_ConvRev->setPlaceholderText(QCoreApplication::translate("ConvertAlgo_Win", "Strike Difference", nullptr));
         Close->setText(QString());
         label_2->setText(QCoreApplication::translate("ConvertAlgo_Win", "Add Algo", nullptr));
     } // retranslateUi

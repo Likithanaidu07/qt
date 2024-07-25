@@ -13,12 +13,11 @@ add_algo_con_rev::add_algo_con_rev(QObject *parent)
 
 
 }
-void add_algo_con_rev::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_,QLineEdit *lineEdit_StrikeDifference_){
+void add_algo_con_rev::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_){
     lineEdit_Start_strike = lineEdit_Start_strike_;
     lineEdit_EndStrike = lineEdit_EndStrike_;
     lineEdit_Fut = lineEdit_Fut_;
     tableWidget = tableWidget_;
-    lineEdit_StrikeDifference = lineEdit_StrikeDifference_;
 //    startStrikeListView = sView;
 //    endStrikeListView = eView;
 //    futListView = fView;
@@ -104,7 +103,6 @@ void add_algo_con_rev::selectedAction(){
     lineEdit_Fut->clear();
     lineEdit_Start_strike->clear();
     lineEdit_EndStrike->clear();
-    lineEdit_StrikeDifference->clear();
 
 
     futListView->hide();
@@ -203,7 +201,7 @@ void add_algo_con_rev::startStrikeEditFinishedAction(){
         contract_table tmp = sharedData->contract_table_hash[sorted_keys_CON_REV[i]];
         float end_strike = tmp.StrikePrice;
         //qDebug()<<tmp.instrument_name<<"=="<<Instr_Name<<"   "<<tmp.option_type<<"=="<<Option_Type<<"   "<<Expiry<<"=="<<tmp.expiry_date;
-        if(start_strike>end_strike)
+        if(start_strike>=end_strike)
             continue;
         if(tmp.InstrumentName==Instr_Name&&tmp.OptionType=="PE"&&Expiry==tmp.Expiry){
             unsigned int unix_time= tmp.Expiry;

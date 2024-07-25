@@ -8,7 +8,7 @@
 #include "sql_conn_utils.h"
 #include "mainwindow.h"
 
-extern MainWindow *MainWindowObj;
+//extern MainWindow *MainWindowObj;
 
 
 loginwindow::loginwindow(QWidget *parent) :
@@ -23,7 +23,7 @@ loginwindow::loginwindow(QWidget *parent) :
 #endif
 
 
-    MainWindowObj = (MainWindow*) parent;
+ //   MainWindowObj = (MainWindow*) parent;
     QFontDatabase::addApplicationFont(":/RacingSansOne-Regular.ttf");
     QFontDatabase::addApplicationFont(":/WorkSans-Bold.ttf");
 
@@ -168,12 +168,15 @@ void loginwindow::on_pushButtonlogin_clicked()
 }
 
 
-void loginwindow::on_lineEdit_username_textEdited(const QString &arg1)
+void loginwindow::on_lineEditUsername_textEdited(const QString &arg1)
 {
     if(ui->label_wron_input->isVisible())
         ui->label_wron_input->setVisible(false);
 }
-void loginwindow::on_lineEdit_password_textEdited(const QString &arg1)
+
+
+
+void loginwindow::on_lineEdit_Password_textEdited(const QString &arg1)
 {
     if(ui->label_wron_input->isVisible())
         ui->label_wron_input->setVisible(false);
@@ -279,3 +282,7 @@ void loginwindow::mouseReleaseEvent(QMouseEvent *event) {
 
 //    return QWidget::nativeEvent(eventType, message, result);
 //}
+
+
+
+

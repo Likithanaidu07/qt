@@ -65,6 +65,7 @@ void Table_Portfolios_Model::onItemChanged(const QModelIndex &index)
 }
 
 void Table_Portfolios_Model::selectionChangedSlot(int currentIdx){
+    QMutexLocker locker(&mutex); // Lock the mutex automatically
 
     if(currentIdx!=-1){
         if(portfolio_data_list[currentIdx]->TradedHighlight == true){
@@ -79,7 +80,7 @@ void Table_Portfolios_Model::selectionChangedSlot(int currentIdx){
     }
     //editing row swithced, make previous row flg not editing
     if(current_editingRow!=currentIdx){
-        if(current_editingRow!=-1)
+        if(current_editingRow!=-1&& current_editingRow < portfolio_data_list.size())
             portfolio_data_list[current_editingRow]->edting.storeRelaxed(0);
         else if(currentIdx == -1)
             current_editingRow = -1;
@@ -717,6 +718,8 @@ void Table_Portfolios_Model::setDataList(QList <PortfolioObject*> portfolio_data
 }
 
 void Table_Portfolios_Model::clearTable(){
+    QMutexLocker locker(&mutex); // Lock the mutex automatically
+
     QList <int> portfolio_ids_ToRemove;
     for(int i=0;i<portfolio_data_list.length();i++){
        portfolio_ids_ToRemove.append(i);
