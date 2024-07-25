@@ -22,24 +22,24 @@ void linersheaderview::paintSection(QPainter* painter, const QRect& rect, int lo
     QApplication::style()->drawControl(QStyle::CE_Header, &opt, painter);*/
 
     Qt::Alignment align = (Qt::AlignHCenter | Qt::AlignVCenter);
-    if (logicalIndex == Liners_Idx::AlgoId)
+//    if (logicalIndex == Liners_Idx::AlgoId)
 
-    {
-        //        painter->fillRect(rect, QColor::fromRgba(qRgba(108,117,125,255)));
-    }
-    else if(logicalIndex == Liners_Idx::AlgoName)
-    {
-        //        painter->fillRect(rect, QColor::fromRgba(qRgba(108,117,125,255)));
-    }
-    else if(logicalIndex == Liners_Idx::BuyAvgPrice||
-             logicalIndex == Liners_Idx::BuyQtyinLots ||
-             logicalIndex == Liners_Idx::SellAvgPrice ||
-             logicalIndex == Liners_Idx::SellQtyinLots ||
-             logicalIndex == Liners_Idx::NetQty ||
-             logicalIndex == Liners_Idx::Profit)
-    {
-        //        painter->fillRect(rect, QColor::fromRgba(qRgba(108,117,125,255)));
-    }
+//    {
+//        //        painter->fillRect(rect, QColor::fromRgba(qRgba(108,117,125,255)));
+//    }
+//    else if(logicalIndex == Liners_Idx::AlgoName)
+//    {
+//        //        painter->fillRect(rect, QColor::fromRgba(qRgba(108,117,125,255)));
+//    }
+//    else if(logicalIndex == Liners_Idx::BuyAvgPrice||
+//             logicalIndex == Liners_Idx::BuyQtyinLots ||
+//             logicalIndex == Liners_Idx::SellAvgPrice ||
+//             logicalIndex == Liners_Idx::SellQtyinLots ||
+//             logicalIndex == Liners_Idx::NetQty ||
+//             logicalIndex == Liners_Idx::Profit)
+//    {
+//        //        painter->fillRect(rect, QColor::fromRgba(qRgba(108,117,125,255)));
+//    }
 
 //    else if(logicalIndex == OrderBook_Idx::BidLegState_OB||
 //             logicalIndex == OrderBook_Idx::Leg1State_OB ||
@@ -61,19 +61,20 @@ void linersheaderview::paintSection(QPainter* painter, const QRect& rect, int lo
     painter->drawText(rect, align, model()->headerData(logicalIndex, orientation(), Qt::DisplayRole).toString());
 
     // Add a right-side border
-    //    painter->setPen(QColor::fromRgba(qRgba(50, 50, 50, 53))); // Set the border color
-//    if(logicalIndex == OrderBook_Idx::AlgoName_OB
-//        ||logicalIndex ==  OrderBook_Idx:: TradeTime_OB
-//        || logicalIndex == OrderBook_Idx::Leg3State_OB){
-//        //painter->setPen(QColor("#6C757D"));
-//        painter->drawLine(rect.topRight(), rect.bottomRight());
-//    }
-//    else
-//    {
-//        painter->setPen(QColor("#6C757D"));
-//        painter->drawLine(rect.topRight(), rect.bottomRight());
-//    }
+        painter->setPen(QColor::fromRgba(qRgba(50, 50, 50, 53))); // Set the border color
+    if(logicalIndex == Liners_Idx::BuyAvgPrice
+        ||logicalIndex ==  Liners_Idx:: SellAvgPrice
+        || logicalIndex == Liners_Idx::NetQty){
+        //painter->setPen(QColor("#6C757D"));
+        painter->drawLine(rect.topRight(), rect.bottomRight());
+    }
+    else
+    {
+        painter->setPen(QColor("#6C757D"));
+        painter->drawLine(rect.topRight(), rect.bottomRight());
+    }
 
+    painter->drawLine(rect.topRight(), rect.bottomRight());
 
 }
 

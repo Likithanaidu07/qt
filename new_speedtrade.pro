@@ -1,4 +1,4 @@
-QT       += core gui
+QT  += core gui
 QT+=sql
 QT += network
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -10,11 +10,9 @@ DEFINES += QT_MESSAGELOGCONTEXT
 
 CONFIG += c++17
 
-
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
-
 
 SOURCES += \
     CombinedTracker/combined_tracker_table_model.cpp \
@@ -27,8 +25,11 @@ SOURCES += \
     Convert_to_Algo/convert_to_algo_bfly_bid.cpp \
     Convert_to_Algo/customtablewidget.cpp \
     Convert_to_Algo/eventfilterlistview.cpp \
+    Liners/liners_delegate.cpp \
     Liners/liners_model.cpp \
     Liners/linersheaderview.cpp \
+    NetPosition/net_position_table_delegate.cpp \
+    NetPosition/net_position_table_headerview.cpp \
     NetPosition/net_position_table_model.cpp \
     OrderBook/table_orderbook_delegate.cpp \
     PortFolio/PortfolioParser.cpp \
@@ -77,8 +78,11 @@ HEADERS += \
     Convert_to_Algo/convert_to_algo_bfly_bid.h \
     Convert_to_Algo/customtablewidget.h \
     Convert_to_Algo/eventfilterlistview.h \
+    Liners/liners_delegate.h \
     Liners/liners_model.h \
     Liners/linersheaderview.h \
+    NetPosition/net_position_table_delegate.h \
+    NetPosition/net_position_table_headerview.h \
     NetPosition/net_position_table_model.h \
     OrderBook/table_orderbook_delegate.h \
     PortFolio/PortfolioParser.h \

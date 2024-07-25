@@ -1,11 +1,11 @@
-#include "table_orderbook_delegate.h"
+#include "linersdelegate.h"
 
-Table_OrderBook_Delegate::Table_OrderBook_Delegate(QObject *parent)  : QStyledItemDelegate{parent}
+linersdelegate::linersdelegate(QObject *parent)  : QStyledItemDelegate{parent}
 {
 
 }
 
-void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
+void linersdelegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
     auto c= index.column();
     auto r= index.row();
@@ -15,7 +15,7 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
 
     Trade_Table_Model *model=(Trade_Table_Model*) index.model();
     QStringList order_list=model->trade_data_list.at(index.row());
-//    QStringList order_list;
+    //    QStringList order_list;
     QList<QString> fifthColumnValues;
 
     /*for (int i = 0; i < model->trade_data_list.size(); ++i) {
@@ -76,37 +76,37 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
 
         QStyledItemDelegate::paint(painter, op, index);
     }
-    else{
-        QColor color("#E0F1FF");
-//       // painter->fillRect(option.rect, color);
-//        op.palette.setColor(QPalette::Highlight , Qt::transparent);
-//        op.palette.setColor(QPalette::HighlightedText , Qt::black);
-        painter->fillRect(option.rect, color);
-    }
+    //    else{
+    //        QColor color("#D5E7F5");
+    //       // painter->fillRect(option.rect, color);
+    //        op.palette.setColor(QPalette::Highlight , Qt::transparent);
+    //        op.palette.setColor(QPalette::HighlightedText , Qt::black);
+    //        painter->fillRect(option.rect, color);
+    //    }
     if(c==OrderBook_Idx::TradeTime_OB || c==OrderBook_Idx::AlgoNo_OB|| c==OrderBook_Idx::UserPrice_OB){
         QStyleOptionViewItem op(option);
 
 
-       // if(c==OrderBook_Idx::BidLegState_OB){
-            double borderWidth = 1;
+        // if(c==OrderBook_Idx::BidLegState_OB){
+        double borderWidth = 1;
         QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
-            painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
+        QPen pen(myColor);
+        pen.setWidthF(borderWidth);
+        painter->setPen(pen);
+        painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
 
-        }
-//        else if (c==OrderBook_Idx::BidLegState_OB){
-//            double borderWidth = 1;
-//            QColor myColor(108, 117, 125);
-//            QPen pen(myColor);
-//            pen.setWidthF(borderWidth);
-//            painter->setPen(pen);
-//            painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
-//        }
+    }
+    //        else if (c==OrderBook_Idx::BidLegState_OB){
+    //            double borderWidth = 1;
+    //            QColor myColor(108, 117, 125);
+    //            QPen pen(myColor);
+    //            pen.setWidthF(borderWidth);
+    //            painter->setPen(pen);
+    //            painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
+    //        }
 
 
-//    }
+    //    }
     double borderWidth = 0.5;
     QColor myColor(108, 117, 125);
     QPen pen(myColor);

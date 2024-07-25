@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'convert_algo_win.ui'
 **
-** Created by: Qt User Interface Compiler version 6.5.3
+** Created by: Qt User Interface Compiler version 6.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -20,7 +20,6 @@
 #include <QtWidgets/QLineEdit>
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QSpacerItem>
-
 #include <QtWidgets/QStackedWidget>
 #include <QtWidgets/QTableWidget>
 #include <QtWidgets/QToolButton>
@@ -34,7 +33,6 @@ public:
     QGridLayout *gridLayout;
     QWidget *widget_2;
     QGridLayout *gridLayout_2;
-
     QSpacerItem *verticalSpacer_2;
     QPushButton *pushButtonAdd;
     QSpacerItem *verticalSpacer_3;
@@ -49,7 +47,6 @@ public:
     QSpacerItem *horizontalSpacer_3;
     QPushButton *pushButtonUpload;
     QPushButton *pushButton_Cancel;
-
     QSpacerItem *verticalSpacer;
     QComboBox *comboBox_AlgoType;
     QStackedWidget *stackedWidget;
@@ -82,9 +79,7 @@ public:
     void setupUi(QDialog *ConvertAlgo_Win)
     {
         if (ConvertAlgo_Win->objectName().isEmpty())
-
-            ConvertAlgo_Win->setObjectName("ConvertAlgo_Win");
-
+            ConvertAlgo_Win->setObjectName(QString::fromUtf8("ConvertAlgo_Win"));
         ConvertAlgo_Win->resize(1000, 410);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
@@ -98,17 +93,15 @@ public:
 "}"));
         gridLayout = new QGridLayout(ConvertAlgo_Win);
         gridLayout->setSpacing(0);
-
-        gridLayout->setObjectName("gridLayout");
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
         widget_2 = new QWidget(ConvertAlgo_Win);
-        widget_2->setObjectName("widget_2");
+        widget_2->setObjectName(QString::fromUtf8("widget_2"));
         widget_2->setStyleSheet(QString::fromUtf8("#widget_2{\n"
 "background: #F2F5F8;\n"
 "}"));
         gridLayout_2 = new QGridLayout(widget_2);
-
-        gridLayout_2->setObjectName("gridLayout_2");
+        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         gridLayout_2->setHorizontalSpacing(9);
         gridLayout_2->setVerticalSpacing(0);
         gridLayout_2->setContentsMargins(12, 0, 12, 14);
@@ -117,7 +110,7 @@ public:
         gridLayout_2->addItem(verticalSpacer_2, 3, 0, 1, 10);
 
         pushButtonAdd = new QPushButton(widget_2);
-        pushButtonAdd->setObjectName("pushButtonAdd");
+        pushButtonAdd->setObjectName(QString::fromUtf8("pushButtonAdd"));
         sizePolicy.setHeightForWidth(pushButtonAdd->sizePolicy().hasHeightForWidth());
         pushButtonAdd->setSizePolicy(sizePolicy);
         pushButtonAdd->setMinimumSize(QSize(90, 28));
@@ -132,16 +125,16 @@ public:
         gridLayout_2->addItem(verticalSpacer_3, 5, 0, 1, 10);
 
         widget = new QWidget(widget_2);
-        widget->setObjectName("widget");
+        widget->setObjectName(QString::fromUtf8("widget"));
         widget->setFocusPolicy(Qt::NoFocus);
         widget->setStyleSheet(QString::fromUtf8("#widget{\n"
 "border-radius: 8px;\n"
 "background: #E0E8EE;\n"
 "}"));
         gridLayout_3 = new QGridLayout(widget);
-        gridLayout_3->setObjectName("gridLayout_3");
+        gridLayout_3->setObjectName(QString::fromUtf8("gridLayout_3"));
         pushButtonDelete = new QPushButton(widget);
-        pushButtonDelete->setObjectName("pushButtonDelete");
+        pushButtonDelete->setObjectName(QString::fromUtf8("pushButtonDelete"));
         pushButtonDelete->setMaximumSize(QSize(58, 16));
         pushButtonDelete->setStyleSheet(QString::fromUtf8(""));
         pushButtonDelete->setFlat(true);
@@ -149,8 +142,7 @@ public:
         gridLayout_3->addWidget(pushButtonDelete, 0, 3, 1, 1);
 
         tableWidget = new QTableWidget(widget);
-
-        tableWidget->setObjectName("tableWidget");
+        tableWidget->setObjectName(QString::fromUtf8("tableWidget"));
         tableWidget->setFocusPolicy(Qt::TabFocus);
         tableWidget->setStyleSheet(QString::fromUtf8("QTableView::item {\n"
 "    background-color: #FFF;\n"
@@ -177,13 +169,13 @@ public:
         gridLayout_3->addWidget(tableWidget, 3, 0, 1, 4);
 
         label = new QLabel(widget);
-        label->setObjectName("label");
+        label->setObjectName(QString::fromUtf8("label"));
         label->setStyleSheet(QString::fromUtf8(""));
 
         gridLayout_3->addWidget(label, 0, 0, 1, 1);
 
         pushButton_Reset = new QPushButton(widget);
-        pushButton_Reset->setObjectName("pushButton_Reset");
+        pushButton_Reset->setObjectName(QString::fromUtf8("pushButton_Reset"));
         pushButton_Reset->setMaximumSize(QSize(58, 16));
         pushButton_Reset->setStyleSheet(QString::fromUtf8(""));
         pushButton_Reset->setFlat(true);
@@ -191,7 +183,7 @@ public:
         gridLayout_3->addWidget(pushButton_Reset, 0, 2, 1, 1);
 
         pushButtonSelectAll = new QPushButton(widget);
-        pushButtonSelectAll->setObjectName("pushButtonSelectAll");
+        pushButtonSelectAll->setObjectName(QString::fromUtf8("pushButtonSelectAll"));
         pushButtonSelectAll->setMaximumSize(QSize(58, 16));
         pushButtonSelectAll->setFocusPolicy(Qt::TabFocus);
         pushButtonSelectAll->setStyleSheet(QString::fromUtf8(""));
@@ -204,14 +196,13 @@ public:
 
         horizontalLayout_2 = new QHBoxLayout();
         horizontalLayout_2->setSpacing(17);
-        horizontalLayout_2->setObjectName("horizontalLayout_2");
+        horizontalLayout_2->setObjectName(QString::fromUtf8("horizontalLayout_2"));
         horizontalSpacer_3 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_2->addItem(horizontalSpacer_3);
 
         pushButtonUpload = new QPushButton(widget_2);
-
-        pushButtonUpload->setObjectName("pushButtonUpload");
+        pushButtonUpload->setObjectName(QString::fromUtf8("pushButtonUpload"));
         sizePolicy.setHeightForWidth(pushButtonUpload->sizePolicy().hasHeightForWidth());
         pushButtonUpload->setSizePolicy(sizePolicy);
         pushButtonUpload->setMinimumSize(QSize(95, 32));
@@ -231,8 +222,7 @@ public:
         horizontalLayout_2->addWidget(pushButtonUpload);
 
         pushButton_Cancel = new QPushButton(widget_2);
-
-        pushButton_Cancel->setObjectName("pushButton_Cancel");
+        pushButton_Cancel->setObjectName(QString::fromUtf8("pushButton_Cancel"));
         pushButton_Cancel->setMinimumSize(QSize(85, 32));
         pushButton_Cancel->setMaximumSize(QSize(95, 16777215));
         pushButton_Cancel->setStyleSheet(QString::fromUtf8("QPushButton{\n"
@@ -258,7 +248,7 @@ public:
         gridLayout_2->addItem(verticalSpacer, 0, 0, 1, 10);
 
         comboBox_AlgoType = new QComboBox(widget_2);
-        comboBox_AlgoType->setObjectName("comboBox_AlgoType");
+        comboBox_AlgoType->setObjectName(QString::fromUtf8("comboBox_AlgoType"));
         comboBox_AlgoType->setMinimumSize(QSize(92, 28));
         comboBox_AlgoType->setMaximumSize(QSize(90, 28));
         comboBox_AlgoType->setStyleSheet(QString::fromUtf8("QComboBox{\n"
@@ -279,14 +269,14 @@ public:
         gridLayout_2->addWidget(comboBox_AlgoType, 1, 0, 1, 3);
 
         stackedWidget = new QStackedWidget(widget_2);
-        stackedWidget->setObjectName("stackedWidget");
+        stackedWidget->setObjectName(QString::fromUtf8("stackedWidget"));
         pageBtfyBid = new QWidget();
-        pageBtfyBid->setObjectName("pageBtfyBid");
+        pageBtfyBid->setObjectName(QString::fromUtf8("pageBtfyBid"));
         horizontalLayout = new QHBoxLayout(pageBtfyBid);
-        horizontalLayout->setObjectName("horizontalLayout");
+        horizontalLayout->setObjectName(QString::fromUtf8("horizontalLayout"));
         horizontalLayout->setContentsMargins(9, 2, -1, 2);
         lineEdit_Start_strike_BtfyBid = new QLineEdit(pageBtfyBid);
-        lineEdit_Start_strike_BtfyBid->setObjectName("lineEdit_Start_strike_BtfyBid");
+        lineEdit_Start_strike_BtfyBid->setObjectName(QString::fromUtf8("lineEdit_Start_strike_BtfyBid"));
         QSizePolicy sizePolicy1(QSizePolicy::Expanding, QSizePolicy::Fixed);
         sizePolicy1.setHorizontalStretch(0);
         sizePolicy1.setVerticalStretch(0);
@@ -299,7 +289,7 @@ public:
         horizontalLayout->addWidget(lineEdit_Start_strike_BtfyBid);
 
         lineEdit_EndStrike_BtfyBid = new QLineEdit(pageBtfyBid);
-        lineEdit_EndStrike_BtfyBid->setObjectName("lineEdit_EndStrike_BtfyBid");
+        lineEdit_EndStrike_BtfyBid->setObjectName(QString::fromUtf8("lineEdit_EndStrike_BtfyBid"));
         sizePolicy1.setHeightForWidth(lineEdit_EndStrike_BtfyBid->sizePolicy().hasHeightForWidth());
         lineEdit_EndStrike_BtfyBid->setSizePolicy(sizePolicy1);
         lineEdit_EndStrike_BtfyBid->setMinimumSize(QSize(0, 28));
@@ -309,7 +299,7 @@ public:
         horizontalLayout->addWidget(lineEdit_EndStrike_BtfyBid);
 
         lineEdit_StrikeDifference_BtfyBid = new QLineEdit(pageBtfyBid);
-        lineEdit_StrikeDifference_BtfyBid->setObjectName("lineEdit_StrikeDifference_BtfyBid");
+        lineEdit_StrikeDifference_BtfyBid->setObjectName(QString::fromUtf8("lineEdit_StrikeDifference_BtfyBid"));
         sizePolicy1.setHeightForWidth(lineEdit_StrikeDifference_BtfyBid->sizePolicy().hasHeightForWidth());
         lineEdit_StrikeDifference_BtfyBid->setSizePolicy(sizePolicy1);
         lineEdit_StrikeDifference_BtfyBid->setMinimumSize(QSize(90, 28));
@@ -320,11 +310,11 @@ public:
 
         stackedWidget->addWidget(pageBtfyBid);
         page_f2f = new QWidget();
-        page_f2f->setObjectName("page_f2f");
+        page_f2f->setObjectName(QString::fromUtf8("page_f2f"));
         horizontalLayout_3 = new QHBoxLayout(page_f2f);
-        horizontalLayout_3->setObjectName("horizontalLayout_3");
+        horizontalLayout_3->setObjectName(QString::fromUtf8("horizontalLayout_3"));
         lineEdit_Start_strike_f2f = new QLineEdit(page_f2f);
-        lineEdit_Start_strike_f2f->setObjectName("lineEdit_Start_strike_f2f");
+        lineEdit_Start_strike_f2f->setObjectName(QString::fromUtf8("lineEdit_Start_strike_f2f"));
         sizePolicy1.setHeightForWidth(lineEdit_Start_strike_f2f->sizePolicy().hasHeightForWidth());
         lineEdit_Start_strike_f2f->setSizePolicy(sizePolicy1);
         lineEdit_Start_strike_f2f->setMinimumSize(QSize(0, 28));
@@ -334,7 +324,7 @@ public:
         horizontalLayout_3->addWidget(lineEdit_Start_strike_f2f);
 
         lineEdit_EndStrike_f2f = new QLineEdit(page_f2f);
-        lineEdit_EndStrike_f2f->setObjectName("lineEdit_EndStrike_f2f");
+        lineEdit_EndStrike_f2f->setObjectName(QString::fromUtf8("lineEdit_EndStrike_f2f"));
         sizePolicy1.setHeightForWidth(lineEdit_EndStrike_f2f->sizePolicy().hasHeightForWidth());
         lineEdit_EndStrike_f2f->setSizePolicy(sizePolicy1);
         lineEdit_EndStrike_f2f->setMinimumSize(QSize(0, 28));
@@ -345,11 +335,11 @@ public:
 
         stackedWidget->addWidget(page_f2f);
         pageBtfy = new QWidget();
-        pageBtfy->setObjectName("pageBtfy");
+        pageBtfy->setObjectName(QString::fromUtf8("pageBtfy"));
         horizontalLayout_4 = new QHBoxLayout(pageBtfy);
-        horizontalLayout_4->setObjectName("horizontalLayout_4");
+        horizontalLayout_4->setObjectName(QString::fromUtf8("horizontalLayout_4"));
         lineEdit_Start_strike_Btfy = new QLineEdit(pageBtfy);
-        lineEdit_Start_strike_Btfy->setObjectName("lineEdit_Start_strike_Btfy");
+        lineEdit_Start_strike_Btfy->setObjectName(QString::fromUtf8("lineEdit_Start_strike_Btfy"));
         sizePolicy1.setHeightForWidth(lineEdit_Start_strike_Btfy->sizePolicy().hasHeightForWidth());
         lineEdit_Start_strike_Btfy->setSizePolicy(sizePolicy1);
         lineEdit_Start_strike_Btfy->setMinimumSize(QSize(0, 28));
@@ -359,7 +349,7 @@ public:
         horizontalLayout_4->addWidget(lineEdit_Start_strike_Btfy);
 
         lineEdit_EndStrike_Btfy = new QLineEdit(pageBtfy);
-        lineEdit_EndStrike_Btfy->setObjectName("lineEdit_EndStrike_Btfy");
+        lineEdit_EndStrike_Btfy->setObjectName(QString::fromUtf8("lineEdit_EndStrike_Btfy"));
         sizePolicy1.setHeightForWidth(lineEdit_EndStrike_Btfy->sizePolicy().hasHeightForWidth());
         lineEdit_EndStrike_Btfy->setSizePolicy(sizePolicy1);
         lineEdit_EndStrike_Btfy->setMinimumSize(QSize(0, 28));
@@ -369,7 +359,7 @@ public:
         horizontalLayout_4->addWidget(lineEdit_EndStrike_Btfy);
 
         lineEdit_StrikeDifference_Btfy = new QLineEdit(pageBtfy);
-        lineEdit_StrikeDifference_Btfy->setObjectName("lineEdit_StrikeDifference_Btfy");
+        lineEdit_StrikeDifference_Btfy->setObjectName(QString::fromUtf8("lineEdit_StrikeDifference_Btfy"));
         sizePolicy1.setHeightForWidth(lineEdit_StrikeDifference_Btfy->sizePolicy().hasHeightForWidth());
         lineEdit_StrikeDifference_Btfy->setSizePolicy(sizePolicy1);
         lineEdit_StrikeDifference_Btfy->setMinimumSize(QSize(90, 28));
@@ -380,11 +370,11 @@ public:
 
         stackedWidget->addWidget(pageBtfy);
         pageConvRev = new QWidget();
-        pageConvRev->setObjectName("pageConvRev");
+        pageConvRev->setObjectName(QString::fromUtf8("pageConvRev"));
         horizontalLayout_5 = new QHBoxLayout(pageConvRev);
-        horizontalLayout_5->setObjectName("horizontalLayout_5");
+        horizontalLayout_5->setObjectName(QString::fromUtf8("horizontalLayout_5"));
         lineEdit_Fut_ConvRev = new QLineEdit(pageConvRev);
-        lineEdit_Fut_ConvRev->setObjectName("lineEdit_Fut_ConvRev");
+        lineEdit_Fut_ConvRev->setObjectName(QString::fromUtf8("lineEdit_Fut_ConvRev"));
         sizePolicy1.setHeightForWidth(lineEdit_Fut_ConvRev->sizePolicy().hasHeightForWidth());
         lineEdit_Fut_ConvRev->setSizePolicy(sizePolicy1);
         lineEdit_Fut_ConvRev->setMinimumSize(QSize(0, 28));
@@ -392,7 +382,7 @@ public:
         horizontalLayout_5->addWidget(lineEdit_Fut_ConvRev);
 
         lineEdit_Start_strike_ConvRev = new QLineEdit(pageConvRev);
-        lineEdit_Start_strike_ConvRev->setObjectName("lineEdit_Start_strike_ConvRev");
+        lineEdit_Start_strike_ConvRev->setObjectName(QString::fromUtf8("lineEdit_Start_strike_ConvRev"));
         sizePolicy1.setHeightForWidth(lineEdit_Start_strike_ConvRev->sizePolicy().hasHeightForWidth());
         lineEdit_Start_strike_ConvRev->setSizePolicy(sizePolicy1);
         lineEdit_Start_strike_ConvRev->setMinimumSize(QSize(0, 28));
@@ -402,7 +392,7 @@ public:
         horizontalLayout_5->addWidget(lineEdit_Start_strike_ConvRev);
 
         lineEdit_EndStrike_ConvRev = new QLineEdit(pageConvRev);
-        lineEdit_EndStrike_ConvRev->setObjectName("lineEdit_EndStrike_ConvRev");
+        lineEdit_EndStrike_ConvRev->setObjectName(QString::fromUtf8("lineEdit_EndStrike_ConvRev"));
         sizePolicy1.setHeightForWidth(lineEdit_EndStrike_ConvRev->sizePolicy().hasHeightForWidth());
         lineEdit_EndStrike_ConvRev->setSizePolicy(sizePolicy1);
         lineEdit_EndStrike_ConvRev->setMinimumSize(QSize(0, 28));
@@ -412,7 +402,7 @@ public:
         horizontalLayout_5->addWidget(lineEdit_EndStrike_ConvRev);
 
         lineEdit_StrikeDifference_ConvRev = new QLineEdit(pageConvRev);
-        lineEdit_StrikeDifference_ConvRev->setObjectName("lineEdit_StrikeDifference_ConvRev");
+        lineEdit_StrikeDifference_ConvRev->setObjectName(QString::fromUtf8("lineEdit_StrikeDifference_ConvRev"));
         sizePolicy1.setHeightForWidth(lineEdit_StrikeDifference_ConvRev->sizePolicy().hasHeightForWidth());
         lineEdit_StrikeDifference_ConvRev->setSizePolicy(sizePolicy1);
         lineEdit_StrikeDifference_ConvRev->setMinimumSize(QSize(90, 28));
@@ -429,8 +419,7 @@ public:
         gridLayout->addWidget(widget_2, 1, 0, 1, 1);
 
         ConvertAlgo_TitleBar = new QWidget(ConvertAlgo_Win);
-
-        ConvertAlgo_TitleBar->setObjectName("ConvertAlgo_TitleBar");
+        ConvertAlgo_TitleBar->setObjectName(QString::fromUtf8("ConvertAlgo_TitleBar"));
         sizePolicy.setHeightForWidth(ConvertAlgo_TitleBar->sizePolicy().hasHeightForWidth());
         ConvertAlgo_TitleBar->setSizePolicy(sizePolicy);
         ConvertAlgo_TitleBar->setMinimumSize(QSize(800, 32));
@@ -439,12 +428,11 @@ public:
 "background: #314458;\n"
 "}"));
         gridLayout_4 = new QGridLayout(ConvertAlgo_TitleBar);
-
-        gridLayout_4->setObjectName("gridLayout_4");
+        gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
         gridLayout_4->setHorizontalSpacing(15);
         gridLayout_4->setContentsMargins(-1, 7, -1, 8);
         Close = new QToolButton(ConvertAlgo_TitleBar);
-        Close->setObjectName("Close");
+        Close->setObjectName(QString::fromUtf8("Close"));
         Close->setMinimumSize(QSize(14, 14));
         Close->setMaximumSize(QSize(14, 14));
         Close->setFocusPolicy(Qt::NoFocus);
@@ -455,8 +443,7 @@ public:
         gridLayout_4->addWidget(Close, 0, 2, 1, 1);
 
         label_2 = new QLabel(ConvertAlgo_TitleBar);
-
-        label_2->setObjectName("label_2");
+        label_2->setObjectName(QString::fromUtf8("label_2"));
         label_2->setMinimumSize(QSize(0, 17));
         label_2->setMaximumSize(QSize(108, 17));
         label_2->setStyleSheet(QString::fromUtf8("#label_2{\n"
@@ -484,7 +471,6 @@ public:
         QWidget::setTabOrder(pushButtonDelete, tableWidget);
         QWidget::setTabOrder(tableWidget, pushButtonUpload);
         QWidget::setTabOrder(pushButtonUpload, pushButton_Cancel);
-
 
         retranslateUi(ConvertAlgo_Win);
 

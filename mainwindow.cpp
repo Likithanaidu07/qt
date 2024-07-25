@@ -19,6 +19,9 @@
 #include "watch_data_list_item.h"
 #include "style_sheet.h"
 #include "sortsettingpopup.h"
+#include "Liners/liners_delegate.h"
+#include "NetPosition/net_position_table_delegate.h"
+#include "NetPosition/net_position_table_headerview.h"
 
 
 #define ENABLE_BACKEND_DEBUG_MSG
@@ -411,12 +414,12 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     trade_table = new QTableView();
-    trade_table->setStyleSheet(tableview_SS);
+  //  trade_table->setStyleSheet(tableview_SS);
     trade_table->horizontalHeader()->setFixedHeight(32);
     trade_table->horizontalHeader()->setFont(headerfont);
     trade_table->setShowGrid(false);
     trade_table->setAlternatingRowColors(true);
-    tradetableheaderview* headerViews = new tradetableheaderview(Qt::Horizontal, T_Portfolio_Table);
+    tradetableheaderview* headerViews = new tradetableheaderview(Qt::Horizontal, trade_table);
     headerViews->setFixedHeight(32);
     headerViews->setFont(headerfont);
     headerViews->setStyleSheet(
@@ -502,7 +505,24 @@ MainWindow::MainWindow(QWidget *parent)
     net_pos_table->setStyleSheet(tableview_SS);
     net_pos_table->setShowGrid(false);
     net_pos_table->setAlternatingRowColors(true);
+
+    net_position_table_headerview* headerView_netpos = new net_position_table_headerview(Qt::Horizontal, net_pos_table);
+    headerView_netpos->setFixedHeight(32);
+    headerView_netpos->setFont(headerfont);
+    headerView_netpos->setStyleSheet(
+        "   background: #495867;"
+        "   border: none;"
+        "   color: #FFF; "
+        "   text-align: center; "
+        "   font-size: 12px; "
+        "   font-style: normal; "
+        "   font-weight: 600; "
+        "   line-height: normal;"
+        );
+    net_pos_table->setHorizontalHeader(headerView_netpos);
+
     net_pos_model = new Net_Position_Table_Model();
+
     net_pos_table->setModel(net_pos_model);
     net_pos_table->horizontalHeader()->setStretchLastSection(true);
     net_pos_table->verticalHeader()->setVisible(false);
@@ -514,6 +534,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     net_pos_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     net_pos_table->setSelectionMode(QAbstractItemView::SingleSelection);
+    net_position_table_delegate* netpos_delegate=new net_position_table_delegate;
+    net_pos_table->setItemDelegate(netpos_delegate);
 
     dock_win_net_pos->setWidget(net_pos_table);
     net_pos_table->show();
@@ -581,7 +603,9 @@ MainWindow::MainWindow(QWidget *parent)
     liners_table->setHorizontalHeader(headerViewrs);
 
     liners_model = new Liners_Model();
+    liners_delegate* liner_delegate=new liners_delegate;
     liners_table->setModel(liners_model);
+    liners_table->setItemDelegate(liner_delegate);
     liners_table->horizontalHeader()->setStretchLastSection(true);
     liners_table->verticalHeader()->setVisible(false);
     /*  net_pos_table->setStyleSheet("QTableView {selection-background-color: #EFB37F;"
@@ -643,6 +667,7 @@ MainWindow::MainWindow(QWidget *parent)
     combined_tracker_table->horizontalHeader()->setFont(headerfont);
     combined_tracker_table->setShowGrid(false);
     combined_tracker_table->setAlternatingRowColors(true);
+
     combined_tracker_model = new Combined_Tracker_Table_Model();
     combined_tracker_table->setModel(combined_tracker_model);
     combined_tracker_table->horizontalHeader()->setStretchLastSection(true);

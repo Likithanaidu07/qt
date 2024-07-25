@@ -103,19 +103,21 @@ enum CombinedTrackerData_Idx{
 };
 
 enum OrderBook_Idx{
-    OrderId_OB,
+    OrderId_OB=0,
     AlgoName_OB,
     UserPrice_OB,
     ExchPrice_OB,
     Jackpot_OB,
     TradedLot_OB,
     RemainingLot_OB,
-    BuyorSell_OB,
     TradeTime_OB,
     BidLegState_OB,
     Leg1State_OB,
     Leg3State_OB,
-    AlgoNo_OB=0,
+    AlgoNo_OB,
+    Expiry_OB,
+    BuyorSell_OB,
+
 
 };
 
@@ -143,6 +145,7 @@ enum NET_POS
     NetQty_NP,
     Profit_NP,
     MTM,
+    TokenNo_NP,
 };
 
 enum PortfolioType
