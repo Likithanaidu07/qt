@@ -1,6 +1,6 @@
 #include "order_detail_popup.h"
 #include "ui_order_detail_popup.h"
-#include "mysql_conn.h"
+
 OrderDetail_Popup::OrderDetail_Popup(QWidget *parent)
     : QDialog(parent)
     , ui(new Ui::OrderDetail_Popup)
@@ -59,20 +59,29 @@ OrderDetail_Popup::OrderDetail_Popup(QWidget *parent)
 
     )";
 
-ui->tableWidget_Sell->setStyleSheet(styleSheet1);
+    ui->tableWidget_Sell->setStyleSheet(styleSheet1);
+}
 
+void OrderDetail_Popup::setData(PortfolioObject *p){
+   ui->algo_id->setText(QString::number(p->PortfolioNumber));
+   ui->algo_name->setText(p->AlgoName);
+   ui->bid_leg->setText(p->BidLeg);
+   ui->buy_qty->setText(QString::number(p->BuyTradedQuantity));
+   ui->sell_qty->setText(QString::number(p->SellTradedQuantity));
+   ui->buy_avg->setText(p->BuyAveragePrice);
+   ui->sell_avg->setText(p->SellAveragePrice);
 
 }
 
-void OrderDetail_Popup::getData(QString user_id, QString portfolioNumber,QString PortfolioType){
-      ui->tableWidget_Buy->setRowCount(0);
+void OrderDetail_Popup::getTradeDataFromDB(QString user_id, QString portfolioNumber,QString PortfolioType){
+    ui->tableWidget_Buy->setRowCount(0);
     ui->tableWidget_Sell->setRowCount(0);
 
 
     auto loadDataFromDB_BackgroundTask = [this, user_id, portfolioNumber, PortfolioType]() {
         // Capture captured variables by value to ensure thread safety
         mysql_conn *db_conn = new mysql_conn(0, "get_popup_data_conn");
-        QList<QHash<QString, QString>> data = db_conn->getTradePopUPData(user_id, portfolioNumber, PortfolioType);
+        QList<QHash<QString, QString>> data = db_conn->getOrderPopUPData(user_id, portfolioNumber, PortfolioType);
         delete db_conn; // Release memory after use
         emit dataLoaded(data);
 

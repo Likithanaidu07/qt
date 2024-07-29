@@ -21,6 +21,7 @@ public:
     QList <QStringList> trade_data_list;
     void search_action(QString searchTxt);
     QStringList getTradedPortFolioList();
+    QStringList getTradedDataForIdx(int idx);
 
 private:
     int col_count;

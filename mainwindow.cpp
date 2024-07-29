@@ -57,7 +57,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(db_conn,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
 
     connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
-    orderWin = new OrderDetail_Popup();
+    orderPopUpWin = new OrderDetail_Popup();
+    tradePopUpWin = new TradeDetailsPopup();
 
 
     QDir dir;
@@ -414,6 +415,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     trade_table = new QTableView();
+    connect(trade_table, &QTableView::doubleClicked, this, &MainWindow::trade_table_cellDoubleClicked);
+
   //  trade_table->setStyleSheet(tableview_SS);
     trade_table->horizontalHeader()->setFixedHeight(32);
     trade_table->horizontalHeader()->setFont(headerfont);
@@ -1900,16 +1903,37 @@ void MainWindow::T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index){
     //int row = index.row();
     int col = index.column();
     if(col==PortfolioData_Idx::_AlgoName){
-        if(orderWin->isHidden())
-            orderWin->show();
-       // QString Expiry = T_Portfolio_Model->portfolio_data_list[index.row()]->Expiry;
+        if(orderPopUpWin->isHidden())
+            orderPopUpWin->show();
+        // QString Expiry = T_Portfolio_Model->portfolio_data_list[index.row()]->Expiry;
         QString PortfolioType =T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioType;
         QString PortfolioNumber = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioNumber);
-        orderWin->getData(QString::number(userData.UserId), PortfolioNumber,PortfolioType);
-        orderWin->activateWindow();
+        orderPopUpWin->getTradeDataFromDB(QString::number(userData.UserId), PortfolioNumber,PortfolioType);
+        orderPopUpWin->setData(T_Portfolio_Model->portfolio_data_list[index.row()]);
+        orderPopUpWin->activateWindow();
     }
 
 }
+
+
+void MainWindow::trade_table_cellDoubleClicked(const QModelIndex &index){
+    //int row = index.row();
+    int col = index.column();
+    if(col==OrderBook_Idx::AlgoName_OB){
+        if(tradePopUpWin->isHidden())
+            tradePopUpWin->show();
+       // QString Expiry = T_Portfolio_Model->portfolio_data_list[index.row()]->Expiry;
+        QStringList data = trade_model->getTradedDataForIdx(index.row());
+        QString localOrderID = data[OrderBook_Idx::TraderData_OB];
+        int LotSize = data[OrderBook_Idx::LotSize_OB].toInt();
+
+        tradePopUpWin->getTradeDataFromDB(QString::number(userData.UserId), localOrderID,LotSize);
+        tradePopUpWin->activateWindow();
+    }
+
+}
+
+
 
 void MainWindow::T_Portfolio_Table_cellClicked(const QItemSelection &selected, const QItemSelection &deselected){
 

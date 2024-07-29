@@ -93,7 +93,9 @@ public:
     bool deleteAlgo(QString PortfolioNumber,QString &msg);
     void logToDB(QString logMessage);
 
-    QList<QHash<QString,QString>>  getTradePopUPData(QString user_id, QString portfolioNumber,QString PortfolioType);
+    QList<QHash<QString,QString>> getOrderPopUPData(QString user_id, QString portfolioNumber,QString PortfolioType);
+    QList<QHash<QString,QString>> getTradePopUPData(QString user_id, QString localOrderID, int lotSize );
+
     ///
     /// \brief loadCurrentDayLogs to load logs of one day
     ///

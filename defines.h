@@ -117,8 +117,8 @@ enum OrderBook_Idx{
     AlgoNo_OB,
     Expiry_OB,
     BuyorSell_OB,
-
-
+    LotSize_OB,
+    TraderData_OB
 };
 
 enum Liners_Idx{
