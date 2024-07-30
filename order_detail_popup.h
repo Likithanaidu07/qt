@@ -3,6 +3,7 @@
 
 #include <QDialog>
 #include <QtConcurrent/QtConcurrent>
+#include "mysql_conn.h"
 
 namespace Ui {
 class OrderDetail_Popup;
@@ -15,7 +16,9 @@ class OrderDetail_Popup : public QDialog
 public:
     explicit OrderDetail_Popup(QWidget *parent = nullptr);
     ~OrderDetail_Popup();
-    void getData(QString user_id, QString portfolioNumber,QString PortfolioType );
+    void getTradeDataFromDB(QString user_id, QString portfolioNumber,QString PortfolioType );
+    void setData(PortfolioObject *p);
+
 signals:
     void dataLoaded(const QList<QHash<QString, QString>>& data);
 

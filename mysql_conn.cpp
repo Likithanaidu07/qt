@@ -653,12 +653,12 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
     }return Algo_Name.toUpper();
 }
 
-  QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QString portfolioNumber,QString PortfolioType){
+  QList<QHash<QString,QString>>  mysql_conn::getOrderPopUPData(QString user_id, QString portfolioNumber,QString PortfolioType){
 
-    QList<QHash<QString,QString>> tradeData;
+    QList<QHash<QString,QString>> orderData;
     QMutexLocker lock(&mutex);
 
-    QList <QStringList> trade_data_listTmp;
+    QList <QStringList> orderData_listTmp;
     QString msg;
 
     bool ok = checkDBOpened(msg);
@@ -794,14 +794,77 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
                 tmp.insert("Buy_Sell",Buy_Sell);
                 tmp.insert("Time",dt.toString("hh:mm:ss"));
 
+                orderData.append(tmp);
+            }
+
+        }
+    }
+    return orderData;
+}
+
+
+
+QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QString localOrderID,int lotSize){
+
+    QList<QHash<QString,QString>> tradeData;
+    QMutexLocker lock(&mutex);
+
+    QList <QStringList> trade_data_listTmp;
+    QString msg;
+
+    bool ok = checkDBOpened(msg);
+    if(ok)
+    {
+        QString query_str = "SELECT StockName,BuySellIndicator,TradedPrice,TotalVolume,TimeOrderEnteredHost FROM Trades WHERE TraderId='"+user_id+"' and LocalOrderNumber="+localOrderID;
+
+        QSqlQuery query(query_str,db);
+        if( !query.exec() )
+        {
+            // Error Handling, check query.lastError(), probably return
+            qDebug()<<query.lastError().text();
+        }
+        else{
+            QSqlRecord rec = query.record();
+            while (query.next()) {
+
+
+
+
+                QString Buy_Sell = query.value(rec.indexOf("BuySellIndicator")).toString();
+                if(Buy_Sell=="1")
+                    Buy_Sell = "Buy";
+                else
+                    Buy_Sell = "Sell";
+
+                QString StockName = query.value(rec.indexOf("StockName")).toString();
+                QString TradedPrice = fixDecimal(((query.value(rec.indexOf("TradedPrice")).toDouble()) / devicer),decimal_precision);//QString::number(static_cast<double>(query.value(rec.indexOf("DesiredRate")).toDouble()) / devicer, 'f', decimal_precision+1);
+
+                int qty = query.value(rec.indexOf("TotalVolume")).toInt();
+
+
+                if(qty>0&&lotSize>0) // to prevent crash
+                    qty = qty / lotSize;
+                QString Lots = QString::number(qty);
+                long long Trade_Time = query.value(rec.indexOf("TimeOrderEnteredHost")).toLongLong();
+                QDateTime dt = QDateTime::fromSecsSinceEpoch(Trade_Time);
+                dt = dt.toUTC();
+                QString Time = dt.toString("hh:mm:ss");
+
+                QHash<QString,QString> tmp;
+                tmp.insert("Buy_Sell",Buy_Sell);
+                tmp.insert("StockName",StockName);
+                tmp.insert("Price",TradedPrice);
+                tmp.insert("Lots",Lots);
+                tmp.insert("Time",Time);
+
                 tradeData.append(tmp);
             }
 
         }
     }
     return tradeData;
-}
 
+}
 void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Liners_Model *liners_model ,QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash)
 {
     QMutexLocker lock(&mutex);
@@ -871,7 +934,7 @@ QList <QStringList> liners_listTmp;
                 int Leg1BuySellIndicator = query.value(rec.indexOf("Leg1_Buy/Sell")).toInt();
                 int Leg1_OrderState = query.value(rec.indexOf("Leg1_OrderState")).toInt();
                 int Leg3_OrderState = query.value(rec.indexOf("Leg3_OrderState")).toInt();
-                int  Leg2_OrderState = query.value(rec.indexOf("Leg2_OrderState")).toInt();
+                int Leg2_OrderState = query.value(rec.indexOf("Leg2_OrderState")).toInt();
                 int Leg1_Total_Volume = query.value(rec.indexOf("Leg1_Total_Volume")).toInt();
                 int Leg2_Total_Volume = query.value(rec.indexOf("Leg2_Total_Volume")).toInt();
                 int Leg3_Total_Volume = query.value(rec.indexOf("Leg3_Total_Volume")).toInt();
@@ -1081,16 +1144,17 @@ QList <QStringList> liners_listTmp;
                 rowList.append(Leg2_OrderStateStr);
                 rowList.append(Leg1_OrderStateStr);
                 rowList.append(Leg3_OrderStateStr);
-                rowList.append(Algo_ID); // 12 th pos
+                rowList.append(Algo_ID);
                 rowList.append(Expiry);
                 rowList.append(Buy_Sell);
+                rowList.append(QString::number(lotSize));
 //                rowList.append(Leg1_OrderState); // this should be the 4th last data inserted to the row
  //               rowList.append(Leg3_OrderState); // this should be the 3rd last data inserted to the row
   //              rowList.append(Leg2_OrderState); // this should be the 2nd last data inserted to the row
-                rowList.append(traderData); // this should be the last data inserted to the row
+                rowList.append(traderData);
 
 
-                trade_data_listTmp.append(rowList);
+               trade_data_listTmp.append(rowList);
                TraderCount=trade_data_listTmp.size();
 
                 QString linersDataKey = Algo_ID;

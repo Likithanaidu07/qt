@@ -2,6 +2,9 @@
 <ui version="4.0">
  <class>OrderDetail_Popup</class>
  <widget class="QDialog" name="OrderDetail_Popup">
+  <property name="windowModality">
+   <enum>Qt::ApplicationModal</enum>
+  </property>
   <property name="geometry">
    <rect>
     <x>0</x>
@@ -40,7 +43,7 @@
      </property>
      <layout class="QGridLayout" name="gridLayout_3">
       <item row="2" column="1">
-       <widget class="QLabel" name="label_27">
+       <widget class="QLabel" name="sell_avg">
         <property name="minimumSize">
          <size>
           <width>1</width>
@@ -96,7 +99,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLabel" name="label_28">
+       <widget class="QLabel" name="lo_size">
         <property name="minimumSize">
          <size>
           <width>1</width>
@@ -121,7 +124,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="label_25">
+       <widget class="QLabel" name="bid_leg">
         <property name="minimumSize">
          <size>
           <width>1</width>
@@ -177,7 +180,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="label_26">
+       <widget class="QLabel" name="buy_avg">
         <property name="minimumSize">
          <size>
           <width>1</width>
@@ -357,7 +360,7 @@
        </widget>
       </item>
       <item row="0" column="5">
-       <widget class="QLabel" name="label_29">
+       <widget class="QLabel" name="total_order">
         <property name="minimumSize">
          <size>
           <width>1</width>
@@ -382,7 +385,7 @@
        </widget>
       </item>
       <item row="1" column="5">
-       <widget class="QLabel" name="label_30">
+       <widget class="QLabel" name="cancel_order">
         <property name="minimumSize">
          <size>
           <width>1</width>
@@ -407,7 +410,7 @@
        </widget>
       </item>
       <item row="2" column="5">
-       <widget class="QLabel" name="label_31">
+       <widget class="QLabel" name="rejected_order">
         <property name="minimumSize">
          <size>
           <width>1</width>
@@ -432,7 +435,7 @@
        </widget>
       </item>
       <item row="3" column="5">
-       <widget class="QLabel" name="label_32">
+       <widget class="QLabel" name="executed_order">
         <property name="minimumSize">
          <size>
           <width>1</width>
@@ -492,11 +495,20 @@
        <height>10</height>
       </size>
      </property>
+     <attribute name="horizontalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
      <attribute name="verticalHeaderMinimumSectionSize">
       <number>15</number>
      </attribute>
      <attribute name="verticalHeaderDefaultSectionSize">
       <number>25</number>
+     </attribute>
+     <attribute name="verticalHeaderStretchLastSection">
+      <bool>false</bool>
      </attribute>
      <column>
       <property name="text">
@@ -607,7 +619,7 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="algo_id">
         <property name="maximumSize">
          <size>
           <width>100</width>
@@ -657,7 +669,7 @@
        </widget>
       </item>
       <item row="0" column="3">
-       <widget class="QLabel" name="label_21">
+       <widget class="QLabel" name="algo_name">
         <property name="minimumSize">
          <size>
           <width>1</width>
@@ -713,7 +725,7 @@
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLabel" name="label_20">
+       <widget class="QLabel" name="buy_value">
         <property name="maximumSize">
          <size>
           <width>100</width>
@@ -751,7 +763,7 @@
        </widget>
       </item>
       <item row="1" column="3">
-       <widget class="QLabel" name="label_22">
+       <widget class="QLabel" name="buy_qty">
         <property name="minimumSize">
          <size>
           <width>1</width>
@@ -807,7 +819,7 @@
        </widget>
       </item>
       <item row="2" column="1">
-       <widget class="QLabel" name="label_19">
+       <widget class="QLabel" name="sell_value">
         <property name="maximumSize">
          <size>
           <width>100</width>
@@ -845,7 +857,7 @@
        </widget>
       </item>
       <item row="2" column="3">
-       <widget class="QLabel" name="label_23">
+       <widget class="QLabel" name="sell_qty">
         <property name="minimumSize">
          <size>
           <width>1</width>
@@ -901,7 +913,7 @@
        </widget>
       </item>
       <item row="3" column="1">
-       <widget class="QLabel" name="label_2">
+       <widget class="QLabel" name="net_qty">
         <property name="minimumSize">
          <size>
           <width>100</width>
@@ -945,7 +957,7 @@
        </widget>
       </item>
       <item row="3" column="3">
-       <widget class="QLabel" name="label_24">
+       <widget class="QLabel" name="p_l">
         <property name="minimumSize">
          <size>
           <width>1</width>
@@ -993,6 +1005,12 @@
      <property name="frameShape">
       <enum>QFrame::NoFrame</enum>
      </property>
+     <attribute name="verticalHeaderVisible">
+      <bool>false</bool>
+     </attribute>
+     <attribute name="verticalHeaderStretchLastSection">
+      <bool>true</bool>
+     </attribute>
      <column>
       <property name="text">
        <string>Traded Price</string>

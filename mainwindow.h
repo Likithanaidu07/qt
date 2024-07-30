@@ -35,6 +35,7 @@
 #include"ui_loginwindow.h"
 #include "loadingdatawindow.h"
 #include "order_detail_popup.h"
+#include "trade_details_popup.h"
 #include "Liners/liners_model.h"
 #include "Liners/linersheaderview.h"
 
@@ -71,7 +72,9 @@ public:
     bool pressed;
     QPoint position;
     QStandardItemModel model;
-    OrderDetail_Popup *orderWin;
+    OrderDetail_Popup *orderPopUpWin;
+    TradeDetailsPopup *tradePopUpWin;
+
     //void updateLabels();
 
 
@@ -229,6 +232,8 @@ public slots:
     void resizePortFolioTableColWidthSlot(int width);
     void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
     void T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index);
+    void trade_table_cellDoubleClicked(const QModelIndex &index);
+
     void slotAddLogForAddAlgoRecord(QString str);
     void slotHideProgressBar();
     void on_startall_Button_clicked();
