@@ -1054,6 +1054,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     val=val*lotSize;
                     double vfq = T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
 
+
+
                     if(val > vfq){
                         QMessageBox msgBox;
                         msgBox.setText("Cannot update OrderQuantity");
@@ -1088,26 +1090,80 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     break;
 
                     case PortfolioData_Idx::_BuyTotalQuantity:{
-                        int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
-                        double val = valStr.toDouble();
-                        val=val*lotSize;
-                        if(T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity==0){
-                        updateQueryList.append("OrderQuantity="+QString::number(lotSize));
+
+
+                        double TTQ = T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTradedQuantity;
+                        double TQ = valStr.toDouble();
+
+                        if (TQ < TTQ) {
+                            QMessageBox msgBox;
+                            msgBox.setText("Total Quantity cannot be less than Traded Quantity. Traded Quantity is " + QString::number(TTQ));
+                            msgBox.setIcon(QMessageBox::Warning);
+                            msgBox.exec();
                         }
-                        updateQueryList.append("BuyTotalQuantity="+QString::number(val));
-                        logMsg = logMsg+"BuyTotalQuantity ["+QString::number(val)+"], ";
+                        else {
+
+                            double OrderQty = T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity;
+                            if(TQ<OrderQty){
+                               // show the error mesg here
+                                QMessageBox msgBox;
+                                msgBox.setText("TQ Less than " + QString::number(OrderQty));
+                                msgBox.setIcon(QMessageBox::Warning);
+                                msgBox.exec();
+                            }
+                            else{
+                                int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                                double val = valStr.toDouble();
+                                val=val*lotSize;
+                                if(T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity==0){
+                                    updateQueryList.append("OrderQuantity="+QString::number(lotSize));
+                                }
+                                updateQueryList.append("BuyTotalQuantity="+QString::number(val));
+                                logMsg = logMsg+"BuyTotalQuantity ["+QString::number(val)+"], ";
+                            }
+
+                        }
+
+
                     }
                     break;
 
                     case PortfolioData_Idx::_SellTotalQuantity:{
-                        int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
-                        double val = valStr.toDouble();
-                        val=val*lotSize;
-                        if(T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity==0){
-                        updateQueryList.append("OrderQuantity="+QString::number(lotSize));
+
+                        double TTQ = T_Portfolio_Model->portfolio_data_list[index.row()]->SellTradedQuantity;
+                        double TQ = valStr.toDouble();
+
+                        if (TQ < TTQ) {
+                            QMessageBox msgBox;
+                            msgBox.setText("Total Quantity cannot be less than Traded Quantity. Traded Quantity is " + QString::number(TTQ));
+                            msgBox.setIcon(QMessageBox::Warning);
+                            msgBox.exec();
                         }
-                        updateQueryList.append("SellTotalQuantity="+QString::number(val));
-                        logMsg = logMsg+"SellTotalQuantity ["+QString::number(val)+"], ";
+                        else {
+
+                            double OrderQty = T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity;
+                            if(TQ<OrderQty){
+                                // show the error mesg here
+                                QMessageBox msgBox;
+                                msgBox.setText("TQ Less than " + QString::number(OrderQty));
+                                msgBox.setIcon(QMessageBox::Warning);
+                                msgBox.exec();
+                            }
+                            else{
+                                int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                                double val = valStr.toDouble();
+                                val=val*lotSize;
+                                if(T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity==0){
+                                    updateQueryList.append("OrderQuantity="+QString::number(lotSize));
+                                }
+                                updateQueryList.append("SellTotalQuantity="+QString::number(val));
+                                logMsg = logMsg+"SellTotalQuantity ["+QString::number(val)+"], ";
+                            }
+
+                        }
+
+
+
                     }
                     break;
 

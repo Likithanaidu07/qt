@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'sortsettingpopup.ui'
 **
-** Created by: Qt User Interface Compiler version 6.5.3
+** Created by: Qt User Interface Compiler version 6.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -33,23 +33,23 @@ public:
     void setupUi(QDialog *SortSettingPopUp)
     {
         if (SortSettingPopUp->objectName().isEmpty())
-            SortSettingPopUp->setObjectName("SortSettingPopUp");
+            SortSettingPopUp->setObjectName(QString::fromUtf8("SortSettingPopUp"));
         SortSettingPopUp->setWindowModality(Qt::ApplicationModal);
         SortSettingPopUp->resize(280, 352);
         SortSettingPopUp->setMinimumSize(QSize(280, 352));
         SortSettingPopUp->setMaximumSize(QSize(280, 352));
         pushButtonAdd = new QPushButton(SortSettingPopUp);
-        pushButtonAdd->setObjectName("pushButtonAdd");
+        pushButtonAdd->setObjectName(QString::fromUtf8("pushButtonAdd"));
         pushButtonAdd->setGeometry(QRect(140, 10, 50, 24));
         pushButtonAdd->setMinimumSize(QSize(50, 0));
         pushButtonAdd->setMaximumSize(QSize(50, 16777215));
         buttonBox = new QDialogButtonBox(SortSettingPopUp);
-        buttonBox->setObjectName("buttonBox");
+        buttonBox->setObjectName(QString::fromUtf8("buttonBox"));
         buttonBox->setGeometry(QRect(9, 319, 166, 24));
         buttonBox->setOrientation(Qt::Horizontal);
         buttonBox->setStandardButtons(QDialogButtonBox::Cancel|QDialogButtonBox::Save);
         pushButtonRemove = new QPushButton(SortSettingPopUp);
-        pushButtonRemove->setObjectName("pushButtonRemove");
+        pushButtonRemove->setObjectName(QString::fromUtf8("pushButtonRemove"));
         pushButtonRemove->setGeometry(QRect(200, 10, 71, 24));
         tableWidget = new QTableWidget(SortSettingPopUp);
         if (tableWidget->columnCount() < 2)
@@ -58,12 +58,12 @@ public:
         tableWidget->setHorizontalHeaderItem(0, __qtablewidgetitem);
         QTableWidgetItem *__qtablewidgetitem1 = new QTableWidgetItem();
         tableWidget->setHorizontalHeaderItem(1, __qtablewidgetitem1);
-        tableWidget->setObjectName("tableWidget");
+        tableWidget->setObjectName(QString::fromUtf8("tableWidget"));
         tableWidget->setGeometry(QRect(9, 39, 261, 248));
         tableWidget->horizontalHeader()->setStretchLastSection(true);
         tableWidget->verticalHeader()->setStretchLastSection(false);
         comboBoxSortItems = new QComboBox(SortSettingPopUp);
-        comboBoxSortItems->setObjectName("comboBoxSortItems");
+        comboBoxSortItems->setObjectName(QString::fromUtf8("comboBoxSortItems"));
         comboBoxSortItems->setGeometry(QRect(9, 9, 121, 24));
 
         retranslateUi(SortSettingPopUp);

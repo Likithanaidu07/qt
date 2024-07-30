@@ -78,8 +78,7 @@ public:
     void setupUi(QDialog *ConvertAlgo_Win)
     {
         if (ConvertAlgo_Win->objectName().isEmpty())
-
-            ConvertAlgo_Win->setObjectName("ConvertAlgo_Win");
+            ConvertAlgo_Win->setObjectName(QString::fromUtf8("ConvertAlgo_Win"));
         ConvertAlgo_Win->resize(1000, 410);
         QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
         sizePolicy.setHorizontalStretch(0);
@@ -91,14 +90,13 @@ public:
         ConvertAlgo_Win->setStyleSheet(QString::fromUtf8(""));
         gridLayout = new QGridLayout(ConvertAlgo_Win);
         gridLayout->setSpacing(0);
-
-        gridLayout->setObjectName("gridLayout");
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
         widget_2 = new QWidget(ConvertAlgo_Win);
-        widget_2->setObjectName("widget_2");
+        widget_2->setObjectName(QString::fromUtf8("widget_2"));
         widget_2->setStyleSheet(QString::fromUtf8(""));
         gridLayout_2 = new QGridLayout(widget_2);
-        gridLayout_2->setObjectName("gridLayout_2");
+        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         gridLayout_2->setHorizontalSpacing(9);
         gridLayout_2->setVerticalSpacing(0);
         gridLayout_2->setContentsMargins(12, 0, 12, 14);
@@ -139,8 +137,7 @@ public:
         gridLayout_3->addWidget(pushButtonDelete, 0, 3, 1, 1);
 
         tableWidget = new QTableWidget(widget);
-
-        tableWidget->setObjectName("tableWidget");
+        tableWidget->setObjectName(QString::fromUtf8("tableWidget"));
         tableWidget->setFocusPolicy(Qt::TabFocus);
         tableWidget->setStyleSheet(QString::fromUtf8("QTableView::item {\n"
 "    background-color: #FFF;\n"
@@ -200,8 +197,7 @@ public:
         horizontalLayout_2->addItem(horizontalSpacer_3);
 
         pushButtonUpload = new QPushButton(widget_2);
-
-        pushButtonUpload->setObjectName("pushButtonUpload");
+        pushButtonUpload->setObjectName(QString::fromUtf8("pushButtonUpload"));
         sizePolicy.setHeightForWidth(pushButtonUpload->sizePolicy().hasHeightForWidth());
         pushButtonUpload->setSizePolicy(sizePolicy);
         pushButtonUpload->setMinimumSize(QSize(95, 32));
@@ -220,8 +216,7 @@ public:
         horizontalLayout_2->addWidget(pushButtonUpload);
 
         pushButton_Cancel = new QPushButton(widget_2);
-
-        pushButton_Cancel->setObjectName("pushButton_Cancel");
+        pushButton_Cancel->setObjectName(QString::fromUtf8("pushButton_Cancel"));
         pushButton_Cancel->setMinimumSize(QSize(85, 32));
         pushButton_Cancel->setMaximumSize(QSize(95, 16777215));
         pushButton_Cancel->setStyleSheet(QString::fromUtf8("QPushButton{\n"
@@ -399,7 +394,6 @@ public:
 
         horizontalLayout_5->addWidget(lineEdit_EndStrike_ConvRev);
 
-
         stackedWidget->addWidget(pageConvRev);
 
         gridLayout_2->addWidget(stackedWidget, 1, 3, 1, 1);
@@ -408,8 +402,7 @@ public:
         gridLayout->addWidget(widget_2, 1, 0, 1, 1);
 
         ConvertAlgo_TitleBar = new QWidget(ConvertAlgo_Win);
-
-        ConvertAlgo_TitleBar->setObjectName("ConvertAlgo_TitleBar");
+        ConvertAlgo_TitleBar->setObjectName(QString::fromUtf8("ConvertAlgo_TitleBar"));
         sizePolicy.setHeightForWidth(ConvertAlgo_TitleBar->sizePolicy().hasHeightForWidth());
         ConvertAlgo_TitleBar->setSizePolicy(sizePolicy);
         ConvertAlgo_TitleBar->setMinimumSize(QSize(800, 32));
@@ -418,8 +411,7 @@ public:
 "background: #314458;\n"
 "}"));
         gridLayout_4 = new QGridLayout(ConvertAlgo_TitleBar);
-
-        gridLayout_4->setObjectName("gridLayout_4");
+        gridLayout_4->setObjectName(QString::fromUtf8("gridLayout_4"));
         gridLayout_4->setHorizontalSpacing(15);
         gridLayout_4->setContentsMargins(-1, 7, -1, 8);
         Close = new QToolButton(ConvertAlgo_TitleBar);
@@ -434,8 +426,7 @@ public:
         gridLayout_4->addWidget(Close, 0, 2, 1, 1);
 
         label_2 = new QLabel(ConvertAlgo_TitleBar);
-
-        label_2->setObjectName("label_2");
+        label_2->setObjectName(QString::fromUtf8("label_2"));
         label_2->setMinimumSize(QSize(0, 17));
         label_2->setMaximumSize(QSize(108, 17));
         label_2->setStyleSheet(QString::fromUtf8("#label_2{\n"

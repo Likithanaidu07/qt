@@ -96,7 +96,6 @@ QStringList Table_Portfolios_Model::getTradedHighlight_ExcludeList(){
 
 int Table_Portfolios_Model::rowCount(const QModelIndex & /*parent*/) const
 {
-
     return portfolio_data_list.length();
 }
 
@@ -308,7 +307,6 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
 
         else if (index.column() == PortfolioData_Idx::_QuantityRatio) {
             return portfolio->QuantityRatio;
-
         }
         else if (index.column() == PortfolioData_Idx::_SkipMarketStrike) {
             return portfolio->SkipMarketStrike;
