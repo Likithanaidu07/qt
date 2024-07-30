@@ -513,3 +513,9 @@ new_speedtrade.pro.user*
 /build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug/.qtc_clangd/.cache/clangd/index/yvals_core.h.65C783796C8DBB25.idx
 /build/Desktop_Qt_6_5_3_MSVC2019_64bit-Debug/.qtc_clangd/compile_commands.json
 /ui_order_detail_popup.h
+/ui_mainwindow.h
+/ui_sortsettingpopup.h
+/ui_watch_data_list_item.h
+/ui_convert_algo_win.h
+/ui_loadingdatawindow.h
+/ui_loginwindow.h
