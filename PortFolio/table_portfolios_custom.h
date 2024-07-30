@@ -32,7 +32,6 @@ protected:
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) override;
     void focusOutEvent(QFocusEvent *event) override;
 
-
 public slots:
     void handleTabKeyPressFromEditableCell(nav_direction direction);
     void mousePressEvent(QMouseEvent *event);

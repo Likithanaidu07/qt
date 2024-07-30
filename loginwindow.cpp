@@ -18,7 +18,7 @@ loginwindow::loginwindow(QWidget *parent) :
     ui->setupUi(this);
 
 #ifdef QT_DEBUG
-    ui->lineEditUsername->setText("bid1");
+    ui->lineEditUsername->setText("stm101");
     ui->lineEdit_Password->setText("123");
 #endif
 
