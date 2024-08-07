@@ -31,7 +31,6 @@ mysql_conn::mysql_conn(QObject *parent,QString conne_name):
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
     settings.beginGroup("DB_Details");
-
     HostName = settings.value("HostName").toString();
     Port = settings.value("Port").toInt();
     DatabaseName = settings.value("DatabaseName").toString();
@@ -815,7 +814,7 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
     bool ok = checkDBOpened(msg);
     if(ok)
     {
-        QString query_str = "SELECT StockName,BuySellIndicator,TradedPrice,TotalVolume,TimeOrderEnteredHost FROM Trades WHERE TraderId='"+user_id+"' and LocalOrderNumber="+localOrderID;
+        QString query_str = "SELECT StockName,LocalOrderNumber,PortfolioNumber,BuySellIndicator,TradedPrice,TotalVolume,TimeOrderEnteredHost FROM Trades WHERE TraderId='"+user_id+"' and LocalOrderNumber="+localOrderID;
 
         QSqlQuery query(query_str,db);
         if( !query.exec() )
@@ -837,6 +836,8 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
                     Buy_Sell = "Sell";
 
                 QString StockName = query.value(rec.indexOf("StockName")).toString();
+                QString OrderId = query.value(rec.indexOf("LocalOrderNumber")).toString();
+                QString AlgoNo = query.value(rec.indexOf("PortfolioNumber")).toString();
                 QString TradedPrice = fixDecimal(((query.value(rec.indexOf("TradedPrice")).toDouble()) / devicer),decimal_precision);//QString::number(static_cast<double>(query.value(rec.indexOf("DesiredRate")).toDouble()) / devicer, 'f', decimal_precision+1);
 
                 int qty = query.value(rec.indexOf("TotalVolume")).toInt();
@@ -852,6 +853,8 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
 
                 QHash<QString,QString> tmp;
                 tmp.insert("Buy_Sell",Buy_Sell);
+                tmp.insert("OrderId",OrderId);
+                tmp.insert("AlgoNo",AlgoNo);
                 tmp.insert("StockName",StockName);
                 tmp.insert("Price",TradedPrice);
                 tmp.insert("Lots",Lots);
@@ -949,9 +952,11 @@ QList <QStringList> liners_listTmp;
                 }
                 else if(Leg1_OrderState==5){
                     Leg1_OrderStateStr = "Cancelled";
+                    leg1Price = 0;
                 }
                 else if(Leg1_OrderState==6){
                     Leg1_OrderStateStr = "Rejected";
+                    leg1Price = 0;
                 }
                 else if(Leg1_OrderState==7){
                     Leg1_OrderStateStr = "Traded";
@@ -970,6 +975,7 @@ QList <QStringList> liners_listTmp;
                 }
                 else if(Leg1_OrderState==13){
                     Leg1_OrderStateStr = "Cancelled";
+                    leg1Price = 0;
                 }
 
 
@@ -978,9 +984,11 @@ QList <QStringList> liners_listTmp;
                 }
                 else if(Leg3_OrderState==5){
                     Leg3_OrderStateStr = "Cancelled";
+                    leg3Price=0;
                 }
                 else if(Leg3_OrderState==6){
                     Leg3_OrderStateStr = "Rejected";
+                    leg3Price=0;
                 }
                 else if(Leg3_OrderState==7){
                     Leg3_OrderStateStr = "Traded";
@@ -999,6 +1007,7 @@ QList <QStringList> liners_listTmp;
                 }
                 else if(Leg3_OrderState==13){
                     Leg3_OrderStateStr = "Cancelled";
+                    leg3Price=0;
                 }
 
 
@@ -1068,9 +1077,7 @@ QList <QStringList> liners_listTmp;
                     else{
                         Exch_Price_val = static_cast<double>((leg1Price - leg2Price) * 1.0) / devicer;
                     }
-
                     break;
-
                 }
                 case PortfolioType::BY:{
                     if(Leg1BuySellIndicator==1){
@@ -1139,18 +1146,18 @@ QList <QStringList> liners_listTmp;
                 rowList.append(Jackpot);
                 rowList.append(Traded_Lot);
                 rowList.append(Remaining_Lot);
-              ///  rowList.append(Buy_Sell);
+              //  rowList.append(Buy_Sell);
                 rowList.append(dt.toString("hh:mm:ss"));
                 rowList.append(Leg2_OrderStateStr);
                 rowList.append(Leg1_OrderStateStr);
                 rowList.append(Leg3_OrderStateStr);
                 rowList.append(Algo_ID);
+                rowList.append(QString::number(Leg2_OrderState));
+                rowList.append(QString::number(Leg1_OrderState));
+                rowList.append(QString::number(Leg3_OrderState));
                 rowList.append(Expiry);
                 rowList.append(Buy_Sell);
                 rowList.append(QString::number(lotSize));
-//                rowList.append(Leg1_OrderState); // this should be the 4th last data inserted to the row
- //               rowList.append(Leg3_OrderState); // this should be the 3rd last data inserted to the row
-  //              rowList.append(Leg2_OrderState); // this should be the 2nd last data inserted to the row
                 rowList.append(traderData);
 
 

@@ -63,6 +63,7 @@ public:
     contract_table GetDetail(int token, int type);
     QString GetStockName(int token, int type);
     QString GetInstrumentName(int token, int type);
+    QString GetInstrumentType (int token, int type);
     int GetStrikePriceOrg(int token, int type);
     QString GetStrikePrice(int token, int type);
     double GetVolumeFreezeQty(int token, int type);

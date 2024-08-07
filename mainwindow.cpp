@@ -422,6 +422,7 @@ MainWindow::MainWindow(QWidget *parent)
     trade_table->horizontalHeader()->setFont(headerfont);
     trade_table->setShowGrid(false);
     trade_table->setAlternatingRowColors(true);
+
     tradetableheaderview* headerViews = new tradetableheaderview(Qt::Horizontal, trade_table);
     headerViews->setFixedHeight(32);
     headerViews->setFont(headerfont);
@@ -445,6 +446,11 @@ MainWindow::MainWindow(QWidget *parent)
     trade_table->setItemDelegate(trade_delegate);
     //T_order_Delegate =  new trade_table_delegate();
     //trade_table->setItemDelegate(T_order_Delegate);
+
+    // Configure column resizing
+    trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
+    trade_table->setColumnWidth(1,300);
+
     trade_table->horizontalHeader()->setStretchLastSection(true);
     trade_table->verticalHeader()->setVisible(false);
     // trade_table->setStyleSheet("QHeaderView { background-color: #111111;} QHeaderView::section { background-color:#555555;color:#eeeeee;font-weight: 400; }");
@@ -527,6 +533,9 @@ MainWindow::MainWindow(QWidget *parent)
     net_pos_model = new Net_Position_Table_Model();
 
     net_pos_table->setModel(net_pos_model);
+    net_pos_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
+    net_pos_table->setColumnWidth(1,250);
+
     net_pos_table->horizontalHeader()->setStretchLastSection(true);
     net_pos_table->verticalHeader()->setVisible(false);
     /*  net_pos_table->setStyleSheet("QTableView {selection-background-color: #EFB37F;"
@@ -609,6 +618,9 @@ MainWindow::MainWindow(QWidget *parent)
     liners_delegate* liner_delegate=new liners_delegate;
     liners_table->setModel(liners_model);
     liners_table->setItemDelegate(liner_delegate);
+
+    liners_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
+    liners_table->setColumnWidth(1,300);
     liners_table->horizontalHeader()->setStretchLastSection(true);
     liners_table->verticalHeader()->setVisible(false);
     /*  net_pos_table->setStyleSheet("QTableView {selection-background-color: #EFB37F;"
@@ -1069,9 +1081,18 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     else{
                         //write
                         int val1 = valStr.toInt();
-                        int qty = T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity;
-                        if(qty>T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity)
-                            qty = T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity;
+                        int BuyTotalQuantity = T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity;
+                        int SellTotalQuantity = T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity;
+                        int qty = BuyTotalQuantity;
+                        if(BuyTotalQuantity==0)
+                            qty = SellTotalQuantity;
+                        else if(SellTotalQuantity==0)
+                            qty = BuyTotalQuantity;
+
+                        else if(BuyTotalQuantity>SellTotalQuantity)
+                            qty = SellTotalQuantity;
+                        else
+                            qty = BuyTotalQuantity;
                         //check the condtion
                         if(val1 >qty){
                             QMessageBox msgBox;
@@ -1093,16 +1114,41 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     break;
 
                     case PortfolioData_Idx::_BuyTotalQuantity:{
+                    double TQ = valStr.toDouble();
+                    int bTTQ= T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTradedQuantity;
+
+                    QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(T_Portfolio_Model->portfolio_data_list[index.row()]->Leg1TokenNo,T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioType.toInt());
 
 
-                        double TTQ = T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTradedQuantity;
-                        double TQ = valStr.toDouble();
+                    if (InstrumentType == "OPTIDX" || InstrumentType == "FUTIDX") {
 
-                        if (TQ < TTQ) {
+                        if (TQ > userData.IDXOpenLimit+bTTQ) {
                             QMessageBox msgBox;
-                            msgBox.setText("Total Quantity cannot be less than Traded Quantity. Traded Quantity is " + QString::number(TTQ));
+                            msgBox.setText("TQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
                             msgBox.setIcon(QMessageBox::Warning);
                             msgBox.exec();
+                            break;
+                        }
+                    }
+                    else if (InstrumentType == "OPTSTK" || InstrumentType == "FUTSTK") {
+
+                        if (TQ > userData.STKOpenLimit+bTTQ) {
+                            QMessageBox msgBox;
+                            msgBox.setText("TQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
+                            msgBox.setIcon(QMessageBox::Warning);
+                            msgBox.exec();
+                            break;
+                        }
+                    }
+
+                    double TTQ = T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTradedQuantity;
+
+                    if (TQ < TTQ) {
+                            QMessageBox msgBox;
+                            msgBox.setText("Total Quantity cannot be less than Traded Quantity is " + QString::number(TTQ));
+                            msgBox.setIcon(QMessageBox::Warning);
+                            msgBox.exec();
+
                         }
                         else {
 
@@ -1110,7 +1156,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                             if(TQ<OrderQty){
                                // show the error mesg here
                                 QMessageBox msgBox;
-                                msgBox.setText("TQ Less than " + QString::number(OrderQty));
+                                msgBox.setText("TQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
                                 msgBox.setIcon(QMessageBox::Warning);
                                 msgBox.exec();
                             }
@@ -1132,23 +1178,45 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     break;
 
                     case PortfolioData_Idx::_SellTotalQuantity:{
-
-                        double TTQ = T_Portfolio_Model->portfolio_data_list[index.row()]->SellTradedQuantity;
                         double TQ = valStr.toDouble();
+                       int sTTQ= T_Portfolio_Model->portfolio_data_list[index.row()]->SellTradedQuantity;
+                        QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(T_Portfolio_Model->portfolio_data_list[index.row()]->Leg1TokenNo,T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioType.toInt());
+
+
+                        if (InstrumentType == "OPTIDX" || InstrumentType == "FUTIDX") {
+
+                            if (TQ > userData.IDXOpenLimit + sTTQ) {
+                                QMessageBox msgBox;
+                                msgBox.setText("TQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
+                                msgBox.setIcon(QMessageBox::Warning);
+                                msgBox.exec();
+                                break;
+                            }
+                        }
+                        else if (InstrumentType == "OPTSTK" || InstrumentType == "FUTSTK") {
+
+                            if (TQ > userData.STKOpenLimit + sTTQ) {
+                                QMessageBox msgBox;
+                                msgBox.setText("TQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
+                                msgBox.setIcon(QMessageBox::Warning);
+                                msgBox.exec();
+                                break;
+                            }
+                        }
+                        double TTQ = T_Portfolio_Model->portfolio_data_list[index.row()]->SellTradedQuantity;
 
                         if (TQ < TTQ) {
                             QMessageBox msgBox;
-                            msgBox.setText("Total Quantity cannot be less than Traded Quantity. Traded Quantity is " + QString::number(TTQ));
+                            msgBox.setText("Total Quantity cannot be less than Traded Quantity is " + QString::number(TTQ));
                             msgBox.setIcon(QMessageBox::Warning);
                             msgBox.exec();
                         }
                         else {
-
                             double OrderQty = T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity;
                             if(TQ<OrderQty){
                                 // show the error mesg here
                                 QMessageBox msgBox;
-                                msgBox.setText("TQ Less than " + QString::number(OrderQty));
+                                msgBox.setText("TQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
                                 msgBox.setIcon(QMessageBox::Warning);
                                 msgBox.exec();
                             }
@@ -1164,9 +1232,6 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                             }
 
                         }
-
-
-
                     }
                     break;
 
@@ -1191,7 +1256,6 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     break;
 
             }
-
             }
             if(updateQueryList.size()>0){
                 QString msg;
@@ -1569,7 +1633,10 @@ void MainWindow::loggedIn(){
 
     //make sure the start_slowdata_worker in main thread
     QMetaObject::invokeMethod(this, [this]() {
-//        ui->label_username->setText(userData.UserName);
+       // ui->label_17->setText(userData.UserName+ "  " +"Summary");
+        QString formattedText =  userData.UserName + " <span style=\"font-weight:normal;\">Summary</span>";
+        ui->label_17->setText(formattedText);
+
         start_slowdata_worker();
         start_slowdata_indices_worker();
         start_backend_comm_socket_worker();
@@ -1704,13 +1771,11 @@ void MainWindow::on_Templates_Close_clicked()
     ui->Templates_Close->setVisible(false);
 }
 
-
-
 void MainWindow::on_close_clicked()
 {
     db_conn->logToDB("Logged Out");
-
     //loggedOut();
+    //portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser;
     close();
 }
 

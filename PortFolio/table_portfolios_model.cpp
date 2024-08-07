@@ -827,6 +827,7 @@ void Table_Portfolios_Model::setColumnWidths(QTableView *tableView) const {
         tableView->setColumnWidth(col, maxWidth);
 
         tableView->setColumnWidth(_Status,45);
+        tableView->setColumnWidth(_AlgoName,300);
         tableView->horizontalHeader()->setSectionResizeMode(_Status, QHeaderView::Fixed);
     }
 }

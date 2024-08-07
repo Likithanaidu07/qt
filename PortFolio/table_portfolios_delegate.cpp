@@ -179,7 +179,6 @@ void Table_Portfolios_Delegate::updateEditorGeometry(QWidget *editor, const QSty
 }
 
 
-
 bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
 {
     if (event->type() == QEvent::KeyPress) {

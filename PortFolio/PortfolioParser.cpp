@@ -129,6 +129,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
 
         obj.SkipMarketStrike= "-";
         obj.FuturePrice="-";
+        obj.Alias="-";
 
         QHash<QString, contract_table> contractDetails = ContractDetail::getInstance().GetContracts("FUT");
 

@@ -22,7 +22,7 @@ void liners_delegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
         color = QColor("#42A5F5");
         op.palette.setColor(QPalette::Highlight, color);
 
-        color = QColor("#FEE");
+        color = QColor("#D6FCF0");
         op.palette.setColor(QPalette::Highlight, Qt::transparent);
         op.palette.setColor(QPalette::HighlightedText, Qt::black);
         painter->fillRect(option.rect, color);
@@ -41,7 +41,7 @@ void liners_delegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
     }
     else if (c == Liners_Idx::SellAvgPrice || c == Liners_Idx::SellQtyinLots)
     {
-        color = QColor("#F0FFFA");
+        color = QColor("#FED9D9");
         op.palette.setColor(QPalette::Highlight, Qt::transparent);
         op.palette.setColor(QPalette::HighlightedText, Qt::black);
         painter->fillRect(option.rect, color);

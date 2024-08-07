@@ -22,7 +22,7 @@ void net_position_table_delegate::paint(QPainter *painter, const QStyleOptionVie
         color = QColor("#42A5F5");
         op.palette.setColor(QPalette::Highlight, color);
 
-        color = QColor("#FEE");
+        color = QColor("#D6FCF0");
         op.palette.setColor(QPalette::Highlight, Qt::transparent);
         op.palette.setColor(QPalette::HighlightedText, Qt::black);
         painter->fillRect(option.rect, color);
@@ -41,7 +41,7 @@ void net_position_table_delegate::paint(QPainter *painter, const QStyleOptionVie
     }
     else if (c== NET_POS::SellAvgPrice_NP || c == NET_POS::SellTotalLot_NP ||c== NET_POS::SellValue_NP)
     {
-        color = QColor("#F0FFFA");
+        color = QColor("#FED9D9");
         op.palette.setColor(QPalette::Highlight, Qt::transparent);
         op.palette.setColor(QPalette::HighlightedText, Qt::black);
         painter->fillRect(option.rect, color);

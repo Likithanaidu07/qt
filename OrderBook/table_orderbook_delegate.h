@@ -28,6 +28,9 @@ public:
    explicit Table_OrderBook_Delegate(QObject *parent = nullptr);
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 //   QList<OrderBookObject*> OrderBook_Data_List;
+
+protected:
+    bool eventFilter(QObject *object, QEvent *event) override;
 private:
 
 

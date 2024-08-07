@@ -4,7 +4,15 @@ Table_OrderBook_Delegate::Table_OrderBook_Delegate(QObject *parent)  : QStyledIt
 {
 
 }
-
+bool Table_OrderBook_Delegate::eventFilter(QObject *object, QEvent *event) {
+    if (event->type() == QEvent::FocusOut) {
+        auto view = qobject_cast<QTableView*>(object->parent());
+        if (view) {
+            view->clearSelection();
+        }
+    }
+    return QStyledItemDelegate::eventFilter(object, event);
+}
 void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
 
@@ -44,7 +52,7 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
         op.palette.setColor(QPalette::Highlight , color);
 
         if(buy_sell == "Sell"){
-            QColor color("#FEE");
+            QColor color("#FED9D9");
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText , Qt::black);
             painter->fillRect(option.rect, color);
@@ -62,7 +70,7 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
         }
         else if(buy_sell == "Buy")
         {
-            QColor color("#F0FFFA");
+            QColor color("#D6FCF0");
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText , Qt::black);
             painter->fillRect(option.rect, color);
