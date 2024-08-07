@@ -171,11 +171,13 @@ enum PortfolioType
     R2L = 200,
     OPEN_BY = 205, // open btfy
     OPEN_BOX = 206, // open btfy
+    F1_F2 = 207,
     BFLY_BID = 250,
     JBX,
     JBX_3L,
     JBX_2L,
     R3L,
+
 
     Spread = 1000,
     INVALID
