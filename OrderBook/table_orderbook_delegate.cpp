@@ -37,6 +37,7 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
     else{
 
     }
+<<<<<<< Updated upstream
     if ( c==OrderBook_Idx::ExchPrice_OB ||
         c==OrderBook_Idx::UserPrice_OB ||
         c==OrderBook_Idx::Jackpot_OB ||
@@ -94,17 +95,54 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
     }
     if(c==OrderBook_Idx::TradeTime_OB || c==OrderBook_Idx::AlgoNo_OB|| c==OrderBook_Idx::UserPrice_OB){
         QStyleOptionViewItem op(option);
+=======
+    if ( c==OrderBook_Idx::TradeTime_OB)
+    {
+        Trade_Table_Model *model=(Trade_Table_Model*) index.model();
+        QStringList order_list=model->trade_data_list.at(index.row());
+        QString buy_sell = order_list[OrderBook_Idx::BuyorSell_OB];
+>>>>>>> Stashed changes
 
+        if(buy_sell == "Sell"){
+            QColor color("#FFF");
+            op.palette.setColor(QPalette::Highlight , Qt::transparent);
+            op.palette.setColor(QPalette::HighlightedText , Qt::black);
+            painter->fillRect(option.rect, color);
 
+<<<<<<< Updated upstream
        // if(c==OrderBook_Idx::BidLegState_OB){
             double borderWidth = 1;
         QColor myColor(108, 117, 125);
+=======
+            double borderWidth = 0.5;
+            QColor myColor(108, 117, 125);
+>>>>>>> Stashed changes
             QPen pen(myColor);
             pen.setWidthF(borderWidth);
             painter->setPen(pen);
-            painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
-
+            QPoint p1= option.rect.bottomLeft();
+            QPoint p2= option.rect.bottomRight();
+            p1.setX(p1.x()-5);
+            p2.setX(p2.x()+5);
+            painter->drawLine(p1,p2);
         }
+        else if(buy_sell == "buy")
+        {
+            QColor color("#F0FFFA");
+            op.palette.setColor(QPalette::Highlight , Qt::transparent);
+            op.palette.setColor(QPalette::HighlightedText , Qt::black);
+            painter->fillRect(option.rect, color);
+
+            double borderWidth = 0.5;
+            QColor myColor(108, 117, 125);
+            QPen pen(myColor);
+            pen.setWidthF(borderWidth);
+            painter->setPen(pen);
+            painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
+        }
+
+        QStyledItemDelegate::paint(painter, op, index);
+    }
 //        else if (c==OrderBook_Idx::BidLegState_OB){
 //            double borderWidth = 1;
 //            QColor myColor(108, 117, 125);
@@ -113,9 +151,28 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
 //            painter->setPen(pen);
 //            painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
 //        }
+    if(c==OrderBook_Idx::BidLegState_OB || c==OrderBook_Idx::AlgoNo_OB|| c==OrderBook_Idx::UserPrice_OB){
+        QStyleOptionViewItem op(option);
 
 
+<<<<<<< Updated upstream
 //    }
+=======
+        // if(c==OrderBook_Idx::BidLegState_OB){
+        double borderWidth = 1;
+        QColor myColor(108, 117, 125);
+        QPen pen(myColor);
+        pen.setWidthF(borderWidth);
+        painter->setPen(pen);
+        painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
+
+    }
+
+    QColor color("#E0F1FF");
+    if(c==0){
+        painter->fillRect(option.rect, color);
+    }
+>>>>>>> Stashed changes
     double borderWidth = 0.5;
     QColor myColor(108, 117, 125);
     QPen pen(myColor);
@@ -133,4 +190,6 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
     painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
     QStyledItemDelegate::paint(painter, op, index);
 }
+
+
 

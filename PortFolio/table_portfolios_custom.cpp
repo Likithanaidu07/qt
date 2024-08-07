@@ -114,6 +114,7 @@ int table_portfolios_custom::findNextEditableCell(int currentColIdx, nav_directi
         PortfolioData_Idx::_BuyTotalQuantity,
         PortfolioData_Idx::_Status,
         PortfolioData_Idx::_OrderQuantity,
+        PortfolioData_Idx::_Alias,
     }; // These are the editable table cells in algo table
     std::sort(editableIDx.begin(), editableIDx.end());
 

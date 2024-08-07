@@ -180,7 +180,8 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
                  c == PortfolioData_Idx::_FuturePrice||
                  c == PortfolioData_Idx::_QuantityRatio ||
                  c == PortfolioData_Idx::_SkipMarketStrike||
-                 c == PortfolioData_Idx::_BidLeg){
+                 c == PortfolioData_Idx::_BidLeg ||
+                   c == PortfolioData_Idx::_Alias){
 
             return font;
         }
@@ -228,6 +229,9 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         else if(index.column()==PortfolioData_Idx::_Cost){
             return Qt::AlignCenter;
         }
+        else if(index.column()==PortfolioData_Idx::_Alias){
+            return Qt::AlignCenter;
+    }
     }
 
 
@@ -294,6 +298,9 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         }
         else if (index.column() == PortfolioData_Idx::_OrderQuantity) {
             return portfolio->OrderQuantity;
+        }
+        else if (index.column() == PortfolioData_Idx::_Alias) {
+            return portfolio->Alias;
         }
         else if (index.column() == PortfolioData_Idx::_ExpiryDateTime) {
             return portfolio->ExpiryDateTime.toString("dd-MMM-yy");
@@ -376,6 +383,10 @@ case Qt::EditRole:{
     else if(c==PortfolioData_Idx::_OrderQuantity){
         emit edit_Started(r,c);
         return portfolio->OrderQuantity;
+    }
+    else if(c==PortfolioData_Idx::_Alias){
+        emit edit_Started(r,c);
+        return portfolio->Alias;
     }
     else
         return QVariant();
@@ -742,7 +753,8 @@ Qt::ItemFlags Table_Portfolios_Model::flags(const QModelIndex &index) const
         c==PortfolioData_Idx::_BuyPriceDifference ||
         c==PortfolioData_Idx::_SellTotalQuantity ||
         c==PortfolioData_Idx::_BuyTotalQuantity ||
-        c==PortfolioData_Idx::_OrderQuantity)
+        c==PortfolioData_Idx::_OrderQuantity ||
+        c==PortfolioData_Idx::_Alias)
     {
         return Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     }
@@ -831,5 +843,6 @@ void Table_Portfolios_Model::setColumnWidths(QTableView *tableView) const {
         tableView->horizontalHeader()->setSectionResizeMode(_Status, QHeaderView::Fixed);
     }
 }
+
 
 

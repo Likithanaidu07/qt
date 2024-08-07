@@ -1146,7 +1146,10 @@ QList <QStringList> liners_listTmp;
                 rowList.append(Jackpot);
                 rowList.append(Traded_Lot);
                 rowList.append(Remaining_Lot);
+<<<<<<< Updated upstream
               //  rowList.append(Buy_Sell);
+=======
+>>>>>>> Stashed changes
                 rowList.append(dt.toString("hh:mm:ss"));
                 rowList.append(Leg2_OrderStateStr);
                 rowList.append(Leg1_OrderStateStr);
@@ -1157,8 +1160,17 @@ QList <QStringList> liners_listTmp;
                 rowList.append(QString::number(Leg3_OrderState));
                 rowList.append(Expiry);
                 rowList.append(Buy_Sell);
+<<<<<<< Updated upstream
                 rowList.append(QString::number(lotSize));
                 rowList.append(traderData);
+=======
+
+
+//                rowList.append(Leg1_OrderState); // this should be the 4th last data inserted to the row
+ //               rowList.append(Leg3_OrderState); // this should be the 3rd last data inserted to the row
+  //              rowList.append(Leg2_OrderState); // this should be the 2nd last data inserted to the row
+                rowList.append(traderData); // this should be the last data inserted to the row
+>>>>>>> Stashed changes
 
 
                trade_data_listTmp.append(rowList);

@@ -29,7 +29,11 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
 
     switch (role) {
 
+<<<<<<< Updated upstream
    case Qt::ForegroundRole :
+=======
+//    case Qt::BackgroundRole :
+>>>>>>> Stashed changes
 //        //jackpot background color
 //        //    if(c==OrderBook_Idx::Jackpot_OB){
 //        //        int jackPot =  trade_data_list[r][c].toInt();
@@ -101,10 +105,16 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
                 return QVariant::fromValue(QColor(0,128,0));
             else
                 return QVariant::fromValue(QColor(0,0,0));
+<<<<<<< Updated upstream
         }
 
         else
             return QVariant();
+=======
+        } */
+//        else
+//            return QVariant();
+>>>>>>> Stashed changes
 
     case Qt::DisplayRole:
         return  trade_data_list[r][c];

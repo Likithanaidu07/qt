@@ -106,7 +106,8 @@ void Table_Portfolios_Delegate::setEditorData(QWidget *editor, const QModelIndex
         c==PortfolioData_Idx::_BuyPriceDifference ||
         c==PortfolioData_Idx::_SellTotalQuantity ||
         c==PortfolioData_Idx::_BuyTotalQuantity ||
-        c==PortfolioData_Idx::_OrderQuantity)
+        c==PortfolioData_Idx::_OrderQuantity ||
+        c==PortfolioData_Idx::_Alias)
     {
         QString value = index.model()->data(index, Qt::EditRole).toString();
        // qDebug()<<"Table_Portfolios_Delegate::setEditorData: "<<value;
@@ -147,7 +148,8 @@ void Table_Portfolios_Delegate::setModelData(QWidget *editor, QAbstractItemModel
         c==PortfolioData_Idx::_BuyPriceDifference ||
         c==PortfolioData_Idx::_SellTotalQuantity ||
         c==PortfolioData_Idx::_BuyTotalQuantity ||
-        c==PortfolioData_Idx::_OrderQuantity)
+        c==PortfolioData_Idx::_OrderQuantity ||
+        c==PortfolioData_Idx::_Alias)
     {
         if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor))
         {
@@ -188,7 +190,8 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
             PortfolioData_Idx::_BuyPriceDifference,
             PortfolioData_Idx::_SellTotalQuantity,
             PortfolioData_Idx::_BuyTotalQuantity,
-            PortfolioData_Idx::_OrderQuantity
+            PortfolioData_Idx::_OrderQuantity,
+            PortfolioData_Idx::_Alias
         }; // these are the editable table cell indexes in the algo table
 
         if (editableIDx.contains(currentColIdx))
@@ -638,7 +641,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         }
         QStyledItemDelegate::paint(painter, op, index);
     }
-    if (/*c == PortfolioData_Idx::_Status ||*/ c==PortfolioData_Idx::_OrderQuantity)
+    if (/*c == PortfolioData_Idx::_Status ||*/ c==PortfolioData_Idx::_OrderQuantity||c==PortfolioData_Idx::_Alias)
     {
         Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
         PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
