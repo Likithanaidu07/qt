@@ -25,6 +25,7 @@ SOURCES += \
     Convert_to_Algo/convert_to_algo_bfly_bid.cpp \
     Convert_to_Algo/customtablewidget.cpp \
     Convert_to_Algo/eventfilterlistview.cpp \
+    F1_F2/f1_f2_buysell.cpp \
     Liners/liners_delegate.cpp \
     Liners/liners_model.cpp \
     Liners/linersheaderview.cpp \
@@ -79,6 +80,7 @@ HEADERS += \
     Convert_to_Algo/convert_to_algo_bfly_bid.h \
     Convert_to_Algo/customtablewidget.h \
     Convert_to_Algo/eventfilterlistview.h \
+    F1_F2/f1_f2_buysell.h \
     Liners/liners_delegate.h \
     Liners/liners_model.h \
     Liners/linersheaderview.h \
@@ -125,6 +127,7 @@ HEADERS += \
     watch_data_list_item.h
 
 FORMS += \
+    F1_F2/f1_f2_buysell.ui \
     convert_algo_win.ui \
     loadingdatawindow.ui \
     loginwindow.ui \

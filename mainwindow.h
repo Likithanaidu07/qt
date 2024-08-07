@@ -47,6 +47,7 @@
 #include "DockAreaWidget.h"
 #include "DockAreaTitleBar.h"
 #include "sortsettingpopup.h"
+#include "F1_F2/f1_f2_buysell.h"
 
 using namespace ads;
 
@@ -225,6 +226,9 @@ public slots:
     void loadCurrentDayLogs();
     void loggedInSucessful(userInfo userData);
     void Delete_clicked_slot();
+    void F1_clicked_slot();
+    void F2_clicked_slot();
+
     void indicesDataRecv_Slot(Indices_Data_Struct data);
     void backend_comm_Data_Slot(QString msg,SocketDataType msgType);
 //    void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
