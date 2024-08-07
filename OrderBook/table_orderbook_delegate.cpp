@@ -7,6 +7,7 @@ Table_OrderBook_Delegate::Table_OrderBook_Delegate(QObject *parent)  : QStyledIt
 
 void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+
     auto c= index.column();
     auto r= index.row();
     QStyleOptionViewItem op(option);
