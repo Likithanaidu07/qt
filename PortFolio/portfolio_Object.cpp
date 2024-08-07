@@ -99,6 +99,7 @@ QString PortfolioObject::getPortFolioTypeString(QString portfolioType)
     PortFolioType_String.insert(QString::number(PortfolioType::BS), "BY 1331");
     PortFolioType_String.insert(QString::number(PortfolioType::R2L), "RATIO");
     PortFolioType_String.insert(QString::number(PortfolioType::BFLY_BID), "BLFY BID");
+    PortFolioType_String.insert(QString::number(PortfolioType::F1_F2), "F1 F2");
 
     if(PortFolioType_String.contains(portfolioType))
         return PortFolioType_String[portfolioType];

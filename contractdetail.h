@@ -48,6 +48,7 @@ public:
     static QStandardItemModel* model_searchInstrument_F2F_Leg1;
     static QStandardItemModel* model_FUT_CON_REV;
     static QStandardItemModel *model_start_strike_BFLY_BID;
+    static QStandardItemModel* model_F1_F2;
 
     static ContractDetail& getInstance();
     void ReloadContractDetails(userInfo uData);
@@ -61,6 +62,7 @@ public:
 
     int GetLotSize(int token, int type);
     contract_table GetDetail(int token, int type);
+
     QString GetStockName(int token, int type);
     QString GetInstrumentName(int token, int type);
     int GetStrikePriceOrg(int token, int type);
@@ -75,6 +77,7 @@ public:
     QStandardItemModel *Get_model_FUT_CON_REV();
     QStandardItemModel *Get_model_start_strike_BFLY();
     QStandardItemModel *Get_model_start_strike_BFLY_BID();
+    QStandardItemModel* Get_model_F1_F2();
 
 #ifdef STORE_CONTRACT_LOCALLY
     PortfolioType checkAlogTypeForTheData(QString instrument_type);

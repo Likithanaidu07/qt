@@ -782,6 +782,8 @@ MainWindow::MainWindow(QWidget *parent)
 //    this->restoreState(settings.value("DOCK_LOCATIONS").toByteArray(),1);
 
     new QShortcut(QKeySequence(Qt::Key_Delete), this,  SLOT(Delete_clicked_slot()));
+    new QShortcut(QKeySequence(Qt::Key_F1), this,  SLOT(F1_clicked_slot()));
+    new QShortcut(QKeySequence(Qt::Key_F2), this,  SLOT(F2_clicked_slot()));
 
     // db_conn =new mysql_conn(this,"main_db_conn");
     // connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
@@ -796,7 +798,7 @@ MainWindow::~MainWindow()
 {
     delete ui;
     if (sortWin) {
-            delete sortWin; // Ensure the window is deleted
+        delete sortWin; // Ensure the window is deleted
     }
 }
 
@@ -2424,6 +2426,27 @@ void MainWindow::on_sorting_Button_clicked(){
        sortWin->activateWindow(); // Give focus to the window
 
 }
+//For Buy
+void MainWindow::F1_clicked_slot(){
+   F1_F2_BuySell *F1F2 = new F1_F2_BuySell(nullptr,devicer,decimal_precision);
+   F1F2->setAttribute(Qt::WA_DeleteOnClose);
+   F1F2->userData = this->userData;
+   F1F2->show();
+   F1F2->setBuyMode(true);
+}
+//For Sell
+void MainWindow::F2_clicked_slot(){
+    F1_F2_BuySell *F1F2 = new F1_F2_BuySell(nullptr,devicer,decimal_precision);
+    F1F2->setAttribute(Qt::WA_DeleteOnClose);
+    F1F2->userData = this->userData;
+    F1F2->show();
+    F1F2->setBuyMode(false);
+
+}
+
+
+
+
 void MainWindow::closeEvent(QCloseEvent* event)
 {
     // Delete dock manager here to delete all floating widgets. This ensures
@@ -2433,4 +2456,9 @@ void MainWindow::closeEvent(QCloseEvent* event)
     DockManagerSidePanel->deleteLater();
     DockManagerMainPanel->deleteLater();
     QMainWindow::closeEvent(event);
+
+    QCoreApplication::quit();
+
 }
+
+

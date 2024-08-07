@@ -174,7 +174,4 @@ void table_portfolios_custom::selectionChanged(const QItemSelection &selected, c
     emit selectionChangedSignal(currentRow);
 }
 
-void table_portfolios_custom::focusOutEvent(QFocusEvent *event) {
-    QTableView::focusOutEvent(event);
-    clearSelection();
-}
+

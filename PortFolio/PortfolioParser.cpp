@@ -168,6 +168,8 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
             obj.Leg2 = ContractDetail::getInstance().GetExpiry(obj.Leg2TokenNo, "ddMMMyy",type);
             break;
 
+
+
         case PortfolioType::BY:
             obj.Leg1 = ContractDetail::getInstance().GetStrikePrice(obj.Leg1TokenNo,type);
             obj.Leg2 = ContractDetail::getInstance().GetStrikePrice(obj.Leg2TokenNo,type);

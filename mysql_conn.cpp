@@ -359,6 +359,12 @@ void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoC
 
             while (query.next()) {
                 // QString foo_token_number = query.value(rec.indexOf("foo_token_number")).toString();
+
+                PortfolioType type = static_cast<PortfolioType>(query.value("PortfolioType").toInt());
+                if(type==PortfolioType::F1_F2) // For F1_F2 do not show the result
+                    continue;
+
+
                 PortfolioObject *o = new PortfolioObject();
                 if(!p.ToObject(query,*o,MBP_Data_Hash,averagePriceList,devicer,decimal_precision)){
                     //show warning an delete portfolio
@@ -2063,3 +2069,103 @@ QString mysql_conn::getAlgoTypeQuery(PortfolioType type, userInfo userLoginInfo)
            whereStr +
            " ORDER BY ExpiryDate,Token, InstrumentName, OptionType, StrikePrice";
 }
+
+
+algo_data_insert_status mysql_conn::place_F1F2_Order(QString userID,QString Leg1TokenNumber,QString sellprice,QString sellqty,QString buyprice,QString buyqty,int MaxPortfolioCount,QString &msg,bool checkDuplicateExist){
+    QMutexLocker lock(&mutex);
+
+    QString ClientID = "0";
+    QString IsBroker = "1";
+    algo_data_insert_status ret = algo_data_insert_status::FAILED;
+    {
+        bool ok = checkDBOpened(msg);
+        if(ok){
+            QSqlQuery query(db);
+            int PortfoliosCount = -1;
+            query.prepare("SELECT * FROM Portfolios");
+            if( !query.exec() )
+            {
+                msg = query.lastError().text();
+                qDebug()<<query.lastError().text();
+                return ret;
+            }
+
+            PortfoliosCount = query.size();
+            //if portfolio limit reaches do not insert
+            if(PortfoliosCount>=MaxPortfolioCount){
+                    ret = algo_data_insert_status::LIMIT_REACHED;
+                    msg = "Maximum Portfolio Limit Reached";
+                    return ret;
+            }
+
+            if(checkDuplicateExist){
+                QString str = "SELECT COUNT(*) FROM Portfolios WHERE Leg1TokenNo="+Leg1TokenNumber+" and TraderID="+userID+" and PortfolioType="+QString::number(PortfolioType::F1_F2);
+                query.prepare(str);
+
+                if( !query.exec() ){
+                    msg = query.lastError().text();
+                    qDebug()<<query.lastError().text();
+                    return ret;
+                }
+
+                if (query.next() && query.value(0).toInt() > 0) {
+                    ret = algo_data_insert_status::EXIST;
+                    msg = "Record already exists in DB";
+                    return ret;
+                }
+            }
+
+            query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID,ClientID,IsBroker, Status, "
+                                          "Leg1TokenNo, Leg2TokenNo, Leg3TokenNo, Leg4TokenNo, Leg5TokenNo, Leg6TokenNo"
+                                          ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                                          "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
+                                          "OrderQuantity) "
+                                          "VALUES (:PortfolioType, :TraderID,:ClientID,:IsBroker, :Status, "
+                                          ":Leg1TokenNo, :Leg2TokenNo, :Leg3TokenNo, :Leg4TokenNo, :Leg5TokenNo, :Leg6TokenNo,"
+                                          ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                                          ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
+                                          ":OrderQuantity)");
+                            query.bindValue(":PortfolioType", QString::number(PortfolioType::F1_F2));
+                            query.bindValue(":TraderID",userID);
+                            query.bindValue(":ClientID",ClientID);
+                            query.bindValue(":IsBroker",IsBroker);
+                            query.bindValue(":Status", "Active");
+                            query.bindValue(":Leg1TokenNo", Leg1TokenNumber);
+                            query.bindValue(":Leg2TokenNo", 0);
+                            query.bindValue(":Leg3TokenNo", 0);
+                            query.bindValue(":Leg4TokenNo", 0);
+                            query.bindValue(":Leg5TokenNo", 0);
+                            query.bindValue(":Leg6TokenNo", 0);
+                            query.bindValue(":BuyPriceDifference", buyprice);
+                            query.bindValue(":BuyTotalQuantity", buyqty);
+                            query.bindValue(":BuyTradedQuantity", 0);
+                            query.bindValue(":SellPriceDifference", sellprice);
+                            query.bindValue(":SellTotalQuantity", sellqty);
+                            query.bindValue(":SellTradedQuantity", 0);
+                            query.bindValue(":OrderQuantity", 0);
+
+
+
+                            if(query.exec()){
+                                msg="Add record to DB successfully";
+                                ret = algo_data_insert_status::INSERTED;
+                            }
+                            else{
+                                msg="Failed to insert record to DB";
+                                ret = algo_data_insert_status::FAILED;
+                                qDebug() << "Executed Query: " << query.lastQuery();
+
+                                qDebug()<<"query.lastError: "+query.lastError().text();
+                            }
+
+
+        }
+        else{
+            qDebug()<<"Cannot connect Database: "+db.lastError().text();
+            msg="Cannot connect Database: "+db.lastError().text();
+        }
+
+    }
+    return ret;
+}
+
