@@ -168,10 +168,15 @@ void table_portfolios_custom::selectionChanged(const QItemSelection &selected, c
     int currentRow = -1;
     //int prevRow = -1;
     QModelIndexList indexes = selected.indexes();
-    if (!indexes.isEmpty())
-        currentRow= indexes.last().row();
+    if (!indexes.isEmpty())        currentRow= indexes.last().row();
 
     emit selectionChangedSignal(currentRow);
 }
+
+//void table_portfolios_custom::focusOutEvent(QFocusEvent *event) {
+//    QTableView::focusOutEvent(event);
+//    clearSelection();
+//}
+
 
 

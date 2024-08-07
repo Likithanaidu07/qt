@@ -508,6 +508,21 @@ QString ContractDetail::GetInstrumentName(int token, int type)
 
 }
 
+QString ContractDetail::GetInstrumentType(int token, int type)
+{
+    if (token == 0)
+        return "-";
+
+    QString key = QString::number(token);
+    if(m_ContractDetails[type].contains(key)){
+        QRegularExpression regex("-");
+        m_ContractDetails[type][key].InstrumentType.replace(regex, "");
+        return m_ContractDetails[type][key].InstrumentType;}
+    else
+        return "-";
+
+}
+
 int ContractDetail::GetStrikePriceOrg(int token, int type)
 {
     if (token == 0)

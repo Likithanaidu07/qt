@@ -1,5 +1,7 @@
 #include "trade_table_model.h"
 #include <qfont.h>
+#include <QTableView>
+#include <QHeaderView>
 
 Trade_Table_Model::Trade_Table_Model(QObject *parent) : QAbstractTableModel(parent)
 {
@@ -27,7 +29,7 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
 
     switch (role) {
 
-//    case Qt::BackgroundRole :
+   case Qt::ForegroundRole :
 //        //jackpot background color
 //        //    if(c==OrderBook_Idx::Jackpot_OB){
 //        //        int jackPot =  trade_data_list[r][c].toInt();
@@ -74,36 +76,35 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
 //            else
 //                return QVariant::fromValue(QColor(0,0,0));
 //        }
-//        else if(c==OrderBook_Idx::Leg1State_OB){
-//            int Leg1_OrderState_idx = trade_data_list[r].size()-4;
-//            int Leg1_OrderState = trade_data_list[r][Leg1_OrderState_idx].toInt();
-//            //            QString Leg2_OrderState =  trade_data_list[r][c];
-//            //            QString Leg3_OrderState =  trade_data_list[r][c];
-//            if(Leg1_OrderState==7 )
-//                return QVariant::fromValue(QColor(0,122,0));
-//            else if(Leg1_OrderState==13)
-//                return QVariant::fromValue(QColor(203,5,5));
-//            else if (Leg1_OrderState==8)
-//                return QVariant::fromValue(QColor(0,0,255));
-//            else
-//                return QVariant::fromValue(QColor(0,0,0));
-//        }
-//        else if(c==OrderBook_Idx::Leg3State_OB){
-//            int Leg3_OrderState_idx = trade_data_list[r].size()-3;
-//            int Leg3_OrderState = trade_data_list[r][Leg3_OrderState_idx].toInt();
-//            //            QString Leg2_OrderState =  trade_data_list[r][c];
-//            //            QString Leg3_OrderState =  trade_data_list[r][c];
-//            if(Leg3_OrderState==7 )
-//                return QVariant::fromValue(QColor(0,122,0));
-//            else if(Leg3_OrderState==13)
-//                return QVariant::fromValue(QColor(203,5,5));
-//            else if (Leg3_OrderState==8)
-//                return QVariant::fromValue(QColor(0,0,255));
-//            else
-//                return QVariant::fromValue(QColor(0,0,0));
-//        } */
-//        else
-//            return QVariant();
+        if(c==OrderBook_Idx::Leg1State_OB){
+            int Leg1_OrderState = trade_data_list[r][OrderBook_Idx::Leg1StateVal_OB].toInt();
+            //            QString Leg2_OrderState =  trade_data_list[r][c];
+            //            QString Leg3_OrderState =  trade_data_list[r][c];
+            if(Leg1_OrderState==5 || Leg1_OrderState==13 )
+                return QVariant::fromValue(QColor(203,5,5));
+            else if(Leg1_OrderState==6)
+                return QVariant::fromValue(QColor(250, 42, 85));
+            else if(Leg1_OrderState==8)
+                return QVariant::fromValue(QColor(0,128,0));
+            else
+                return QVariant::fromValue(QColor(0,0,0));
+        }
+        else if(c==OrderBook_Idx::Leg3State_OB){
+            int Leg3_OrderState = trade_data_list[r][OrderBook_Idx::Leg3StateVal_OB].toInt();
+            //            QString Leg2_OrderState =  trade_data_list[r][c];
+            //            QString Leg3_OrderState =  trade_data_list[r][c];
+            if(Leg3_OrderState==5 || Leg3_OrderState==13 )
+                return QVariant::fromValue(QColor(203,5,5));
+            else if(Leg3_OrderState==6)
+                return QVariant::fromValue(QColor(250, 42, 85));
+            else if(Leg3_OrderState==8)
+                return QVariant::fromValue(QColor(0,128,0));
+            else
+                return QVariant::fromValue(QColor(0,0,0));
+        }
+
+        else
+            return QVariant();
 
     case Qt::DisplayRole:
         return  trade_data_list[r][c];
@@ -115,13 +116,13 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
 
     case Qt::FontRole: {
         QFont font("Work Sans");
-        if (c == OrderBook_Idx::AlgoName_OB){
+        if (c == OrderBook_Idx::AlgoName_OB
+            || c==OrderBook_Idx::AlgoNo_OB){
             font.setPointSize(8);
             font.setBold(true);
             return font;
         }
-        else if(c==OrderBook_Idx::AlgoNo_OB ||
-                   c==OrderBook_Idx::ExchPrice_OB ||
+        else if( c==OrderBook_Idx::ExchPrice_OB ||
                    c==OrderBook_Idx::UserPrice_OB ||
                    c==OrderBook_Idx::TradeTime_OB ||
                    c==OrderBook_Idx::Jackpot_OB ||
@@ -228,4 +229,32 @@ QVariant Trade_Table_Model::headerData(int section, Qt::Orientation orientation,
     else
         return QString::number(section);
 
+}
+void Trade_Table_Model::setColumnWidths(QTableView *tableView) const {
+    for (int col = 0; col < columnCount(); ++col) {
+        int maxWidth = 0;
+
+        // Consider header text width
+        QVariant headerText = this->headerData(col, Qt::Horizontal, Qt::DisplayRole);
+        int headerWidth = tableView->fontMetrics().horizontalAdvance(headerText.toString());
+        maxWidth = qMax(maxWidth, headerWidth);
+
+        for (int row = 0; row < rowCount(); ++row) {
+            QModelIndex index = this->index(row, col);
+
+            // Use the font metrics of the QTableView
+            QString text = data(index, Qt::DisplayRole).toString();
+            int textWidth = tableView->fontMetrics().horizontalAdvance(text);
+
+            // Adjust the maximum width if necessary
+            maxWidth = qMax(maxWidth, textWidth);
+        }
+
+        // Add some padding
+        maxWidth += 30;
+        // Set the column width directly in the view
+        tableView->setColumnWidth(col, maxWidth);
+        tableView->setColumnWidth(AlgoName_OB,300);
+      //  tableView->horizontalHeader()->setSectionResizeMode(_Status, QHeaderView::Fixed);
+    }
 }

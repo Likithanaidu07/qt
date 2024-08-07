@@ -12,7 +12,7 @@ OrderDetail_Popup::OrderDetail_Popup(QWidget *parent)
  QString styleSheet = R"(
     QTableWidget {
         background-color: transparent;
-        alternate-background-color: #F0FFFA; /* light green with transparency */
+        alternate-background-color: #D6FCF0; /* light green with transparency */
         gridline-color: #FFF;
         font: bold;
     }

@@ -27,6 +27,7 @@ public:
     QString StatusVal;
     int PortfolioNumber; // "P.No";
     QString AlgoName; // new column added on Qt
+    QString Alias;
 
     double SellMarketRate; //"-MR";
     QString SellAveragePrice; //"-APD"

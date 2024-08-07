@@ -9,15 +9,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>647</width>
-    <height>345</height>
+    <width>727</width>
+    <height>179</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Trade Details</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
-   <item>
+  <layout class="QGridLayout" name="gridLayout">
+   <item row="0" column="0">
     <widget class="QTableWidget" name="tableWidget">
      <attribute name="horizontalHeaderStretchLastSection">
       <bool>true</bool>
@@ -35,12 +35,17 @@
      </column>
      <column>
       <property name="text">
-       <string>Stockname</string>
+       <string>OrderId</string>
       </property>
      </column>
      <column>
       <property name="text">
-       <string>buy/sell</string>
+       <string>AlgoNo</string>
+      </property>
+     </column>
+     <column>
+      <property name="text">
+       <string>Stockname</string>
       </property>
      </column>
      <column>

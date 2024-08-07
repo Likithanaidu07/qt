@@ -63,37 +63,52 @@ TradeDetailsPopup::TradeDetailsPopup(QWidget *parent) :
                c0->setData(Qt::DisplayRole,QString::number(i+1));
                c0->setFlags(c0->flags() & ~Qt::ItemIsEditable);
                c0->setBackground(backgroundColor);
+               c0->setTextAlignment(Qt::AlignCenter);
                ui->tableWidget->setItem(ui->tableWidget->rowCount()-1, 0, c0);
 
                QTableWidgetItem *c1 = new QTableWidgetItem();
-               c1->setData(Qt::DisplayRole,data[i]["StockName"]);
+               c1->setData(Qt::DisplayRole,data[i]["OrderId"]);
                c1->setFlags(c1->flags() & ~Qt::ItemIsEditable);
                c1->setBackground(backgroundColor);
+               c1->setTextAlignment(Qt::AlignCenter);
                ui->tableWidget->setItem(ui->tableWidget->rowCount()-1, 1, c1);
 
                QTableWidgetItem *c2 = new QTableWidgetItem();
-               c2->setData(Qt::DisplayRole,data[i]["Buy_Sell"]);
+               c2->setData(Qt::DisplayRole,data[i]["AlgoNo"]);
                c2->setFlags(c2->flags() & ~Qt::ItemIsEditable);
                c2->setBackground(backgroundColor);
+               c2->setTextAlignment(Qt::AlignCenter);
                ui->tableWidget->setItem(ui->tableWidget->rowCount()-1, 2, c2);
 
+
                QTableWidgetItem *c3 = new QTableWidgetItem();
-               c3->setData(Qt::DisplayRole,data[i]["Price"]);
+               c3->setData(Qt::DisplayRole,data[i]["StockName"]);
                c3->setFlags(c3->flags() & ~Qt::ItemIsEditable);
                c3->setBackground(backgroundColor);
+               c3->setTextAlignment(Qt::AlignCenter);
                ui->tableWidget->setItem(ui->tableWidget->rowCount()-1, 3, c3);
+               ui->tableWidget->resizeColumnToContents(3);
 
                QTableWidgetItem *c4 = new QTableWidgetItem();
-               c4->setData(Qt::DisplayRole,data[i]["Lots"]);
+               c4->setData(Qt::DisplayRole,data[i]["Price"]);
                c4->setFlags(c4->flags() & ~Qt::ItemIsEditable);
                c4->setBackground(backgroundColor);
+               c4->setTextAlignment(Qt::AlignCenter);
                ui->tableWidget->setItem(ui->tableWidget->rowCount()-1, 4, c4);
 
                QTableWidgetItem *c5 = new QTableWidgetItem();
-               c5->setData(Qt::DisplayRole,data[i]["Time"]);
+               c5->setData(Qt::DisplayRole,data[i]["Lots"]);
                c5->setFlags(c5->flags() & ~Qt::ItemIsEditable);
                c5->setBackground(backgroundColor);
+               c5->setTextAlignment(Qt::AlignCenter);
                ui->tableWidget->setItem(ui->tableWidget->rowCount()-1, 5, c5);
+
+               QTableWidgetItem *c6 = new QTableWidgetItem();
+               c6->setData(Qt::DisplayRole,data[i]["Time"]);
+               c6->setFlags(c6->flags() & ~Qt::ItemIsEditable);
+               c6->setBackground(backgroundColor);
+               c6->setTextAlignment(Qt::AlignCenter);
+               ui->tableWidget->setItem(ui->tableWidget->rowCount()-1, 6, c6);
 
        }
  }

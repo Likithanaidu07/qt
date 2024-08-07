@@ -5,6 +5,7 @@
 #include <QAbstractTableModel>
 #include "defines.h"
 #include "QColor"
+#include "qtableview.h"
 
 class Trade_Table_Model : public QAbstractTableModel
 {
@@ -22,6 +23,7 @@ public:
     void search_action(QString searchTxt);
     QStringList getTradedPortFolioList();
     QStringList getTradedDataForIdx(int idx);
+    void setColumnWidths(QTableView *tableView) const;
 
 private:
     int col_count;
