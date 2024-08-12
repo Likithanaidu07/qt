@@ -42,6 +42,7 @@ public:
     static QStringList F2F_data_list_Sorted_Key;
     static QStringList BFLY_data_list_Sorted_Key;
     static QStringList BFLY_BID_data_list_Sorted_Key;
+    static QStringList CR_data_list_Sorted_Key;
 
 //    static QStandardItemModel *model_searchInstrument_BOX_Leg1; // used in add algo window  for BOX startegy
     static QStandardItemModel *model_start_strike_BFLY; // used in add algo window  for BFLY startegy

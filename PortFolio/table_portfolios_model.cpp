@@ -179,7 +179,7 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
                    c == PortfolioData_Idx::_Price ||
                  c == PortfolioData_Idx::_FuturePrice||
                  c == PortfolioData_Idx::_QuantityRatio ||
-                 c == PortfolioData_Idx::_SkipMarketStrike||
+             //    c == PortfolioData_Idx::_SkipMarketStrike||
                  c == PortfolioData_Idx::_BidLeg ||
                    c == PortfolioData_Idx::_Alias){
 
@@ -204,6 +204,7 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         else if(index.column()==PortfolioData_Idx::_AlgoName){
             return Qt::AlignCenter;
         }
+
         else if(index.column()==PortfolioData_Idx::_BuyMarketRate || index.column()==PortfolioData_Idx::_BuyAveragePrice || index.column()==PortfolioData_Idx::_BuyPriceDifference || index.column()==PortfolioData_Idx::_BuyTotalQuantity|| index.column()==PortfolioData_Idx::_BuyTradedQuantity || index.column()==PortfolioData_Idx::_BuyRemainingQuantity){
             return Qt::AlignCenter;
         }
@@ -213,9 +214,9 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         else if(index.column()==PortfolioData_Idx::_ExpiryDateTime || index.column()==PortfolioData_Idx::_Leg1){
             return Qt::AlignCenter;
         }
-        else if(index.column()==PortfolioData_Idx::_SkipMarketStrike){
-            return Qt::AlignCenter;
-        }
+//        else if(index.column()==PortfolioData_Idx::_SkipMarketStrike){
+//            return Qt::AlignCenter;
+//        }
         else if(index.column()==PortfolioData_Idx::_FuturePrice){
             return Qt::AlignCenter;
         }
@@ -254,6 +255,7 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         else if(index.column() == PortfolioData_Idx::_AlgoName){
             return portfolio->AlgoName;
         }
+
         else if (index.column() == PortfolioData_Idx::_SellMarketRate) {
             return double_to_Human_Readable(portfolio->SellMarketRate,decimal_precision);
         }
@@ -315,10 +317,10 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         else if (index.column() == PortfolioData_Idx::_QuantityRatio) {
             return portfolio->QuantityRatio;
         }
-        else if (index.column() == PortfolioData_Idx::_SkipMarketStrike) {
-            return portfolio->SkipMarketStrike;
+//        else if (index.column() == PortfolioData_Idx::_SkipMarketStrike) {
+//            return portfolio->SkipMarketStrike;
 
-        }
+//        }
         else if (index.column() == PortfolioData_Idx::_BidLeg) {
             return portfolio->BidLeg;
 
@@ -478,6 +480,16 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
                 editingDataHash[c] = value.toString();
 
             portfolio_data_list[index.row()]->OrderQuantity = value.toDouble();
+            emit dataChanged(index, index);
+            return true;
+
+        }
+        else if(c==PortfolioData_Idx::_Alias){
+            //store data to editing hash if it not equal to previous value
+            if(portfolio_data_list[index.row()]->Alias != value.toString())
+                editingDataHash[c] = value.toString();
+
+            portfolio_data_list[index.row()]->Alias = value.toString();
             emit dataChanged(index, index);
             return true;
 

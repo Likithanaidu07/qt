@@ -71,7 +71,7 @@ enum PortfolioData_Idx
     _ExpiryDateTime,
     _Cost, //currently up to this the data is displayed on portfolio table in the same order as the enum
     _QuantityRatio,
-    _SkipMarketStrike,
+ //   _SkipMarketStrike,
     _BidLeg,
     _FuturePrice,
     _InstrumentName,

@@ -79,6 +79,8 @@ int portfolioCustomSorting::columnNameToIDx(QString colStr){
         return 5;
     else if(colStr=="Option Type")
         return 6;
+    else if(colStr=="Alias")
+        return 7;
     else
      return -1;
 }

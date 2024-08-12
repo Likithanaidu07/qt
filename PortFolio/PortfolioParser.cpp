@@ -64,7 +64,9 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         obj.SellTradedQuantity = query.value("SellTradedQuantity").toInt() / lotSize;
         obj.SellTotalQuantity = totalQty;
         obj.SellRemainingQuantity = totalQty - obj.SellTradedQuantity;
-
+        obj.Alias = query.value("Alias").toString();
+        if(obj.Alias=="")
+            obj.Alias="-";
         totalQty = query.value("BuyTotalQuantity").toInt() / lotSize;
         obj.BuyPriceDifference = query.value("BuyPriceDifference").toDouble()/devicer_;// convert->ToRupees(query.value("BuyPriceDifference").toDouble());
         obj.BuyTradedQuantity = query.value("BuyTradedQuantity").toInt() / lotSize;
@@ -121,15 +123,22 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         if(obj.PortfolioType=="250" || obj.PortfolioType=="2"){
             obj.QuantityRatio="1:2:1";
         }
+        else if(obj.PortfolioType==QString::number(PortfolioType::CR)){
+            obj.QuantityRatio="1:1:1";
+        }
         else{
             obj.QuantityRatio="N/A";
         }
 
         obj.BidLeg = ContractDetail::getInstance().GetStockName(obj.Leg2TokenNo,obj.PortfolioType.toInt());
 
-        obj.SkipMarketStrike= "-";
+        if(obj.PortfolioType==QString::number(PortfolioType::CR)){
+            obj.BidLeg = ContractDetail::getInstance().GetStockName(obj.Leg1TokenNo,obj.PortfolioType.toInt());
+        }
+
+        //obj.SkipMarketStrike= "-";
         obj.FuturePrice="-";
-        obj.Alias="-";
+
 
         QHash<QString, contract_table> contractDetails = ContractDetail::getInstance().GetContracts("FUT");
 

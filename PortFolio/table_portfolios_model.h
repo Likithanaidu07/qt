@@ -46,7 +46,7 @@ private:
                           "Avg", "Diff","TQ",
                           "TTQ","RQ","Odr Qty","Expiry 1", /*"Expiry 2",*/
                           "Cost" ,"Qty Ratio",
-                          "Skip/Market Strike", "Bid Leg", "Fut Price"};
+                           "Bid Leg", "Fut Price"};
 
 
     QString double_to_Human_Readable(double num, int precision) const;

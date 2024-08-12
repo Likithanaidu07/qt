@@ -67,7 +67,7 @@ void PortfolioHeaderView::paintSection(QPainter* painter, const QRect& rect, int
 
     // Add a right-side border
 //    painter->setPen(QColor::fromRgba(qRgba(50, 50, 50, 53))); // Set the border color
-    if(logicalIndex == PortfolioData_Idx::_AlgoName
+    if(logicalIndex == PortfolioData_Idx::_Alias
         ||logicalIndex ==  PortfolioData_Idx:: _BuyRemainingQuantity
         || logicalIndex == PortfolioData_Idx::_SellRemainingQuantity){
         //painter->setPen(QColor("#6C757D"));

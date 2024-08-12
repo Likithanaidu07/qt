@@ -934,6 +934,9 @@ QList <QStringList> liners_listTmp;
                     Expiry = P.Expiry;
                     Algo_Name =get_Algo_Name(portfolio_type,leg1_token_number,leg2_token_number,leg3_token_number,devicer,decimal_precision);
                 }
+                else{
+                    continue;
+                }
 
                 int qty = query.value(rec.indexOf("Leg1_Total_Volume")).toInt();
                 //int leg2qty = query.value(rec.indexOf("Leg2_Total_Volume")).toInt();
@@ -1145,17 +1148,14 @@ QList <QStringList> liners_listTmp;
 
                 QStringList rowList;
                 rowList.append(order_id);
-//                rowList.append(Volant_No);
+                //                rowList.append(Volant_No);
                 rowList.append(Algo_Name);
                 rowList.append(User_Price);
                 rowList.append(Exch_Price);
                 rowList.append(Jackpot);
                 rowList.append(Traded_Lot);
                 rowList.append(Remaining_Lot);
-<<<<<<< Updated upstream
-              //  rowList.append(Buy_Sell);
-=======
->>>>>>> Stashed changes
+                //  rowList.append(Buy_Sell);
                 rowList.append(dt.toString("hh:mm:ss"));
                 rowList.append(Leg2_OrderStateStr);
                 rowList.append(Leg1_OrderStateStr);
@@ -1166,17 +1166,14 @@ QList <QStringList> liners_listTmp;
                 rowList.append(QString::number(Leg3_OrderState));
                 rowList.append(Expiry);
                 rowList.append(Buy_Sell);
-<<<<<<< Updated upstream
                 rowList.append(QString::number(lotSize));
                 rowList.append(traderData);
-=======
 
 
 //                rowList.append(Leg1_OrderState); // this should be the 4th last data inserted to the row
  //               rowList.append(Leg3_OrderState); // this should be the 3rd last data inserted to the row
   //              rowList.append(Leg2_OrderState); // this should be the 2nd last data inserted to the row
-                rowList.append(traderData); // this should be the last data inserted to the row
->>>>>>> Stashed changes
+           //    rowList.append(traderData); // this should be the last data inserted to the row
 
 
                trade_data_listTmp.append(rowList);
@@ -1646,6 +1643,7 @@ QMap <int, QHash<QString, contract_table>> mysql_conn::getContractTable(
     QStringList &F2F_data_list_Sorted_Key,
     QStringList &BFLY_data_list_Sorted_Key,
     QStringList &BFLY_BID_data_list_Sorted_Key,
+    QStringList &CR_data_list_Sorted_Key,
     userInfo userData)
 {
 
@@ -1659,6 +1657,7 @@ QMap <int, QHash<QString, contract_table>> mysql_conn::getContractTable(
         contractTableData[PortfolioType::BFLY_BID] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::BFLY_BID, userData),&db, BFLY_BID_data_list_Sorted_Key);
         contractTableData[PortfolioType::BY] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::BY,userData),&db, BFLY_data_list_Sorted_Key);
         contractTableData[PortfolioType::F2F] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::F2F,userData),&db,F2F_data_list_Sorted_Key);
+        contractTableData[PortfolioType::CR] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::CR,userData),&db,CR_data_list_Sorted_Key);
     }
     return contractTableData;
 }
@@ -1675,40 +1674,51 @@ bool mysql_conn::deleteAlgo(QString PortfolioNumber,QString &msg)
             QString str = "SELECT Id FROM Trades WHERE PortfolioNumber='"+PortfolioNumber+"' OR PortfolioNumber='"+QString::number(PortfolioNumber.toInt() + 1500000)+"'";
             qDebug()<<"Delete Check records in Trades Query: " <<str;
             query.prepare(str);
-            if(!query.exec())
-            {
-                msg = query.lastError().text();
-                qDebug()<<query.lastError().text();
-            }
-            else{
 
-                if(query.size()>0){
-                    ret = false;  // PortfolioNumber exist in Trades so return
-                    msg = "Delete skipped, Record exist in Trades table.";
-                }
-                else {
+            if(!query.exec()) {
+                msg = query.lastError().text();
+                qDebug() << query.lastError().text();
+
+                // Show error popup
+                QMessageBox::warning(nullptr, "Executed Trades cannot be Deleted", "Error executing query: " + msg);
+            } else {
+                if(query.size() > 0) {
+                    ret = false;  // PortfolioNumber exists in Trades, so return
+                    msg = "Executed Trades cannot be Deleted";
+
+                    // Show information popup
+                    QMessageBox::information(nullptr, "Delete Skipped", msg);
+                } else {
                     str = "DELETE FROM Portfolios WHERE PortfolioNumber='"+PortfolioNumber+"'" +  " AND SellTradedQuantity = 0 AND BuyTradedQuantity = 0";
                     qDebug()<<"Delete Query: " <<str;
                     query.prepare(str);
-                    if( !query.exec() )
-                    {
+
+                    if(!query.exec()) {
                         msg = query.lastError().text();
-                        qDebug()<<query.lastError().text();
-                    }
-                    else{
+                        qDebug() << query.lastError().text();
+
+                        // Show error popup
+                        QMessageBox::warning(nullptr, "Delete Failed", "Error executing delete query: " + msg);
+                    } else {
                         int rowsAffected = query.numRowsAffected();
                         if (rowsAffected > 0) {
-                            ret = true;  //delet scuccess
+                            ret = true;  // Delete success
                             msg = "Deleted successfully.";
-                        }
-                        else {
-                            msg = "Deleted failed.";
+
+                            // Show success popup
+                            QMessageBox::information(nullptr, "Delete Successful", msg);
+                        } else {
+                            msg = "Delete failed.";
                             ret = false;
+
+                            // Show failure popup
+                            QMessageBox::warning(nullptr, "Delete Failed", msg);
                         }
                     }
                 }
             }
         }
+
         else{
             qDebug()<<"Delete Portfolio  Cannot connect Database: "+db.lastError().text();
             msg="Delete Portfolio Cannot connect Database: "+db.lastError().text();
@@ -1836,7 +1846,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                               "Leg1TokenNo, Leg2TokenNo"
                                               ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
                                               "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                              "OrderQuantity) "
+                                              "OrderQuantity,Alias) "
                                               "VALUES (:PortfolioType, :TraderID, :Status, "
                                               ":Leg1TokenNo, :Leg2TokenNo,"
                                               ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
@@ -2015,12 +2025,12 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                               "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
                                               ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
                                               "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                              "OrderQuantity) "
+                                              "OrderQuantity,Alias) "
                                               "VALUES (:PortfolioType, :TraderID, :Status,"
                                               ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
                                               ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
                                               ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                              ":OrderQuantity)");
+                                              ":OrderQuantity,:Alias)");
                                 query.bindValue(":PortfolioType", data.algo_type);
                                 query.bindValue(":TraderID", data.user_id);
                                 query.bindValue(":Status", data.Algo_Status);
