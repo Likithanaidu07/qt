@@ -119,7 +119,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
         bool ok = checkDBOpened(msg);
         userLoginInfo.loginResponse = msg;
         if(ok){
-            QSqlQuery query("SELECT UserId, UserName,Password,STKOpenLimit,IDXOpenLimit,MaxPortfolioCount,BFLY_BIDInFilter,BYInFilter,F2FInFilter FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
+            QSqlQuery query("SELECT UserId, UserName,Password,STKOpenLimit,IDXOpenLimit,MaxPortfolioCount,BFLY_BIDInFilter,BYInFilter,F2FInFilter,CRInFilter FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
             if(!query.exec())
             {
                 // Error Handling, check query.lastError(), probably return
@@ -168,6 +168,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                     userLoginInfo.algoFilterMap[PortfolioType::BFLY_BID] = query.value(rec.indexOf("BFLY_BIDInFilter")).toString();
                     userLoginInfo.algoFilterMap[PortfolioType::BY] = query.value(rec.indexOf("BYInFilter")).toString();
                     userLoginInfo.algoFilterMap[PortfolioType::F2F] = query.value(rec.indexOf("F2FInFilter")).toString();
+                    userLoginInfo.algoFilterMap[PortfolioType::CR] = query.value(rec.indexOf("CRInFilter")).toString();
 
                     userLoginInfo.UserId = query.value(rec.indexOf("UserId")).toInt();
                     userLoginInfo.MaxPortfolioCount = query.value(rec.indexOf("MaxPortfolioCount")).toInt();
@@ -938,6 +939,9 @@ QList <QStringList> liners_listTmp;
                     Expiry = P.Expiry;
                     Algo_Name =get_Algo_Name(portfolio_type,leg1_token_number,leg2_token_number,leg3_token_number,devicer,decimal_precision);
                 }
+                else{
+                    continue;
+                }
 
                 int qty = query.value(rec.indexOf("Leg1_Total_Volume")).toInt();
                 //int leg2qty = query.value(rec.indexOf("Leg2_Total_Volume")).toInt();
@@ -1101,6 +1105,7 @@ QList <QStringList> liners_listTmp;
                 }
                 case PortfolioType::CR:{
                     int strikePrice = ContractDetail::getInstance().GetStrikePrice(leg2_token_number,portfolio_type).toInt();
+                    strikePrice = strikePrice * devicer; // GetStrikePrice function will return strikePrice devided by devicer, and in below eqution again devide by devicer, to prevent it multipley it with debvicer
                     if(Leg1BuySellIndicator==1){
                         float diff = -leg1Price - leg3Price + leg2Price + strikePrice;
                         Exch_Price_val = static_cast<double>(diff) / devicer;
@@ -1149,14 +1154,14 @@ QList <QStringList> liners_listTmp;
 
                 QStringList rowList;
                 rowList.append(order_id);
-//                rowList.append(Volant_No);
+                //                rowList.append(Volant_No);
                 rowList.append(Algo_Name);
                 rowList.append(User_Price);
                 rowList.append(Exch_Price);
                 rowList.append(Jackpot);
                 rowList.append(Traded_Lot);
                 rowList.append(Remaining_Lot);
-              //  rowList.append(Buy_Sell);
+                //  rowList.append(Buy_Sell);
                 rowList.append(dt.toString("hh:mm:ss"));
                 rowList.append(Leg2_OrderStateStr);
                 rowList.append(Leg1_OrderStateStr);
@@ -1169,6 +1174,12 @@ QList <QStringList> liners_listTmp;
                 rowList.append(Buy_Sell);
                 rowList.append(QString::number(lotSize));
                 rowList.append(traderData);
+
+
+//                rowList.append(Leg1_OrderState); // this should be the 4th last data inserted to the row
+ //               rowList.append(Leg3_OrderState); // this should be the 3rd last data inserted to the row
+  //              rowList.append(Leg2_OrderState); // this should be the 2nd last data inserted to the row
+           //    rowList.append(traderData); // this should be the last data inserted to the row
 
 
                trade_data_listTmp.append(rowList);
@@ -1708,6 +1719,7 @@ QMap <int, QHash<QString, contract_table>> mysql_conn::getContractTable(
     QStringList &F2F_data_list_Sorted_Key,
     QStringList &BFLY_data_list_Sorted_Key,
     QStringList &BFLY_BID_data_list_Sorted_Key,
+    QStringList &CR_data_list_Sorted_Key,
     userInfo userData)
 {
 
@@ -1721,6 +1733,7 @@ QMap <int, QHash<QString, contract_table>> mysql_conn::getContractTable(
         contractTableData[PortfolioType::BFLY_BID] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::BFLY_BID, userData),&db, BFLY_BID_data_list_Sorted_Key);
         contractTableData[PortfolioType::BY] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::BY,userData),&db, BFLY_data_list_Sorted_Key);
         contractTableData[PortfolioType::F2F] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::F2F,userData),&db,F2F_data_list_Sorted_Key);
+        contractTableData[PortfolioType::CR] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::CR,userData),&db,CR_data_list_Sorted_Key);
     }
     return contractTableData;
 }
@@ -1747,6 +1760,10 @@ bool mysql_conn::deleteAlgo(QString PortfolioNumber,QString &msg)
                 if(query.size()>0){
                     ret = false;  // PortfolioNumber exist in Trades so return
                     msg = "Delete skipped, Record exist in Trades table.";
+                    QMessageBox msgBox;
+                    msgBox.setText("Executed Trades cannot be deleted ");
+                    msgBox.setIcon(QMessageBox::Warning);
+                    msgBox.exec();
                 }
                 else {
                     str = "DELETE FROM Portfolios WHERE PortfolioNumber='"+PortfolioNumber+"'" +  " AND SellTradedQuantity = 0 AND BuyTradedQuantity = 0";
@@ -1916,6 +1933,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                 query.bindValue(":SellTotalQuantity", 0);
                                 query.bindValue(":SellTradedQuantity", 0);
                                 query.bindValue(":OrderQuantity", 0);
+
 
                             }
                             //BFLY

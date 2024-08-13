@@ -73,6 +73,12 @@ QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOp
 
         return editor;
     }
+    else if( c == PortfolioData_Idx::_Alias ){
+        QLineEdit *editor = new QLineEdit(parent);
+      //  editor->setValidator(new QIntValidator(0, 9999));
+        editor->installEventFilter(const_cast<Table_Portfolios_Delegate *>(this));
+        return editor;
+    }
     else if( c == PortfolioData_Idx::_SellTotalQuantity ||
              c == PortfolioData_Idx::_BuyTotalQuantity ){
         QLineEdit *editor = new QLineEdit(parent);
@@ -106,7 +112,8 @@ void Table_Portfolios_Delegate::setEditorData(QWidget *editor, const QModelIndex
         c==PortfolioData_Idx::_BuyPriceDifference ||
         c==PortfolioData_Idx::_SellTotalQuantity ||
         c==PortfolioData_Idx::_BuyTotalQuantity ||
-        c==PortfolioData_Idx::_OrderQuantity)
+        c==PortfolioData_Idx::_OrderQuantity ||
+        c==PortfolioData_Idx::_Alias)
     {
         QString value = index.model()->data(index, Qt::EditRole).toString();
        // qDebug()<<"Table_Portfolios_Delegate::setEditorData: "<<value;
@@ -147,7 +154,8 @@ void Table_Portfolios_Delegate::setModelData(QWidget *editor, QAbstractItemModel
         c==PortfolioData_Idx::_BuyPriceDifference ||
         c==PortfolioData_Idx::_SellTotalQuantity ||
         c==PortfolioData_Idx::_BuyTotalQuantity ||
-        c==PortfolioData_Idx::_OrderQuantity)
+        c==PortfolioData_Idx::_OrderQuantity
+        )
     {
         if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor))
         {
@@ -165,10 +173,28 @@ void Table_Portfolios_Delegate::setModelData(QWidget *editor, QAbstractItemModel
 
             }
         }
+
         else
         {
             QStyledItemDelegate::setModelData(editor, model, index);
         }
+    }
+    else if(c==PortfolioData_Idx::_Alias){
+        if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor))
+        {
+            bool ok;
+            QString str = lineEdit->text();
+            // Use const_cast here to remove the const qualifier from the model
+            mutableModel = const_cast<QAbstractItemModel *>(model);
+            mutableModel->setData(index, str, Qt::EditRole);
+            mutableModel = nullptr;
+            lineEdit->setAlignment(Qt::AlignCenter);
+        }
+        else
+        {
+            QStyledItemDelegate::setModelData(editor, model, index);
+        }
+
     }
 
 }
@@ -270,6 +296,37 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
             else if (keyEvent->key() == Qt::Key_Tab){
                 emit tabKeyPressed(nav_direction::nav_forward);
             }
+        }
+        else if(PortfolioData_Idx::_Alias){
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+
+            if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return)
+            {
+                if (currentIndex.isValid())
+                {
+                    if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(obj))
+                    {
+                        QString  currentValue = lineEdit->text();
+
+                        mutableModel = const_cast<QAbstractItemModel *>(currentIndex.model());
+                        mutableModel->setData(currentIndex, currentValue, Qt::EditRole);
+                        // Close the editor and commit the data
+                        emit commitData(lineEdit);
+                        emit closeEditor(lineEdit);
+                        mutableModel = nullptr;
+                        emit editFinished(currentValue, currentIndex);
+                        return true;
+                    }
+                }
+            }
+            else if (keyEvent->key() == Qt::Key_Backtab) {
+                // Tab key and Shift key are pressed simultaneously, do something here
+                emit tabKeyPressed(nav_direction::nav_backward);
+            }
+            else if (keyEvent->key() == Qt::Key_Tab){
+                emit tabKeyPressed(nav_direction::nav_forward);
+            }
+
         }
     }
     return QStyledItemDelegate::eventFilter(obj, event);
@@ -561,6 +618,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         QStyledItemDelegate::paint(painter, op, index);
     }
     else if(c==PortfolioData_Idx::_OrderQuantity
+               || c==PortfolioData_Idx::_Alias
                || c == PortfolioData_Idx::_Leg1
                || c==PortfolioData_Idx::_ExpiryDateTime
                || c==PortfolioData_Idx::_Cost
@@ -570,7 +628,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
                || c==PortfolioData_Idx::_AdditionalData1
                || c==PortfolioData_Idx::_PortfolioType
                || c==PortfolioData_Idx::_Price
-               || c==PortfolioData_Idx::_SkipMarketStrike
+            //   || c==PortfolioData_Idx::_SkipMarketStrike
                || c==PortfolioData_Idx::_QuantityRatio
                || c==PortfolioData_Idx::_BidLeg
                || c==PortfolioData_Idx:: _FuturePrice)
@@ -638,7 +696,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         }
         QStyledItemDelegate::paint(painter, op, index);
     }
-    if (/*c == PortfolioData_Idx::_Status ||*/ c==PortfolioData_Idx::_OrderQuantity)
+    if (/*c == PortfolioData_Idx::_Status ||*/ c==PortfolioData_Idx::_OrderQuantity||c==PortfolioData_Idx::_Alias)
     {
         Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
         PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());

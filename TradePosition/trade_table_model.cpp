@@ -29,53 +29,53 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
 
     switch (role) {
 
-   case Qt::ForegroundRole :
-//        //jackpot background color
-//        //    if(c==OrderBook_Idx::Jackpot_OB){
-//        //        int jackPot =  trade_data_list[r][c].toInt();
-//        //        if(jackPot>0)
-//        //            return QVariant::fromValue(QColor(Qt::green));
-//        //        else
-//        //            return QVariant::fromValue(QColor(Qt::red));
-//        //    }
-//        if(c==OrderBook_Idx::BuyorSell_OB ||
-//            c==OrderBook_Idx::ExchPrice_OB ||
-//            c==OrderBook_Idx::UserPrice_OB ||
-//            c==OrderBook_Idx::Jackpot_OB ||
-//            c==OrderBook_Idx::TradedLot_OB ||
-//            c==OrderBook_Idx::RemainingLot_OB ||
-//            c==OrderBook_Idx::TradeTime_OB ||
-//            c==OrderBook_Idx::AlgoName_OB ||
-//            c==OrderBook_Idx::AlgoNo_OB ||
-//            c==OrderBook_Idx::OrderId_OB ||
-//            c==OrderBook_Idx::BidLegState_OB ||
-//            c==OrderBook_Idx::Leg1State_OB ||
-//            c==OrderBook_Idx::Leg3State_OB) {
+    case Qt::ForegroundRole :
+        //        //jackpot background color
+        //        //    if(c==OrderBook_Idx::Jackpot_OB){
+        //        //        int jackPot =  trade_data_list[r][c].toInt();
+        //        //        if(jackPot>0)
+        //        //            return QVariant::fromValue(QColor(Qt::green));
+        //        //        else
+        //        //            return QVariant::fromValue(QColor(Qt::red));
+        //        //    }
+        //        if(c==OrderBook_Idx::BuyorSell_OB ||
+        //            c==OrderBook_Idx::ExchPrice_OB ||
+        //            c==OrderBook_Idx::UserPrice_OB ||
+        //            c==OrderBook_Idx::Jackpot_OB ||
+        //            c==OrderBook_Idx::TradedLot_OB ||
+        //            c==OrderBook_Idx::RemainingLot_OB ||
+        //            c==OrderBook_Idx::TradeTime_OB ||
+        //            c==OrderBook_Idx::AlgoName_OB ||
+        //            c==OrderBook_Idx::AlgoNo_OB ||
+        //            c==OrderBook_Idx::OrderId_OB ||
+        //            c==OrderBook_Idx::BidLegState_OB ||
+        //            c==OrderBook_Idx::Leg1State_OB ||
+        //            c==OrderBook_Idx::Leg3State_OB) {
 
-//            QString buy_sell = trade_data_list[r][OrderBook_Idx::BuyorSell_OB];
+        //            QString buy_sell = trade_data_list[r][OrderBook_Idx::BuyorSell_OB];
 
-//            if(buy_sell == "Sell")
-//                return QVariant::fromValue(QColor("#FEE"));
-//            else
-//                return QVariant::fromValue(QColor("#F0FFFA"));
-//        }
+        //            if(buy_sell == "Sell")
+        //                return QVariant::fromValue(QColor("#FEE"));
+        //            else
+        //                return QVariant::fromValue(QColor("#F0FFFA"));
+        //        }
 
 
 
-//        //
+        //        //
 
-// /*       else if(c==OrderBook_Idx::BidLegState_OB){
-//            int Leg2_OrderState_idx = trade_data_list[r].size()-2;
-//            int Leg2_OrderState = trade_data_list[r][Leg2_OrderState_idx].toInt();
-//            if(Leg2_OrderState==7 )
-//                return QVariant::fromValue(QColor(0,122,0));
-//            else if(Leg2_OrderState==13)
-//                return QVariant::fromValue(QColor(203,5,5));
-//            else if (Leg2_OrderState==8)
-//                return QVariant::fromValue(QColor(0,0,255));
-//            else
-//                return QVariant::fromValue(QColor(0,0,0));
-//        }
+        // /*       else if(c==OrderBook_Idx::BidLegState_OB){
+        //            int Leg2_OrderState_idx = trade_data_list[r].size()-2;
+        //            int Leg2_OrderState = trade_data_list[r][Leg2_OrderState_idx].toInt();
+        //            if(Leg2_OrderState==7 )
+        //                return QVariant::fromValue(QColor(0,122,0));
+        //            else if(Leg2_OrderState==13)
+        //                return QVariant::fromValue(QColor(203,5,5));
+        //            else if (Leg2_OrderState==8)
+        //                return QVariant::fromValue(QColor(0,0,255));
+        //            else
+        //                return QVariant::fromValue(QColor(0,0,0));
+        //        }
         if(c==OrderBook_Idx::Leg1State_OB){
             int Leg1_OrderState = trade_data_list[r][OrderBook_Idx::Leg1StateVal_OB].toInt();
             //            QString Leg2_OrderState =  trade_data_list[r][c];
@@ -123,16 +123,16 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
             return font;
         }
         else if( c==OrderBook_Idx::ExchPrice_OB ||
-                   c==OrderBook_Idx::UserPrice_OB ||
-                   c==OrderBook_Idx::TradeTime_OB ||
-                   c==OrderBook_Idx::Jackpot_OB ||
-                   c==OrderBook_Idx::TradedLot_OB ||
-                   c==OrderBook_Idx::RemainingLot_OB ||
-                   c==OrderBook_Idx::BuyorSell_OB ||
-                   c==OrderBook_Idx::BidLegState_OB||
-                   c==OrderBook_Idx::Leg1State_OB||
-                   c==OrderBook_Idx::Leg3State_OB||
-                   c==OrderBook_Idx::OrderId_OB){
+                 c==OrderBook_Idx::UserPrice_OB ||
+                 c==OrderBook_Idx::TradeTime_OB ||
+                 c==OrderBook_Idx::Jackpot_OB ||
+                 c==OrderBook_Idx::TradedLot_OB ||
+                 c==OrderBook_Idx::RemainingLot_OB ||
+                 c==OrderBook_Idx::BuyorSell_OB ||
+                 c==OrderBook_Idx::BidLegState_OB||
+                 c==OrderBook_Idx::Leg1State_OB||
+                 c==OrderBook_Idx::Leg3State_OB||
+                 c==OrderBook_Idx::OrderId_OB){
 
             return font;
         }
@@ -255,6 +255,6 @@ void Trade_Table_Model::setColumnWidths(QTableView *tableView) const {
         // Set the column width directly in the view
         tableView->setColumnWidth(col, maxWidth);
         tableView->setColumnWidth(AlgoName_OB,300);
-      //  tableView->horizontalHeader()->setSectionResizeMode(_Status, QHeaderView::Fixed);
+        //  tableView->horizontalHeader()->setSectionResizeMode(_Status, QHeaderView::Fixed);
     }
 }

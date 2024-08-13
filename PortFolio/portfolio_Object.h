@@ -55,7 +55,7 @@ public:
     QString FutPrice;
     QString StockName;
     QString BidLeg;
-    QString SkipMarketStrike;
+  //  QString SkipMarketStrike;
     QString QuantityRatio;
     /***********************************************************************************/
 

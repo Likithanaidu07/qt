@@ -71,7 +71,7 @@ enum PortfolioData_Idx
     _ExpiryDateTime,
     _Cost, //currently up to this the data is displayed on portfolio table in the same order as the enum
     _QuantityRatio,
-    _SkipMarketStrike,
+ //   _SkipMarketStrike,
     _BidLeg,
     _FuturePrice,
     _InstrumentName,
@@ -156,7 +156,7 @@ enum PortfolioType
 {
     F2F = 1,
     BY,
-    CR,
+
     BOX,
     BS,
     BS1221,
@@ -173,6 +173,7 @@ enum PortfolioType
     OPEN_BOX = 206, // open btfy
     F1_F2 = 207,
     BFLY_BID = 250,
+    CR = 251,
     JBX,
     JBX_3L,
     JBX_2L,

@@ -24,7 +24,7 @@
 #include "NetPosition/net_position_table_headerview.h"
 
 
-#define ENABLE_BACKEND_DEBUG_MSG
+//#define ENABLE_BACKEND_DEBUG_MSG
 
 static const char stylesheetvis[]= "background: #596167;" "border-radius: 10px;";
 
@@ -1075,7 +1075,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
         portfolio_table_updating_db.storeRelaxed(1);
         QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
-        T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0); // maked the row flg not editing, so the bg data will be updated.
+        T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0);
 
         //Update status data to DB
         if(index.column()==PortfolioData_Idx::_Status){
@@ -1115,6 +1115,26 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 }
             }
         }
+        else if(index.column() == PortfolioData_Idx::_Alias) {
+            // Skip checking for duplicate alias names
+
+            QString Query = "UPDATE Portfolios SET Alias='" + valStr + "' WHERE PortfolioNumber=" + PortfolioNumber;
+            QString msg;
+            bool success = db_conn->updateDB_Table(Query, msg);
+
+            if (success) {
+                db_conn->logToDB(QString("Updated Alias to " + valStr + " [" + PortfolioNumber + "]"));
+                // Refresh sorting
+                reloadSortSettFlg.storeRelaxed(1);
+            } else {
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("Update Alias Failed");
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.setText(msg);
+                msgBox.exec();
+            }
+        }
+
         //Get edited cell data from portfolio table and update DB
         else{
             QHash<int, QString> editedCellData(T_Portfolio_Model->editingDataHash);
@@ -1319,6 +1339,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
             }
             }
+
+            T_Portfolio_Model->editingDataHash.clear();
             if(updateQueryList.size()>0){
                 QString msg;
                 QString Query = "UPDATE Portfolios SET " +

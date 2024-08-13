@@ -172,9 +172,9 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
         ui->comboBox_AlgoType->clear();
         ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
-        ui->comboBox_AlgoType->addItem("F2F");
-        ui->comboBox_AlgoType->addItem("BFLY");
-        ui->comboBox_AlgoType->addItem("CON-REV");
+      //  ui->comboBox_AlgoType->addItem("F2F");
+      //  ui->comboBox_AlgoType->addItem("BFLY");
+        ui->comboBox_AlgoType->addItem("CR-BID");
 //        ui->comboBox_AlgoType->addItem("BOX");
 //        ui->comboBox_AlgoType->addItem("Open-BFLY");
 //        ui->comboBox_AlgoType->addItem("Open-BOX");
@@ -455,7 +455,7 @@ void ConvertAlgo_Win::resetTableWidget(){
     else if(algoType=="BFLY"){
         headers = {"Algo Name","Option Type ","Expiry","Leg1 Strike","Leg2 Strike","Leg3 Strike","Reserved","Reserved","Status"};
     }
-    else if(algoType=="CON-REV"){
+    else if(algoType=="CR-BID"){
         headers = {"Algo Name","Strike/Expiry1","Strike/Expiry2","Strike/Expiry3","Buy Diff","Sell Diff","Status"};
     }
     else if(algoType=="2L Straddle"){
@@ -542,7 +542,7 @@ void ConvertAlgo_Win::on_pushButtonAdd_clicked()
     }
     /************************BFLY*************************************/
 
-    else if(algo_type=="CON-REV"){
+    else if(algo_type=="CR-BID"){
         algoConRev->generateAlgo();
 
     }
@@ -589,7 +589,7 @@ void ConvertAlgo_Win::on_comboBox_AlgoType_currentTextChanged(const QString algo
         ui->stackedWidget->setCurrentWidget(ui->pageBtfy);
         algoBtFly->selectedAction();
     }
-    else if(algoType=="CON-REV"){
+    else if(algoType=="CR-BID"){
 
         ui->stackedWidget->setCurrentWidget(ui->pageConvRev);
         algoConRev->selectedAction();
@@ -697,7 +697,7 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                 else if(algo_type==QString::number(PortfolioType::BY))
                     algo_type="BFLY";
                 else if(algo_type==QString::number(PortfolioType::CR))
-                    algo_type="CON-REV";
+                    algo_type="CR-BID";
                 else if(algo_type==QString::number(PortfolioType::BOX))
                     algo_type="BOX";
                 else if(algo_type==QString::number(PortfolioType::OPEN_BY))

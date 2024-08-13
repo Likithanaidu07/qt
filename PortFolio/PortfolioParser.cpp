@@ -64,7 +64,9 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         obj.SellTradedQuantity = query.value("SellTradedQuantity").toInt() / lotSize;
         obj.SellTotalQuantity = totalQty;
         obj.SellRemainingQuantity = totalQty - obj.SellTradedQuantity;
-
+        obj.Alias = query.value("Alias").toString();
+        if(obj.Alias=="")
+            obj.Alias="-";
         totalQty = query.value("BuyTotalQuantity").toInt() / lotSize;
         obj.BuyPriceDifference = query.value("BuyPriceDifference").toDouble()/devicer_;// convert->ToRupees(query.value("BuyPriceDifference").toDouble());
         obj.BuyTradedQuantity = query.value("BuyTradedQuantity").toInt() / lotSize;
@@ -121,15 +123,22 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         if(obj.PortfolioType=="250" || obj.PortfolioType=="2"){
             obj.QuantityRatio="1:2:1";
         }
+        else if(obj.PortfolioType==QString::number(PortfolioType::CR)){
+            obj.QuantityRatio="1:1:1";
+        }
         else{
             obj.QuantityRatio="N/A";
         }
 
         obj.BidLeg = ContractDetail::getInstance().GetStockName(obj.Leg2TokenNo,obj.PortfolioType.toInt());
 
-        obj.SkipMarketStrike= "-";
+        if(obj.PortfolioType==QString::number(PortfolioType::CR)){
+            obj.BidLeg = ContractDetail::getInstance().GetStockName(obj.Leg1TokenNo,obj.PortfolioType.toInt());
+        }
+
+        //obj.SkipMarketStrike= "-";
         obj.FuturePrice="-";
-        obj.Alias="-";
+
 
         QHash<QString, contract_table> contractDetails = ContractDetail::getInstance().GetContracts("FUT");
 
@@ -1388,11 +1397,14 @@ void PortfolioParser::CalculateConRevPriceDifference(PortfolioObject &portfolio,
        }*/
     QMap<int, QHash<QString, contract_table>> Contract =  ContractDetail::getInstance().GetContracts();
     int strikePrice = 0;//ContractDetail::GetDetail(portfolio.Leg2TokenNo).StrikePrice;
+
     if(Contract[type].contains(QString::number(portfolio.Leg2TokenNo)))
         strikePrice = Contract[type][QString::number(portfolio.Leg2TokenNo)].StrikePrice;
     else{
-        qDebug()<<"Waring: portfolio.Leg2TokenNo = "<<portfolio.Leg2TokenNo<<"  not exist in contract for CR price calculation";
+        qDebug()<<"Waring: Cannot get Leg2TokenNo = "<<portfolio.Leg2TokenNo<<" CR for Price calculation "<<"portfopliNo="<<portfolio.PortfolioNumber;
     }
+
+
 
 
     MBP_Data_Struct leg1 = MBP_Data_Hash[QString::number(portfolio.Leg1TokenNo)];
@@ -1412,8 +1424,23 @@ void PortfolioParser::CalculateConRevPriceDifference(PortfolioObject &portfolio,
                                        (leg2.lastTradedPrice.toDouble() * 2 * 0.0009) +
                                        (leg3.lastTradedPrice.toDouble() * 2 * 0.0009)) / devicer), 'f', decimal_precision);
 
+   // strikePrice = strikePrice*devicer;
     bool ret = false;
     double diff = (-strikePrice - leg2SellPrice + leg1BuyPrice + leg3BuyPrice) * 1.0 / devicer;
+
+   /* qDebug()
+
+        <<"strikePrice="<<strikePrice<<
+        "portfolioNo="<<portfolio.PortfolioNumber<<
+        " Leg1TokenNo="<<portfolio.Leg1TokenNo<<
+        " Leg2TokenNo="<<portfolio.Leg2TokenNo<<
+        " Leg3TokenNo="<<portfolio.Leg3TokenNo;
+
+    qDebug()<<
+        " leg1BuyPrice="<<QString::asprintf("%.0f", leg1BuyPrice)<<" leg1SellPrice="<<QString::asprintf("%.0f", leg1SellPrice)<<
+        " leg2BuyPrice="<<QString::asprintf("%.0f", leg2BuyPrice)<<"   leg2SellPrice="<<QString::asprintf("%.0f", leg2SellPrice)<<
+        " leg3BuyPrice="<<QString::asprintf("%.0f", leg3BuyPrice)<<"   leg3SellPrice="<<QString::asprintf("%.0f", leg3SellPrice);
+    qDebug()<<"\n\n";*/
     if (portfolio.SellMarketRate != diff)
     {
         ret = true;

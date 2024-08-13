@@ -11,6 +11,8 @@ QHash<QString, QStringList> ContractDetail::m_ContractDetailsFiltered;
 QStringList ContractDetail::F2F_data_list_Sorted_Key;
 QStringList ContractDetail::BFLY_data_list_Sorted_Key;
 QStringList ContractDetail::BFLY_BID_data_list_Sorted_Key;
+QStringList ContractDetail::CR_data_list_Sorted_Key;
+
 //QStandardItemModel* ContractDetail::model_searchInstrument_BOX_Leg1  = nullptr;
 QStandardItemModel* ContractDetail::model_start_strike_BFLY = nullptr;
 QStandardItemModel* ContractDetail::model_searchInstrument_F2F_Leg1 = nullptr;
@@ -100,7 +102,8 @@ void ContractDetail::ReloadContractDetails(userInfo uData)
      if (!LoadContractLocal(m_ContractDetailsFiltered,
                            F2F_data_list_Sorted_Key,
                            BFLY_data_list_Sorted_Key,
-                           BFLY_BID_data_list_Sorted_Key))
+                           BFLY_BID_data_list_Sorted_Key,
+                           CR_data_list_Sorted_Key))
      {
 #endif
 
@@ -109,7 +112,8 @@ void ContractDetail::ReloadContractDetails(userInfo uData)
     m_ContractDetails = con.getContractTable(m_ContractDetailsFiltered,
                                              F2F_data_list_Sorted_Key,
                                              BFLY_data_list_Sorted_Key,
-                                             BFLY_BID_data_list_Sorted_Key, uData);
+                                             BFLY_BID_data_list_Sorted_Key,
+                                             CR_data_list_Sorted_Key,uData);
     qDebug()<<"Loaded ContractDetails from DB size="<<m_ContractDetails.size();
 
 #ifdef STORE_CONTRACT_LOCALLY
@@ -197,16 +201,7 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
 
         /********************************************************************/
 
-        /**********Create model for F1_F2*************************/
 
-        QStandardItem *itemF1_F2 = new QStandardItem;
-        itemF1_F2->setText(algo_combination);
-        itemF1_F2->setData(contract.TokenNumber, Qt::UserRole + 1);
-        // Set the composite key as data for sorting
-        itemF1_F2->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
-        model_F1_F2->appendRow(itemF1_F2);
-
-        /********************************************************************/
 
     }
     //doubt
@@ -271,6 +266,7 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
     }
     //doubt
 
+
     for(int i=0;i<F2F_data_list_Sorted_Key.length();i++){
 
         /**********Create model for _F2F*************************/
@@ -310,18 +306,42 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
 
         /********************************************************************/
 
+    }
+
+
+
+    for(int i=0;i<CR_data_list_Sorted_Key.length();i++){
+
+    /**********Create model for CON_REV*************************/
+        const auto& contract = m_ContractDetails[PortfolioType::CR][CR_data_list_Sorted_Key[i]];
+
+        unsigned int unix_time= contract.Expiry;
+        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+        dt = dt.addYears(10);
+        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
+        QString instrument_name = contract.InstrumentName;
+
+      //  QStandardItem *itemFut = new QStandardItem;
+      //  itemFut->setText(instrument_name+" "+Expiry);
+      //  itemFut->setData(contract.TokenNumber, Qt::UserRole + 1);
+        QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd");
+        // Set the composite key as data for sorting
+       // itemFut->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+       // model_FUT_CON_REV->appendRow(itemFut);
+
+    /********************************************************************/
+
 
         /**********Create model for F1_F2*************************/
-        QStandardItem *itemF1_F2 = new QStandardItem;
         QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract)+" "+contract.OptionType;
+        QStandardItem *itemF1_F2 = new QStandardItem;
         itemF1_F2->setText(algo_combination);
         itemF1_F2->setData(contract.TokenNumber, Qt::UserRole + 1);
         // Set the composite key as data for sorting
         itemF1_F2->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
         model_F1_F2->appendRow(itemF1_F2);
-        /*********************************************************/
 
-
+        /********************************************************************/
     }
 
 
@@ -413,17 +433,25 @@ contract_table ContractDetail::GetDetail(int token, int type)
         ReloadContractDetails(userData);
     }
 
-    //F1_F2 means Btfy and F2F
+    //F1_F2 icclude  all the toekn as CR
     if(type==PortfolioType::F1_F2){
         contract_table tmp;
         QString key = QString::number(token);
-        if(m_ContractDetails[PortfolioType::BY].contains(key))
-            return m_ContractDetails[PortfolioType::BY][key];
-        if(m_ContractDetails[PortfolioType::F2F].contains(key))
-            return m_ContractDetails[PortfolioType::F2F][key];
+        if(m_ContractDetails[PortfolioType::CR].contains(key))
+            return m_ContractDetails[PortfolioType::CR][key];
+
 
         return contract_table();
     }
+
+//    if(type==PortfolioType::CR){
+//        contract_table tmp;
+//        QString key = QString::number(token);
+//        if(m_ContractDetails[PortfolioType::F2F].contains(key))
+//            return m_ContractDetails[PortfolioType::F2F][key];
+
+//        return contract_table();
+//    }
 
     else{
         contract_table tmp;
@@ -445,15 +473,24 @@ int ContractDetail::GetLotSize(int token,int type)
 
     QString key = QString::number(token);
 
-    //F1_F2 means Btfy and F2F
+    //F1_F2 icclude  all the toekn as CR
     if(type==PortfolioType::F1_F2){
-        if(m_ContractDetails[PortfolioType::BY].contains(key))
-            return m_ContractDetails[PortfolioType::BY][key].LotSize;
-        if(m_ContractDetails[PortfolioType::F2F].contains(key))
-            return m_ContractDetails[PortfolioType::F2F][key].LotSize;
+        if(m_ContractDetails[PortfolioType::CR].contains(key))
+            return m_ContractDetails[PortfolioType::CR][key].LotSize;
+
 
          return 0;
+
+
     }
+
+//    //For CR contract is same as F2F
+//    if(type==PortfolioType::CR){
+//         if(m_ContractDetails[PortfolioType::F2F].contains(key))
+//            return m_ContractDetails[PortfolioType::F2F][key].LotSize;
+
+//         return 0;
+//    }
 
 
     if(m_ContractDetails[type].contains(key))
@@ -469,15 +506,18 @@ QString ContractDetail::GetStockName(int token,int type)
         return "-";
     QString key = QString::number(token);
 
-    //F1_F2 means Btfy and F2F
+    //F1_F2 icclude  all the toekn as CR
     if(type==PortfolioType::F1_F2){
-        if(m_ContractDetails[PortfolioType::BY].contains(key))
-            return m_ContractDetails[PortfolioType::BY][key].StockName;
-        if(m_ContractDetails[PortfolioType::F2F].contains(key))
-            return m_ContractDetails[PortfolioType::F2F][key].StockName;
+        if(m_ContractDetails[PortfolioType::CR].contains(key))
+            return m_ContractDetails[PortfolioType::CR][key].StockName;
+
          return "-";
     }
-
+//    if(type==PortfolioType::CR){
+//         if(m_ContractDetails[PortfolioType::F2F].contains(key))
+//            return m_ContractDetails[PortfolioType::F2F][key].StockName;
+//         return "-";
+//    }
     if(m_ContractDetails[type].contains(key)){
         return m_ContractDetails[type][key].StockName;}
     else
@@ -490,7 +530,7 @@ QString ContractDetail::GetInstrumentName(int token, int type)
         return "-";
 
     QString key = QString::number(token);
-    //F1_F2 means Btfy and F2F
+    //F1_F2 icclude  all the toekn as CR
     if(type==PortfolioType::F1_F2){
         if(m_ContractDetails[PortfolioType::BY].contains(key))
             return m_ContractDetails[PortfolioType::BY][key].InstrumentName;
@@ -498,6 +538,11 @@ QString ContractDetail::GetInstrumentName(int token, int type)
             return m_ContractDetails[PortfolioType::F2F][key].InstrumentName;
          return "-";
     }
+//    if(type==PortfolioType::CR){
+//         if(m_ContractDetails[PortfolioType::F2F].contains(key))
+//            return m_ContractDetails[PortfolioType::F2F][key].InstrumentName;
+//         return "-";
+//    }
 
     if(m_ContractDetails[type].contains(key)){
         QRegularExpression regex("-");
@@ -528,14 +573,19 @@ int ContractDetail::GetStrikePriceOrg(int token, int type)
     if (token == 0)
         return 0;
     QString key = QString::number(token);
-    //F1_F2 means Btfy and F2F
+    //F1_F2 icclude  all the toekn as CR
     if(type==PortfolioType::F1_F2){
-        if(m_ContractDetails[PortfolioType::BY].contains(key))
-            return m_ContractDetails[PortfolioType::BY][key].StrikePrice;
-        if(m_ContractDetails[PortfolioType::F2F].contains(key))
-            return m_ContractDetails[PortfolioType::F2F][key].StrikePrice;
+        if(m_ContractDetails[PortfolioType::CR].contains(key))
+            return m_ContractDetails[PortfolioType::CR][key].StrikePrice;
+
          return 0;
     }
+
+//    if(type==PortfolioType::CR){
+//         if(m_ContractDetails[PortfolioType::F2F].contains(key))
+//            return m_ContractDetails[PortfolioType::F2F][key].StrikePrice;
+//         return 0;
+//    }
 
     if(m_ContractDetails[type].contains(key))
         return m_ContractDetails[type][key].StrikePrice;
@@ -549,14 +599,19 @@ double ContractDetail::GetVolumeFreezeQty(int token, int type)
     if (token == 0)
         return 0;
     QString key = QString::number(token);
-    //F1_F2 means Btfy and F2F
+    //F1_F2 icclude  all the toekn as CR
     if(type==PortfolioType::F1_F2){
-        if(m_ContractDetails[PortfolioType::BY].contains(key))
-            return m_ContractDetails[PortfolioType::BY][key].VolumeFreezeQty;
-        if(m_ContractDetails[PortfolioType::F2F].contains(key))
-            return m_ContractDetails[PortfolioType::F2F][key].VolumeFreezeQty;
+        if(m_ContractDetails[PortfolioType::CR].contains(key))
+            return m_ContractDetails[PortfolioType::CR][key].VolumeFreezeQty;
+
          return 0;
     }
+
+//    if(type==PortfolioType::CR){
+//         if(m_ContractDetails[PortfolioType::F2F].contains(key))
+//            return m_ContractDetails[PortfolioType::F2F][key].VolumeFreezeQty;
+//         return 0;
+//    }
 
     if(m_ContractDetails[type].contains(key))
         return m_ContractDetails[type][key].VolumeFreezeQty;
@@ -571,10 +626,10 @@ QString ContractDetail::GetStrikePrice(int token, int type)
         return "-";
 
     QString key = QString::number(token);
-    //F1_F2 means Btfy and F2F
+    //F1_F2 icclude  all the toekn as CR
     if(type==PortfolioType::F1_F2){
-       if(m_ContractDetails[PortfolioType::BY].contains(key)){
-             double sp = m_ContractDetails[PortfolioType::BY][key].StrikePrice * 1.0 / devicer_contract;
+       if(m_ContractDetails[PortfolioType::CR].contains(key)){
+             double sp = m_ContractDetails[PortfolioType::CR][key].StrikePrice * 1.0 / devicer_contract;
 
              std::ostringstream formattedNumber;
 
@@ -591,28 +646,35 @@ QString ContractDetail::GetStrikePrice(int token, int type)
              //            return QString::number(sp,'f',decimal_precision_contract);
              return QString::fromStdString(result);
          }
-         else if(m_ContractDetails[PortfolioType::F2F].contains(key)){
-             double sp = m_ContractDetails[PortfolioType::F2F][key].StrikePrice * 1.0 / devicer_contract;
 
-             std::ostringstream formattedNumber;
-
-             if (sp - static_cast<int>(sp) != 0) {
-                 // If there are decimal places, store the number with decimal values
-                 formattedNumber << std::fixed << std::setprecision(2) << sp;
-             } else {
-                 // If there are no decimal places or only zeros, store the number without decimal values
-                 formattedNumber << std::fixed << std::setprecision(0) << sp;
-             }
-
-             std::string result = formattedNumber.str(); // Get the formatted number as a string
-
-             //            return QString::number(sp,'f',decimal_precision_contract);
-             return QString::fromStdString(result);
-         }
          else
              return "-";
 
     }
+
+//    if(type==PortfolioType::CR){
+//          if(m_ContractDetails[PortfolioType::F2F].contains(key)){
+//             double sp = m_ContractDetails[PortfolioType::F2F][key].StrikePrice * 1.0 / devicer_contract;
+
+//             std::ostringstream formattedNumber;
+
+//             if (sp - static_cast<int>(sp) != 0) {
+//                 // If there are decimal places, store the number with decimal values
+//                 formattedNumber << std::fixed << std::setprecision(2) << sp;
+//             } else {
+//                 // If there are no decimal places or only zeros, store the number without decimal values
+//                 formattedNumber << std::fixed << std::setprecision(0) << sp;
+//             }
+
+//             std::string result = formattedNumber.str(); // Get the formatted number as a string
+
+//             //            return QString::number(sp,'f',decimal_precision_contract);
+//             return QString::fromStdString(result);
+//         }
+//         else
+//             return "-";
+
+//    }
 
 
     if(m_ContractDetails[type].contains(key)){
@@ -644,14 +706,19 @@ QString ContractDetail::GetOptionType(int token, int type)
 
     QString key = QString::number(token);
 
-    //F1_F2 means Btfy and F2F
+    //F1_F2 icclude  all the toekn as CR
     if(type==PortfolioType::F1_F2){
-        if(m_ContractDetails[PortfolioType::BY].contains(key))
-            return m_ContractDetails[PortfolioType::BY][key].OptionType;
-        if(m_ContractDetails[PortfolioType::F2F].contains(key))
-            return m_ContractDetails[PortfolioType::F2F][key].OptionType;
+        if(m_ContractDetails[PortfolioType::CR].contains(key))
+            return m_ContractDetails[PortfolioType::CR][key].OptionType;
+
        return "-";
     }
+
+//    if(type==PortfolioType::CR){
+//       if(m_ContractDetails[PortfolioType::F2F].contains(key))
+//            return m_ContractDetails[PortfolioType::F2F][key].OptionType;
+//       return "-";
+//    }
 
     if(m_ContractDetails[type].contains(key)){
         return m_ContractDetails[type][key].OptionType;
@@ -676,14 +743,19 @@ QString ContractDetail::GetExpiry(int token, QString format, int type)
     QString key = QString::number(token);
 
 
-    //F1_F2 means Btfy and F2F
+    //F1_F2 icclude  all the toekn as CR
     if(type==PortfolioType::F1_F2){
-        if(m_ContractDetails[PortfolioType::BY].contains(key))
-            return GetExpiry(format,m_ContractDetails[type][key].Expiry);
-        if(m_ContractDetails[PortfolioType::F2F].contains(key))
-            return GetExpiry(format,m_ContractDetails[type][key].Expiry);
+        if(m_ContractDetails[PortfolioType::CR].contains(key))
+            return GetExpiry(format,m_ContractDetails[PortfolioType::CR][key].Expiry);
+
        return "-";
     }
+
+//    if(type==PortfolioType::CR){
+//       if(m_ContractDetails[PortfolioType::F2F].contains(key))
+//            return GetExpiry(format,m_ContractDetails[type][key].Expiry);
+//       return "-";
+//    }
 
     if(m_ContractDetails[type].contains(key)){
         QString dateTimeStr = GetExpiry(format,m_ContractDetails[type][key].Expiry);
@@ -708,24 +780,29 @@ QDateTime ContractDetail::GetExpiryDate(int token,int type)
 {
     QString key = QString::number(token);
 
-    //F1_F2 means Btfy and F2F
+    //F1_F2 icclude  all the toekn as CR
     if(type==PortfolioType::F1_F2){
-        if(m_ContractDetails[PortfolioType::BY].contains(key)){
+        if(m_ContractDetails[PortfolioType::CR].contains(key)){
             QDateTime dt;
             dt.setOffsetFromUtc(0);
             dt.setDate(QDate(1980, 1, 1));
             dt.setTime(QTime(0, 0, 0));
-            return dt.addSecs(m_ContractDetails[PortfolioType::BY][key].Expiry);
+            return dt.addSecs(m_ContractDetails[PortfolioType::CR][key].Expiry);
         }
-        if(m_ContractDetails[PortfolioType::F2F].contains(key)){
-            QDateTime dt;
-            dt.setOffsetFromUtc(0);
-            dt.setDate(QDate(1980, 1, 1));
-            dt.setTime(QTime(0, 0, 0));
-            return dt.addSecs(m_ContractDetails[PortfolioType::F2F][key].Expiry);
-        }
+
       return QDateTime();
     }
+
+//    if(type==PortfolioType::CR){
+//      if(m_ContractDetails[PortfolioType::F2F].contains(key)){
+//            QDateTime dt;
+//            dt.setOffsetFromUtc(0);
+//            dt.setDate(QDate(1980, 1, 1));
+//            dt.setTime(QTime(0, 0, 0));
+//            return dt.addSecs(m_ContractDetails[PortfolioType::F2F][key].Expiry);
+//      }
+//      return QDateTime();
+//    }
 
     if(m_ContractDetails[type].contains(key)){
         QDateTime dt;
@@ -746,14 +823,19 @@ qint64 ContractDetail::GetExpiry(int token,int type)
 
     QString key = QString::number(token);
 
-    //F1_F2 means Btfy and F2F
+    //F1_F2 icclude  all the toekn as CR
     if(type==PortfolioType::F1_F2){
-        if(m_ContractDetails[PortfolioType::BY].contains(key))
-            return m_ContractDetails[PortfolioType::BY][key].Expiry;
-        if(m_ContractDetails[PortfolioType::F2F].contains(key))
-            return m_ContractDetails[PortfolioType::F2F][key].Expiry;
+        if(m_ContractDetails[PortfolioType::CR].contains(key))
+            return m_ContractDetails[PortfolioType::CR][key].Expiry;
        return 0;
     }
+//    if(type==PortfolioType::CR){
+//       if(m_ContractDetails[PortfolioType::BY].contains(key))
+//            return m_ContractDetails[PortfolioType::BY][key].Expiry;
+//       if(m_ContractDetails[PortfolioType::F2F].contains(key))
+//            return m_ContractDetails[PortfolioType::F2F][key].Expiry;
+//       return 0;
+//    }
 
     if(m_ContractDetails[type].contains(key)){
         return m_ContractDetails[type][key].Expiry;
@@ -806,7 +888,9 @@ qint64 ContractDetail::GetExpiry(int token,int type)
  bool ContractDetail::LoadContractLocal(QHash<QString, QStringList> &_m_ContractDetailsFiltered,
                                         QStringList &F2F_data_list_Sorted_Key,
                                         QStringList &BFLY_data_list_Sorted_Key,
-                                        QStringList &BFLY_BID_data_list_Sorted_Key)
+                                        QStringList &BFLY_BID_data_list_Sorted_Key,
+                                        QStringList &CR_data_list_Sorted_Key
+                                        )
 
  {
      try
@@ -842,6 +926,7 @@ qint64 ContractDetail::GetExpiry(int token,int type)
                  QHash<QString, contract_table> BFLY_Contract_Hash;
                  QHash<QString, contract_table> F2F_Contract_Hash;
                  QHash<QString, contract_table> BFLY_BID_Contract_Hash;
+                 QHash<QString, contract_table> CR_Contract_Hash;
 
                  long long actualMin = LLONG_MAX ;
                  QDataStream in(&file);
@@ -890,6 +975,13 @@ qint64 ContractDetail::GetExpiry(int token,int type)
                          BFLY_BID_data_list_Sorted_Key.append(tokenNo);
                          break;
                      }
+                     case PortfolioType::CR:{
+                         CR_Contract_Hash.insert( tokenNo, contractT);
+                         CR_data_list_Sorted_Key.append(tokenNo);
+                         break;
+                     }
+
+
 
                      default:
                          break;
@@ -899,6 +991,7 @@ qint64 ContractDetail::GetExpiry(int token,int type)
                 m_ContractDetails[PortfolioType::BFLY_BID] = BFLY_BID_Contract_Hash;
                 m_ContractDetails[PortfolioType::BY] = BFLY_Contract_Hash;
                 m_ContractDetails[PortfolioType::F2F] = F2F_Contract_Hash;
+                m_ContractDetails[PortfolioType::CR] = CR_Contract_Hash;
 
 
 
