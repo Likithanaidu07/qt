@@ -554,6 +554,10 @@ QHash<QString, contract_table> mysql_conn::prpareContractDataFromDB(QString quer
             contractTableTmp.StockName = query.value(rec.indexOf("StockName")).toString();
             contractTableTmp.MinimumSpread = query.value(rec.indexOf("MinSpread")).toInt();
             contractTableTmp.VolumeFreezeQty = query.value(rec.indexOf("VolumeFreezeQty")).toDouble();
+            contractTableTmp.OperatingRangeslowPriceRange = query.value(rec.indexOf("OperatingRangeslowPriceRange")).toInt();
+            contractTableTmp.OperatingRangeshighPriceRange = query.value(rec.indexOf("OperatingRangeshighPriceRange")).toInt();
+
+
 
             tokenData.append(QString::number(contractTableTmp.TokenNumber));
             contract_table_hash.insert( query.value(rec.indexOf("Token")).toString(), contractTableTmp);
@@ -1498,6 +1502,76 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,d
     }
 }
 
+
+void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user_id){
+    QMutexLocker lock(&mutex);
+
+    QList <QStringList> missed_trade_list;
+
+    QString msg;
+
+    bool ok = checkDBOpened(msg);
+    if(ok)
+    {
+        QString query_str = "SELECT * FROM MissedTrades WHERE TraderID='"+user_id+"'";
+        QSqlQuery query(query_str,db);
+        if( !query.exec() )
+        {
+            // Error Handling, check query.lastError(), probably return
+            qDebug()<<query.lastError().text();
+        }
+        else{
+            QSqlRecord rec = query.record();
+            while (query.next()) {
+
+
+
+                QString ID =  query.value(rec.indexOf("Id")).toString();
+                long long DateTime = query.value(rec.indexOf("DateTime")).toLongLong();
+                QDateTime dt = QDateTime::fromSecsSinceEpoch(DateTime);
+                dt = dt.toUTC();
+                QString DateTimeStr = dt.toString("hh:mm:ss");
+
+
+
+                QString BuySellIndicator = query.value(rec.indexOf("BuySellIndicator")).toString();
+                QString Type = query.value(rec.indexOf("Type")).toString();
+                QString Symbol = query.value(rec.indexOf("Symbol")).toString();
+                QString Message = query.value(rec.indexOf("Message")).toString();
+
+
+
+                int Quantity = query.value(rec.indexOf("Quantity")).toInt();
+                int Portfolio = query.value(rec.indexOf("Portfolio")).toInt();
+                int Price = query.value(rec.indexOf("Price")).toInt();
+
+                QString PriceStr = QString::number(Price);
+                QString QuantityStr = QString::number(Quantity);
+                QString PortfolioStr = QString::number(Portfolio);
+
+
+
+                QStringList rowList;
+                rowList.append(ID);
+                rowList.append(BuySellIndicator);
+                rowList.append(Type);
+                rowList.append(QuantityStr);
+                rowList.append(PortfolioStr);
+                rowList.append(Symbol);
+                rowList.append(Message);
+                rowList.append(PriceStr);
+                rowList.append(DateTimeStr);
+
+
+             missed_trade_list.append(rowList);
+            }
+            model->setDataList(missed_trade_list);
+
+        }
+    }
+}
+
+
 void mysql_conn::getNetPosTableData_BackUp(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash)
 {
     QMutexLocker lock(&mutex);
@@ -2090,7 +2164,7 @@ QString mysql_conn::getAlgoTypeQuery(PortfolioType type, userInfo userLoginInfo)
     }
     whereStr += ")";
 
-    return "SELECT InstrumentType, InstrumentName, OptionType, StrikePrice, LotSize, ExpiryDate, Token, StockName, MinSpread,VolumeFreezeQty FROM Contract" +
+    return "SELECT InstrumentType, InstrumentName, OptionType, StrikePrice, LotSize, ExpiryDate, Token, StockName, MinSpread,VolumeFreezeQty,OperatingRangeslowPriceRange,OperatingRangeshighPriceRange FROM Contract" +
            whereStr +
            " ORDER BY ExpiryDate,Token, InstrumentName, OptionType, StrikePrice";
 }

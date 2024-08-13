@@ -29,6 +29,7 @@ SOURCES += \
     Liners/liners_delegate.cpp \
     Liners/liners_model.cpp \
     Liners/linersheaderview.cpp \
+    MissedTrades/missed_trade_table_model.cpp \
     NetPosition/net_position_table_delegate.cpp \
     NetPosition/net_position_table_headerview.cpp \
     NetPosition/net_position_table_model.cpp \
@@ -84,6 +85,7 @@ HEADERS += \
     Liners/liners_delegate.h \
     Liners/liners_model.h \
     Liners/linersheaderview.h \
+    MissedTrades/missed_trade_table_model.h \
     NetPosition/net_position_table_delegate.h \
     NetPosition/net_position_table_headerview.h \
     NetPosition/net_position_table_model.h \

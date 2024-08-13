@@ -157,6 +157,12 @@ int table_portfolios_custom::findNextEditableCell(int currentColIdx, nav_directi
 
     return idx;
 }
+//To disable the automatic scrolling to the current editing cell in a Qt QTableView,
+//you can override the scrollTo function in a custom QTableView subclass.
+//This way, you can prevent the default behavior of scrolling to the current editing cell.
+void table_portfolios_custom::scrollTo(const QModelIndex &index, ScrollHint hint) {
+        // Do nothing to prevent scrolling to the current editing cell
+}
 
 void table_portfolios_custom::selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) {
     // Call the base class implementation (important)

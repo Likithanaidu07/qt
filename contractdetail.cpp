@@ -936,7 +936,21 @@ qint64 ContractDetail::GetExpiry(int token,int type)
                      QString PortfolioType;
 
                      contract_table contractT;
-                     in >> PortfolioType>> tokenNo >> contractT.InstrumentType >> contractT.InstrumentName >> contractT.OptionType >> contractT.StrikePrice >> contractT.LotSize >> contractT.Expiry >> contractT.TokenNumber >> contractT.StockName >> contractT.MinimumSpread >> contractT.VolumeFreezeQty;
+                     in >> PortfolioType>>
+                             tokenNo >>
+                             contractT.InstrumentType >>
+                             contractT.InstrumentName >>
+                             contractT.OptionType >>
+                             contractT.StrikePrice >>
+                             contractT.LotSize >>
+                             contractT.Expiry >>
+                             contractT.TokenNumber >>
+                             contractT.StockName >>
+                             contractT.MinimumSpread >>
+                             contractT.VolumeFreezeQty >>
+                             contractT.OperatingRangeslowPriceRange >>
+                             contractT.OperatingRangeshighPriceRange;
+
                      if(contractT.Expiry>0){
                          if(actualMin>contractT.Expiry)
                              actualMin = contractT.Expiry;
@@ -1056,7 +1070,9 @@ qint64 ContractDetail::GetExpiry(int token,int type)
                  << hashIt.value().TokenNumber
                  << hashIt.value().StockName
                  << hashIt.value().MinimumSpread
-                 << hashIt.value().VolumeFreezeQty;
+                 << hashIt.value().VolumeFreezeQty
+                 << hashIt.value().OperatingRangeslowPriceRange
+                 << hashIt.value().OperatingRangeshighPriceRange ;
          }
      }
 

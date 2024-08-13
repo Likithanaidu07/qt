@@ -1404,7 +1404,7 @@ void PortfolioParser::CalculateConRevPriceDifference(PortfolioObject &portfolio,
         qDebug()<<"Waring: Cannot get Leg2TokenNo = "<<portfolio.Leg2TokenNo<<" CR for Price calculation "<<"portfopliNo="<<portfolio.PortfolioNumber;
     }
 
-   // double strikePrice = ContractDetail::getInstance().GetStrikePrice(portfolio.Leg2TokenNo,type).toDouble();
+
 
 
     MBP_Data_Struct leg1 = MBP_Data_Hash[QString::number(portfolio.Leg1TokenNo)];
