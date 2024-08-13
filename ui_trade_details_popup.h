@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'trade_details_popup.ui'
 **
-** Created by: Qt User Interface Compiler version 6.3.2
+** Created by: Qt User Interface Compiler version 6.5.3
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -27,11 +27,11 @@ public:
     void setupUi(QDialog *TradeDetailsPopup)
     {
         if (TradeDetailsPopup->objectName().isEmpty())
-            TradeDetailsPopup->setObjectName(QString::fromUtf8("TradeDetailsPopup"));
+            TradeDetailsPopup->setObjectName("TradeDetailsPopup");
         TradeDetailsPopup->setWindowModality(Qt::ApplicationModal);
         TradeDetailsPopup->resize(727, 179);
         gridLayout = new QGridLayout(TradeDetailsPopup);
-        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
+        gridLayout->setObjectName("gridLayout");
         tableWidget = new QTableWidget(TradeDetailsPopup);
         if (tableWidget->columnCount() < 7)
             tableWidget->setColumnCount(7);
@@ -49,7 +49,7 @@ public:
         tableWidget->setHorizontalHeaderItem(5, __qtablewidgetitem5);
         QTableWidgetItem *__qtablewidgetitem6 = new QTableWidgetItem();
         tableWidget->setHorizontalHeaderItem(6, __qtablewidgetitem6);
-        tableWidget->setObjectName(QString::fromUtf8("tableWidget"));
+        tableWidget->setObjectName("tableWidget");
         tableWidget->horizontalHeader()->setStretchLastSection(true);
         tableWidget->verticalHeader()->setVisible(false);
         tableWidget->verticalHeader()->setStretchLastSection(false);

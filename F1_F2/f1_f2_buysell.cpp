@@ -29,8 +29,7 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
 
 
     const char LineEdit_SS[]="border-radius: 6px;""border: 0.5px solid #343A40;""background: #FFF;""color: #6C757D;""font-size: 12px;""font-style: normal;""font-weight: 400;""line-height: normal;" "padding: 4px 10px 4px 10px;";
-    for(auto w: {ui->lineEdit_Lots,
-            ui->lineEdit_Price,
+    for(auto w: {
             ui->lineEdit_Stockname}){
             w->setStyleSheet(LineEdit_SS);
             QFont font=w->font();
@@ -38,13 +37,18 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
             w->setFont(font);
     }
 
-    QDoubleValidator *val = new QDoubleValidator();
-    val->setLocale(QLocale::C);
-    val->setNotation(QDoubleValidator::StandardNotation);
-    ui->lineEdit_Price->setValidator(val);
+    ui->doubleSpinBox_price->setStyleSheet(LineEdit_SS);
+    QFont font1=ui->doubleSpinBox_price->font();
+    font.setFamily("Work Sans");
+    ui->doubleSpinBox_price->setFont(font1);
 
-    QIntValidator *valInt = new QIntValidator();
-    ui->lineEdit_Lots->setValidator(valInt);
+    ui->spinBoxLot->setStyleSheet(LineEdit_SS);
+    QFont font2=ui->spinBoxLot->font();
+    font.setFamily("Work Sans");
+    ui->spinBoxLot->setFont(font2);
+
+
+
 
     model_stock_name =  ContractDetail::getInstance().Get_model_F1_F2();
 
@@ -109,6 +113,15 @@ void F1_F2_BuySell::itemSelectedStockName(QModelIndex index)
         QVariant data = index.data( Qt::UserRole + 1);
         token_number = data.toString();
         ui->lineEdit_Stockname->setText(index.data(Qt::DisplayRole).toString());
+        contract_table c = ContractDetail::getInstance().GetDetail(token_number.toInt(),PortfolioType::F1_F2);
+        ui->doubleSpinBox_price->setMinimum(c.OperatingRangeslowPriceRange/devicer);
+        ui->doubleSpinBox_price->setMaximum(c.OperatingRangeshighPriceRange/devicer);
+        ui->spinBoxLot->setMinimum(0);
+        ui->spinBoxLot->setMaximum(c.VolumeFreezeQty/c.LotSize);
+
+        qDebug()<<"F_F2--> token_number: "<<token_number<<"   OperatingRangeslowPriceRange: "<<c.OperatingRangeslowPriceRange/devicer<<"   OperatingRangeshighPriceRange:"<<c.OperatingRangeshighPriceRange/devicer;
+        qDebug()<<"F_F2--> token_number: "<<token_number<<"   VolumeFreezeQty: "<<c.VolumeFreezeQty<<"   LotSize:"<<c.LotSize << "  maxLot"<<c.VolumeFreezeQty/c.LotSize;
+
 
     }
     else
@@ -128,7 +141,7 @@ F1_F2_BuySell::~F1_F2_BuySell()
 
 void F1_F2_BuySell::on_pushButtonSubmit_clicked()
 {
-    if(ui->lineEdit_Lots->text()==""||ui->lineEdit_Price->text()==""||ui->lineEdit_Stockname->text()==""){
+    if(ui->lineEdit_Stockname->text()==""){
         QMessageBox msgBox;
         msgBox.setWindowTitle("Cannot Add .");
         msgBox.setIcon(QMessageBox::Warning);
@@ -150,14 +163,16 @@ void F1_F2_BuySell::on_pushButtonSubmit_clicked()
     QString buyqty="0";
     QString msg="0";
 
+
+
     int lotSize=ContractDetail::getInstance().GetLotSize(token_number.toInt(),PortfolioType::F1_F2);
     if(buy_mode){
-        buyprice = QString::number(ui->lineEdit_Price->text().toDouble()* devicer);
-        buyqty = QString::number(ui->lineEdit_Lots->text().toInt()* lotSize);
+        buyprice = QString::number(ui->doubleSpinBox_price->value()* devicer);
+        buyqty = QString::number(ui->spinBoxLot->value()* lotSize);
     }
     else{
-        sellprice = QString::number(ui->lineEdit_Price->text().toDouble()* devicer);
-        sellqty = QString::number(ui->lineEdit_Lots->text().toInt()* lotSize);
+        sellprice = QString::number(ui->doubleSpinBox_price->value()* devicer);
+        sellqty = QString::number(ui->spinBoxLot->value()* lotSize);
     }
 
     mysql_conn *db_conn = new mysql_conn(0, "add_algo_db_conn");
@@ -174,8 +189,8 @@ void F1_F2_BuySell::on_pushButtonSubmit_clicked()
                      msgBox.setText("Order placed successfully.");
                      msgBox.exec();
                      ui->lineEdit_Stockname->clear();
-                     ui->lineEdit_Lots->clear();
-                     ui->lineEdit_Price->clear();
+                     ui->spinBoxLot->setValue(0);
+                     ui->doubleSpinBox_price->setValue(0.00);
                      token_number = "";
                  }
                  else{
@@ -194,8 +209,8 @@ void F1_F2_BuySell::on_pushButtonSubmit_clicked()
         msgBox.setText("Order placed successfully.");
         msgBox.exec();
         ui->lineEdit_Stockname->clear();
-        ui->lineEdit_Lots->clear();
-        ui->lineEdit_Price->clear();
+        ui->spinBoxLot->setValue(0);
+        ui->doubleSpinBox_price->setValue(0.00);
         token_number = "";
     }
     else{
@@ -221,11 +236,11 @@ void F1_F2_BuySell::on_comboBoxBuySell_currentTextChanged(const QString &arg1)
 {
      if(arg1=="Buy"){
         buy_mode = true;
-        this->setWindowTitle("F1: BuyManual");
+       // this->setWindowTitle("F1: BuyManual");
      }
      else{
          buy_mode = false;
-          this->setWindowTitle("F2: SellManual");
+         // this->setWindowTitle("F2: SellManual");
      }
 }
 void F1_F2_BuySell::setBuyMode(bool buy_mode_){

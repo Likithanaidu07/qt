@@ -49,6 +49,7 @@
 #include "sortsettingpopup.h"
 #include "F1_F2/f1_f2_buysell.h"
 
+#include "MissedTrades/missed_trade_table_model.h"
 using namespace ads;
 
 class mysql_conn;
@@ -175,6 +176,13 @@ private:
     Trade_Table_Model *trade_model;
     CDockWidget *dock_win_trade;
 
+
+    QTableView *missed_trade_table;
+    Missed_Trade_Table_Model *missed_trade_model;
+    CDockWidget *dock_win_missed_trades;
+
+
+
 //    QLineEdit *line_edit_trade_search;
 //    QList<LiveDataWidget*> liveDataWidgetList;
 
@@ -274,6 +282,7 @@ private slots:
     void OnOrderBookDockWidgetVisiblityChanged(bool p_Visible);
     void OnPositionsDockWidgetVisiblityChanged(bool p_Visible);
     void OnHPDockWidgetVisiblityChanged(bool p_Visible);
+    void OnMTDockWidgetVisiblityChanged(bool p_Visible);
     void OnLinersDockWidgetVisiblityChanged(bool p_Visible);
     void on_Algorithms_Button_clicked();
     void on_Algorithms_Close_clicked();
@@ -287,6 +296,10 @@ private slots:
 
     void on_toggle_Button_1_clicked();
 
+
+    void on_MissedTrade_Button_clicked();
+
+    void on_MissedTrade_Close_clicked();
 
 protected:
     virtual void closeEvent(QCloseEvent* event) override;

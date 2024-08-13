@@ -205,6 +205,7 @@ enum T_Table{
     NET_POS = 2,
     Liners,
     SUMMARY,
+    MISSED_TRADE,
 };
 
 enum T_LoginErroCode{
@@ -276,6 +277,8 @@ struct contract_table{
     QString StockName;
     int MinimumSpread;
     double VolumeFreezeQty;
+    int OperatingRangeslowPriceRange;
+    int OperatingRangeshighPriceRange;
 };
 struct userInfo{
     int UserId;

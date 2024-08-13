@@ -636,6 +636,10 @@ MainWindow::MainWindow(QWidget *parent)
     liners_table->show();
     /************Liners Window********************************/
 
+
+
+
+
     /************Historical Positions Window********************************/
     QPixmap pixmapdock_hp_close(":/dock_close.png");
 
@@ -696,7 +700,62 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
+    /************Missed Trades Window********************************/
+    QPixmap pixmapdock_mt_close(":/dock_close.png");
 
+    dock_win_missed_trades =  new CDockWidget(tr("Missed Trades"));
+    connect(dock_win_missed_trades, SIGNAL(visibilityChanged(bool)), this, SLOT(OnMTDockWidgetVisiblityChanged(bool)));
+    dock_win_missed_trades->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
+    dock_win_missed_trades->setMinimumSize(200,150);
+    const auto autoHideContainer_missed_trade = DockManagerMainPanel->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_missed_trades);
+    autoHideContainer_missed_trade->setSize(480);
+
+    //create a titlebar
+    QWidget *mt_titlebar=new QWidget;
+    mt_titlebar->setStyleSheet(DockTitleBar_Style);
+    QHBoxLayout *position_mt_layout=new QHBoxLayout(mt_titlebar);
+    position_mt_layout->setSpacing(10);
+   position_mt_layout->setContentsMargins(17,8,10,6);
+    QLabel *mt_label=new QLabel("Missed Trades");
+    QFont font_mt_label=mt_label->font();
+    font_mt_label.setFamily("Work Sans");
+    mt_label->setFont(font_mt_label);
+    mt_label->setStyleSheet("color: #495057;font-size: 16px;font-style: normal;font-weight: 700;line-height: normal;");
+    QSpacerItem* mt_spacer=new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QLineEdit* line_edit_mt = new QLineEdit;
+    line_edit_mt->setMaximumWidth(160);
+    line_edit_mt->setStyleSheet(lineedit_dock_SS);
+    QToolButton* mt_close=new QToolButton();
+    connect(mt_close, &QToolButton::clicked, [=](){ dock_win_missed_trades->close(); });
+    mt_close->setIcon(pixmapdock_mt_close);
+    mt_close->setIconSize(QSize(14, 14));
+    position_mt_layout->addWidget(mt_label);
+    position_mt_layout->addSpacerItem(mt_spacer);
+    position_mt_layout->addWidget(line_edit_mt);
+    position_mt_layout->addWidget(mt_close);
+    //dock_win_missed_trades->setTitleBarWidget(mt_titlebar);
+
+
+
+    //subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_missed_trades);
+
+    missed_trade_table = new QTableView(dock_win_missed_trades);
+    missed_trade_table->setStyleSheet(tableview_SS);
+    missed_trade_table->horizontalHeader()->setFixedHeight(32);
+    missed_trade_table->horizontalHeader()->setFont(headerfont);
+    missed_trade_table->setShowGrid(false);
+    missed_trade_table->setAlternatingRowColors(true);
+
+    missed_trade_model = new Missed_Trade_Table_Model();
+    missed_trade_table->setModel(missed_trade_model);
+    missed_trade_table->horizontalHeader()->setStretchLastSection(true);
+    missed_trade_table->verticalHeader()->setVisible(false);
+    missed_trade_table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    missed_trade_table->setSelectionMode(QAbstractItemView::SingleSelection);
+
+    dock_win_missed_trades->setWidget(missed_trade_table);
+    missed_trade_table->show();
+    /************Missed Trades ********************************/
 
 
 
@@ -757,6 +816,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Positions_Close->setIcon(pixmapbuttonclose);
     ui->Liners_Close->setIcon(pixmapbuttonclose);
     ui->HP_Close->setIcon(pixmapbuttonclose);
+    ui->MissedTrade_Close->setIcon(pixmapbuttonclose);
     ui->Templates_Close->setIcon(pixmapbuttonclose);
 
     const char stylesheet_params[] = "color: #000000 ;""font-size: 12px;""font-style: normal;""font-weight: bold;""line-height: normal;";
@@ -1358,6 +1418,8 @@ void MainWindow::refreshTableIn_Intervel(){
         loadDataAndUpdateTable(T_Table::TRADE);
         loadDataAndUpdateTable(T_Table::NET_POS);
         loadDataAndUpdateTable(T_Table::SUMMARY);
+        loadDataAndUpdateTable(T_Table::MISSED_TRADE);
+
 
         //loadMysQLData(Table::ORDER);*/
 
@@ -1448,6 +1510,14 @@ void MainWindow::loadDataAndUpdateTable(int table){
         emit data_summary_update_signal();
         break;
     }
+
+    case T_Table::MISSED_TRADE:{
+        db_conn->getMissedTradeData(missed_trade_model,QString::number(userData.UserId));
+        emit data_loded_signal(T_Table::NET_POS);
+        break;
+    }
+
+
 
     default:
         break;
@@ -1731,6 +1801,8 @@ void MainWindow::on_Liners_Button_clicked()
 }
 
 
+
+
 void MainWindow::on_Liners_Close_clicked()
 {
     //10
@@ -1757,6 +1829,20 @@ void MainWindow::on_HP_Close_clicked()
     ui->HP_Close->setVisible(false);
 }
 
+
+void MainWindow::on_MissedTrade_Button_clicked()
+{
+    dock_win_missed_trades->toggleView(true);
+    ui->MissedTrade_widget->setStyleSheet(stylesheetvis);
+    ui->MissedTrade_Close->setVisible(true);
+}
+
+void MainWindow::on_MissedTrade_Close_clicked()
+{
+    dock_win_missed_trades->toggleView(false);
+    ui->MissedTrade_widget->setStyleSheet("");
+    ui->MissedTrade_Close->setVisible(false);
+}
 
 void MainWindow::on_Templates_Button_clicked()
 {
@@ -1932,6 +2018,15 @@ void MainWindow::OnHPDockWidgetVisiblityChanged(bool p_Visible)
     else
         ui->HP_Widget->setStyleSheet("");
     ui->HP_Close->setVisible(p_Visible);
+}
+
+void MainWindow::OnMTDockWidgetVisiblityChanged(bool p_Visible)
+{
+    if(p_Visible)
+        ui->MissedTrade_widget->setStyleSheet(stylesheetvis);
+    else
+        ui->MissedTrade_widget->setStyleSheet("");
+    ui->MissedTrade_Close->setVisible(p_Visible);
 }
 
 
@@ -2581,5 +2676,11 @@ void MainWindow::closeEvent(QCloseEvent* event)
     QCoreApplication::quit();
 
 }
+
+
+
+
+
+
 
 

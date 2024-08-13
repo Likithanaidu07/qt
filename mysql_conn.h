@@ -21,6 +21,7 @@
 #include "Liners/liners_model.h"
 //class MainWindow;
 #include "PortFolio/portfoliocustomsorting.h"
+#include "MissedTrades/missed_trade_table_model.h"
 
 struct net_pos_data_{
     QString  token_number;
@@ -85,6 +86,8 @@ public:
     void  getTradeTableData(int &TraderCount,Trade_Table_Model *model,Liners_Model *liners_model ,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
     void  getNetPosTableData(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash);
     void  getNetPosTableData_BackUp(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash);
+    void getMissedTradeData(Missed_Trade_Table_Model* model,QString user_id);
+
 
     void getSummaryTableData(int &OrderCount,QString user_id);
     void getLinersTableData(Liners_Model *model,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);

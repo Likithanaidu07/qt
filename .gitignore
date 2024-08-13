@@ -519,3 +519,4 @@ new_speedtrade.pro.user*
 /ui_convert_algo_win.h
 /ui_loadingdatawindow.h
 /ui_loginwindow.h
+/ui_trade_details_popup.h

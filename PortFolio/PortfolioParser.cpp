@@ -1390,6 +1390,9 @@ void PortfolioParser::CalculateConRevPriceDifference(PortfolioObject &portfolio,
     int strikePrice = 0;//ContractDetail::GetDetail(portfolio.Leg2TokenNo).StrikePrice;
     if(Contract[type].contains(QString::number(portfolio.Leg2TokenNo)))
         strikePrice = Contract[type][QString::number(portfolio.Leg2TokenNo)].StrikePrice;
+    else{
+        qDebug()<<"Waring: portfolio.Leg2TokenNo = "<<portfolio.Leg2TokenNo<<"  not exist in contract for CR price calculation";
+    }
 
 
     MBP_Data_Struct leg1 = MBP_Data_Hash[QString::number(portfolio.Leg1TokenNo)];

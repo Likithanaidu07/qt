@@ -26,65 +26,9 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>F1 F2</string>
+   <string>Manual Orders</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="1" column="2">
-    <widget class="QLabel" name="label_2">
-     <property name="text">
-      <string>Stockname</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="4">
-    <widget class="QLineEdit" name="lineEdit_Lots">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>28</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>70</width>
-       <height>16777215</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <spacer name="verticalSpacer_3">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="4">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>No. of Lots</string>
-     </property>
-    </widget>
-   </item>
-   <item row="0" column="2">
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
    <item row="2" column="1">
     <widget class="QComboBox" name="comboBoxBuySell">
      <property name="minimumSize">
@@ -105,22 +49,6 @@
      </item>
     </widget>
    </item>
-   <item row="2" column="3">
-    <widget class="QLineEdit" name="lineEdit_Price">
-     <property name="minimumSize">
-      <size>
-       <width>0</width>
-       <height>28</height>
-      </size>
-     </property>
-     <property name="maximumSize">
-      <size>
-       <width>110</width>
-       <height>16777215</height>
-      </size>
-     </property>
-    </widget>
-   </item>
    <item row="1" column="1">
     <widget class="QLabel" name="label">
      <property name="text">
@@ -128,24 +56,31 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="5">
-    <widget class="QPushButton" name="pushButtonSubmit">
-     <property name="minimumSize">
+   <item row="3" column="2">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
       <size>
-       <width>90</width>
-       <height>28</height>
+       <width>20</width>
+       <height>40</height>
       </size>
      </property>
-     <property name="maximumSize">
+    </spacer>
+   </item>
+   <item row="2" column="8">
+    <spacer name="verticalSpacer_4">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
       <size>
-       <width>90</width>
-       <height>28</height>
+       <width>20</width>
+       <height>40</height>
       </size>
      </property>
-     <property name="text">
-      <string>Submit</string>
-     </property>
-    </widget>
+    </spacer>
    </item>
    <item row="1" column="3">
     <widget class="QLabel" name="label_3">
@@ -154,8 +89,21 @@
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
-    <spacer name="verticalSpacer">
+   <item row="2" column="0">
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="0" column="2">
+    <spacer name="verticalSpacer_2">
      <property name="orientation">
       <enum>Qt::Vertical</enum>
      </property>
@@ -177,26 +125,73 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="6">
-    <spacer name="verticalSpacer_4">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
+   <item row="1" column="5">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>No. of Lots</string>
      </property>
-     <property name="sizeHint" stdset="0">
+    </widget>
+   </item>
+   <item row="2" column="7">
+    <widget class="QPushButton" name="pushButtonSubmit">
+     <property name="minimumSize">
       <size>
-       <width>20</width>
-       <height>40</height>
+       <width>90</width>
+       <height>28</height>
       </size>
      </property>
-    </spacer>
+     <property name="maximumSize">
+      <size>
+       <width>90</width>
+       <height>28</height>
+      </size>
+     </property>
+     <property name="text">
+      <string>Submit</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="3" colspan="2">
+    <widget class="QDoubleSpinBox" name="doubleSpinBox_price">
+     <property name="minimumSize">
+      <size>
+       <width>100</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximum">
+      <double>9999.989999999999782</double>
+     </property>
+     <property name="stepType">
+      <enum>QAbstractSpinBox::DefaultStepType</enum>
+     </property>
+    </widget>
+   </item>
+   <item row="1" column="2">
+    <widget class="QLabel" name="label_2">
+     <property name="text">
+      <string>Stockname</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="5" colspan="2">
+    <widget class="QSpinBox" name="spinBoxLot">
+     <property name="minimumSize">
+      <size>
+       <width>80</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximum">
+      <number>99999999</number>
+     </property>
+    </widget>
    </item>
   </layout>
  </widget>
  <tabstops>
   <tabstop>comboBoxBuySell</tabstop>
   <tabstop>lineEdit_Stockname</tabstop>
-  <tabstop>lineEdit_Price</tabstop>
-  <tabstop>lineEdit_Lots</tabstop>
   <tabstop>pushButtonSubmit</tabstop>
  </tabstops>
  <resources/>
