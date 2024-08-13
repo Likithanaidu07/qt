@@ -156,7 +156,7 @@ enum PortfolioType
 {
     F2F = 1,
     BY,
-    CR,
+
     BOX,
     BS,
     BS1221,
@@ -173,6 +173,7 @@ enum PortfolioType
     OPEN_BOX = 206, // open btfy
     F1_F2 = 207,
     BFLY_BID = 250,
+    CR = 251,
     JBX,
     JBX_3L,
     JBX_2L,

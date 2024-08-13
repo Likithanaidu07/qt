@@ -119,7 +119,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
         bool ok = checkDBOpened(msg);
         userLoginInfo.loginResponse = msg;
         if(ok){
-            QSqlQuery query("SELECT UserId, UserName,Password,STKOpenLimit,IDXOpenLimit,MaxPortfolioCount,BFLY_BIDInFilter,BYInFilter,F2FInFilter FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
+            QSqlQuery query("SELECT UserId, UserName,Password,STKOpenLimit,IDXOpenLimit,MaxPortfolioCount,BFLY_BIDInFilter,BYInFilter,F2FInFilter,CRInFilter FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
             if(!query.exec())
             {
                 // Error Handling, check query.lastError(), probably return
@@ -168,6 +168,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                     userLoginInfo.algoFilterMap[PortfolioType::BFLY_BID] = query.value(rec.indexOf("BFLY_BIDInFilter")).toString();
                     userLoginInfo.algoFilterMap[PortfolioType::BY] = query.value(rec.indexOf("BYInFilter")).toString();
                     userLoginInfo.algoFilterMap[PortfolioType::F2F] = query.value(rec.indexOf("F2FInFilter")).toString();
+                    userLoginInfo.algoFilterMap[PortfolioType::CR] = query.value(rec.indexOf("CRInFilter")).toString();
 
                     userLoginInfo.UserId = query.value(rec.indexOf("UserId")).toInt();
                     userLoginInfo.MaxPortfolioCount = query.value(rec.indexOf("MaxPortfolioCount")).toInt();
@@ -1100,6 +1101,7 @@ QList <QStringList> liners_listTmp;
                 }
                 case PortfolioType::CR:{
                     int strikePrice = ContractDetail::getInstance().GetStrikePrice(leg2_token_number,portfolio_type).toInt();
+                    strikePrice = strikePrice * devicer; // GetStrikePrice function will return strikePrice devided by devicer, and in below eqution again devide by devicer, to prevent it multipley it with debvicer
                     if(Leg1BuySellIndicator==1){
                         float diff = -leg1Price - leg3Price + leg2Price + strikePrice;
                         Exch_Price_val = static_cast<double>(diff) / devicer;
@@ -1674,51 +1676,44 @@ bool mysql_conn::deleteAlgo(QString PortfolioNumber,QString &msg)
             QString str = "SELECT Id FROM Trades WHERE PortfolioNumber='"+PortfolioNumber+"' OR PortfolioNumber='"+QString::number(PortfolioNumber.toInt() + 1500000)+"'";
             qDebug()<<"Delete Check records in Trades Query: " <<str;
             query.prepare(str);
-
-            if(!query.exec()) {
+            if(!query.exec())
+            {
                 msg = query.lastError().text();
-                qDebug() << query.lastError().text();
+                qDebug()<<query.lastError().text();
+            }
+            else{
 
-                // Show error popup
-                QMessageBox::warning(nullptr, "Executed Trades cannot be Deleted", "Error executing query: " + msg);
-            } else {
-                if(query.size() > 0) {
-                    ret = false;  // PortfolioNumber exists in Trades, so return
-                    msg = "Executed Trades cannot be Deleted";
-
-                    // Show information popup
-                    QMessageBox::information(nullptr, "Delete Skipped", msg);
-                } else {
+                if(query.size()>0){
+                    ret = false;  // PortfolioNumber exist in Trades so return
+                    msg = "Delete skipped, Record exist in Trades table.";
+                    QMessageBox msgBox;
+                    msgBox.setText("Executed Trades cannot be deleted ");
+                    msgBox.setIcon(QMessageBox::Warning);
+                    msgBox.exec();
+                }
+                else {
                     str = "DELETE FROM Portfolios WHERE PortfolioNumber='"+PortfolioNumber+"'" +  " AND SellTradedQuantity = 0 AND BuyTradedQuantity = 0";
                     qDebug()<<"Delete Query: " <<str;
                     query.prepare(str);
-
-                    if(!query.exec()) {
+                    if( !query.exec() )
+                    {
                         msg = query.lastError().text();
-                        qDebug() << query.lastError().text();
-
-                        // Show error popup
-                        QMessageBox::warning(nullptr, "Delete Failed", "Error executing delete query: " + msg);
-                    } else {
+                        qDebug()<<query.lastError().text();
+                    }
+                    else{
                         int rowsAffected = query.numRowsAffected();
                         if (rowsAffected > 0) {
-                            ret = true;  // Delete success
+                            ret = true;  //delet scuccess
                             msg = "Deleted successfully.";
-
-                            // Show success popup
-                            QMessageBox::information(nullptr, "Delete Successful", msg);
-                        } else {
-                            msg = "Delete failed.";
+                        }
+                        else {
+                            msg = "Deleted failed.";
                             ret = false;
-
-                            // Show failure popup
-                            QMessageBox::warning(nullptr, "Delete Failed", msg);
                         }
                     }
                 }
             }
         }
-
         else{
             qDebug()<<"Delete Portfolio  Cannot connect Database: "+db.lastError().text();
             msg="Delete Portfolio Cannot connect Database: "+db.lastError().text();
@@ -1846,7 +1841,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                               "Leg1TokenNo, Leg2TokenNo"
                                               ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
                                               "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                              "OrderQuantity,Alias) "
+                                              "OrderQuantity) "
                                               "VALUES (:PortfolioType, :TraderID, :Status, "
                                               ":Leg1TokenNo, :Leg2TokenNo,"
                                               ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
@@ -1864,6 +1859,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                 query.bindValue(":SellTotalQuantity", 0);
                                 query.bindValue(":SellTradedQuantity", 0);
                                 query.bindValue(":OrderQuantity", 0);
+
 
                             }
                             //BFLY
@@ -2025,12 +2021,12 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                               "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
                                               ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
                                               "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                              "OrderQuantity,Alias) "
+                                              "OrderQuantity) "
                                               "VALUES (:PortfolioType, :TraderID, :Status,"
                                               ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
                                               ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
                                               ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                              ":OrderQuantity,:Alias)");
+                                              ":OrderQuantity)");
                                 query.bindValue(":PortfolioType", data.algo_type);
                                 query.bindValue(":TraderID", data.user_id);
                                 query.bindValue(":Status", data.Algo_Status);

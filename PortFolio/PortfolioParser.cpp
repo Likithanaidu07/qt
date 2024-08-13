@@ -1397,8 +1397,14 @@ void PortfolioParser::CalculateConRevPriceDifference(PortfolioObject &portfolio,
        }*/
     QMap<int, QHash<QString, contract_table>> Contract =  ContractDetail::getInstance().GetContracts();
     int strikePrice = 0;//ContractDetail::GetDetail(portfolio.Leg2TokenNo).StrikePrice;
+
     if(Contract[type].contains(QString::number(portfolio.Leg2TokenNo)))
         strikePrice = Contract[type][QString::number(portfolio.Leg2TokenNo)].StrikePrice;
+    else{
+        qDebug()<<"Waring: Cannot get Leg2TokenNo = "<<portfolio.Leg2TokenNo<<" CR for Price calculation "<<"portfopliNo="<<portfolio.PortfolioNumber;
+    }
+
+   // double strikePrice = ContractDetail::getInstance().GetStrikePrice(portfolio.Leg2TokenNo,type).toDouble();
 
 
     MBP_Data_Struct leg1 = MBP_Data_Hash[QString::number(portfolio.Leg1TokenNo)];
@@ -1418,8 +1424,23 @@ void PortfolioParser::CalculateConRevPriceDifference(PortfolioObject &portfolio,
                                        (leg2.lastTradedPrice.toDouble() * 2 * 0.0009) +
                                        (leg3.lastTradedPrice.toDouble() * 2 * 0.0009)) / devicer), 'f', decimal_precision);
 
+   // strikePrice = strikePrice*devicer;
     bool ret = false;
     double diff = (-strikePrice - leg2SellPrice + leg1BuyPrice + leg3BuyPrice) * 1.0 / devicer;
+
+   /* qDebug()
+
+        <<"strikePrice="<<strikePrice<<
+        "portfolioNo="<<portfolio.PortfolioNumber<<
+        " Leg1TokenNo="<<portfolio.Leg1TokenNo<<
+        " Leg2TokenNo="<<portfolio.Leg2TokenNo<<
+        " Leg3TokenNo="<<portfolio.Leg3TokenNo;
+
+    qDebug()<<
+        " leg1BuyPrice="<<QString::asprintf("%.0f", leg1BuyPrice)<<" leg1SellPrice="<<QString::asprintf("%.0f", leg1SellPrice)<<
+        " leg2BuyPrice="<<QString::asprintf("%.0f", leg2BuyPrice)<<"   leg2SellPrice="<<QString::asprintf("%.0f", leg2SellPrice)<<
+        " leg3BuyPrice="<<QString::asprintf("%.0f", leg3BuyPrice)<<"   leg3SellPrice="<<QString::asprintf("%.0f", leg3SellPrice);
+    qDebug()<<"\n\n";*/
     if (portfolio.SellMarketRate != diff)
     {
         ret = true;

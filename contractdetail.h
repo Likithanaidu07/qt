@@ -87,7 +87,8 @@ public:
     bool LoadContractLocal(QHash<QString, QStringList> &_m_ContractDetailsFiltered,
                       QStringList &F2F_data_list_Sorted_Key,
                       QStringList &BFLY_data_list_Sorted_Key,
-                           QStringList &BFLY_BID_data_list_Sorted_Key);
+                           QStringList &BFLY_BID_data_list_Sorted_Key,
+                           QStringList &CR_data_list_Sorted_Key);
 #endif
 };
 
