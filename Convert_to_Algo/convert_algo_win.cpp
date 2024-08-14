@@ -169,9 +169,15 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     }*/
 
    //  ui->comboBox_AlgoType->setItemData(1, QVariant(0), Qt::UserRole-1);
+    ui->comboBox_AlgoType->clear();
+    ui->comboBox_AlgoType->setEditable(true);  // Make the combo box editable to show the placeholder
+    ui->comboBox_AlgoType->lineEdit()->setPlaceholderText("Build Algo");  // Set the placeholder text
+    ui->comboBox_AlgoType->setEditable(false);  // Set it back to non-editable to function as a normal combo box
 
-        ui->comboBox_AlgoType->clear();
-        ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
+    // Add the items to the dropdown
+    ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
+//        ui->comboBox_AlgoType->clear();
+//        ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
       //  ui->comboBox_AlgoType->addItem("F2F");
       //  ui->comboBox_AlgoType->addItem("BFLY");
         ui->comboBox_AlgoType->addItem("CR-BID");

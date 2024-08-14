@@ -120,7 +120,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         else
             obj.StatusVal = QString::number(portfolio_status::Filled);
 
-        if(obj.PortfolioType=="250" || obj.PortfolioType=="2"){
+        if(obj.PortfolioType==QString::number(PortfolioType::BFLY_BID)){
             obj.QuantityRatio="1:2:1";
         }
         else if(obj.PortfolioType==QString::number(PortfolioType::CR)){
