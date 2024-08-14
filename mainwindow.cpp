@@ -13,7 +13,7 @@
 #include <QTreeView>
 #include <QStandardItemModel>
 #include <QLabel>
-#include "ContractDetail.h"
+#include "contractdetail.h"
 #include "OrderBook/table_orderbook_delegate.h"
 #include "mysql_conn.h"
 #include "watch_data_list_item.h"

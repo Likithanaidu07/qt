@@ -848,7 +848,13 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
 
                 QString StockName = query.value(rec.indexOf("StockName")).toString();
                 QString OrderId = query.value(rec.indexOf("LocalOrderNumber")).toString();
-                QString AlgoNo = query.value(rec.indexOf("PortfolioNumber")).toString();
+                int  AlgoNo = query.value(rec.indexOf("PortfolioNumber")).toInt();
+                QString AlgoNoStr = "";
+                if(AlgoNo>1500000){
+                    AlgoNoStr = QString::number(AlgoNo - 1500000);
+                }
+                else
+                    AlgoNoStr = QString::number(AlgoNo);
                 QString TradedPrice = fixDecimal(((query.value(rec.indexOf("TradedPrice")).toDouble()) / devicer),decimal_precision);//QString::number(static_cast<double>(query.value(rec.indexOf("DesiredRate")).toDouble()) / devicer, 'f', decimal_precision+1);
 
                 int qty = query.value(rec.indexOf("TotalVolume")).toInt();
@@ -865,7 +871,7 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
                 QHash<QString,QString> tmp;
                 tmp.insert("Buy_Sell",Buy_Sell);
                 tmp.insert("OrderId",OrderId);
-                tmp.insert("AlgoNo",AlgoNo);
+                tmp.insert("AlgoNo",AlgoNoStr);
                 tmp.insert("StockName",StockName);
                 tmp.insert("Price",TradedPrice);
                 tmp.insert("Lots",Lots);

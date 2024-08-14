@@ -58,7 +58,7 @@ public:
     QStringList Get_F2F_data_list_Sorted_Key();
     QStringList Get_BFLY_data_list_Sorted_Key();
     QStringList Get_BFLY_BID_data_list_Sorted_Key();
-    QHash<QString, contract_table> GetFutureContracts();
+   // QHash<QString, contract_table> GetFutureContracts();
     QHash<QString, contract_table> GetContracts(QString type);
 
     int GetLotSize(int token, int type);

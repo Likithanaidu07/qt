@@ -389,8 +389,7 @@ QStringList ContractDetail::Get_BFLY_BID_data_list_Sorted_Key()
 {
     return BFLY_BID_data_list_Sorted_Key;
 }
-
-QHash<QString, contract_table> ContractDetail::GetFutureContracts()
+/*Hash<QString, contract_table> ContractDetail::GetFutureContracts()
 {
     if (m_ContractDetails.empty())
     {
@@ -407,7 +406,7 @@ QHash<QString, contract_table> ContractDetail::GetFutureContracts()
     //  [](const ContractDetail& a, const ContractDetail& b) { return a.InstrumentName < b.InstrumentName; });
 
     return futureContracts;
-}
+}*/
 
 QHash<QString, contract_table> ContractDetail::GetContracts(QString type)
 {

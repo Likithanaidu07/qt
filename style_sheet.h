@@ -21,7 +21,16 @@ const char DockTitleBar_Style[]="background: #FFF;"
 const char lineedit_dock_SS[]="border-radius: 10px;"
                               "border: 1px solid #ADB5BD;"
                               "background: #FFF;";
+
+
 const char scroll_bar_SS[]="QTableView {"
+                             "border-bottom-left-radius : 12px;"
+                             "border-bottom-right-radius : 12px;"
+                             "border: 4px solid #DAE1E9;"
+                             "}"
+                            ;
+
+const char scroll_bar_SS_prev[]="QTableView {"
                              "border-bottom-left-radius : 12px;"
                              "border-bottom-right-radius : 12px;"
                              "border: 4px solid #DAE1E9;"
@@ -82,7 +91,24 @@ const char scroll_bar_SS[]="QTableView {"
                              "    subcontrol-origin: margin;"
                              "    border-radius: 2px;"
                              "}";
+
 const char tableview_SS[]=  "QHeaderView::section {"
+                            "   background: #495867;"
+                            "   border: none;"
+                            "   color: #FFFFFF;"
+                            "   text-align: center; "
+                            "   font-size: 12px; "
+                            "   font-style: normal; "
+                            "   font-weight: 600; "
+                            "   line-height: normal;"
+                            "}"
+                            "QTableView {"
+                             "border-bottom-left-radius : 12px;"
+                             "border-bottom-right-radius : 12px;"
+                             "border: 4px solid #DAE1E9;"
+                             "}"
+                            ;
+const char tableview_SS_prev[]=  "QHeaderView::section {"
                             "   background: #495867;"
                             "   border: none;"
                             "   color: #FFFFFF;"
