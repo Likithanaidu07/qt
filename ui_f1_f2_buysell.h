@@ -50,6 +50,7 @@ public:
         F1_F2_BuySell->setMinimumSize(QSize(680, 100));
         F1_F2_BuySell->setMaximumSize(QSize(680, 100));
         gridLayout = new QGridLayout(F1_F2_BuySell);
+
         gridLayout->setObjectName("gridLayout");
         comboBoxBuySell = new QComboBox(F1_F2_BuySell);
         comboBoxBuySell->addItem(QString());
@@ -79,7 +80,9 @@ public:
 
         verticalSpacer_3 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
+
         gridLayout->addItem(verticalSpacer_3, 2, 0, 1, 1);
+
 
         verticalSpacer_2 = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
@@ -89,6 +92,7 @@ public:
         lineEdit_Stockname->setObjectName("lineEdit_Stockname");
         lineEdit_Stockname->setMinimumSize(QSize(200, 28));
 
+
         gridLayout->addWidget(lineEdit_Stockname, 2, 2, 1, 1);
 
         label_4 = new QLabel(F1_F2_BuySell);
@@ -96,12 +100,14 @@ public:
 
         gridLayout->addWidget(label_4, 1, 5, 1, 1);
 
+
         pushButtonSubmit = new QPushButton(F1_F2_BuySell);
         pushButtonSubmit->setObjectName("pushButtonSubmit");
         pushButtonSubmit->setMinimumSize(QSize(90, 28));
         pushButtonSubmit->setMaximumSize(QSize(90, 28));
 
         gridLayout->addWidget(pushButtonSubmit, 2, 7, 1, 1);
+
 
         doubleSpinBox_price = new QDoubleSpinBox(F1_F2_BuySell);
         doubleSpinBox_price->setObjectName("doubleSpinBox_price");
@@ -111,10 +117,12 @@ public:
 
         gridLayout->addWidget(doubleSpinBox_price, 2, 3, 1, 2);
 
+
         label_2 = new QLabel(F1_F2_BuySell);
         label_2->setObjectName("label_2");
 
         gridLayout->addWidget(label_2, 1, 2, 1, 1);
+
 
         spinBoxLot = new QSpinBox(F1_F2_BuySell);
         spinBoxLot->setObjectName("spinBoxLot");

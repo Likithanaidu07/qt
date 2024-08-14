@@ -116,8 +116,8 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
 
     case Qt::FontRole: {
         QFont font("Work Sans");
-        if (c == OrderBook_Idx::AlgoName_OB
-            || c==OrderBook_Idx::AlgoNo_OB){
+        if (c == OrderBook_Idx::AlgoName_OB){
+            //|| c==OrderBook_Idx::AlgoNo_OB){
             font.setPointSize(8);
             font.setBold(true);
             return font;
@@ -132,7 +132,8 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
                  c==OrderBook_Idx::BidLegState_OB||
                  c==OrderBook_Idx::Leg1State_OB||
                  c==OrderBook_Idx::Leg3State_OB||
-                 c==OrderBook_Idx::OrderId_OB){
+                 c==OrderBook_Idx::OrderId_OB
+                   || c==OrderBook_Idx::AlgoNo_OB){
 
             return font;
         }

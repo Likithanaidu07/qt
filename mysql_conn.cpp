@@ -876,7 +876,6 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
                 tmp.insert("Price",TradedPrice);
                 tmp.insert("Lots",Lots);
                 tmp.insert("Time",Time);
-
                 tradeData.append(tmp);
             }
 
