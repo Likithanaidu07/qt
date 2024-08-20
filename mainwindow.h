@@ -50,6 +50,9 @@
 #include "F1_F2/f1_f2_buysell.h"
 
 #include "MissedTrades/missed_trade_table_model.h"
+#include "Cards/logs_cards.h"
+#include "Cards/summary_cards.h"
+#include "Cards/watch_cards.h"
 using namespace ads;
 
 class mysql_conn;
@@ -94,11 +97,14 @@ signals:
     void display_log_text_signal(QString);
     void update_ui_signal(int);
     void signalHideProgressBar();
-    void data_summary_update_signal();
+    void data_summary_update_signal(QStringList);
+    void indicesDataRecv_Signal_watch_card(Indices_Data_Struct);
+    void logDataSignal(QStringList);
 
 
 private:
     Ui::MainWindow *ui;
+    QStringList logsdata;
 
     loadingdatawindow *loadingDataWinodw;
     SortSettingPopUp *sortWin; // Add this line
@@ -212,14 +218,14 @@ private:
 
     QMutex indicesDataMutex; //list to store indices data for watch
     QString watchItemSelectedindexName;
-    QStringList savedWatchItems; // saved watch item to display on watch
+   // QStringList savedWatchItems; // saved watch item to display on watch
     void showSaveWatchOnListView();
-    void initWatchWindow();
+   // void initWatchWindow();
     void updateSelecteWatch_UI( Indices_Data_Struct data);
     void addToSavedWatchItems(Indices_Data_Struct data);
     void removeFromSavedWatchItems(Indices_Data_Struct data);
-    void saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList);
-    void loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList);
+ //   void saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList);
+ //   void loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList);
 
     void saveDockManagerState();
      void restoreDockManagerState();
@@ -288,18 +294,20 @@ private slots:
     void on_Algorithms_Close_clicked();
 
     void on_ConvertAlgo_button_clicked();
-    void on_lineEditWatchSearch_textChanged(const QString &arg1);
-    void on_listWidgetWatch_itemClicked(QListWidgetItem *item);
+   // void on_lineEditWatchSearch_textChanged(const QString &arg1);
+   // void on_listWidgetWatch_itemClicked(QListWidgetItem *item);
 
-    void on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item);
-    void on_listWidgetWatch_itemSelectionChanged();
+ //   void on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item);
+   // void on_listWidgetWatch_itemSelectionChanged();
 
-    void on_toggle_Button_1_clicked();
+  //  void on_toggle_Button_1_clicked();
 
 
     void on_MissedTrade_Button_clicked();
 
     void on_MissedTrade_Close_clicked();
+
+    void on_comboBox_currentTextChanged(const QString &arg1);
 
 protected:
     virtual void closeEvent(QCloseEvent* event) override;
