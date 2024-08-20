@@ -86,6 +86,8 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
                 return QVariant::fromValue(QColor(250, 42, 85));
             else if(Leg1_OrderState==8)
                 return QVariant::fromValue(QColor(0,128,0));
+            else if(Leg1_OrderState==10)
+                return QVariant::fromValue(QColor(0,0,139));
             else
                 return QVariant::fromValue(QColor(0,0,0));
         }
@@ -99,6 +101,8 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
                 return QVariant::fromValue(QColor(250, 42, 85));
             else if(Leg3_OrderState==8)
                 return QVariant::fromValue(QColor(0,128,0));
+            else if(Leg3_OrderState==10)
+                return QVariant::fromValue(QColor(0,0,139));
             else
                 return QVariant::fromValue(QColor(0,0,0));
         }
