@@ -305,7 +305,12 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
             return portfolio->Alias;
         }
         else if (index.column() == PortfolioData_Idx::_ExpiryDateTime) {
-            return portfolio->ExpiryDateTime.toString("dd-MMM-yy");
+            QString ExpiryDateTimeStr = "-";
+            if (!portfolio->ExpiryDateTime.isNull() && portfolio->ExpiryDateTime.isValid())
+                ExpiryDateTimeStr =  portfolio->ExpiryDateTime.toString("dd-MMM-yy");
+            if(ExpiryDateTimeStr=="")
+                ExpiryDateTimeStr = "-";
+            return ExpiryDateTimeStr;
         }
         else if (index.column() == PortfolioData_Idx::_Leg1) {
             return portfolio->Leg1;

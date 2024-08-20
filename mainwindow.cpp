@@ -861,8 +861,7 @@ MainWindow::MainWindow(QWidget *parent)
     // connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
    //loadContract();
     initWatchWindow();
-    // this should be called after all dock widget are set
-    restoreDockManagerState();
+
 }
 
 
@@ -875,6 +874,9 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::update_ui_slot(int type){
+
+    // this should be called after all dock widget are set
+    restoreDockManagerState();
 
     switch (type) {
     case LOADED_MODEL:

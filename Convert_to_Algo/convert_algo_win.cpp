@@ -37,6 +37,9 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     setTabOrder(ui->lineEdit_Start_strike_ConvRev,ui->lineEdit_EndStrike_ConvRev);
     setTabOrder(ui->lineEdit_EndStrike_ConvRev,ui->pushButtonAdd);
 
+    setTabOrder(ui->lineEdit_Fut_CRJellyBid,ui->lineEdit_Start_strike_CRJellyBid);
+    setTabOrder(ui->lineEdit_Start_strike_CRJellyBid,ui->lineEdit_EndStrike_CRJellyBid);
+    setTabOrder(ui->lineEdit_EndStrike_CRJellyBid,ui->pushButtonAdd);
 
     setTabOrder(ui->pushButtonAdd, ui->pushButtonSelectAll);
     setTabOrder(ui->pushButtonSelectAll, ui->pushButton_Reset);
@@ -133,6 +136,19 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     algoBtFlyBid->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_BtfyBid,ui->lineEdit_EndStrike_BtfyBid,ui->lineEdit_StrikeDifference_BtfyBid);
     /*******Class to generate BtFly-bid algos************/
 
+
+
+    /*******Class to generate algoCRJellyBid algos************/
+    algoCRJellyBid= new add_algo_cr_jelly_bid();
+    algoCRJellyBid->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_CRJellyBid,ui->lineEdit_EndStrike_CRJellyBid,ui->lineEdit_Fut_CRJellyBid);
+    /*******Class to generate algoCRJellyBid algos************/
+
+
+
+
+
+
+
     QDoubleValidator *val = new QDoubleValidator();
     val->setLocale(QLocale::C);
     val->setNotation(QDoubleValidator::StandardNotation);
@@ -185,6 +201,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 //        ui->comboBox_AlgoType->addItem("Open-BFLY");
 //        ui->comboBox_AlgoType->addItem("Open-BOX");
 
+        ui->comboBox_AlgoType->addItem("CRJELLY");
         ui->comboBox_AlgoType->setStyleSheet(
             "QComboBox {"
             "    font-weight: bold;"
@@ -262,6 +279,10 @@ void ConvertAlgo_Win::hideAnyListViewVisible(){
     algoConRev->slotEndHide("");
     algoConRev->slotFutHide("");
 
+    algoCRJellyBid->slotStartHide("");
+    algoCRJellyBid->slotEndHide("");
+    algoCRJellyBid->slotFutHide("");
+
 
 }
 
@@ -319,7 +340,7 @@ void ConvertAlgo_Win::update_ui_slot(int type){
 
 void ConvertAlgo_Win::update_contract_tableData(QString foo_user_id_,int MaxPortfolioCount_){
 
-    QMap<int, QHash<QString, contract_table>> contract_table_ = ContractDetail::getInstance().GetContracts();
+    QHash<QString, contract_table> contract_table_ = ContractDetail::getInstance().GetContracts();
 
     sharedData->foo_user_id = foo_user_id_;
     sharedData->MaxPortfolioCount = MaxPortfolioCount_;
@@ -344,6 +365,11 @@ void ConvertAlgo_Win::update_contract_tableData(QString foo_user_id_,int MaxPort
     algoConRev->sorted_keys_F2F = sharedData->FO_F2F_data_list_Sorted_Key;
     algoConRev->model_Fut_CR = ContractDetail::getInstance().Get_model_FUT_CON_REV();  //get the model generated from contract class
 
+
+    algoCRJellyBid->sorted_keys_CON_REV_JELLY_BID = sharedData->FO_BFLY_data_list_Sorted_Key;
+    algoCRJellyBid->sorted_keys_F2F = sharedData->FO_F2F_data_list_Sorted_Key;
+    algoCRJellyBid->model_Fut_CR_JELLY_BID = ContractDetail::getInstance().Get_model_FUT_CON_REV();  //get the model generated from contract class
+
     /*algoBOX->sorted_keys_BOX = sharedData->FO_BFLY_data_list_Sorted_Key;
     algoBOX->model_searchInstrument_BOX_Leg1 = ContractDetail::getInstance().Get_model_searchInstrument_BOX_Leg1(); //get the model generated from contract class for leg1
 
@@ -360,12 +386,12 @@ void ConvertAlgo_Win::update_contract_tableData(QString foo_user_id_,int MaxPort
     QFuture<void> futureBackGroundDBThread = QtConcurrent::run(&ConvertAlgo_Win::sort_data_and_populate_model,this,contract_table_/*,cd_contract_table_hash_*/);
 }
 
-void ConvertAlgo_Win::sort_data_and_populate_model(QMap<int, QHash<QString, contract_table>> contract_table_/*,QHash<QString, contract_table> cd_contract_table_*/){
+void ConvertAlgo_Win::sort_data_and_populate_model(QHash<QString, contract_table> contract_table_/*,QHash<QString, contract_table> cd_contract_table_*/){
     // qDebug()<<"Populating data on inpute file started..";
 
     emit display_log_text_slot("Setting contract data for input field..");
     //filter data based on instrument_type
-    QHashIterator<QString, contract_table> iter1(contract_table_[PortfolioType::BFLY_BID]);
+   /* QHashIterator<QString, contract_table> iter1(contract_table_[PortfolioType::BFLY_BID]);
 
     while (iter1.hasNext()){
         iter1.next();
@@ -385,9 +411,9 @@ void ConvertAlgo_Win::sort_data_and_populate_model(QMap<int, QHash<QString, cont
     while (iter3.hasNext()){
         iter3.next();
         sharedData->fo_contract_table_hash[QString::number(iter3.value().TokenNumber)] = iter3.value();
-    }
+    }*/
     // default oprion will be FO so use the contract table  for fo option
-    sharedData->contract_table_hash = sharedData->fo_contract_table_hash;
+    sharedData->contract_table_hash = ContractDetail::getInstance().GetContracts();//sharedData->fo_contract_table_hash;
     //algoF2F->sorted_keys_F2F = sharedData->FO_F2F_data_list_Sorted_Key;
     //algoBtFly->sorted_keys_BFLY = sharedData->FO_BFLY_data_list_Sorted_Key;
     //algoConRev->sorted_keys_CON_REV = sharedData->FO_BFLY_data_list_Sorted_Key;
@@ -479,6 +505,9 @@ void ConvertAlgo_Win::resetTableWidget(){
     else if(algoType==BFLY_BID_TYPE){
         headers = {"Algo Name","Option Type ","Expiry","Leg1 Strike","Leg2 Strike","Leg3 Strike","Reserved","Reserved","Status"};
     }
+    else if(algoType=="CRJELLY"){
+        headers = {"Algo Name","Strike/Expiry1","Strike/Expiry2","Strike/Expiry3","Buy Diff","Sell Diff","Status"};
+    }
 
     ui->tableWidget->clear();
     ui->tableWidget->setRowCount(0);
@@ -555,6 +584,10 @@ void ConvertAlgo_Win::on_pushButtonAdd_clicked()
     else if(algo_type==BFLY_BID_TYPE){
         algoBtFlyBid->generateAlgo();
     }
+
+    else if(algo_type=="CRJELLY"){
+        algoCRJellyBid->generateAlgo();
+    }
 //    if(algo_type=="BOX"){
 //        algoBOX->generateAlgo();
 //    }
@@ -604,6 +637,12 @@ void ConvertAlgo_Win::on_comboBox_AlgoType_currentTextChanged(const QString algo
 
         ui->stackedWidget->setCurrentWidget(ui->pageBtfyBid);
         algoBtFlyBid->selectedAction();
+    }
+
+    if(algoType=="CRJELLY"){
+
+        ui->stackedWidget->setCurrentWidget(ui->pageCRJellyBid);
+        algoCRJellyBid->selectedAction();
     }
 //    else if(algoType=="2L Straddle"){
 
@@ -712,6 +751,10 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                     algo_type="Open-BOX";
                 else if(algo_type==QString::number(PortfolioType::BFLY_BID))
                     algo_type="BFLY_BID_TYPE";
+                else if(algo_type==QString::number(PortfolioType::CR_JELLY))
+                    algo_type="CRJELLY";
+
+
 
                 QString Algo_Name = algo_type+"-"+sharedData->algo_data_list[i].Algo_Name;
                 QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.2;'>"
@@ -757,23 +800,6 @@ void ConvertAlgo_Win::on_pushButton_Reset_clicked()
 {
     resetTableWidget();
     sharedData->algo_data_list.clear();
-
-    //ui->lineEdit_Instrument_Name->clear();
-    // ui->lineEdit_algo_combination->clear();
-//    ui->lineEdit_Start_strike->clear();
-//    ui->lineEdit_EndStrike->clear();
-//    // ui->lineEdit_OptionType->clear();
-//    ui->lineEdit_StrikeDifference->clear();
-//    ui->lineEdit_Fut->clear();
-//    //ui->lineEdit_Instrument_Name->setCompleter(0);
-//    // ui->lineEdit_algo_combination->setCompleter(0);
-//    // ui->lineEdit_Start_strike->setCompleter(0);
-//    ui->lineEdit_EndStrike->setCompleter(0);
-//    ui->lineEdit_Fut->setCompleter(0);
-//    // ui->lineEdit_OptionType->setCompleter(0);
-
-    //update_input_field();
-
     ui->lineEdit_StrikeDifference_Btfy->clear();
     ui->lineEdit_StrikeDifference_BtfyBid->clear();
     ui->lineEdit_Start_strike_Btfy->clear();
@@ -785,6 +811,9 @@ void ConvertAlgo_Win::on_pushButton_Reset_clicked()
     ui->lineEdit_EndStrike_ConvRev->clear();
     ui->lineEdit_EndStrike_f2f->clear();
     ui->lineEdit_Fut_ConvRev->clear();
+    ui->lineEdit_EndStrike_CRJellyBid->clear();
+    ui->lineEdit_Fut_CRJellyBid->clear();
+    ui->lineEdit_Start_strike_CRJellyBid->clear();
 }
 
 

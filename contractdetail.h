@@ -36,13 +36,12 @@ private:
 public:
 
 
-    static QMap<int, QHash<QString, contract_table>> m_ContractDetails;
+    static QHash<int , QStringList> m_ContractDetails_Grouped;
+    static QHash<QString, contract_table> m_ContractDetails_Hash;
+
     static QHash<QString, QStringList> m_ContractDetailsFiltered;
 
-    static QStringList F2F_data_list_Sorted_Key;
-    static QStringList BFLY_data_list_Sorted_Key;
-    static QStringList BFLY_BID_data_list_Sorted_Key;
-    static QStringList CR_data_list_Sorted_Key;
+
 
 //    static QStandardItemModel *model_searchInstrument_BOX_Leg1; // used in add algo window  for BOX startegy
     static QStandardItemModel *model_start_strike_BFLY; // used in add algo window  for BFLY startegy
@@ -54,7 +53,7 @@ public:
     static ContractDetail& getInstance();
     void ReloadContractDetails(userInfo uData);
     qint64 GetExpiry(int token, int type);
-    QMap<int, QHash<QString, contract_table> > GetContracts();
+    QHash<QString, contract_table>  GetContracts();
     QStringList Get_F2F_data_list_Sorted_Key();
     QStringList Get_BFLY_data_list_Sorted_Key();
     QStringList Get_BFLY_BID_data_list_Sorted_Key();
@@ -83,12 +82,8 @@ public:
 
 #ifdef STORE_CONTRACT_LOCALLY
     PortfolioType checkAlogTypeForTheData(QString instrument_type);
-    void StoreContractToLocalFile();
-    bool LoadContractLocal(QHash<QString, QStringList> &_m_ContractDetailsFiltered,
-                      QStringList &F2F_data_list_Sorted_Key,
-                      QStringList &BFLY_data_list_Sorted_Key,
-                           QStringList &BFLY_BID_data_list_Sorted_Key,
-                           QStringList &CR_data_list_Sorted_Key);
+   // void StoreContractToLocalFile();
+    bool LoadContractLocal(QHash<QString, QStringList> &_m_ContractDetailsFiltered);
 #endif
 };
 

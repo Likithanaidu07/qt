@@ -86,6 +86,8 @@ QString PortfolioObject::getPortFolioTypeString(QString portfolioType)
     PortFolioType_String.insert(QString::number(PortfolioType::F2F), "FtF");
     PortFolioType_String.insert(QString::number(PortfolioType::BY), "BY");
     PortFolioType_String.insert(QString::number(PortfolioType::CR), "CR");
+    PortFolioType_String.insert(QString::number(PortfolioType::CR_JELLY), "CR_JELLY");
+
     //  PortFolioType_String.insert(QString::number(PortfolioType::CR_SKIP), "2L CR");
 
     PortFolioType_String.insert(QString::number(PortfolioType::JBX), "BOX");
