@@ -980,9 +980,6 @@ QList <QStringList> liners_listTmp;
                 else if(Leg1_OrderState==7){
                     Leg1_OrderStateStr = "Traded";
                 }
-                else if(Leg1_OrderState==11){
-                    Leg1_OrderStateStr = "Modified";
-                }
                 else if(Leg1_OrderState==9){
                     Leg1_OrderStateStr = "Open";
                 }
@@ -1017,9 +1014,6 @@ QList <QStringList> liners_listTmp;
                 }
                 else if(Leg3_OrderState==9){
                     Leg3_OrderStateStr = "Open";
-                }
-                else if(Leg3_OrderState==11){
-                    Leg3_OrderStateStr = "Modified";
                 }
                 else if(Leg3_OrderState==10){
                     Leg3_OrderStateStr = "ModifyPending";
@@ -1073,27 +1067,22 @@ QList <QStringList> liners_listTmp;
                 //Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")";
                // Leg1_OrderStateStr = Leg1_OrderStateStr+" ("+(QString::number(Leg1_OrderState))+")";
                // Leg3_OrderStateStr = Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")";
-                Leg2_OrderStateStr = Leg2_OrderStateStr;
-                              //       +" ("+(QString::number(Leg2_OrderState))+")";
+                Leg2_OrderStateStr = Leg2_OrderStateStr+" ("+(QString::number(Leg2_OrderState))+")";
                 if(Leg1_OrderState==8)
                 {
-                   Leg1_OrderStateStr = Leg1_OrderStateStr+"["+(QString::number(Leg1_Total_Volume/lotSize))+"]";
-                   // +" ("+(QString::number(Leg1_OrderState))+")"+" "
+                   Leg1_OrderStateStr = Leg1_OrderStateStr+" ("+(QString::number(Leg1_OrderState))+")"+" "+"["+(QString::number(Leg1_Total_Volume/lotSize))+"]";
                 }
                 else
                 {
-                   Leg1_OrderStateStr = Leg1_OrderStateStr;
-                                        //+" ("+(QString::number(Leg1_OrderState))+")";
+                    Leg1_OrderStateStr = Leg1_OrderStateStr+" ("+(QString::number(Leg1_OrderState))+")";
                 }
                 if(Leg3_OrderState==8)
                 {
-                    Leg3_OrderStateStr = Leg3_OrderStateStr+"["+(QString::number(Leg3_Total_Volume/lotSize))+"]";
-                  // +" ("+(QString::number(Leg3_OrderState))+")"+" "
+                    Leg3_OrderStateStr = Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")"+" "+"["+(QString::number(Leg3_Total_Volume/lotSize))+"]";
                 }
                 else
                 {
-                    Leg3_OrderStateStr = Leg3_OrderStateStr;
-                                         //+" ("+(QString::number(Leg3_OrderState))+")";
+                    Leg3_OrderStateStr = Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")";
                 }
 
                 QString Exch_Price = "0";

@@ -40,11 +40,11 @@ public:
 private:
    // QStringList header={"Status","Algo ID","Algo Name","Rate", "Avg", "Diff" ,"TQ", "TTQ", "RQ", "Rate", "Avg", "Diff", "TQ", "TTQ", "RQ", "Odr Qty" ,"Qty Ratio", "Skip/Market Strike", "Bid Leg", "Cost", "Fut Price"};
     QStringList header={"Status","Algo No",
-                          "Algo Name","Alias","B Rate",
-                          "B Avg","B Diff","B TQ",
-                          "B TTQ","B RQ","S Rate",
-                          "S Avg", "S Diff","S TQ",
-                          "S TTQ","S RQ","Odr Qty","Expiry 1", /*"Expiry 2",*/
+                          "Algo Name","Alias","B-Rate",
+                          "B-Avg","B-Diff","B-TQ",
+                          "B-TTQ","B-RQ","S-Rate",
+                          "S-Avg", "S-Diff","S-TQ",
+                          "S-TTQ","S-RQ","Odr Qty","Expiry 1", /*"Expiry 2",*/
                           "Cost" ,"Qty Ratio",
                            "Bid Leg", "Fut Price"};
 

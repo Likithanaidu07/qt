@@ -152,7 +152,7 @@ void SortSettingPopUp::on_pushButtonAdd_clicked()
       ui->tableWidget->setItem(row, 0, item);
 
       // Second column with ComboBox
-       QComboBox *comboBox = new QComboBox();
+      QComboBox *comboBox = new QComboBox();
       if(selectedText == "Algo Status"){
           comboBox->addItem("Enabled");
           comboBox->addItem("Disabled"); 

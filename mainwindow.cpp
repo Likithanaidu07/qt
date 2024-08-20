@@ -22,7 +22,6 @@
 #include "Liners/liners_delegate.h"
 #include "NetPosition/net_position_table_delegate.h"
 #include "NetPosition/net_position_table_headerview.h"
-#include "Cards/logs_cards.h"
 
 
 //#define ENABLE_BACKEND_DEBUG_MSG
@@ -46,22 +45,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->setupUi(this);
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-    ui->comboBox->setStyleSheet(
-        "QComboBox {"
-        "    text-align: center;"
-        "    background-color: #46454d;"
-        "    color: white;"
-        "    font-family: 'Work Sans';"
-        "}"
-        );
 
 
-   // ui->sidePanel->setVisible(false);
-    ui->widget_3->setVisible(false);
-      ui->widget_5->setVisible(true);
-    ui->widget_4->setVisible(false);
-    //ui->toggle_Button_1->setVisible(false);
-  //  connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
+    connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
     connect(this,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
     loadingDataWinodw = new loadingdatawindow(this);
     connect(this,SIGNAL(signalHideProgressBar()),this,SLOT(slotHideProgressBar()));
@@ -113,30 +99,30 @@ MainWindow::MainWindow(QWidget *parent)
 
     /***********************Move Side Panel items to dock Widget**********************/
 
-//    DockManagerSidePanel = new CDockManager(ui->sidePanel);
-//    ui->sidePanel->layout()->addWidget(DockManagerSidePanel);
-//    CDockWidget* watchWidgetDockWidget = new CDockWidget("Watch");
-//    watchWidgetDockWidget->setWidget(ui->watchWidget);
-//    watchWidgetDockWidget->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
-//    watchWidgetDockWidget->resize(250, 150);
-//    watchWidgetDockWidget->setMinimumSize(200,150);
-//    DockManagerSidePanel->addDockWidget(DockWidgetArea::TopDockWidgetArea, watchWidgetDockWidget);
+    DockManagerSidePanel = new CDockManager(ui->sidePanel);
+    ui->sidePanel->layout()->addWidget(DockManagerSidePanel);
+    CDockWidget* watchWidgetDockWidget = new CDockWidget("Watch");
+    watchWidgetDockWidget->setWidget(ui->watchWidget);
+    watchWidgetDockWidget->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
+    watchWidgetDockWidget->resize(250, 150);
+    watchWidgetDockWidget->setMinimumSize(200,150);
+    DockManagerSidePanel->addDockWidget(DockWidgetArea::TopDockWidgetArea, watchWidgetDockWidget);
 
-//    ui->sidePanel->layout()->addWidget(DockManagerSidePanel);
-//    CDockWidget* summaryhWidgetDockWidget = new CDockWidget("Summary");
-//    summaryhWidgetDockWidget->setWidget(ui->summary_widget);
-//    summaryhWidgetDockWidget->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
-//    summaryhWidgetDockWidget->resize(250, 150);
-//    summaryhWidgetDockWidget->setMinimumSize(200,150);
-//    DockManagerSidePanel->addDockWidget(DockWidgetArea::CenterDockWidgetArea, summaryhWidgetDockWidget);
+    ui->sidePanel->layout()->addWidget(DockManagerSidePanel);
+    CDockWidget* summaryhWidgetDockWidget = new CDockWidget("Summary");
+    summaryhWidgetDockWidget->setWidget(ui->summary_widget);
+    summaryhWidgetDockWidget->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
+    summaryhWidgetDockWidget->resize(250, 150);
+    summaryhWidgetDockWidget->setMinimumSize(200,150);
+    DockManagerSidePanel->addDockWidget(DockWidgetArea::CenterDockWidgetArea, summaryhWidgetDockWidget);
 
-//    ui->sidePanel->layout()->addWidget(DockManagerSidePanel);
-//    CDockWidget* loghWidgetDockWidget = new CDockWidget("Logs");
-//    loghWidgetDockWidget->setWidget(ui->Logs_Widget);
-//    loghWidgetDockWidget->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
-//    loghWidgetDockWidget->resize(250, 150);
-//    loghWidgetDockWidget->setMinimumSize(200,150);
-//    DockManagerSidePanel->addDockWidget(DockWidgetArea::BottomDockWidgetArea, loghWidgetDockWidget);
+    ui->sidePanel->layout()->addWidget(DockManagerSidePanel);
+    CDockWidget* loghWidgetDockWidget = new CDockWidget("Logs");
+    loghWidgetDockWidget->setWidget(ui->Logs_Widget);
+    loghWidgetDockWidget->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
+    loghWidgetDockWidget->resize(250, 150);
+    loghWidgetDockWidget->setMinimumSize(200,150);
+    DockManagerSidePanel->addDockWidget(DockWidgetArea::BottomDockWidgetArea, loghWidgetDockWidget);
 
 
 
@@ -793,14 +779,14 @@ MainWindow::MainWindow(QWidget *parent)
    // connect(ui->toggle_Button, SIGNAL(clicked()), this, SLOT(on_toggle_Button_clicked()));
 
     //stylesheet for summary window title labels
-//    const char stylesheet_userinfo[] = "color: #2F3339;" "text-align: center;""font-size: 12px;""font-style: normal;""font-weight: bold;""line-height: normal;";
-//    for (auto w : {ui->label_7, ui->label_9,ui->label_10,ui->label_8,ui->label_2,ui->label_20,ui->label_6,ui->label_16,ui->label_15,ui->label_14,ui->m2mlabel,ui->label_13}){
-//        w->setStyleSheet(stylesheet_userinfo);
-//        QFont font=w->font();
-//        font.setFamily("Work Sans");
-//        w->setFont(font);
-//        w->setWordWrap(true);
-//    }
+    const char stylesheet_userinfo[] = "color: #2F3339;" "text-align: center;""font-size: 12px;""font-style: normal;""font-weight: bold;""line-height: normal;";
+    for (auto w : {ui->label_7, ui->label_9,ui->label_10,ui->label_8,ui->label_2,ui->label_20,ui->label_6,ui->label_16,ui->label_15,ui->label_14,ui->m2mlabel,ui->label_13}){
+        w->setStyleSheet(stylesheet_userinfo);
+        QFont font=w->font();
+        font.setFamily("Work Sans");
+        w->setFont(font);
+        w->setWordWrap(true);
+    }
 
 //    ui->label_3->setText(QString::number(AlgoCount));
 //    ui->label_25->setText(QString::number(OrderCount));
@@ -812,11 +798,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->HP_Close->setVisible(false);
     ui->Templates_Close->setVisible(false);
 
-//    ui->lineEditWatchSearch->setPlaceholderText("Search...");
-//    ui->lineEditWatchSearch->setStyleSheet("font-family: 'Work Sans';"
-//                                           "font-size: 12px;"
-//                                           "font-weight: 400;"
-//                                           );
+    ui->lineEditWatchSearch->setPlaceholderText("Search...");
+    ui->lineEditWatchSearch->setStyleSheet("font-family: 'Work Sans';"
+                                           "font-size: 12px;"
+                                           "font-weight: 400;"
+                                           );
     QPixmap pixmapmenu(":/menu.png");
     ui->close->setIcon(pixmapclose);
     ui->minimize->setIcon(pixmapminimize);
@@ -830,34 +816,34 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Positions_Close->setIcon(pixmapbuttonclose);
     ui->Liners_Close->setIcon(pixmapbuttonclose);
     ui->HP_Close->setIcon(pixmapbuttonclose);
-    ui->MissedTrade_Close_6->setIcon(pixmapbuttonclose);
+    ui->MissedTrade_Close->setIcon(pixmapbuttonclose);
     ui->Templates_Close->setIcon(pixmapbuttonclose);
 
     const char stylesheet_params[] = "color: #000000 ;""font-size: 12px;""font-style: normal;""font-weight: bold;""line-height: normal;";
-//    for (auto w : {ui->Open_Label, ui->High_Label,ui->Low_Label,ui->Volume_Label}){
-//        w->setStyleSheet(stylesheet_params);
-//        QFont font=w->font();
-//        font.setFamily("Work Sans");
-//        w->setFont(font);
-//    }
+    for (auto w : {ui->Open_Label, ui->High_Label,ui->Low_Label,ui->Volume_Label}){
+        w->setStyleSheet(stylesheet_params);
+        QFont font=w->font();
+        font.setFamily("Work Sans");
+        w->setFont(font);
+    }
 
     const char stylesheet_params_nos[] = "color: #4f3c7f ;""font-family: Work Sans;" "font-size: 14px;" "font-style: normal;" "font-weight: bold;""line-height: normal;";
-//    for (auto w : {ui->Open_Num, ui->High_Num,ui->Low_Num,ui->Volume_Num}){
-//        w->setStyleSheet(stylesheet_params_nos);
-//        QFont font=w->font();
-//        font.setFamily("Work Sans");
-//        w->setFont(font);
-//    }
+    for (auto w : {ui->Open_Num, ui->High_Num,ui->Low_Num,ui->Volume_Num}){
+        w->setStyleSheet(stylesheet_params_nos);
+        QFont font=w->font();
+        font.setFamily("Work Sans");
+        w->setFont(font);
+    }
 
-//    QFont fontbuy=ui->Buy_Watch_Button->font();
-//    QFont fontsell=ui->Sell_Watch_Button->font();
-//    fontbuy.setFamily("Work Sans");
-//    fontsell.setFamily("Work Sans");
-//    ui->Buy_Watch_Button->setFont(fontbuy);
-//    ui->Sell_Watch_Button->setFont(fontsell);
+    QFont fontbuy=ui->Buy_Watch_Button->font();
+    QFont fontsell=ui->Sell_Watch_Button->font();
+    fontbuy.setFamily("Work Sans");
+    fontsell.setFamily("Work Sans");
+    ui->Buy_Watch_Button->setFont(fontbuy);
+    ui->Sell_Watch_Button->setFont(fontsell);
 
-//    ui->listWidgetWatch->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Hides vertical scroll bar
-//    ui->listWidgetWatch->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Hides horizontal scroll bar
+    ui->listWidgetWatch->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Hides vertical scroll bar
+    ui->listWidgetWatch->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Hides horizontal scroll bar
 
 
 
@@ -874,7 +860,7 @@ MainWindow::MainWindow(QWidget *parent)
     // db_conn =new mysql_conn(this,"main_db_conn");
     // connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
    //loadContract();
-    //initWatchWindow();
+    initWatchWindow();
     // this should be called after all dock widget are set
     restoreDockManagerState();
 }
@@ -1042,13 +1028,13 @@ void MainWindow::loadSettings(){
         settings.beginGroup("GeneralSettings");
         if (settings.contains("market_type"))
             market_type = settings.value("market_type").toString();
-//        if(settings.contains("Watch_InstrumentNames")){
-//           QString watch=  settings.value("Watch_InstrumentNames").toString();
-//            if(watch=="")
-//               savedWatchItems.clear();
-//            else
-//                savedWatchItems = watch.split(";");
-//        }
+        if(settings.contains("Watch_InstrumentNames")){
+           QString watch=  settings.value("Watch_InstrumentNames").toString();
+            if(watch=="")
+               savedWatchItems.clear();
+            else
+                savedWatchItems = watch.split(";");
+        }
         settings.endGroup();
     }
     //currently hardcoded for FO
@@ -1199,10 +1185,13 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                         }
                         else{
                             updateQueryList.append("OrderQuantity="+QString::number(val));
-                            logMsg = logMsg+"OrderQuantity ["+QString::number(val1)+"], ";
+                            logMsg = logMsg+"OrderQuantity ["+QString::number(val)+"], ";
                         }
                     }
                 }
+
+
+
 
                     break;
 
@@ -1510,14 +1499,14 @@ void MainWindow::loadDataAndUpdateTable(int table){
 
         db_conn->getPortfoliosTableData(reloadSortSettFlg,AlgoCount,T_Portfolio_Model,combined_tracker_model,averagePriceList,QString::number(userData.UserId),TradedPortFolioList);
         emit data_loded_signal(T_Table::PORTFOLIO);
-        updateSummaryLabels();
+        emit data_summary_update_signal();
         break;
        }
 
     case T_Table::SUMMARY:
         db_conn->getSummaryTableData(OrderCount,QString::number(userData.UserId) );  // Correctly get the count
         emit data_loded_signal(T_Table::SUMMARY);
-        updateSummaryLabels();
+        emit data_summary_update_signal();
         break;
 
     case T_Table::TRADE:{
@@ -1525,7 +1514,7 @@ void MainWindow::loadDataAndUpdateTable(int table){
         QHash<QString, PortFolioData_Less> PortFolioHash = T_Portfolio_Model->getPortFolioDataLess();
         db_conn->getTradeTableData(TraderCount,trade_model,liners_model,QString::number(userData.UserId),PortFolioHash);
         emit data_loded_signal(T_Table::TRADE);
-        updateSummaryLabels();
+        emit data_summary_update_signal();
         break;
     }
    /* case T_Table::Liners:{
@@ -1540,7 +1529,7 @@ void MainWindow::loadDataAndUpdateTable(int table){
         QHash<QString,int> PortFoliosLotSizeHash = T_Portfolio_Model->getPortFoliosLotSize();
         db_conn->getNetPosTableData(BuyValue,SellValue,Profit,BuyQty_summary,SellQty_summary,NetQty,net_pos_model,QString::number(userData.UserId),PortFoliosLotSizeHash);
         emit data_loded_signal(T_Table::NET_POS);
-        updateSummaryLabels();
+        emit data_summary_update_signal();
         break;
     }
 
@@ -1562,58 +1551,42 @@ QString MainWindow::fixDecimal(double num,int decimal_precision){
 }
 void MainWindow::updateSummaryLabels()
 {
-    QStringList summarydatList;
-    summarydatList.append(QString::number(AlgoCount));
-    summarydatList.append(QString::number(OrderCount));
-    summarydatList.append(QString::number(TraderCount));
-    summarydatList.append(QString::number(BuyValue));
-    summarydatList.append(QString::number(SellValue));
-    summarydatList.append(QString::number(Profit));
-    summarydatList.append(QString::number(BuyQty_summary));
-    summarydatList.append(QString::number(SellQty_summary));
-    summarydatList.append(QString::number(NetQty));
+    ui->label_3->setText(QString::number(AlgoCount));
+    ui->label_3->setAlignment(Qt::AlignCenter);
 
-    data_summary_update_signal(summarydatList); // Call the method directly
+    ui->label_25->setText(QString::number(OrderCount));
+    ui->label_25->setAlignment(Qt::AlignCenter);
 
+    ui->label_30->setText(QString::number(TraderCount));
+    ui->label_30->setAlignment(Qt::AlignCenter);
 
+    int decimal_precision = 1;
+    ui->label_23->setText(fixDecimal(BuyValue, decimal_precision));
+    ui->label_23->setAlignment(Qt::AlignCenter);
 
+    ui->label_26->setText(fixDecimal(SellValue, decimal_precision));
+    ui->label_26->setAlignment(Qt::AlignCenter);
 
-//    ui->label_3->setText(QString::number(AlgoCount));
-//    ui->label_3->setAlignment(Qt::AlignCenter);
+    ui->label_31->setText(fixDecimal(Profit, decimal_precision));
+    ui->label_31->setAlignment(Qt::AlignCenter);
 
-//    ui->label_25->setText(QString::number(OrderCount));
-//    ui->label_25->setAlignment(Qt::AlignCenter);
+    ui->label_24->setText(QString::number(BuyQty_summary));
+    ui->label_24->setAlignment(Qt::AlignCenter);
 
-//    ui->label_30->setText(QString::number(TraderCount));
-//    ui->label_30->setAlignment(Qt::AlignCenter);
+    ui->label_27->setText(QString::number(SellQty_summary));
+    ui->label_27->setAlignment(Qt::AlignCenter);
 
-//    int decimal_precision = 1;
-//    ui->label_23->setText(fixDecimal(BuyValue, decimal_precision));
-//    ui->label_23->setAlignment(Qt::AlignCenter);
+    ui->label_32->setText(QString::number(NetQty));
+    ui->label_32->setAlignment(Qt::AlignCenter);
 
-//    ui->label_26->setText(fixDecimal(SellValue, decimal_precision));
-//    ui->label_26->setAlignment(Qt::AlignCenter);
+    ui->label_33->setText("-");
+    ui->label_33->setAlignment(Qt::AlignCenter);
 
-//    ui->label_31->setText(fixDecimal(Profit, decimal_precision));
-//    ui->label_31->setAlignment(Qt::AlignCenter);
+    ui->label_28->setText("-");
+    ui->label_28->setAlignment(Qt::AlignCenter);
 
-//    ui->label_24->setText(QString::number(BuyQty_summary));
-//    ui->label_24->setAlignment(Qt::AlignCenter);
-
-//    ui->label_27->setText(QString::number(SellQty_summary));
-//    ui->label_27->setAlignment(Qt::AlignCenter);
-
-//    ui->label_32->setText(QString::number(NetQty));
-//    ui->label_32->setAlignment(Qt::AlignCenter);
-
-//    ui->label_33->setText("-");
-//    ui->label_33->setAlignment(Qt::AlignCenter);
-
-//    ui->label_28->setText("-");
-//    ui->label_28->setAlignment(Qt::AlignCenter);
-
-//    ui->label_34->setText("-");
-//    ui->label_34->setAlignment(Qt::AlignCenter);
+    ui->label_34->setText("-");
+    ui->label_34->setAlignment(Qt::AlignCenter);
 }
 
 void MainWindow::start_backend_comm_socket_worker()
@@ -1756,7 +1729,7 @@ void MainWindow::loggedIn(){
     QMetaObject::invokeMethod(this, [this]() {
        // ui->label_17->setText(userData.UserName+ "  " +"Summary");
         QString formattedText =  userData.UserName + " <span style=\"font-weight:normal;\">Summary</span>";
-      //  ui->label_17->setText(formattedText);
+        ui->label_17->setText(formattedText);
 
         start_slowdata_worker();
         start_slowdata_indices_worker();
@@ -1801,9 +1774,7 @@ void MainWindow::loggedOut(){
 }
 
 void MainWindow::add_logs(QString str){
-   // ui->textEdit->append(str);
-    logsdata.append(str);
-    emit logDataSignal(logsdata);
+    ui->textEdit->append(str);
 }
 
 void MainWindow::on_OrderBook_Button_clicked()
@@ -1884,15 +1855,15 @@ void MainWindow::on_HP_Close_clicked()
 void MainWindow::on_MissedTrade_Button_clicked()
 {
     dock_win_missed_trades->toggleView(true);
-    ui->MissedTrade_widget_6->setStyleSheet(stylesheetvis);
-    ui->MissedTrade_Close_6->setVisible(true);
+    ui->MissedTrade_widget->setStyleSheet(stylesheetvis);
+    ui->MissedTrade_Close->setVisible(true);
 }
 
 void MainWindow::on_MissedTrade_Close_clicked()
 {
     dock_win_missed_trades->toggleView(false);
-    ui->MissedTrade_widget_6->setStyleSheet("");
-    ui->MissedTrade_Close_6->setVisible(false);
+    ui->MissedTrade_widget->setStyleSheet("");
+    ui->MissedTrade_Close->setVisible(false);
 }
 
 void MainWindow::on_Templates_Button_clicked()
@@ -2074,10 +2045,10 @@ void MainWindow::OnHPDockWidgetVisiblityChanged(bool p_Visible)
 void MainWindow::OnMTDockWidgetVisiblityChanged(bool p_Visible)
 {
     if(p_Visible)
-        ui->MissedTrade_widget_6->setStyleSheet(stylesheetvis);
+        ui->MissedTrade_widget->setStyleSheet(stylesheetvis);
     else
-        ui->MissedTrade_widget_6->setStyleSheet("");
-    ui->MissedTrade_Close_6->setVisible(p_Visible);
+        ui->MissedTrade_widget->setStyleSheet("");
+    ui->MissedTrade_Close->setVisible(p_Visible);
 }
 
 
@@ -2235,11 +2206,8 @@ void MainWindow::T_Portfolio_Table_cellClicked(const QItemSelection &selected, c
 void MainWindow::slotAddLogForAddAlgoRecord(QString str)
 {
     // To show the latest log at top
-//    htmlLogsContent.prepend(str);
-//     ui->textEdit->setText(htmlLogsContent);
-   //  emit logDataSignal(str);
-    logsdata.append(str);
-    emit logDataSignal(logsdata);
+    htmlLogsContent.prepend(str);
+     ui->textEdit->setText(htmlLogsContent);
 }
 
 void MainWindow::slotHideProgressBar()
@@ -2249,362 +2217,359 @@ void MainWindow::slotHideProgressBar()
 
 /*********************Watch data section*************************/
 
-//QDataStream &operator<<(QDataStream &out, const Indices_Data_Struct &data) {
-//    out << data.indexName << data.indexValue << data.change << data.percentagechange
-//        << data.netChangeIndicator << data.openingIdx << data.closingIdx
-//        << data.highIndexValue << data.lowIndexValue << data.marketCapitialisation
-//        << data.display_widget_idx;
-//    return out;
-//}
+QDataStream &operator<<(QDataStream &out, const Indices_Data_Struct &data) {
+    out << data.indexName << data.indexValue << data.change << data.percentagechange
+        << data.netChangeIndicator << data.openingIdx << data.closingIdx
+        << data.highIndexValue << data.lowIndexValue << data.marketCapitialisation
+        << data.display_widget_idx;
+    return out;
+}
 
-//QDataStream &operator>>(QDataStream &in, Indices_Data_Struct &data) {
-//    in >> data.indexName >> data.indexValue >> data.change >> data.percentagechange
-//        >> data.netChangeIndicator >> data.openingIdx >> data.closingIdx
-//        >> data.highIndexValue >> data.lowIndexValue >> data.marketCapitialisation
-//        >> data.display_widget_idx;
-//    return in;
-//}
-//void MainWindow::initWatchWindow(){
-//    loadIndicesDataListFromFile(indicesDataList);
-//    showSaveWatchOnListView();
+QDataStream &operator>>(QDataStream &in, Indices_Data_Struct &data) {
+    in >> data.indexName >> data.indexValue >> data.change >> data.percentagechange
+        >> data.netChangeIndicator >> data.openingIdx >> data.closingIdx
+        >> data.highIndexValue >> data.lowIndexValue >> data.marketCapitialisation
+        >> data.display_widget_idx;
+    return in;
+}
+void MainWindow::initWatchWindow(){
+    loadIndicesDataListFromFile(indicesDataList);
+    showSaveWatchOnListView();
 
-//}
+}
 
 
-//void MainWindow::saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList) {
-//    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-//    QString fileName = appDataPath+"/Data/watch_cache.bin";
-//    QFile file(fileName);
-//    if (!file.open(QIODevice::WriteOnly)) {
-//        qWarning("Could not open file for writing.");
-//        return;
-//    }
-//    QDataStream out(&file);
-//    out << indicesDataList;
-//    file.close();
-//}
+void MainWindow::saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList) {
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString fileName = appDataPath+"/Data/watch_cache.bin";
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning("Could not open file for writing.");
+        return;
+    }
+    QDataStream out(&file);
+    out << indicesDataList;
+    file.close();
+}
 
-//void MainWindow::loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList) {
-//    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-//    QString fileName = appDataPath+"/Data/watch_cache.bin";
-//    QFile file(fileName);
-//    if (!file.open(QIODevice::ReadOnly)) {
-//        qWarning("Could not open file for reading--> watch_cache.bin");
-//        return;
-//    }
-//    QDataStream in(&file);
-//    in >> indicesDataList;
-//    file.close();
-//}
+void MainWindow::loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList) {
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString fileName = appDataPath+"/Data/watch_cache.bin";
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning("Could not open file for reading--> watch_cache.bin");
+        return;
+    }
+    QDataStream in(&file);
+    in >> indicesDataList;
+    file.close();
+}
 
 
 void MainWindow::indicesDataRecv_Slot(Indices_Data_Struct data){
-    emit indicesDataRecv_Signal_watch_card(data);
+    bool newIndicesData = false;
+    indicesDataMutex.lock();
+    if(!indicesDataList.contains(data.indexName)){
+        indicesDataList.insert(data.indexName,data);
+        newIndicesData = true;
+    }
+    //check any of the value changed
+    else if((indicesDataList[data.indexName].indexValue!=data.indexValue) || (indicesDataList[data.indexName].change!=data.change) || (indicesDataList[data.indexName].percentagechange!=data.percentagechange)){
+        indicesDataList[data.indexName]=data;
+        newIndicesData = true;
+    }
 
-    //remove below code
-//    bool newIndicesData = false;
-//    indicesDataMutex.lock();
-//    if(!indicesDataList.contains(data.indexName)){
-//        indicesDataList.insert(data.indexName,data);
-//        newIndicesData = true;
-//    }
-//    //check any of the value changed
-//    else if((indicesDataList[data.indexName].indexValue!=data.indexValue) || (indicesDataList[data.indexName].change!=data.change) || (indicesDataList[data.indexName].percentagechange!=data.percentagechange)){
-//        indicesDataList[data.indexName]=data;
-//        newIndicesData = true;
-//    }
+    indicesDataMutex.unlock();
+   // qDebug()<<"indicesDataRecv_Slot: " <<data.indexName;
 
-//    indicesDataMutex.unlock();
-//   // qDebug()<<"indicesDataRecv_Slot: " <<data.indexName;
+    if(newIndicesData==true&&ui->lineEditWatchSearch->text()=="")
+        showSaveWatchOnListView();
 
-//    if(newIndicesData==true&&ui->lineEditWatchSearch->text()=="")
-//        showSaveWatchOnListView();
+    if(newIndicesData==true){
 
-//    if(newIndicesData==true){
+        QListWidgetItem *item = ui->listWidgetWatch->currentItem();
+        if (item) {
+            watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(item));
+            if (widget) {
+                updateSelecteWatch_UI( widget->data);
+            }
+        }
 
-//        QListWidgetItem *item = ui->listWidgetWatch->currentItem();
-//        if (item) {
-//            watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(item));
-//            if (widget) {
-//                updateSelecteWatch_UI( widget->data);
-//            }
-//        }
+        saveIndicesDataListToFile(indicesDataList);
 
-//        saveIndicesDataListToFile(indicesDataList);
-
-//    }
+    }
 
 }
-//void MainWindow::on_lineEditWatchSearch_textChanged(const QString &text)
-//{
-//    if(text==""){
-//        showSaveWatchOnListView();
-//        return;
-//    }
+void MainWindow::on_lineEditWatchSearch_textChanged(const QString &text)
+{
+    if(text==""){
+        showSaveWatchOnListView();
+        return;
+    }
 
-//    indicesDataMutex.lock();
+    indicesDataMutex.lock();
 
-//    QHash<QString, Indices_Data_Struct> indicesDataListTmp = indicesDataList;
-//    indicesDataListTmp.detach();
-//    indicesDataMutex.unlock();
-
-
-//    /*QStringList nameList;
-//    nameList.append("Nifty50");
-//    nameList.append("BankNifty");
-//    nameList.append("FinNifty");
-//    nameList.append("SmallCap");
-//    nameList.append("ABC");
-//    nameList.append("DDD");
-//    nameList.append("ee");
-//    nameList.append("dd");
-//    nameList.append("ABC");
-//    nameList.append("de");
-//    nameList.append("ddd");
-//    nameList.append("wsd");
-//    nameList.append("dfe");
-//    nameList.append("fg");
-//    nameList.append("gf");
-//    nameList.append("rt");
-//    nameList.append("fg");*/
+    QHash<QString, Indices_Data_Struct> indicesDataListTmp = indicesDataList;
+    indicesDataListTmp.detach();
+    indicesDataMutex.unlock();
 
 
-//    QRegularExpression regex(text, QRegularExpression::CaseInsensitiveOption);
-//    QStringList filteredList;
-
-//    for (auto it = indicesDataListTmp.constBegin(); it != indicesDataListTmp.constEnd(); ++it) {
-//        const QString &key = it.key();
-//        if (regex.match(key).hasMatch()) {
-//            filteredList.append(key);
-//        }
-//       // const Indices_Data_Struct &value = it.value();
-//    }
-
-//    /*for(const QString &name : nameList) {
-//        if (regex.match(name).hasMatch()) {
-//            filteredList.append(name);
-//        }
-//    }*/
-
-//    ui->listWidgetWatch->clear();
-//    int selecteIDx = -1;
-//    for(int i=0;i<filteredList.size();i++){
-//        auto item = new QListWidgetItem();
-//        auto widget1 = new watch_Data_List_Item(this);
-//        Indices_Data_Struct data = indicesDataListTmp[filteredList[i]];
-//        widget1->setData(data);
-//        item->setSizeHint(widget1->sizeHint());
-
-//        ui->listWidgetWatch->addItem(item);
-//        ui->listWidgetWatch->setItemWidget(item, widget1);
-//        if(data.indexName==watchItemSelectedindexName)
-//            selecteIDx = ui->listWidgetWatch->count()-1;
-//    }
-//    if(selecteIDx>-1){
-//        ui->listWidgetWatch->setCurrentRow(selecteIDx);
-//    }
+    /*QStringList nameList;
+    nameList.append("Nifty50");
+    nameList.append("BankNifty");
+    nameList.append("FinNifty");
+    nameList.append("SmallCap");
+    nameList.append("ABC");
+    nameList.append("DDD");
+    nameList.append("ee");
+    nameList.append("dd");
+    nameList.append("ABC");
+    nameList.append("de");
+    nameList.append("ddd");
+    nameList.append("wsd");
+    nameList.append("dfe");
+    nameList.append("fg");
+    nameList.append("gf");
+    nameList.append("rt");
+    nameList.append("fg");*/
 
 
-//}
-//void MainWindow::showSaveWatchOnListView(){
+    QRegularExpression regex(text, QRegularExpression::CaseInsensitiveOption);
+    QStringList filteredList;
 
-//    ui->listWidgetWatch->clear();
-//    if(savedWatchItems.size()==0){
-//        ui->watchListSelectedDetails_Parent->setVisible(false);
-//        return;
-//    }
-//    indicesDataMutex.lock();
-//    QHash<QString, Indices_Data_Struct> indicesDataListTmp = indicesDataList;
-//    indicesDataListTmp.detach();
-//    indicesDataMutex.unlock();
-//    int selecteIDx = -1;
-//    for(int i=0;i<savedWatchItems.length();i++){
-//        if(indicesDataListTmp.contains(savedWatchItems[i])){
-//            auto item = new QListWidgetItem();
-//            auto widget1 = new watch_Data_List_Item(this);
-//            Indices_Data_Struct data = indicesDataListTmp[savedWatchItems[i]];
-//            widget1->setData(data);
-//            item->setSizeHint(widget1->sizeHint());
-//            ui->listWidgetWatch->addItem(item);
-//            ui->listWidgetWatch->setItemWidget(item, widget1);
-//            if(data.indexName==watchItemSelectedindexName)
-//                selecteIDx = ui->listWidgetWatch->count()-1;
-//        }
-//    }
-//    if(selecteIDx>-1){
-//        ui->listWidgetWatch->setCurrentRow(selecteIDx);
-//    }
-//    if(ui->listWidgetWatch->selectedItems().count()==0){
-//        ui->watchListSelectedDetails_Parent->setVisible(false);
-//    }
-//}
+    for (auto it = indicesDataListTmp.constBegin(); it != indicesDataListTmp.constEnd(); ++it) {
+        const QString &key = it.key();
+        if (regex.match(key).hasMatch()) {
+            filteredList.append(key);
+        }
+       // const Indices_Data_Struct &value = it.value();
+    }
 
-//void MainWindow::on_listWidgetWatch_itemClicked(QListWidgetItem *item)
-//{
-//    if (!item) {
-//        ui->watchListSelectedDetails_Parent->setHidden(true);
-//        return; // Handle no item clicked scenario
-//    }
+    /*for(const QString &name : nameList) {
+        if (regex.match(name).hasMatch()) {
+            filteredList.append(name);
+        }
+    }*/
 
-//    watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(item));
-//    if (!widget) {
-//        ui->watchListSelectedDetails_Parent->setHidden(true);
-//        return; // Handle case where no widget is associated with the item
-//    }
+    ui->listWidgetWatch->clear();
+    int selecteIDx = -1;
+    for(int i=0;i<filteredList.size();i++){
+        auto item = new QListWidgetItem();
+        auto widget1 = new watch_Data_List_Item(this);
+        Indices_Data_Struct data = indicesDataListTmp[filteredList[i]];        
+        widget1->setData(data);
+        item->setSizeHint(widget1->sizeHint());
 
-//    watchItemSelectedindexName = widget->data.indexName;
-
-//    updateSelecteWatch_UI(widget->data);
-
-//}
-
-//void MainWindow::updateSelecteWatch_UI( Indices_Data_Struct data){
-//    ui->watchListSelectedDetails_Parent->setVisible(true);
-
-//    bool redArrow = true;
-//    //if(data.netChangeIndicator=="+")
-//    // redArrow = false;
-//    if(data.change.toDouble()>=0)
-//        redArrow = false;
-
-//    if(redArrow){
-//        QPixmap pixmap(":/arrow_red.png");
-//        pixmap = pixmap.scaled(ui->watch_indicator->width(),ui->watch_indicator->height(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
-//        ui->watch_indicator->setPixmap(pixmap);
-//        ui->watch_indicator->setMask(pixmap.mask());
-//        ui->watch_indicator->setStyleSheet("font-family: 'Work Sans';"
-//                                           "font-size: 10px;"
-//                                           "font-weight: 500;"
-//                                           "color:#CC3437"
-//                                           );
-//    }
-//    else{
-//        QPixmap pixmap(":/arrow_green.png");
-//        pixmap = pixmap.scaled(ui->watch_indicator->width(),ui->watch_indicator->height(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
-//        ui->watch_indicator->setPixmap(pixmap);
-//        ui->watch_indicator->setMask(pixmap.mask());
-
-//        ui->watch_val1->setStyleSheet("font-family: 'Work Sans';"
-//                                      "font-size: 10px;"
-//                                      "font-weight: 500;"
-//                                      "color:#008000"
-//                                      );
-//    }
-
-//    QString percent = (data.change+"("+data.percentagechange+"%)");
-//    ui->Index_Name->setText(data.indexName);
-//    ui->watch_val1->setText(data.indexValue);
-//    ui->watch_val2->setText(percent);
-//    ui->Open_Num->setText(data.openingIdx);
-//    ui->High_Num->setText(data.highIndexValue);
-//    ui->Low_Num->setText(data.lowIndexValue);
-//    ui->Volume_Num->setText(data.marketCapitialisation);
+        ui->listWidgetWatch->addItem(item);
+        ui->listWidgetWatch->setItemWidget(item, widget1);
+        if(data.indexName==watchItemSelectedindexName)
+            selecteIDx = ui->listWidgetWatch->count()-1;
+    }
+    if(selecteIDx>-1){
+        ui->listWidgetWatch->setCurrentRow(selecteIDx);
+    }
 
 
+}
+void MainWindow::showSaveWatchOnListView(){
 
-//}
+    ui->listWidgetWatch->clear();
+    if(savedWatchItems.size()==0){
+        ui->watchListSelectedDetails_Parent->setVisible(false);
+        return;
+    }
+    indicesDataMutex.lock();
+    QHash<QString, Indices_Data_Struct> indicesDataListTmp = indicesDataList;
+    indicesDataListTmp.detach();
+    indicesDataMutex.unlock();
+    int selecteIDx = -1;
+    for(int i=0;i<savedWatchItems.length();i++){
+        if(indicesDataListTmp.contains(savedWatchItems[i])){
+            auto item = new QListWidgetItem();
+            auto widget1 = new watch_Data_List_Item(this);
+            Indices_Data_Struct data = indicesDataListTmp[savedWatchItems[i]];
+            widget1->setData(data);
+            item->setSizeHint(widget1->sizeHint());
+            ui->listWidgetWatch->addItem(item);
+            ui->listWidgetWatch->setItemWidget(item, widget1);
+            if(data.indexName==watchItemSelectedindexName)
+                selecteIDx = ui->listWidgetWatch->count()-1;
+        }
+    }
+    if(selecteIDx>-1){
+        ui->listWidgetWatch->setCurrentRow(selecteIDx);
+    }
+    if(ui->listWidgetWatch->selectedItems().count()==0){
+        ui->watchListSelectedDetails_Parent->setVisible(false);
+    }
+}
 
-//void MainWindow::on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item)
-//{
-//    QListWidgetItem *selectedItem = ui->listWidgetWatch->currentItem();
-//    if (selectedItem) {
-//        watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(selectedItem));
+void MainWindow::on_listWidgetWatch_itemClicked(QListWidgetItem *item)
+{
+    if (!item) {
+        ui->watchListSelectedDetails_Parent->setHidden(true);
+        return; // Handle no item clicked scenario
+    }
 
-//        //if selected item already in saved item list remove from else or add it
-//        if(savedWatchItems.contains(widget->data.indexName)){
-//            removeFromSavedWatchItems(widget->data);
-//        }
-//        else{
-//            addToSavedWatchItems(widget->data);
-//        }
+    watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(item));
+    if (!widget) {
+        ui->watchListSelectedDetails_Parent->setHidden(true);
+        return; // Handle case where no widget is associated with the item
+    }
 
-//        ui->lineEditWatchSearch->clear();
-//    }
-//    else {
-//        QMessageBox msgBox;
-//        msgBox.setText("Please select an item from Watch.");
-//        msgBox.setIcon(QMessageBox::Warning);
-//        msgBox.exec();
-//    }
+    watchItemSelectedindexName = widget->data.indexName;
 
-//}
+    updateSelecteWatch_UI(widget->data);
 
-//void MainWindow::addToSavedWatchItems(Indices_Data_Struct data)
-//{
-//        if(!savedWatchItems.contains(data.indexName)){
-//            savedWatchItems.append(data.indexName);
-//            QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-//            QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
-//            settings.beginGroup("GeneralSettings");
-//            if(savedWatchItems.length()==1)
-//                settings.setValue("Watch_InstrumentNames",savedWatchItems[0]);
-//            else
-//                settings.setValue("Watch_InstrumentNames",savedWatchItems.join(";"));
-//            settings.endGroup();
+}
 
-//            if(ui->lineEditWatchSearch->text()=="")
-//                showSaveWatchOnListView();
+void MainWindow::updateSelecteWatch_UI( Indices_Data_Struct data){
+    ui->watchListSelectedDetails_Parent->setVisible(true);
 
-//        }
-//        else{
-//            QMessageBox msgBox;
-//            msgBox.setText("IndexName already added.");
-//            msgBox.setIcon(QMessageBox::Warning);
-//            msgBox.exec();
-//        }
-//}
+    bool redArrow = true;
+    //if(data.netChangeIndicator=="+")
+    // redArrow = false;
+    if(data.change.toDouble()>=0)
+        redArrow = false;
 
-//void MainWindow::removeFromSavedWatchItems( Indices_Data_Struct data)
-//{
-//        if(savedWatchItems.contains(data.indexName)){
-//            savedWatchItems.removeOne(data.indexName);
-//            QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-//            QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
-//            settings.beginGroup("GeneralSettings");
-//            if(savedWatchItems.length()==1)
-//                settings.setValue("Watch_InstrumentNames",savedWatchItems[0]);
-//            else
-//                settings.setValue("Watch_InstrumentNames",savedWatchItems.join(";"));
-//            settings.endGroup();
-//            if(ui->lineEditWatchSearch->text()=="")
-//                showSaveWatchOnListView();
+    if(redArrow){
+        QPixmap pixmap(":/arrow_red.png");
+        pixmap = pixmap.scaled(ui->watch_indicator->width(),ui->watch_indicator->height(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        ui->watch_indicator->setPixmap(pixmap);
+        ui->watch_indicator->setMask(pixmap.mask());
+        ui->watch_indicator->setStyleSheet("font-family: 'Work Sans';"
+                                           "font-size: 10px;"
+                                           "font-weight: 500;"
+                                           "color:#CC3437"
+                                           );
+    }
+    else{
+        QPixmap pixmap(":/arrow_green.png");
+        pixmap = pixmap.scaled(ui->watch_indicator->width(),ui->watch_indicator->height(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
+        ui->watch_indicator->setPixmap(pixmap);
+        ui->watch_indicator->setMask(pixmap.mask());
+
+        ui->watch_val1->setStyleSheet("font-family: 'Work Sans';"
+                                      "font-size: 10px;"
+                                      "font-weight: 500;"
+                                      "color:#008000"
+                                      );
+    }
+
+    QString percent = (data.change+"("+data.percentagechange+"%)");
+    ui->Index_Name->setText(data.indexName);
+    ui->watch_val1->setText(data.indexValue);
+    ui->watch_val2->setText(percent);
+    ui->Open_Num->setText(data.openingIdx);
+    ui->High_Num->setText(data.highIndexValue);
+    ui->Low_Num->setText(data.lowIndexValue);
+    ui->Volume_Num->setText(data.marketCapitialisation);
 
 
-//        }
-//        else{
-//            QMessageBox msgBox;
-//            msgBox.setText("IndexName not exist in Saved List.");
-//            msgBox.setIcon(QMessageBox::Warning);
-//            msgBox.exec();
-//        }
 
-//}
-//void MainWindow::on_listWidgetWatch_itemSelectionChanged()
-//{
-//    if(ui->listWidgetWatch->selectedItems().count()==0){
-//        ui->watchListSelectedDetails_Parent->setVisible(false);
-//    }
-//}
+}
+
+void MainWindow::on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item)
+{
+    QListWidgetItem *selectedItem = ui->listWidgetWatch->currentItem();
+    if (selectedItem) {
+        watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(selectedItem));
+
+        //if selected item already in saved item list remove from else or add it
+        if(savedWatchItems.contains(widget->data.indexName)){
+            removeFromSavedWatchItems(widget->data);
+        }
+        else{
+            addToSavedWatchItems(widget->data);
+        }
+
+        ui->lineEditWatchSearch->clear();
+    }
+    else {
+        QMessageBox msgBox;
+        msgBox.setText("Please select an item from Watch.");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
+    }
+
+}
+
+void MainWindow::addToSavedWatchItems(Indices_Data_Struct data)
+{
+        if(!savedWatchItems.contains(data.indexName)){
+            savedWatchItems.append(data.indexName);
+            QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+            QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
+            settings.beginGroup("GeneralSettings");
+            if(savedWatchItems.length()==1)
+                settings.setValue("Watch_InstrumentNames",savedWatchItems[0]);
+            else
+                settings.setValue("Watch_InstrumentNames",savedWatchItems.join(";"));
+            settings.endGroup();
+
+            if(ui->lineEditWatchSearch->text()=="")
+                showSaveWatchOnListView();
+
+        }
+        else{
+            QMessageBox msgBox;
+            msgBox.setText("IndexName already added.");
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.exec();
+        }
+}
+
+void MainWindow::removeFromSavedWatchItems( Indices_Data_Struct data)
+{
+        if(savedWatchItems.contains(data.indexName)){
+            savedWatchItems.removeOne(data.indexName);
+            QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+            QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
+            settings.beginGroup("GeneralSettings");
+            if(savedWatchItems.length()==1)
+                settings.setValue("Watch_InstrumentNames",savedWatchItems[0]);
+            else
+                settings.setValue("Watch_InstrumentNames",savedWatchItems.join(";"));
+            settings.endGroup();
+            if(ui->lineEditWatchSearch->text()=="")
+                showSaveWatchOnListView();
+
+
+        }
+        else{
+            QMessageBox msgBox;
+            msgBox.setText("IndexName not exist in Saved List.");
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.exec();
+        }
+
+}
+void MainWindow::on_listWidgetWatch_itemSelectionChanged()
+{
+    if(ui->listWidgetWatch->selectedItems().count()==0){
+        ui->watchListSelectedDetails_Parent->setVisible(false);
+    }
+}
 
 
 /****************************************************************/
 
 
 
-//void MainWindow::on_toggle_Button_1_clicked()
-//{
-//    bool currentVisibility = ui->sidePanel->isVisible();
-//    if (currentVisibility) {
-//        ui->sidePanel->setVisible(false);
-//        QPixmap pixmapRight(":/right_arrow.png");
-//        ui->toggle_Button_1->setIcon(pixmapRight);
+void MainWindow::on_toggle_Button_1_clicked()
+{
+    bool currentVisibility = ui->sidePanel->isVisible();
+    if (currentVisibility) {
+        ui->sidePanel->setVisible(false);
+        QPixmap pixmapRight(":/right_arrow.png");
+        ui->toggle_Button_1->setIcon(pixmapRight);
 
-//    } else {
-//        ui->sidePanel->setVisible(true);
-//        QPixmap pixmapLeft(":/left_arrow.png");
-//        ui->toggle_Button_1->setIcon(pixmapLeft);
-//    }
-//}
+    } else {
+        ui->sidePanel->setVisible(true);
+        QPixmap pixmapLeft(":/left_arrow.png");
+        ui->toggle_Button_1->setIcon(pixmapLeft);
+    }
+}
 
 
 void MainWindow::saveDockManagerState()
@@ -2740,45 +2705,4 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 
 
-
-void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
-{
-
-    if (arg1 == "Logs")
-    {
-          Logs_cards *LC = new Logs_cards(this);
-          Qt::WindowFlags flags = LC->windowFlags();
-          LC->setWindowFlags(flags | Qt::Tool);
-          LC->setAttribute(Qt::WA_DeleteOnClose);
-          LC->logDataSignal_Slot(logsdata);
-          connect(this, &MainWindow::logDataSignal, LC, &Logs_cards::logDataSignal_Slot);
-
-          LC->show();
-
-    }
-    else if (arg1 == "Summary") {
-
-          Summary_cards *SC = new Summary_cards(this);
-          Qt::WindowFlags flags = SC->windowFlags();
-          SC->setWindowFlags(flags | Qt::Tool);
-          SC->setAttribute(Qt::WA_DeleteOnClose);
-          connect(this, &MainWindow::data_summary_update_signal, SC, &Summary_cards::updateSummaryData);
-
-          SC->show();
-    }
-    else if (arg1 == "Watch")
-    {
-         Watch_cards *WC = new Watch_cards(this);
-          Qt::WindowFlags flags = WC->windowFlags();
-          WC->setWindowFlags(flags | Qt::Tool);
-
-          WC->setAttribute(Qt::WA_DeleteOnClose);
-          //connect(this, &MainWindow::indicesDataRecv_Signal_watch_card(Indices_Data_Struct), WC, &Watch_cards::indicesDataRecv_Slot(Indices_Data_Struct));
-          connect(this, &MainWindow::indicesDataRecv_Signal_watch_card, WC, &Watch_cards::indicesDataRecv_Slot);
-
-
-          WC->show();
-    }
-
-}
 
