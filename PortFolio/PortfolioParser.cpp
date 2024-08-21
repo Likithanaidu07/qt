@@ -591,7 +591,7 @@ QString PortfolioParser::get_Algo_Name(PortfolioType algo_type,int leg1_token_nu
         //            QString StockName = ContractDetail::getInstance().GetStockName(leg2_token_number);
         //            StockName.chop(2);
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type);
-        Algo_Name_For_Sorting   = "CR-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type);
+        Algo_Name_For_Sorting   = "CR-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type)+"-0-A"; // For CR no  strike diff and optiontype in algoname, so make some dummy data so sorting will work
 
     }
     else if(algo_type==PortfolioType::CR_JELLY){
@@ -599,7 +599,7 @@ QString PortfolioParser::get_Algo_Name(PortfolioType algo_type,int leg1_token_nu
         //            QString StockName = ContractDetail::getInstance().GetStockName(leg2_token_number);
         //            StockName.chop(2);
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type);
-        Algo_Name_For_Sorting   = "CRJELLY-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type);
+        Algo_Name_For_Sorting   = "CRJELLY-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type); // // For CRJELLY no strike diff and optiontype in algoname, so make some dummy data so sorting will work
 
     }
     else if(algo_type==PortfolioType::BOX){
@@ -1262,6 +1262,8 @@ void PortfolioParser::CalculatePriceDifference(PortfolioObject &portfolio, QHash
         case PortfolioType::OPEN_BY:
             return CalculateOPENBFLYPriceDifference(portfolio,MBP_Data_Hash,devicer,decimal_precision);
         case PortfolioType::CR:
+        case PortfolioType::CR_JELLY:
+
             return CalculateConRevPriceDifference(portfolio,MBP_Data_Hash,devicer,decimal_precision,portfolio.PortfolioTypeEnum);
 
         case PortfolioType::BX_MKT:
