@@ -33,7 +33,7 @@ struct net_pos_data_{
     double Sell_Price;
     double Buy_Avg_Price;
     double Sell_Avg_Price;
-    double BuyValue_summary;
+    double BuyValue;
     double SellValue;
     double Net_Qty;
   int lotSize;
