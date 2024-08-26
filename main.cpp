@@ -39,7 +39,9 @@ int main(int argc, char *argv[])
     MainWindowObj = &mainWindow;
 
    // UiUtils::SetMainWindow(&mainWindow);
-    loginwindow loginWindow(MainWindowObj);
+    //loginwindow loginWindow(MainWindowObj);
+    loginwindow loginWindow;
+
     QObject::connect(&loginWindow, &loginwindow::loginStatus,&mainWindow, &MainWindow::loggedInSucessful);
     QObject::connect(&loginWindow, &loginwindow::loginStatus, [&](const userInfo& userInfo) {
         if (userInfo.loggedIn) {

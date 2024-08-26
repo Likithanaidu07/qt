@@ -201,7 +201,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 //        ui->comboBox_AlgoType->addItem("Open-BFLY");
 //        ui->comboBox_AlgoType->addItem("Open-BOX");
 
-        ui->comboBox_AlgoType->addItem("CRJELLY");
+        ui->comboBox_AlgoType->addItem("CRJELLY-BID");
         ui->comboBox_AlgoType->setStyleSheet(
             "QComboBox {"
             "    font-weight: bold;"
@@ -505,7 +505,7 @@ void ConvertAlgo_Win::resetTableWidget(){
     else if(algoType==BFLY_BID_TYPE){
         headers = {"Algo Name","Option Type ","Expiry","Leg1 Strike","Leg2 Strike","Leg3 Strike","Reserved","Reserved","Status"};
     }
-    else if(algoType=="CRJELLY"){
+    else if(algoType=="CRJELLY-BID"){
         headers = {"Algo Name","Strike/Expiry1","Strike/Expiry2","Strike/Expiry3","Buy Diff","Sell Diff","Status"};
     }
 
@@ -585,7 +585,7 @@ void ConvertAlgo_Win::on_pushButtonAdd_clicked()
         algoBtFlyBid->generateAlgo();
     }
 
-    else if(algo_type=="CRJELLY"){
+    else if(algo_type=="CRJELLY-BID"){
         algoCRJellyBid->generateAlgo();
     }
 //    if(algo_type=="BOX"){
@@ -639,7 +639,7 @@ void ConvertAlgo_Win::on_comboBox_AlgoType_currentTextChanged(const QString algo
         algoBtFlyBid->selectedAction();
     }
 
-    if(algoType=="CRJELLY"){
+    if(algoType=="CRJELLY-BID"){
 
         ui->stackedWidget->setCurrentWidget(ui->pageCRJellyBid);
         algoCRJellyBid->selectedAction();

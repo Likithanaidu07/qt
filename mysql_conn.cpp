@@ -119,7 +119,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
         bool ok = checkDBOpened(msg);
         userLoginInfo.loginResponse = msg;
         if(ok){
-            QSqlQuery query("SELECT UserId, UserName,Password,STKOpenLimit,IDXOpenLimit,MaxPortfolioCount,BFLY_BIDInFilter,BYInFilter,F2FInFilter,CRInFilter FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
+            QSqlQuery query("SELECT UserId, UserName,Password,STKOpenLimit,IDXOpenLimit,MaxPortfolioCount,BFLY_BIDInFilter,BYInFilter,F2FInFilter,CRInFilter,F1_F2InFilter FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
             if(!query.exec())
             {
                 // Error Handling, check query.lastError(), probably return
@@ -318,7 +318,7 @@ void  mysql_conn::getSummaryTableData(int &OrderCount,QString user_id)
 
 
 
-void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount,Table_Portfolios_Model *model, Combined_Tracker_Table_Model *comb_tracker_model, QHash<QString, PortfolioAvgPrice> &averagePriceList, QString user_id, QStringList TradedPortFolioList )
+void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount,Table_Portfolios_Model *model, Combined_Tracker_Table_Model *comb_tracker_model, QHash<QString, PortfolioAvgPrice> &averagePriceList, QString user_id, QStringList TradedPortFolioList,QStringList &PortFoliosToDelete )
 {
     QMutexLocker lock(&mutex);
     // int editing_state = portfolio_table_editing.loadRelaxed();
@@ -383,6 +383,10 @@ void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoC
                 PortfolioObject *o = new PortfolioObject();
                 if(!p.ToObject(query,*o,MBP_Data_Hash,averagePriceList,devicer,decimal_precision)){
                     //show warning an delete portfolio
+                    PortFoliosToDelete.append(QString::number(o->PortfolioNumber));
+                    delete o;
+
+                    continue;
                 }
                 //o->BuyTotalQuantity = QDateTime::currentSecsSinceEpoch(); // this need to remove
 
@@ -1158,6 +1162,21 @@ QList <QStringList> liners_listTmp;
 
                     break;
                 }
+                case PortfolioType::CR_JELLY:{
+                    int strikePrice = ContractDetail::getInstance().GetStrikePrice(leg2_token_number,portfolio_type).toInt();
+                    strikePrice = strikePrice * devicer; // GetStrikePrice function will return strikePrice devided by devicer, and in below eqution again devide by devicer, to prevent it multipley it with debvicer
+                    if(Leg1BuySellIndicator==1){
+                        float diff = -leg1Price - leg3Price + leg2Price + strikePrice;
+                        Exch_Price_val = static_cast<double>(diff) / devicer;
+                    }
+                    else{
+                        float diff = -leg2Price - strikePrice + leg3Price + leg1Price;
+                        Exch_Price_val = static_cast<double>(diff) / devicer;
+                    }
+
+
+                    break;
+                }
                 case PortfolioType::BFLY_BID:{
                     if(Leg1BuySellIndicator==1){
                         Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
@@ -1916,6 +1935,47 @@ bool mysql_conn::deleteAlgo(QString PortfolioNumber,QString &msg)
                     }
                 }
             }
+        }
+        else{
+            qDebug()<<"Delete Portfolio  Cannot connect Database: "+db.lastError().text();
+            msg="Delete Portfolio Cannot connect Database: "+db.lastError().text();
+        }
+
+        //db.close();
+    }
+    return ret;
+}
+
+bool mysql_conn::deleteAlgos(QStringList PortfolioNumbers,QString &msg)
+{
+    QMutexLocker lock(&mutex);
+
+    bool ret = false;
+    {
+        bool ok = checkDBOpened(msg);
+        if(ok){
+            QSqlQuery query(db);
+            QString str = "DELETE FROM Portfolios WHERE PortfolioNumber IN ('" + PortfolioNumbers.join("','") + "')";
+
+
+            query.prepare(str);
+            if( !query.exec() )
+            {
+                msg = query.lastError().text();
+                qDebug()<<query.lastError().text();
+            }
+            else{
+                int rowsAffected = query.numRowsAffected();
+                if (rowsAffected > 0) {
+                    ret = true;  //delet scuccess
+                    msg = "Portfolios "+PortfolioNumbers.join("','")+" Deleted successfully.";
+                }
+                else {
+                    msg = "Deleted failed.";
+                    ret = false;
+                }
+            }
+
         }
         else{
             qDebug()<<"Delete Portfolio  Cannot connect Database: "+db.lastError().text();

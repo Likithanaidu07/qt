@@ -161,7 +161,7 @@ void Table_Portfolios_Delegate::setModelData(QWidget *editor, QAbstractItemModel
         {
             bool ok;
             QString str = lineEdit->text();
-            qDebug()<<"Table_Portfolios_Delegate::setModelData: "<<str;
+            //qDebug()<<"Table_Portfolios_Delegate::setModelData: "<<str;
             double value = str.toDouble(&ok);
             if (ok)
             {

@@ -39,7 +39,10 @@ void SlowData::dataExchangeSlot(MBP_Data_Struct data){
     QMutexLocker lock(&leg_n_tokens_Mutex);
     if(leg_n_tokens.contains(data.token)){
         QMutexLocker lock(&MBP_Data_Hash_Mutex);
+        // the insert will overwrite the date if data.token already exist
+        //qDebug()<<"MBP_Data_Struct Token: "<<data.token;
         MBP_Data_Hash.insert(data.token, data);
+        emit newSlowDataReceivedSignal(MBP_Data_Hash);
     }
 
 }

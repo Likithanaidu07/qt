@@ -26,11 +26,47 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         obj.TraderID = query.value("TraderID").toInt();
 
         obj.Leg1TokenNo = query.value("Leg1TokenNo").toInt();
+        if(obj.Leg1TokenNo>0){
+            if(!ContractDetail::getInstance().checkTokenExist(obj.Leg1TokenNo)){
+               qDebug()<< "Leg1TokenNo: "<<obj.Leg1TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               return false;
+            }
+        }
         obj.Leg2TokenNo = query.value("Leg2TokenNo").toInt();
+        if(obj.Leg2TokenNo>0){
+            if(!ContractDetail::getInstance().checkTokenExist(obj.Leg2TokenNo)){
+               qDebug()<< "Leg2TokenNo: "<<obj.Leg2TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               return false;
+            }
+        }
         obj.Leg3TokenNo = query.value("Leg3TokenNo").toInt();
+        if(obj.Leg3TokenNo>0){
+            if(!ContractDetail::getInstance().checkTokenExist(obj.Leg3TokenNo)){
+               qDebug()<< "Leg3TokenNo: "<<obj.Leg3TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               return false;
+            }
+        }
         obj.Leg4TokenNo = query.value("Leg4TokenNo").toInt();
+        if(obj.Leg4TokenNo>0){
+            if(!ContractDetail::getInstance().checkTokenExist(obj.Leg4TokenNo)){
+               qDebug()<< "Leg4TokenNo: "<<obj.Leg4TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               return false;
+            }
+        }
         obj.Leg5TokenNo = query.value("Leg5TokenNo").toInt();
+        if(obj.Leg5TokenNo>0){
+            if(!ContractDetail::getInstance().checkTokenExist(obj.Leg5TokenNo)){
+               qDebug()<< "Leg5TokenNo: "<<obj.Leg5TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               return false;
+            }
+        }
         obj.Leg6TokenNo = query.value("Leg6TokenNo").toInt();
+        if(obj.Leg6TokenNo>0){
+            if(!ContractDetail::getInstance().checkTokenExist(obj.Leg6TokenNo)){
+               qDebug()<< "Leg6TokenNo: "<<obj.Leg6TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               return false;
+            }
+        }
 
         /*SlowDataReader::GetInstance().RegisterContract(static_cast<uint>(obj.Leg1TokenNo));
             SlowDataReader::GetInstance().RegisterContract(static_cast<uint>(obj.Leg2TokenNo));
@@ -51,7 +87,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
 
         int lotSize = obj.GetLotSize();
         if(lotSize==0){
-            obj.AlgoName = "Cannot get lost size from Contract, token not found in Contract ";
+            obj.AlgoName = "Cannot get lotSize from Contract, token not found in Contract ";
             return false;
         }
 
@@ -591,7 +627,7 @@ QString PortfolioParser::get_Algo_Name(PortfolioType algo_type,int leg1_token_nu
         //            QString StockName = ContractDetail::getInstance().GetStockName(leg2_token_number);
         //            StockName.chop(2);
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type);
-        Algo_Name_For_Sorting   = "CR-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type)+"-0-A"; // For CR no  strike diff and optiontype in algoname, so make some dummy data so sorting will work
+        Algo_Name_For_Sorting   = "CR-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type)+"-0-ZE"; // For CR no  strike diff and optiontype in algoname, so make some dummy data so sorting will work
 
     }
     else if(algo_type==PortfolioType::CR_JELLY){
@@ -599,7 +635,7 @@ QString PortfolioParser::get_Algo_Name(PortfolioType algo_type,int leg1_token_nu
         //            QString StockName = ContractDetail::getInstance().GetStockName(leg2_token_number);
         //            StockName.chop(2);
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type);
-        Algo_Name_For_Sorting   = "CRJELLY-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type); // // For CRJELLY no strike diff and optiontype in algoname, so make some dummy data so sorting will work
+        Algo_Name_For_Sorting   = "CRJELLY-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type)+"-0-ZE"; // // For CRJELLY no strike diff and optiontype in algoname, so make some dummy data so sorting will work
 
     }
     else if(algo_type==PortfolioType::BOX){

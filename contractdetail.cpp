@@ -434,11 +434,15 @@ contract_table ContractDetail::GetDetail(int token, int type)
        return m_ContractDetails_Hash[key];
     return contract_table();
 
-
-
 }
 
-
+bool ContractDetail::checkTokenExist(int token){
+    QString key = QString::number(token);
+    if(m_ContractDetails_Hash.contains(key))
+       return true;
+    else
+      return false;
+}
 
 int ContractDetail::GetLotSize(int token,int type)
 {

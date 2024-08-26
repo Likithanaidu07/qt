@@ -62,6 +62,7 @@ public:
 
     int GetLotSize(int token, int type);
     contract_table GetDetail(int token, int type);
+    bool checkTokenExist(int token);
 
     QString GetStockName(int token, int type);
     QString GetInstrumentName(int token, int type);

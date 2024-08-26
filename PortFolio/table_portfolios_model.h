@@ -8,6 +8,7 @@
 #include "QMutex"
 #include "qpixmap.h"
 #include "qtableview.h"
+#include <QElapsedTimer>
 
 class Table_Portfolios_Model : public QAbstractTableModel
 {
@@ -35,6 +36,7 @@ public:
     void setColumnWidths(QTableView *tableView) const;
     QStringList getTradedHighlight_ExcludeList();
     QStringList  TradedHighlight_ExcludeList;
+    void updateMarketRate(const QHash<QString, MBP_Data_Struct>& data);
 
 
 private:
@@ -55,6 +57,9 @@ private:
     bool storeToken(PortfolioObject* p);
     void loadSettings();
     int current_editingRow; //row which is editing currently
+
+    QElapsedTimer slowDataPriceUpdateTimer;
+
 
 
 public slots:
