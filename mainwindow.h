@@ -230,7 +230,13 @@ private:
     void saveDockManagerState();
      void restoreDockManagerState();
      void restoreTableViewColumnState(QTableView *tableView);
+    void restoreTradeTableViewColumnState(QTableView *tableView);
+      void restoreNetposTableViewColumnState(QTableView *tableView);
+     void restoreLinersTableViewColumnState(QTableView *tableView);
      void saveTableViewColumnState(QTableView *tableView);
+      void saveTradeTableViewColumnState(QTableView *tableView);
+     void saveNetposTableViewColumnState(QTableView *tableView);
+      void saveLinersTableViewColumnState(QTableView *tableView);
 public slots:
     void profolioTableEditFinshedSlot(QString val,QModelIndex);
 //    void edit_Started_PortFolio_Table(int row,int col);
@@ -259,7 +265,12 @@ public slots:
     void updateSummaryLabels();
     void on_sorting_Button_clicked();
     void onPortFolioTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
-
+    void onTradeTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
+     void onNetposTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
+     void onLinersTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
+    void onSummaryActionTriggered();
+    void onWatchActionTriggered();
+    void onLogActionTriggered();
 private slots:
     void on_close_clicked();
     void on_minimize_clicked();
@@ -307,7 +318,7 @@ private slots:
 
     void on_MissedTrade_Close_clicked();
 
-    void on_comboBox_currentTextChanged(const QString &arg1);
+  //  void on_comboBox_currentTextChanged(const QString &arg1);
 
 protected:
     virtual void closeEvent(QCloseEvent* event) override;
