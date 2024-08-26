@@ -232,6 +232,9 @@ void BackendComm::processQueue()
         }
     }
 
+    qDebug()<<"Exiting backend communication thread....";
+
+
 }
 
 void BackendComm::quitDataFetchThread(){

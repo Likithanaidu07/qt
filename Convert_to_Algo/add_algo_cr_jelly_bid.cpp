@@ -1,19 +1,20 @@
-#include "add_algo_con_rev.h"
+#include "add_algo_cr_jelly_bid.h"
 #include "contractdetail.h"
 
 
-add_algo_con_rev::add_algo_con_rev(QObject *parent)
+
+add_algo_cr_jelly_bid::add_algo_cr_jelly_bid(QObject *parent)
     : QObject{parent}
 {
 
     // model_FUT_CON_REV = new QStandardItemModel;
     sharedData = &AddAlgoSharedVar::getInstance();
-    model_start_strike_CR = new QStandardItemModel;
-    model_end_strike_CR = new QStandardItemModel;
+    model_start_strike_CR_JELLY_BID = new QStandardItemModel;
+    model_end_strike_CR_JELLY_BID = new QStandardItemModel;
 
 
 }
-void add_algo_con_rev::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_){
+void add_algo_cr_jelly_bid::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_){
     lineEdit_Start_strike = lineEdit_Start_strike_;
     lineEdit_EndStrike = lineEdit_EndStrike_;
     lineEdit_Fut = lineEdit_Fut_;
@@ -39,7 +40,7 @@ void add_algo_con_rev::copyUIElement(QDialog *parentWidget,QTableWidget *tableWi
     connect(startStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedStartStrike(QModelIndex)));
     startStrikeListView->setSizePolicy(sizePolicy);
     startStrikeListView->setFixedSize(230, 200);
-    startStrikeListView->setEditTriggers(QAbstractItemView::NoEditTriggers);   
+    startStrikeListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
     startStrikeListView->hide();
 
 
@@ -74,8 +75,8 @@ void add_algo_con_rev::copyUIElement(QDialog *parentWidget,QTableWidget *tableWi
 
 
 
-      model_Fut_CR =   ContractDetail::getInstance().Get_model_FUT_CON_REV();
-      CustomSearchWidget *futCustomWidget = new CustomSearchWidget(futListView,model_Fut_CR);
+      model_Fut_CR_JELLY_BID =   ContractDetail::getInstance().Get_model_FUT_CON_REV();
+      CustomSearchWidget *futCustomWidget = new CustomSearchWidget(futListView,model_Fut_CR_JELLY_BID);
       connect(lineEdit_Fut, SIGNAL(textEdited(QString)),futCustomWidget, SLOT(filterItems(QString)));
 
 
@@ -86,15 +87,15 @@ void add_algo_con_rev::copyUIElement(QDialog *parentWidget,QTableWidget *tableWi
 
 
 
-      CustomSearchWidget *startstrikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_CR);
+      CustomSearchWidget *startstrikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_CR_JELLY_BID);
       connect(lineEdit_Start_strike, SIGNAL(textEdited(QString)),startstrikeCustomWidget, SLOT(filterItems(QString)));
 
-      CustomSearchWidget *endstrikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike_CR);
+      CustomSearchWidget *endstrikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike_CR_JELLY_BID);
       connect(lineEdit_EndStrike, SIGNAL(textEdited(QString)),endstrikeCustomWidget, SLOT(filterItems(QString)));
 
 }
 
-void add_algo_con_rev::selectedAction(){
+void add_algo_cr_jelly_bid::selectedAction(){
 
     foo_token_number_start_strike = "";
     foo_token_number_end_strike = "";
@@ -127,8 +128,21 @@ void add_algo_con_rev::selectedAction(){
 }
 
 
+bool add_algo_cr_jelly_bid::checkDateIn2MonthRange(const QDateTime& d, const QDateTime& dateToCheck) {
+    // Define the 3-month range (current month, next month, and the following month)
+    QDateTime month1 = d;
+    QDateTime month2 = d.addMonths(1);
+    QDateTime month3 = d.addMonths(2);
 
-void add_algo_con_rev::create_AutoFillModel_StartStrike(){
+    // Check if the year and month of the date to check falls within the 3-month range
+    if ((dateToCheck.date().year() == month1.date().year() && dateToCheck.date().month() == month1.date().month()) ||
+        (dateToCheck.date().year() == month2.date().year() && dateToCheck.date().month() == month2.date().month()) ||
+        (dateToCheck.date().year() == month3.date().year() && dateToCheck.date().month() == month3.date().month())) {
+        return true;
+    }
+    return false;
+}
+void add_algo_cr_jelly_bid::create_AutoFillModel_StartStrike(){
 
     lineEdit_Start_strike->clear();
     lineEdit_EndStrike->clear();
@@ -140,18 +154,18 @@ void add_algo_con_rev::create_AutoFillModel_StartStrike(){
 
     QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[key].Expiry);
     dt1 = dt1.addYears(10);
-    QString ExpirySlected=dt1.toString("MMM dd yyyy").toUpper();
 
-    model_start_strike_CR->clear();
+    model_start_strike_CR_JELLY_BID->clear();
     //create list based on the Fut input and populate start strike model the data is of same as butterfly
-    for(int i=0;i<sorted_keys_CON_REV.length();i++) {
-        contract_table tmp = sharedData->contract_table_hash[sorted_keys_CON_REV[i]];
+    for(int i=0;i<sorted_keys_CON_REV_JELLY_BID.length();i++) {
+        contract_table tmp = sharedData->contract_table_hash[sorted_keys_CON_REV_JELLY_BID[i]];
         unsigned int unix_time= tmp.Expiry;
         QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
         dt = dt.addYears(10);
         QString ExpiryTmp=dt.toString("MMM dd yyyy").toUpper();
 
-        if(tmp.InstrumentName==Instr_Name&&tmp.OptionType=="CE"&&ExpirySlected==ExpiryTmp){
+
+        if(tmp.InstrumentName==Instr_Name&&tmp.OptionType=="CE"&&checkDateIn2MonthRange(dt1,dt)==true){
 
 
             QString algo_combination = tmp.InstrumentName+" "+ExpiryTmp+" "+QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);//+" "+tmp.OptionType;
@@ -161,7 +175,7 @@ void add_algo_con_rev::create_AutoFillModel_StartStrike(){
             QString compositeKey = tmp.InstrumentName + "-" + dt.toString("yyyyMMdd") + "-" + QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
             // Set the composite key as data for sorting
             item->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
-            model_start_strike_CR->appendRow(item);
+            model_start_strike_CR_JELLY_BID->appendRow(item);
             //qDebug()<<"Instr_Name: "<<Instr_Name;
 
         }
@@ -189,7 +203,7 @@ void add_algo_con_rev::create_AutoFillModel_StartStrike(){
 
 
 
-void add_algo_con_rev::startStrikeEditFinishedAction(){
+void add_algo_cr_jelly_bid::startStrikeEditFinishedAction(){
     lineEdit_EndStrike->clear();
     foo_token_number_end_strike = "";
     strike_priceList.clear();
@@ -202,9 +216,9 @@ void add_algo_con_rev::startStrikeEditFinishedAction(){
     float start_strike = sharedData->contract_table_hash[key].StrikePrice;
 
     // float expiry_date_start = contract_table_hash[key].expiry_date.toFloat();
-    model_end_strike_CR->clear();
-    for(int i=0;i<sorted_keys_CON_REV.length();i++) {
-        contract_table tmp = sharedData->contract_table_hash[sorted_keys_CON_REV[i]];
+    model_end_strike_CR_JELLY_BID->clear();
+    for(int i=0;i<sorted_keys_CON_REV_JELLY_BID.length();i++) {
+        contract_table tmp = sharedData->contract_table_hash[sorted_keys_CON_REV_JELLY_BID[i]];
         float end_strike = tmp.StrikePrice;
         //qDebug()<<tmp.instrument_name<<"=="<<Instr_Name<<"   "<<tmp.option_type<<"=="<<Option_Type<<"   "<<Expiry<<"=="<<tmp.expiry_date;
         if(start_strike>=end_strike)
@@ -221,7 +235,7 @@ void add_algo_con_rev::startStrikeEditFinishedAction(){
             QString compositeKey = tmp.InstrumentName + "-" + dt.toString("yyyyMMdd") + "-" + QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
               // Set the composite key as data for sorting
             item->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
-            model_end_strike_CR->appendRow(item);
+            model_end_strike_CR_JELLY_BID->appendRow(item);
 
         }
     }
@@ -245,18 +259,18 @@ void add_algo_con_rev::startStrikeEditFinishedAction(){
 }
 
 // Comparator function to sort based on StrikePrice
-/*bool add_algo_con_rev::compareStrikePrice(const QString &key1, const QString &key2, const QHash<QString, contract_table> &contractTableHash) {
+bool add_algo_cr_jelly_bid::compareStrikePrice(const QString &key1, const QString &key2, const QHash<QString, contract_table> &contractTableHash) {
     return contractTableHash[key1].StrikePrice < contractTableHash[key2].StrikePrice;
 }
 
-void add_algo_con_rev::sortFilteredKeys(QStringList &filteredKeys, const QHash<QString, contract_table> &contractTableHash) {
+void add_algo_cr_jelly_bid::sortFilteredKeys(QStringList &filteredKeys, const QHash<QString, contract_table> &contractTableHash) {
     std::sort(filteredKeys.begin(), filteredKeys.end(),
               [&](const QString &key1, const QString &key2) {
                   return compareStrikePrice(key1, key2, contractTableHash);
               });
-}*/
+}
 
-void add_algo_con_rev::generateAlgo(){
+void add_algo_cr_jelly_bid::generateAlgo(){
 
     if(foo_token_number_start_strike=="" || foo_token_number_end_strike=="" || foo_token_number_fut==""){
         QMessageBox msgBox;
@@ -302,22 +316,22 @@ void add_algo_con_rev::generateAlgo(){
     long long expiryDateStartStrike = sharedData->contract_table_hash[keyStart].Expiry;
     //filter based on  selected combination
     QStringList filteredKeys;
-    for(int i=0;i<sorted_keys_CON_REV.length();i++) {
-        if(Instr_Name!= sharedData->contract_table_hash[sorted_keys_CON_REV[i]].InstrumentName||sharedData->contract_table_hash[sorted_keys_CON_REV[i]].Expiry!=expiryDateStartStrike)
+    for(int i=0;i<sorted_keys_CON_REV_JELLY_BID.length();i++) {
+        if(Instr_Name!= sharedData->contract_table_hash[sorted_keys_CON_REV_JELLY_BID[i]].InstrumentName||sharedData->contract_table_hash[sorted_keys_CON_REV_JELLY_BID[i]].Expiry!=expiryDateStartStrike)
             continue;
-        QString optionType = sharedData->contract_table_hash[sorted_keys_CON_REV[i]].OptionType;
+        QString optionType = sharedData->contract_table_hash[sorted_keys_CON_REV_JELLY_BID[i]].OptionType;
 
 
 
-        int tmpStrike =  sharedData->contract_table_hash[sorted_keys_CON_REV[i]].StrikePrice; // will be in paise so converted to Rs
+        int tmpStrike =  sharedData->contract_table_hash[sorted_keys_CON_REV_JELLY_BID[i]].StrikePrice; // will be in paise so converted to Rs
         if(tmpStrike>endStrike||tmpStrike<startStrike)
             continue;
 
         if(optionType=="CE"||optionType=="PE")
-            filteredKeys.append(sorted_keys_CON_REV[i]);
+            filteredKeys.append(sorted_keys_CON_REV_JELLY_BID[i]);
     }
 
- //   sortFilteredKeys(filteredKeys, sharedData->contract_table_hash);
+    sortFilteredKeys(filteredKeys, sharedData->contract_table_hash);
 
     //qDebug()<<filteredKeys.length();
     // get all data to diplay-----note: BFLY sorted based on strike price.
@@ -359,10 +373,13 @@ void add_algo_con_rev::generateAlgo(){
 //                    Algo_Name_list.append(Algo_Name);
 
 
-                    QString Algo_Name ="CR- "+Instr_Name+" "+dt1.toString("yyyy MMM").toUpper()+" "+
+                   /* QString Algo_Name ="CRJELLY- "+Instr_Name+" "+dt1.toString("yyyy MMM").toUpper()+" "+
                                         QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)
                                         +" "+optionType+" - "+QString::number(((endStrike-startStrike)/sharedData->strike_price_devider),'f',sharedData->decimal_precision)+" - "
-                                        +" "+Instr_Name+" "+dt3.toString("yyyy MMM").toUpper();
+                                        +" "+Instr_Name+" "+dt3.toString("yyyy MMM").toUpper();*/
+
+                    QString Algo_Name = "CRJELLY-"+Instr_Name+"-"+dt1.toString("ddMMM")+"-"+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
+
                     Algo_Name_list.append(Algo_Name);
 
 
@@ -393,7 +410,9 @@ void add_algo_con_rev::generateAlgo(){
                     Leg3_strike_list.append(QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice));
                     Leg2_list.append(leg2);
                     Leg3_list.append(leg3);
-                    QString Algo_Name ="CR-"+Instr_Name+"-"+dt.toString("ddMMM").toUpper()+"-"+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+"-"+dt3.toString("ddMMM").toUpper();
+                   // QString Algo_Name ="CRJELLY-"+Instr_Name+"-"+dt.toString("ddMMM").toUpper()+"-"+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+"-"+dt3.toString("ddMMM").toUpper();
+                    QString Algo_Name = "CRJELLY-"+Instr_Name+"-"+dt1.toString("ddMMM")+"-"+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
+
                     Algo_Name_list.append(Algo_Name);
                     break;
                 }
@@ -412,7 +431,6 @@ void add_algo_con_rev::generateAlgo(){
 //    QString Leg1_val=dt.toString("MMM dd yyyy").toUpper();
 
     QStringList duplicateList;
-
     for(int i=0;i<Leg2_list.size();i++){
 
         bool exist=false;
@@ -500,7 +518,7 @@ void add_algo_con_rev::generateAlgo(){
 
         algo_data_to_insert data;
         data.Algo_Status = "DisabledByUser";
-        data.algo_type = QString::number(PortfolioType::CR);
+        data.algo_type = QString::number(PortfolioType::CR_JELLY);
         data.exchange = sharedData->exchange;
         data.user_id = sharedData->foo_user_id;
         data.Algo_Name = Algo_Name_list[i];
@@ -534,21 +552,21 @@ void add_algo_con_rev::generateAlgo(){
 
 
 }
-void add_algo_con_rev::itemSelectedFut(QModelIndex index)
+void add_algo_cr_jelly_bid::itemSelectedFut(QModelIndex index)
 {
     if(index.isValid())
     {
         QVariant dData = index.data(Qt::DisplayRole);
         if (dData.isValid())
         {
-            for (int row = 0; row < model_Fut_CR->rowCount(); ++row)
+            for (int row = 0; row < model_Fut_CR_JELLY_BID->rowCount(); ++row)
             {
-                QModelIndex index = model_Fut_CR->index(row, 0);
+                QModelIndex index = model_Fut_CR_JELLY_BID->index(row, 0);
                 // Check if the item's display role value matches
-                QVariant displayData = model_Fut_CR->data(index, Qt::DisplayRole);
+                QVariant displayData = model_Fut_CR_JELLY_BID->data(index, Qt::DisplayRole);
                 if (displayData.isValid() && displayData.toString() == dData)
                 {
-                    QVariant userData = model_Fut_CR->data(index, Qt::UserRole + 1);
+                    QVariant userData = model_Fut_CR_JELLY_BID->data(index, Qt::UserRole + 1);
                     if (userData.isValid())
                     {
                         foo_token_number_fut = userData.toString();
@@ -569,21 +587,21 @@ void add_algo_con_rev::itemSelectedFut(QModelIndex index)
     }
 }
 
-void add_algo_con_rev::itemSelectedStartStrike(QModelIndex index)
+void add_algo_cr_jelly_bid::itemSelectedStartStrike(QModelIndex index)
 {
     if(index.isValid())
     {
         QVariant dData = index.data(Qt::DisplayRole);
         if (dData.isValid())
         {
-            for (int row = 0; row < model_start_strike_CR->rowCount(); ++row)
+            for (int row = 0; row < model_start_strike_CR_JELLY_BID->rowCount(); ++row)
             {
-                QModelIndex index = model_start_strike_CR->index(row, 0);
+                QModelIndex index = model_start_strike_CR_JELLY_BID->index(row, 0);
                 // Check if the item's display role value matches
-                QVariant displayData = model_start_strike_CR->data(index, Qt::DisplayRole);
+                QVariant displayData = model_start_strike_CR_JELLY_BID->data(index, Qt::DisplayRole);
                 if (displayData.isValid() && displayData.toString() == dData)
                 {
-                    QVariant userData = model_start_strike_CR->data(index, Qt::UserRole + 1);
+                    QVariant userData = model_start_strike_CR_JELLY_BID->data(index, Qt::UserRole + 1);
                     if (userData.isValid())
                     {
                         foo_token_number_start_strike = userData.toString();
@@ -604,21 +622,21 @@ void add_algo_con_rev::itemSelectedStartStrike(QModelIndex index)
     }
 }
 
-void add_algo_con_rev::itemSelectedEndStrike(QModelIndex index)
+void add_algo_cr_jelly_bid::itemSelectedEndStrike(QModelIndex index)
 {
     if(index.isValid())
     {
         QVariant dData = index.data(Qt::DisplayRole);
         if (dData.isValid())
         {
-            for (int row = 0; row < model_end_strike_CR->rowCount(); ++row)
+            for (int row = 0; row < model_end_strike_CR_JELLY_BID->rowCount(); ++row)
             {
-                QModelIndex index = model_end_strike_CR->index(row, 0);
+                QModelIndex index = model_end_strike_CR_JELLY_BID->index(row, 0);
                 // Check if the item's display role value matches
-                QVariant displayData = model_end_strike_CR->data(index, Qt::DisplayRole);
+                QVariant displayData = model_end_strike_CR_JELLY_BID->data(index, Qt::DisplayRole);
                 if (displayData.isValid() && displayData.toString() == dData)
                 {
-                    QVariant userData = model_end_strike_CR->data(index, Qt::UserRole + 1);
+                    QVariant userData = model_end_strike_CR_JELLY_BID->data(index, Qt::UserRole + 1);
                     if (userData.isValid())
                     {
                         foo_token_number_end_strike = userData.toString();
@@ -641,7 +659,7 @@ void add_algo_con_rev::itemSelectedEndStrike(QModelIndex index)
 }
 
 
-void add_algo_con_rev::slotStartHide(QString)
+void add_algo_cr_jelly_bid::slotStartHide(QString)
 {
     endStrikeListView->hide();
     futListView->hide();
@@ -649,7 +667,7 @@ void add_algo_con_rev::slotStartHide(QString)
 
 }
 
-void add_algo_con_rev::slotEndHide(QString)
+void add_algo_cr_jelly_bid::slotEndHide(QString)
 {
     startStrikeListView->hide();
     futListView->hide();
@@ -657,7 +675,7 @@ void add_algo_con_rev::slotEndHide(QString)
 }
 
 
-void add_algo_con_rev::slotFutHide(QString)
+void add_algo_cr_jelly_bid::slotFutHide(QString)
 {
     endStrikeListView->hide();
     endStrikeListView->hide();

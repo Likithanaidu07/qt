@@ -50,6 +50,10 @@ MainWindow::MainWindow(QWidget *parent)
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     //ui->sidePanel->setVisible(false);
 
+    showMessagOnceFlg = true;
+    connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
+    connect(this,SIGNAL(showMessageSignal(QString)),this,SLOT(showMessageSlot(QString)));
+
 
 
     // Create the Card menu
@@ -96,6 +100,7 @@ MainWindow::MainWindow(QWidget *parent)
     //ui->widget_4->setVisible(false);
     //ui->toggle_Button_1->setVisible(false);
   //  connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
+
     connect(this,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
     loadingDataWinodw = new loadingdatawindow(this);
     connect(this,SIGNAL(signalHideProgressBar()),this,SLOT(slotHideProgressBar()));
@@ -240,7 +245,7 @@ MainWindow::MainWindow(QWidget *parent)
             line_edit_trade_search->setStyleSheet(lineedit_dock_SS);
 
             QToolButton *ConvertAlgo_button = new QToolButton();
-            connect(ConvertAlgo_button, SIGNAL(clicked()), this, SLOT(on_ConvertAlgo_button_clicked()));
+            connect(ConvertAlgo_button, SIGNAL(clicked()), this, SLOT(ConvertAlgo_button_clicked()));
             //Frame 364.png
             ConvertAlgo_button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             ConvertAlgo_button->setIcon(QIcon(":/BuildAlgo.png"));
@@ -274,13 +279,14 @@ MainWindow::MainWindow(QWidget *parent)
             internalLayout->setContentsMargins(10,-1,-1,-1);
             QSpacerItem* spc = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
             QToolButton* button1 = new QToolButton();
-            connect(button1, SIGNAL(clicked()), this, SLOT(on_startall_Button_clicked()));
+            connect(button1, SIGNAL(clicked()), this, SLOT(startall_Button_clicked()));
+
             button1->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             button1->setIcon(QIcon(":/start_all.png"));
             button1->setToolTip("Start All");
 
             QToolButton* button2 = new QToolButton();
-            connect(button2, SIGNAL(clicked()), this, SLOT(on_stopall_Button_clicked()));
+            connect(button2, SIGNAL(clicked()), this, SLOT(stopall_Button_clicked()));
             button2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             button2->setIcon(QIcon(":/stop_all.png"));
             button2->setToolTip("Stop All");
@@ -294,7 +300,7 @@ MainWindow::MainWindow(QWidget *parent)
             button4->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             button4->setIcon(QIcon(":/reset.png"));
             button4->setToolTip("Sorting");
-            connect(button4, SIGNAL(clicked()), this, SLOT(on_sorting_Button_clicked()));
+            connect(button4, SIGNAL(clicked()), this, SLOT(sorting_Button_clicked()));
 
             QToolButton* button5 = new QToolButton();
             button5->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -363,7 +369,7 @@ MainWindow::MainWindow(QWidget *parent)
     //connect(T_Portfolio_Model,SIGNAL(edit_Started(int,int)),this,SLOT(edit_Started_PortFolio_Table(int,int)));
     QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::editFinished, this, &MainWindow::profolioTableEditFinshedSlot);
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::editCompleted, this, &MainWindow::profolioTableEditFinshedSlot);
-     QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::tabKeyPressed, T_Portfolio_Table, &table_portfolios_custom::handleTabKeyPressFromEditableCell);
+    QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::tabKeyPressed, T_Portfolio_Table, &table_portfolios_custom::handleTabKeyPressFromEditableCell);
     QObject::connect(T_Portfolio_Table, &table_portfolios_custom::spaceKeySignal, this, &MainWindow::updatePortFolioStatus);
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::resizePortFolioTableColWidth, this, &MainWindow::resizePortFolioTableColWidthSlot);
    // QObject::connect(T_Portfolio_Table, &table_portfolios_custom::clicked, T_Portfolio_Model, &Table_Portfolios_Model::onItemChanged);
@@ -930,8 +936,7 @@ MainWindow::MainWindow(QWidget *parent)
     // connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
    //loadContract();
     //initWatchWindow();
-    // this should be called after all dock widget are set
-    restoreDockManagerState();
+
 }
 
 
@@ -944,6 +949,9 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::update_ui_slot(int type){
+
+    // this should be called after all dock widget are set
+    restoreDockManagerState();
 
     switch (type) {
     case LOADED_MODEL:
@@ -1531,17 +1539,29 @@ void MainWindow::refreshTableIn_Intervel(){
     //QTimer::singleShot(2000, this, &MainWindow::refreshTableIn_Intervel);
 }
 
+
+// This data will received from exchange and used to update alog table rate column
 void MainWindow::start_slowdata_worker()
 {
     // SlowData& slowData = SlowData::getInstance();
     //  slowData.startSlowDataSocket();
     slowData = new SlowData();
+    QObject::connect(slowData, SIGNAL(newSlowDataReceivedSignal(const QHash<QString, MBP_Data_Struct> &)), this, SLOT(slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct> &)));
+
     slowData->startSlowDataSocket();
 }
 
 void MainWindow::stop_slowdata_worker(){
     slowData->stopSlowDataSocket();
 }
+
+//This slot will be called when new slow date received
+void MainWindow::slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct>& data){
+
+    T_Portfolio_Model->updateMarketRate(data);
+}
+
+
 
 void MainWindow::start_slowdata_indices_worker()
 {
@@ -1563,7 +1583,20 @@ void MainWindow::loadDataAndUpdateTable(int table){
             TradedPortFolioList.removeAll(item);
         }
 
-        db_conn->getPortfoliosTableData(reloadSortSettFlg,AlgoCount,T_Portfolio_Model,combined_tracker_model,averagePriceList,QString::number(userData.UserId),TradedPortFolioList);
+
+        QStringList PortFoliosToDelete;
+        db_conn->getPortfoliosTableData(reloadSortSettFlg,AlgoCount,T_Portfolio_Model,combined_tracker_model,averagePriceList,QString::number(userData.UserId),TradedPortFolioList,PortFoliosToDelete);
+        if(PortFoliosToDelete.size()){
+          QString msg = "Token not exist in contract table for  Portfolios ('" + PortFoliosToDelete.join("','") + "')!. Deleting it.";
+          if(showMessagOnceFlg)
+            emit showMessageSignal(msg);
+          bool ret = db_conn->deleteAlgos(PortFoliosToDelete,msg);
+          if(!ret&&showMessagOnceFlg){
+            emit showMessageSignal(msg);
+          }
+          showMessagOnceFlg = false;
+        }
+
         emit data_loded_signal(T_Table::PORTFOLIO);
         updateSummaryLabels();
         break;
@@ -1709,8 +1742,11 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
     // ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(94, 255, 107);border-radius:6px;color:#000;");
 }
 void MainWindow::stop_backend_comm_socket_worker(){
-    //delete socket_Conn;
     backend_comm->quitDataFetchThread();
+
+    // Quit the thread's event loop and wait for it to finish
+    backend_comm_thread->quit();
+    backend_comm_thread->wait();
     backend_comm_thread->deleteLater();
 }
 
@@ -1846,15 +1882,20 @@ void MainWindow::loggedInSucessful(userInfo userData)
 
 }
 
+void MainWindow::stopBG_Threads(){
+    stop_dataLoadingThread();
+    stop_slowdata_worker();
+    stop_slowdata_indices_worker();
+    stop_backend_comm_socket_worker();
+}
+
+
 void MainWindow::loggedOut(){
 
 
 
     loggedInFlg.storeRelaxed(0);
-    stop_slowdata_worker();
-    stop_slowdata_indices_worker();
-    stop_dataLoadingThread();
-    stop_backend_comm_socket_worker();
+    stopBG_Threads();
     emit logoutRequested();
 
 
@@ -1977,6 +2018,7 @@ void MainWindow::on_close_clicked()
     db_conn->logToDB("Logged Out");
     //loggedOut();
     //portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser;
+    stopBG_Threads();
     close();
 }
 
@@ -2037,7 +2079,7 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
 }
 
 
-void MainWindow::on_startall_Button_clicked()
+void MainWindow::startall_Button_clicked()
 {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "Confirmation", "Are you sure you want to activate all selected algos?",
@@ -2063,7 +2105,7 @@ void MainWindow::on_startall_Button_clicked()
 
 
 }
-void MainWindow::on_stopall_Button_clicked()
+void MainWindow::stopall_Button_clicked()
 {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "Confirmation", "Are you sure you want to Disable all selected algos?",
@@ -2158,7 +2200,7 @@ void MainWindow::on_Algorithms_Close_clicked()
     ui->Algorithms_Widget->setStyleSheet("");
     ui->Algorithms_Close->setVisible(false);
 }
-void MainWindow::on_ConvertAlgo_button_clicked(){
+void MainWindow::ConvertAlgo_button_clicked(){
 
     if(!convertalgo){
         convertalgo=new ConvertAlgo_Win(this);
@@ -2815,9 +2857,8 @@ void MainWindow::restoreLinersTableViewColumnState(QTableView *tableView) {
        tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
      }
 }
-void MainWindow::on_sorting_Button_clicked(){
 
-
+void MainWindow::sorting_Button_clicked(){
       if (!sortWin) {
            sortWin = new SortSettingPopUp();
            connect(sortWin, &SortSettingPopUp::reloadSortSettingSignal, [this]() {
@@ -2871,6 +2912,12 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 }
 
+void MainWindow::showMessageSlot(QString msg){
+    QMessageBox msgBox;
+    msgBox.setText(msg);
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.exec();
+}
 
 
 

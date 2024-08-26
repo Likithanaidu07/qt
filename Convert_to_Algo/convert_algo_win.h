@@ -13,7 +13,7 @@
 #include "mysql_conn.h"
 #include "convert_to_algo_bfly_bid.h"
 #include "Common/macros.h"
-
+#include "add_algo_cr_jelly_bid.h"
 enum UI_UPDATE_TYPE{
     LOADED_MODEL=0
 };
@@ -73,9 +73,11 @@ private:
     add_algo_btfly *algoBtFly;
     add_algo_f2f *algoF2F;
     add_algo_con_rev *algoConRev;
+    add_algo_cr_jelly_bid *algoCRJellyBid;
+
     add_algo_btfly_bid *algoBtFlyBid;
 
-    void sort_data_and_populate_model(QMap<int, QHash<QString, contract_table>> contract_table_/*,QHash<QString, contract_table> cd_contract_table_*/);
+    void sort_data_and_populate_model(QHash<QString, contract_table> contract_table_/*,QHash<QString, contract_table> cd_contract_table_*/);
     void resetTableWidget();
     void enable_disable_UIElement(bool enable);
     QWidget *floatingWidgetES;

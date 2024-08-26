@@ -100,7 +100,7 @@ signals:
     void data_summary_update_signal(QStringList);
     void indicesDataRecv_Signal_watch_card(Indices_Data_Struct);
     void logDataSignal(QStringList);
-
+    void showMessageSignal(QString);
 
 private:
     Ui::MainWindow *ui;
@@ -109,6 +109,7 @@ private:
     loadingdatawindow *loadingDataWinodw;
     SortSettingPopUp *sortWin; // Add this line
 
+    bool showMessagOnceFlg;
     int AlgoCount;
     int OrderCount;
     int TraderCount;
@@ -160,6 +161,7 @@ private:
     void stop_dataLoadingThread();
     void refreshTableIn_Intervel();
     void loggedOut();
+    void stopBG_Threads();
 
     Table_Portfolios_Model  *T_Portfolio_Model;
     table_portfolios_custom *T_Portfolio_Table;
@@ -250,6 +252,7 @@ public slots:
     void F2_clicked_slot();
 
     void indicesDataRecv_Slot(Indices_Data_Struct data);
+    void slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct>& data);
     void backend_comm_Data_Slot(QString msg,SocketDataType msgType);
 //    void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
     void updatePortFolioStatus();
@@ -260,10 +263,11 @@ public slots:
 
     void slotAddLogForAddAlgoRecord(QString str);
     void slotHideProgressBar();
-    void on_startall_Button_clicked();
-    void on_stopall_Button_clicked();
+    void startall_Button_clicked();
+    void stopall_Button_clicked();
     void updateSummaryLabels();
-    void on_sorting_Button_clicked();
+    void showMessageSlot(QString);
+    void sorting_Button_clicked();
     void onPortFolioTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
     void onTradeTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
      void onNetposTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
@@ -304,9 +308,10 @@ private slots:
     void on_Algorithms_Button_clicked();
     void on_Algorithms_Close_clicked();
 
-    void on_ConvertAlgo_button_clicked();
-   // void on_lineEditWatchSearch_textChanged(const QString &arg1);
-   // void on_listWidgetWatch_itemClicked(QListWidgetItem *item);
+
+    void ConvertAlgo_button_clicked();
+    void on_lineEditWatchSearch_textChanged(const QString &arg1);
+    void on_listWidgetWatch_itemClicked(QListWidgetItem *item);
 
  //   void on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item);
    // void on_listWidgetWatch_itemSelectionChanged();

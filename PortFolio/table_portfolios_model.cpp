@@ -13,7 +13,7 @@
 #include <QHeaderView>
 #include <QVBoxLayout>
 #include <QWidget>
-
+#include "PortFolio/PortfolioParser.h"
 struct CustomFormatting {
     QColor color;
     QFont font;
@@ -25,6 +25,8 @@ Table_Portfolios_Model::Table_Portfolios_Model(QObject *parent) : QAbstractTable
     decimal_precision = FO_DECIMAL_PRECISION;
    // loadSettings();
     current_editingRow = -1;
+
+    slowDataPriceUpdateTimer.start();  // Start the timer initially
 
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
     QSettings settings(appDataPath + "/tradedHighlight_ExcludeList.dat", QSettings::IniFormat);
@@ -305,7 +307,12 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
             return portfolio->Alias;
         }
         else if (index.column() == PortfolioData_Idx::_ExpiryDateTime) {
-            return portfolio->ExpiryDateTime.toString("dd-MMM-yy");
+            QString ExpiryDateTimeStr = "-";
+            if (!portfolio->ExpiryDateTime.isNull() && portfolio->ExpiryDateTime.isValid())
+                ExpiryDateTimeStr =  portfolio->ExpiryDateTime.toString("dd-MMM-yy");
+            if(ExpiryDateTimeStr=="")
+                ExpiryDateTimeStr = "-";
+            return ExpiryDateTimeStr;
         }
         else if (index.column() == PortfolioData_Idx::_Leg1) {
             return portfolio->Leg1;
@@ -364,7 +371,7 @@ case Qt::EditRole:{
     }
     PortfolioObject *portfolio = portfolio_data_list.at(index.row());
     portfolio->edting.storeRelaxed(1);
-    qDebug()<<"editStarted";
+   // qDebug()<<"editStarted";
     if(c==PortfolioData_Idx::_SellPriceDifference){
         emit edit_Started(r,c);
         return double_to_Human_Readable(portfolio->SellPriceDifference,decimal_precision);
@@ -378,7 +385,7 @@ case Qt::EditRole:{
         return portfolio->SellTotalQuantity;
     }
     else if(c==PortfolioData_Idx::_BuyTotalQuantity){
-        qDebug()<<"editStarted";
+      //  qDebug()<<"editStarted";
         emit edit_Started(r,c);
         return portfolio->BuyTotalQuantity;
     }
@@ -623,6 +630,9 @@ for(int i = 0;i<portfolio_ids_ToRemove.length();i++){
 void Table_Portfolios_Model::setDataList(QList <PortfolioObject*> portfolio_data_list_new){
 
     QMutexLocker locker(&mutex); // Lock the mutex automatically
+
+    slowDataPriceUpdateTimer.restart(); // The price is already updated so do it on next slow date receive
+
     //new data so insert all to the list
     bool newTokenFound = false;
     QString largestText = "";
@@ -671,7 +681,7 @@ void Table_Portfolios_Model::setDataList(QList <PortfolioObject*> portfolio_data
                             PortfolioObject* clonedObject = new PortfolioObject(* portfolio_data_list_new[row_new]);
                             delete portfolio_data_list[row_existing]; // Delete the original PortfolioObject at the specified index in portfolio_data_list
                             portfolio_data_list[row_existing] = clonedObject;
-                            int col = 17;// this need to be updated according to the changed column, if needed in future
+                            int col = columnCount()-1;// this need to be updated according to the changed column, if needed in future
                             emit dataChanged(index(row_existing,0), index(row_existing, col));
                         }
                     }
@@ -856,5 +866,28 @@ void Table_Portfolios_Model::setColumnWidths(QTableView *tableView) const {
     }
 }
 
+// This function will be called when slow data receved
+void Table_Portfolios_Model::updateMarketRate(const QHash<QString, MBP_Data_Struct>& MBP_Data_Hash){
 
+    QMutexLocker locker(&mutex); // Lock the mutex automatically
+    if (slowDataPriceUpdateTimer.elapsed() >= 1000) {
+             PortfolioParser portfolioPareser;
+            // qDebug()<<"updateMarketRate...";
 
+             for(int i=0;i<portfolio_data_list.length();i++){
+                 // update only if the current row is not editing
+                 if(portfolio_data_list[i]->edting.loadRelaxed()==0){
+                     portfolioPareser.CalculatePriceDifference(*portfolio_data_list[i],MBP_Data_Hash,devicer,decimal_precision);
+                    // portfolio_data_list[i]->BuyMarketRate = 1000;
+                    // portfolio_data_list[i]->SellMarketRate = 1000;
+                     QModelIndex topLeft = index(i, PortfolioData_Idx::_BuyMarketRate);
+                     QModelIndex bottomRight = index(i, PortfolioData_Idx::_SellMarketRate);
+                     emit dataChanged(topLeft, bottomRight);
+
+                 }
+             }
+
+            // Reset the timer
+            slowDataPriceUpdateTimer.restart();
+        }
+}

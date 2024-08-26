@@ -8,6 +8,7 @@
 #include "QMutex"
 #include "qpixmap.h"
 #include "qtableview.h"
+#include <QElapsedTimer>
 
 class Table_Portfolios_Model : public QAbstractTableModel
 {
@@ -35,18 +36,19 @@ public:
     void setColumnWidths(QTableView *tableView) const;
     QStringList getTradedHighlight_ExcludeList();
     QStringList  TradedHighlight_ExcludeList;
+    void updateMarketRate(const QHash<QString, MBP_Data_Struct>& data);
 
 
 private:
    // QStringList header={"Status","Algo ID","Algo Name","Rate", "Avg", "Diff" ,"TQ", "TTQ", "RQ", "Rate", "Avg", "Diff", "TQ", "TTQ", "RQ", "Odr Qty" ,"Qty Ratio", "Skip/Market Strike", "Bid Leg", "Cost", "Fut Price"};
-    QStringList header={"Status","Algo No",
-                          "Algo Name","Alias","B Rate",
-                          "B Avg","B Diff","B TQ",
-                          "B TTQ","B RQ","S Rate",
-                          "S Avg", "S Diff","S TQ",
-                          "S TTQ","S RQ","Odr Qty","Expiry 1", /*"Expiry 2",*/
+    QStringList header={"Status","Algo No",                         
+                          "Algo Name","Alias","BRate",
+                          "BAvg","BDiff","BTQ",
+                          "BTTQ","BRQ","SRate",
+                          "SAvg", "SDiff","STQ",
+                          "STTQ","SRQ","Odr Qty","Expiry 1", /*"Expiry 2",*/
                           "Cost" ,"Qty Ratio",
-                           "Bid Leg", "Fut Price"};
+                          "Bid Leg", "Fut Price"};
 
 
     QString double_to_Human_Readable(double num, int precision) const;
@@ -55,6 +57,9 @@ private:
     bool storeToken(PortfolioObject* p);
     void loadSettings();
     int current_editingRow; //row which is editing currently
+
+    QElapsedTimer slowDataPriceUpdateTimer;
+
 
 
 public slots:

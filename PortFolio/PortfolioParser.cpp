@@ -26,11 +26,47 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         obj.TraderID = query.value("TraderID").toInt();
 
         obj.Leg1TokenNo = query.value("Leg1TokenNo").toInt();
+        if(obj.Leg1TokenNo>0){
+            if(!ContractDetail::getInstance().checkTokenExist(obj.Leg1TokenNo)){
+               qDebug()<< "Leg1TokenNo: "<<obj.Leg1TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               return false;
+            }
+        }
         obj.Leg2TokenNo = query.value("Leg2TokenNo").toInt();
+        if(obj.Leg2TokenNo>0){
+            if(!ContractDetail::getInstance().checkTokenExist(obj.Leg2TokenNo)){
+               qDebug()<< "Leg2TokenNo: "<<obj.Leg2TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               return false;
+            }
+        }
         obj.Leg3TokenNo = query.value("Leg3TokenNo").toInt();
+        if(obj.Leg3TokenNo>0){
+            if(!ContractDetail::getInstance().checkTokenExist(obj.Leg3TokenNo)){
+               qDebug()<< "Leg3TokenNo: "<<obj.Leg3TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               return false;
+            }
+        }
         obj.Leg4TokenNo = query.value("Leg4TokenNo").toInt();
+        if(obj.Leg4TokenNo>0){
+            if(!ContractDetail::getInstance().checkTokenExist(obj.Leg4TokenNo)){
+               qDebug()<< "Leg4TokenNo: "<<obj.Leg4TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               return false;
+            }
+        }
         obj.Leg5TokenNo = query.value("Leg5TokenNo").toInt();
+        if(obj.Leg5TokenNo>0){
+            if(!ContractDetail::getInstance().checkTokenExist(obj.Leg5TokenNo)){
+               qDebug()<< "Leg5TokenNo: "<<obj.Leg5TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               return false;
+            }
+        }
         obj.Leg6TokenNo = query.value("Leg6TokenNo").toInt();
+        if(obj.Leg6TokenNo>0){
+            if(!ContractDetail::getInstance().checkTokenExist(obj.Leg6TokenNo)){
+               qDebug()<< "Leg6TokenNo: "<<obj.Leg6TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               return false;
+            }
+        }
 
         /*SlowDataReader::GetInstance().RegisterContract(static_cast<uint>(obj.Leg1TokenNo));
             SlowDataReader::GetInstance().RegisterContract(static_cast<uint>(obj.Leg2TokenNo));
@@ -51,7 +87,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
 
         int lotSize = obj.GetLotSize();
         if(lotSize==0){
-            obj.AlgoName = "Cannot get lost size from Contract, token not found in Contract ";
+            obj.AlgoName = "Cannot get lotSize from Contract, token not found in Contract ";
             return false;
         }
 
@@ -107,7 +143,6 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
 
         obj.Expiry = ContractDetail::getInstance().GetExpiry(obj.GetFirstToken(), "dd-MMM-yy",type);
         obj.ExpiryMonth = ContractDetail::getInstance().GetExpiry(obj.GetFirstToken(), "MMM",type);
-        obj.ExpiryDateTime = ContractDetail::getInstance().GetExpiryDate(obj.GetFirstToken(),type);
         obj.ExpiryBinary = ContractDetail::getInstance().GetExpiry(obj.GetFirstToken(),type);
 
         obj.Status = query.value("Status").toString() == "Active";
@@ -126,6 +161,10 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         else if(obj.PortfolioType==QString::number(PortfolioType::CR)){
             obj.QuantityRatio="1:1:1";
         }
+        else if(obj.PortfolioType==QString::number(PortfolioType::CR_JELLY)){
+            obj.QuantityRatio="1:1:1";
+
+        }
         else{
             obj.QuantityRatio="N/A";
         }
@@ -133,6 +172,10 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         obj.BidLeg = ContractDetail::getInstance().GetStockName(obj.Leg2TokenNo,obj.PortfolioType.toInt());
 
         if(obj.PortfolioType==QString::number(PortfolioType::CR)){
+            obj.BidLeg = ContractDetail::getInstance().GetStockName(obj.Leg1TokenNo,obj.PortfolioType.toInt());
+        }
+
+        if(obj.PortfolioType==QString::number(PortfolioType::CR_JELLY)){
             obj.BidLeg = ContractDetail::getInstance().GetStockName(obj.Leg1TokenNo,obj.PortfolioType.toInt());
         }
 
@@ -238,13 +281,24 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
 
         case PortfolioType::CR:
             obj.Expiry = ContractDetail::getInstance().GetExpiry(obj.Leg2TokenNo, "dd-MMM-yy",type);
-            obj.ExpiryDateTime = ContractDetail::getInstance().GetExpiryDate(obj.Leg2TokenNo,type);
             obj.ExpiryBinary = ContractDetail::getInstance().GetExpiry(obj.Leg2TokenNo,type);
 
             obj.Leg1 = ContractDetail::getInstance().GetExpiry(obj.Leg1TokenNo, "ddMMMyy",type);
             obj.Leg2 = ContractDetail::getInstance().GetStrikePrice(obj.Leg2TokenNo,type);
             obj.Leg3 = ContractDetail::getInstance().GetStrikePrice(obj.Leg3TokenNo,type);
             break;
+
+        case PortfolioType::CR_JELLY:
+            obj.Expiry = ContractDetail::getInstance().GetExpiry(obj.Leg2TokenNo, "dd-MMM-yy",type);
+            obj.ExpiryDateTime = ContractDetail::getInstance().GetExpiryDate(obj.Leg1TokenNo,type);
+            obj.ExpiryBinary = ContractDetail::getInstance().GetExpiry(obj.Leg1TokenNo,type);
+
+            obj.Leg1 = ContractDetail::getInstance().GetExpiry(obj.Leg1TokenNo, "ddMMMyy",type);
+            obj.Leg2 = ContractDetail::getInstance().GetStrikePrice(obj.Leg2TokenNo,type);
+            obj.Leg3 = ContractDetail::getInstance().GetStrikePrice(obj.Leg3TokenNo,type);
+            break;
+
+
 
         case PortfolioType::BOX:
         case PortfolioType::OPEN_BOX:
@@ -573,7 +627,15 @@ QString PortfolioParser::get_Algo_Name(PortfolioType algo_type,int leg1_token_nu
         //            QString StockName = ContractDetail::getInstance().GetStockName(leg2_token_number);
         //            StockName.chop(2);
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type);
-        Algo_Name_For_Sorting   = "CR-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type);
+        Algo_Name_For_Sorting   = "CR-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type)+"-0-ZE"; // For CR no  strike diff and optiontype in algoname, so make some dummy data so sorting will work
+
+    }
+    else if(algo_type==PortfolioType::CR_JELLY){
+        Algo_Name = "CRJELLY-";//Nifty-17000";
+        //            QString StockName = ContractDetail::getInstance().GetStockName(leg2_token_number);
+        //            StockName.chop(2);
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type);
+        Algo_Name_For_Sorting   = "CRJELLY-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type)+"-0-ZE"; // // For CRJELLY no strike diff and optiontype in algoname, so make some dummy data so sorting will work
 
     }
     else if(algo_type==PortfolioType::BOX){
@@ -803,10 +865,86 @@ void PortfolioParser::CalculateAveragePrice(PortfolioObject &portfolio,    QHash
     }
 
     case PortfolioType::CR:{
-        QMap<int, QHash<QString, contract_table>> Contract =  ContractDetail::getInstance().GetContracts();
+        QHash<QString, contract_table> Contract =  ContractDetail::getInstance().GetContracts();
         int strikePrice = 0;//ContractDetail::GetDetail(portfolio.Leg2TokenNo).StrikePrice;
-        if(Contract[portfolio.PortfolioTypeEnum].contains(QString::number(portfolio.Leg2TokenNo)))
-            strikePrice = Contract[portfolio.PortfolioTypeEnum][QString::number(portfolio.Leg2TokenNo)].StrikePrice;
+        if(Contract.contains(QString::number(portfolio.Leg2TokenNo)))
+            strikePrice = Contract[QString::number(portfolio.Leg2TokenNo)].StrikePrice;
+
+        double leg1BuyPrice = DBL_MAX;
+        double leg1SellPrice = DBL_MAX;
+        double leg2BuyPrice = DBL_MAX;
+        double leg2SellPrice = DBL_MAX;
+        double leg3BuyPrice = DBL_MAX;
+        double leg3SellPrice = DBL_MAX;
+        QString key1 = QString::number(portfolio.PortfolioNumber)+"_"+QString::number(portfolio.Leg1TokenNo);
+        if(averagePriceList.contains(key1)){
+            PortfolioAvgPrice leg1 = averagePriceList[key1];
+            leg1BuyPrice = leg1.AvgPrice;
+        }
+        key1 = QString::number(portfolio.PortfolioNumber + 1500000)+"_"+QString::number(portfolio.Leg1TokenNo);
+        if(averagePriceList.contains(key1)){
+            PortfolioAvgPrice leg1 = averagePriceList[key1];
+            leg1SellPrice = leg1.AvgPrice;
+        }
+
+        QString key2 = QString::number(portfolio.PortfolioNumber)+"_"+QString::number(portfolio.Leg2TokenNo);
+        if(averagePriceList.contains(key2)){
+            PortfolioAvgPrice leg2 = averagePriceList[key2];
+            leg2SellPrice = leg2.AvgPrice;
+        }
+        key2 = QString::number(portfolio.PortfolioNumber + 1500000)+"_"+QString::number(portfolio.Leg2TokenNo);
+        if(averagePriceList.contains(key2)){
+            PortfolioAvgPrice leg2 = averagePriceList[key2];
+            leg2BuyPrice = leg2.AvgPrice;
+        }
+        QString key3 = QString::number(portfolio.PortfolioNumber)+"_"+QString::number(portfolio.Leg3TokenNo);
+        if(averagePriceList.contains(key3)){
+            PortfolioAvgPrice leg3 = averagePriceList[key3];
+            leg3BuyPrice = leg3.AvgPrice;
+        }
+        key3 = QString::number(portfolio.PortfolioNumber + 1500000)+"_"+QString::number(portfolio.Leg3TokenNo);
+        if(averagePriceList.contains(key3)){
+            PortfolioAvgPrice leg3 = averagePriceList[key3];
+            leg3SellPrice = leg3.AvgPrice;
+        }
+
+        if (leg2SellPrice == DBL_MAX|| leg1BuyPrice == DBL_MAX || leg3BuyPrice == DBL_MAX)
+        {
+            portfolio.SellAveragePrice = "-";
+        }
+        else{
+            double diffVal = (leg1BuyPrice + leg3BuyPrice) - ((strikePrice / devicer) + leg2SellPrice);
+            QString diff = QString::number(diffVal, 'f', decimal_precision);
+            if (portfolio.SellAveragePrice != diff)
+            {
+                portfolio.AverageUpdateTime = QDateTime::currentDateTime();
+                portfolio.SellAveragePrice = diff;
+            }
+        }
+        if (leg2BuyPrice == DBL_MAX || leg1SellPrice == DBL_MAX || leg3SellPrice == DBL_MAX)
+        {
+            portfolio.BuyAveragePrice = "-";
+        }
+        else
+        {
+            double diffVal = ((strikePrice / devicer) + leg2BuyPrice) - (leg1SellPrice + leg3SellPrice);
+            QString diff = QString::number(diffVal, 'f', decimal_precision);
+            if (portfolio.BuyAveragePrice != diff)
+            {
+                portfolio.AverageUpdateTime =QDateTime::currentDateTime();
+                portfolio.BuyAveragePrice = diff;
+            }
+        }
+
+
+        break;
+    }
+
+    case PortfolioType::CR_JELLY:{
+        QHash<QString, contract_table> Contract =  ContractDetail::getInstance().GetContracts();
+        int strikePrice = 0;//ContractDetail::GetDetail(portfolio.Leg2TokenNo).StrikePrice;
+        if(Contract.contains(QString::number(portfolio.Leg2TokenNo)))
+            strikePrice = Contract[QString::number(portfolio.Leg2TokenNo)].StrikePrice;
 
         double leg1BuyPrice = DBL_MAX;
         double leg1SellPrice = DBL_MAX;
@@ -928,13 +1066,13 @@ void PortfolioParser::CalculateAveragePrice(PortfolioObject &portfolio,    QHash
             leg4BuyPrice = leg4.AvgPrice;
         }
 
-        QMap<int, QHash<QString, contract_table>> Contract =  ContractDetail::getInstance().GetContracts();
+        QHash<QString, contract_table> Contract =  ContractDetail::getInstance().GetContracts();
         int l1StrikePrice = 0;
         int l3StrikePrice = 0;
-        if(Contract[portfolio.PortfolioTypeEnum].contains(QString::number(portfolio.Leg1TokenNo)))
-            l1StrikePrice = Contract[portfolio.PortfolioTypeEnum][QString::number(portfolio.Leg1TokenNo)].StrikePrice;
-        if(Contract[portfolio.PortfolioTypeEnum].contains(QString::number(portfolio.Leg3TokenNo)))
-            l3StrikePrice = Contract[portfolio.PortfolioTypeEnum][QString::number(portfolio.Leg3TokenNo)].StrikePrice;
+        if(Contract.contains(QString::number(portfolio.Leg1TokenNo)))
+            l1StrikePrice = Contract[QString::number(portfolio.Leg1TokenNo)].StrikePrice;
+        if(Contract.contains(QString::number(portfolio.Leg3TokenNo)))
+            l3StrikePrice = Contract[QString::number(portfolio.Leg3TokenNo)].StrikePrice;
 
         double strikeDiff = (1.0 * (l3StrikePrice - l1StrikePrice)) / devicer;
         bool ret = false;
@@ -1023,13 +1161,13 @@ void PortfolioParser::CalculateAveragePrice(PortfolioObject &portfolio,    QHash
             leg4BuyPrice = leg4.AvgPrice;
         }
 
-        QMap<int, QHash<QString, contract_table>> Contract =  ContractDetail::getInstance().GetContracts();
+        QHash<QString, contract_table> Contract =  ContractDetail::getInstance().GetContracts();
         int l1StrikePrice = 0;
         int l3StrikePrice = 0;
-        if(Contract[portfolio.PortfolioTypeEnum].contains(QString::number(portfolio.Leg1TokenNo)))
-            l1StrikePrice = Contract[portfolio.PortfolioTypeEnum][QString::number(portfolio.Leg1TokenNo)].StrikePrice;
-        if(Contract[portfolio.PortfolioTypeEnum].contains(QString::number(portfolio.Leg3TokenNo)))
-            l3StrikePrice = Contract[portfolio.PortfolioTypeEnum][QString::number(portfolio.Leg3TokenNo)].StrikePrice;
+        if(Contract.contains(QString::number(portfolio.Leg1TokenNo)))
+            l1StrikePrice = Contract[QString::number(portfolio.Leg1TokenNo)].StrikePrice;
+        if(Contract.contains(QString::number(portfolio.Leg3TokenNo)))
+            l3StrikePrice = Contract[QString::number(portfolio.Leg3TokenNo)].StrikePrice;
 
         double strikeDiff = (1.0 * (l3StrikePrice - l1StrikePrice)) / devicer;
         bool ret = false;
@@ -1160,6 +1298,8 @@ void PortfolioParser::CalculatePriceDifference(PortfolioObject &portfolio, QHash
         case PortfolioType::OPEN_BY:
             return CalculateOPENBFLYPriceDifference(portfolio,MBP_Data_Hash,devicer,decimal_precision);
         case PortfolioType::CR:
+        case PortfolioType::CR_JELLY:
+
             return CalculateConRevPriceDifference(portfolio,MBP_Data_Hash,devicer,decimal_precision,portfolio.PortfolioTypeEnum);
 
         case PortfolioType::BX_MKT:
@@ -1395,11 +1535,11 @@ void PortfolioParser::CalculateConRevPriceDifference(PortfolioObject &portfolio,
        {
            return false;
        }*/
-    QMap<int, QHash<QString, contract_table>> Contract =  ContractDetail::getInstance().GetContracts();
+    QHash<QString, contract_table> Contract =  ContractDetail::getInstance().GetContracts();
     int strikePrice = 0;//ContractDetail::GetDetail(portfolio.Leg2TokenNo).StrikePrice;
 
-    if(Contract[type].contains(QString::number(portfolio.Leg2TokenNo)))
-        strikePrice = Contract[type][QString::number(portfolio.Leg2TokenNo)].StrikePrice;
+    if(Contract.contains(QString::number(portfolio.Leg2TokenNo)))
+        strikePrice = Contract[QString::number(portfolio.Leg2TokenNo)].StrikePrice;
     else{
         qDebug()<<"Waring: Cannot get Leg2TokenNo = "<<portfolio.Leg2TokenNo<<" CR for Price calculation "<<"portfopliNo="<<portfolio.PortfolioNumber;
     }
@@ -1493,13 +1633,13 @@ void PortfolioParser::CalculateBoxPriceDifference(PortfolioObject &portfolio, QH
        {
            return;
        }*/
-    QMap<int,QHash<QString, contract_table>> Contract =  ContractDetail::getInstance().GetContracts();
+    QHash<QString, contract_table> Contract =  ContractDetail::getInstance().GetContracts();
     int strikePriceLeg3 = 0;//ContractDetail::GetDetail(portfolio.Leg2TokenNo).StrikePrice;
-    if(Contract[type].contains(QString::number(portfolio.Leg3TokenNo)))
-        strikePriceLeg3 = Contract[type][QString::number(portfolio.Leg3TokenNo)].StrikePrice;
+    if(Contract.contains(QString::number(portfolio.Leg3TokenNo)))
+        strikePriceLeg3 = Contract[QString::number(portfolio.Leg3TokenNo)].StrikePrice;
     int strikePriceLeg1 = 0;//ContractDetail::GetDetail(portfolio.Leg2TokenNo).StrikePrice;
-    if(Contract[type].contains(QString::number(portfolio.Leg1TokenNo)))
-        strikePriceLeg1 = Contract[type][QString::number(portfolio.Leg1TokenNo)].StrikePrice;
+    if(Contract.contains(QString::number(portfolio.Leg1TokenNo)))
+        strikePriceLeg1 = Contract[QString::number(portfolio.Leg1TokenNo)].StrikePrice;
 
 
 
@@ -1577,13 +1717,13 @@ void PortfolioParser::CalculateOpenBoxPriceDifference(PortfolioObject &portfolio
        {
            return;
        }*/
-    QMap<int, QHash<QString, contract_table>> Contract =  ContractDetail::getInstance().GetContracts();
+     QHash<QString, contract_table> Contract =  ContractDetail::getInstance().GetContracts();
     int strikePriceLeg3 = 0;//ContractDetail::GetDetail(portfolio.Leg2TokenNo).StrikePrice;
-    if(Contract[type].contains(QString::number(portfolio.Leg3TokenNo)))
-        strikePriceLeg3 = Contract[type][QString::number(portfolio.Leg3TokenNo)].StrikePrice;
+    if(Contract.contains(QString::number(portfolio.Leg3TokenNo)))
+        strikePriceLeg3 = Contract[QString::number(portfolio.Leg3TokenNo)].StrikePrice;
     int strikePriceLeg1 = 0;//ContractDetail::GetDetail(portfolio.Leg2TokenNo).StrikePrice;
-    if(Contract[type].contains(QString::number(portfolio.Leg1TokenNo)))
-        strikePriceLeg1 = Contract[type][QString::number(portfolio.Leg1TokenNo)].StrikePrice;
+    if(Contract.contains(QString::number(portfolio.Leg1TokenNo)))
+        strikePriceLeg1 = Contract[QString::number(portfolio.Leg1TokenNo)].StrikePrice;
 
 
 

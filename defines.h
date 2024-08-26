@@ -174,6 +174,7 @@ enum PortfolioType
     F1_F2 = 207,
     BFLY_BID = 250,
     CR = 251,
+    CR_JELLY= 252,
     JBX,
     JBX_3L,
     JBX_2L,
@@ -292,7 +293,7 @@ struct userInfo{
     int IDXOpenLimit;
     int STKOpenLimit;
 
-    QMap<PortfolioType,QString> algoFilterMap;
+    QMap<PortfolioType,QStringList> algoFilterMap;
 
 };
 

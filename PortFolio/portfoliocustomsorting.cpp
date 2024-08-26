@@ -79,8 +79,6 @@ int portfolioCustomSorting::columnNameToIDx(QString colStr){
         return 5;
     else if(colStr=="Option Type")
         return 6;
-    else if(colStr=="Alias")
-        return 7;
     else
      return -1;
 }
@@ -98,6 +96,14 @@ bool portfolioCustomSorting::customComparator(const QString &a, const QString &b
 
             auto aVal = aParts[colIndex];
             auto bVal = bParts[colIndex];
+
+            // Handle the special case for PE/CE/ZE in case of CR jelly and CR where optiontype is not there and for camparison a tmp value of ZE given, also the strike diff give 0 so it will automatticaly sodrt
+                        if ((aVal == "ZE" && (bVal == "PE" || bVal == "CE")) ||
+                            (bVal == "ZE" && (aVal == "PE" || aVal == "CE"))) {
+                            // Always put ZE last
+                            return (aVal == "ZE") ? false : true;
+                        }
+
             //means its "algostatus", "Middle Strike" or "strike diff" so it shold consider as number sorting, rest all should be
             // alphabetical sort
             bool isNumaric = false;
@@ -144,7 +150,7 @@ bool portfolioCustomSorting::customComparator(const QString &a, const QString &b
 
 
             //CE should come first so sort Ascending order
-            if (order == "CE") {
+            /*if (order == "CE") {
                 if (aParts[colIndex] < bParts[colIndex]) {
                     return true;
                 } else if (aParts[colIndex] > bParts[colIndex]) {
@@ -158,7 +164,28 @@ bool portfolioCustomSorting::customComparator(const QString &a, const QString &b
                 } else if (aParts[colIndex] < bParts[colIndex]) {
                     return false;
                 }
-            }
+            }*/
+
+
+            // CE should come first (Ascending order)
+                        if (order == "CE") {
+                            if (aVal < bVal) {
+                                return true;
+                            } else if (aVal > bVal) {
+                                return false;
+                            }
+                        }
+                        // PE should come first (Descending order)
+                        else if (order == "PE") {
+                            if (aVal > bVal) {
+                                return true;
+                            } else if (aVal < bVal) {
+                                return false;
+                            }
+                        }
+
+
+
             //Disabled algo(status=0) should come first so sort Ascending order
             if (order == "Disabled") {
 
