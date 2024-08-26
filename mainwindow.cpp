@@ -243,8 +243,8 @@ MainWindow::MainWindow(QWidget *parent)
             connect(ConvertAlgo_button, SIGNAL(clicked()), this, SLOT(on_ConvertAlgo_button_clicked()));
             //Frame 364.png
             ConvertAlgo_button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-
-            ConvertAlgo_button->setText("Build Algo");
+            ConvertAlgo_button->setIcon(QIcon(":/BuildAlgo.png"));
+            ConvertAlgo_button->setToolTip("Build Algo");
             ConvertAlgo_button->setStyleSheet("text-align: center;");
 
             const char convert_to_algo_button[]="QToolButton {"
