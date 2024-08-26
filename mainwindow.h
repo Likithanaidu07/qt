@@ -310,8 +310,8 @@ private slots:
 
 
     void ConvertAlgo_button_clicked();
-    void on_lineEditWatchSearch_textChanged(const QString &arg1);
-    void on_listWidgetWatch_itemClicked(QListWidgetItem *item);
+   // void on_lineEditWatchSearch_textChanged(const QString &arg1);
+   // void on_listWidgetWatch_itemClicked(QListWidgetItem *item);
 
  //   void on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item);
    // void on_listWidgetWatch_itemSelectionChanged();

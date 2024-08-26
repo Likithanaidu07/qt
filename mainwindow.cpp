@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget *parent)
     //ui->sidePanel->setVisible(false);
 
     showMessagOnceFlg = true;
-    connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
+   // connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
     connect(this,SIGNAL(showMessageSignal(QString)),this,SLOT(showMessageSlot(QString)));
 
 
