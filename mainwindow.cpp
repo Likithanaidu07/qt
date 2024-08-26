@@ -273,68 +273,77 @@ MainWindow::MainWindow(QWidget *parent)
             test->setLayout(internalLayout);
             internalLayout->setContentsMargins(10,-1,-1,-1);
             QSpacerItem* spc = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-            QToolButton* button1=new QToolButton();
+            QToolButton* button1 = new QToolButton();
             connect(button1, SIGNAL(clicked()), this, SLOT(on_startall_Button_clicked()));
             button1->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            //button1->setIcon(QIcon(":/done_all.png"));
-            button1->setText("Start All");
-            QToolButton* button2=new QToolButton();
+            button1->setIcon(QIcon(":/start_all.png"));
+            button1->setToolTip("Start All");
+
+            QToolButton* button2 = new QToolButton();
             connect(button2, SIGNAL(clicked()), this, SLOT(on_stopall_Button_clicked()));
             button2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            //button2->setIcon(QIcon(a2));
-            button2->setText("Stop All");
-            QToolButton* button3=new QToolButton();
+            button2->setIcon(QIcon(":/stop_all.png"));
+            button2->setToolTip("Stop All");
+
+            QToolButton* button3 = new QToolButton();
             button3->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            //button3->setIcon(QIcon(a3));
-            button3->setText("Import");
-            QToolButton* button6=new QToolButton();
-            button6->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            //button6->setIcon(QIcon(a4));
-            button6->setText("Export");
-            QToolButton* button4=new QToolButton();
+            button3->setIcon(QIcon(":/import.png"));
+            button3->setToolTip("Import");
+
+            QToolButton* button4 = new QToolButton();
             button4->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            //button4->setIcon(QIcon(a5));
-            button4->setText("Sorting");
+            button4->setIcon(QIcon(":/reset.png"));
+            button4->setToolTip("Sorting");
             connect(button4, SIGNAL(clicked()), this, SLOT(on_sorting_Button_clicked()));
 
-            QToolButton* button5=new QToolButton();
+            QToolButton* button5 = new QToolButton();
             button5->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            //button5->setIcon(QIcon(a6));
-           // button5->setText("Portfolio Colour");
-            const char stylesheet_tb[] ="QToolButton {"
-                                        "border-radius: 4px;"
-                                        "border: 1px solid #4F5D75;"
-                                        "background: #F7F7FF;"
-                                        "color: #4F5D75;"
-                                        "font-style: normal;"
-                                        "font-size: 12px;"
-                                        "font-weight: 500;"
-                                        "line-height: normal;"
-                                        "}"
-                                        "QToolButton:hover {"
-                                        "border-radius: 4px;"
-                                        "border: 1px solid #4F5D75;"
-                                        "background: #4F5D75;"
-                                        "color: #FFF; "
-                                        "font-family: Work Sans;"
-                                        "font-size: 12px;"
-                                        "font-style: normal;"
-                                        "font-weight: 500;"
-                                        "line-height: normal;"
-                                        "}";
-            for (auto w : {button1,button2,button3,button4,button5,button6}){
-                w->setStyleSheet(stylesheet_tb);
-                QFont font=w->font();
-                font.setFamily("Work Sans");
-                w->setFont(font);
+            button5->setToolTip("Portfolio Colour");
+
+            QToolButton* button6 = new QToolButton();
+            button6->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            button6->setIcon(QIcon(":/export.png"));
+            button6->setToolTip("Export");
+
+            const char stylesheet_tb[] =
+                "QToolButton {"
+                "border-radius: 4px;"
+                "border: 1px solid #4F5D75;"
+                "background: #345D71;"
+                "color: #4F5D75;"
+                "font-style: normal;"
+                "font-size: 12px;"
+                "font-weight: 500;"
+                "line-height: normal;"
+                "padding: 2px 5px;"
+                "}"
+                "QToolButton:hover {"
+                "border-radius: 4px;"
+                "border: 1px solid #4F5D75;"
+                "background: #4F5D75;"
+                "color: #FFF;"
+                "font-family: Work Sans;"
+                "font-size: 12px;"
+                "font-style: normal;"
+                "font-weight: 500;"
+                "line-height: normal;"
+                "padding: 2px 5px;"
+                "}";
+
+            for (auto w : {button1, button2, button3, button4, button5, button6}) {
+        w->setStyleSheet(stylesheet_tb);
+        QFont font = w->font();
+        font.setFamily("Work Sans");
+        w->setFont(font);
             }
+
 
 
 
                 internalLayout->addWidget(ConvertAlgo_button);
                 internalLayout->addSpacerItem(spc);
                 internalLayout->addWidget(line_edit_trade_search);
-                //internalLayout->addSpacerItem(spc);
+                internalLayout->addSpacerItem(spc);
                 internalLayout->addWidget(button1);
                 internalLayout->addWidget(button2);
                 internalLayout->addWidget(button3);
