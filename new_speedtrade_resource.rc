@@ -1,6 +1,6 @@
 #include <windows.h>
 
-IDI_ICON1	ICON	"C:\\Users\\USER\\Documents\\gitui\\ui-qt\\Resources\\logo.ico"
+IDI_ICON1	ICON	"C:\\Users\\USER\\Documents\\gitui\\ui\\ui-qt\\Resources\\logo.ico"
 
 VS_VERSION_INFO VERSIONINFO
 	FILEVERSION 0,0,0,0
