@@ -1288,3 +1288,6 @@ new_speedtrade.pro.user*
 /build-ads-Qt6_7_2_msvc2019_64-Release/src/Makefile
 /build-ads-Qt6_7_2_msvc2019_64-Release/src/Makefile.Debug
 /build-ads-Qt6_7_2_msvc2019_64-Release/src/Makefile.Release
+/Qt-Advanced-Docking-System/lib
+/Qt-Advanced-Docking-System/src/Makefile.Debug
+/Qt-Advanced-Docking-System/src/Makefile.Release
