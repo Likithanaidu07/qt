@@ -1291,3 +1291,7 @@ new_speedtrade.pro.user*
 /Qt-Advanced-Docking-System/lib
 /Qt-Advanced-Docking-System/src/Makefile.Debug
 /Qt-Advanced-Docking-System/src/Makefile.Release
+/Qt-Advanced-Docking-System/.qtc_clangd
+/ui_logs_cards.h
+/ui_summary_cards.h
+/ui_watch_cards.h
