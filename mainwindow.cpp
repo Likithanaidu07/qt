@@ -23,11 +23,9 @@
 #include "NetPosition/net_position_table_delegate.h"
 #include "NetPosition/net_position_table_headerview.h"
 #include "Cards/logs_cards.h"
-#include "Cards/summary_cards.h"
-#include "Cards/watch_cards.h"
-#include "QMenu"
 
-#define ENABLE_BACKEND_DEBUG_MSG
+
+//#define ENABLE_BACKEND_DEBUG_MSG
 
 static const char stylesheetvis[]= "background: #596167;" "border-radius: 10px;";
 
@@ -48,52 +46,20 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->setupUi(this);
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
-    //ui->sidePanel->setVisible(false);
-
-
-
-    // Create the Card menu
-    QMenu *cardMenu = new QMenu("Card", this);
-
-    // Create actions
-    QAction *summaryAction = new QAction("Summary", this);
-    QAction *watchAction = new QAction("Watch", this);
-    QAction *LogAction = new QAction("Logs", this);
-
-    // Add actions to the Card menu
-    cardMenu->addAction(summaryAction);
-    cardMenu->addAction(watchAction);
-     cardMenu->addAction(LogAction);
-
-
-    // Create a ToolButton to act as the menu title on ui->card
-    ui->toolButtonCards->setMenu(cardMenu);
-    ui->toolButtonCards->setPopupMode(QToolButton::InstantPopup);
-
-    ui->toolButtonCards->setStyleSheet(
-        "QToolButton {"
+    ui->comboBox->setStyleSheet(
+        "QComboBox {"
+        "    text-align: center;"
+        "    background-color: #46454d;"
         "    color: white;"
         "    font-family: 'Work Sans';"
-        "    font-weight: bold;"
         "}"
         );
-    QFont font("Work Sans", 10, QFont::Bold); // Set the font to Work Sans, size 10, bold
-    ui->label_4->setFont(font);
-    ui->label_4->setText("status :");
-    ui->label_2->setFont(font);
-    ui->label_2->setText("User Message :");
-
-    // Connect the actions to their respective slots (if needed)
-    connect(summaryAction, &QAction::triggered, this, &MainWindow::onSummaryActionTriggered);
-    connect(watchAction, &QAction::triggered, this, &MainWindow::onWatchActionTriggered);
-    connect(LogAction, &QAction::triggered, this, &MainWindow::onLogActionTriggered);
-
 
 
    // ui->sidePanel->setVisible(false);
-    //ui->widget_3->setVisible(false);
+    ui->widget_3->setVisible(false);
       ui->widget_5->setVisible(true);
-    //ui->widget_4->setVisible(false);
+    ui->widget_4->setVisible(false);
     //ui->toggle_Button_1->setVisible(false);
   //  connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
     connect(this,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
@@ -346,7 +312,6 @@ MainWindow::MainWindow(QWidget *parent)
                 lay->addWidget(test, 0, 0);
 
     T_Portfolio_Table = new table_portfolios_custom(T_Portfolio_DockWin);
-    T_Portfolio_Table->setObjectName("algo_table");
     T_Portfolio_Table->setStyleSheet(scroll_bar_SS);
     // T_Portfolio_Table->viewport()->setFocusPolicy(Qt::NoFocus);
     T_Portfolio_Model = new Table_Portfolios_Model();
@@ -485,15 +450,11 @@ MainWindow::MainWindow(QWidget *parent)
         "   font-weight: 600; "
         "   line-height: normal;"
         );
-//    headerViews->setSectionsMovable(true);
-//    headerViews->setHighlightSections(true);
-     connect(headerViews, &QHeaderView::sectionMoved, this, &MainWindow::onTradeTableHeader_Rearranged);
     trade_table->setHorizontalHeader(headerViews);
 
     lay_Trade_Window->addWidget(trade_table, 1, 0, 1, 3);
 
     trade_model = new Trade_Table_Model();
-    trade_table->setObjectName("trade_table");
     Table_OrderBook_Delegate* trade_delegate=new Table_OrderBook_Delegate;
     trade_table->setModel(trade_model);
     trade_table->setItemDelegate(trade_delegate);
@@ -501,13 +462,12 @@ MainWindow::MainWindow(QWidget *parent)
     //trade_table->setItemDelegate(T_order_Delegate);
 
     // Configure column resizing
-    //trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
+    trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
     trade_table->setColumnWidth(1,300);
 
     trade_table->horizontalHeader()->setStretchLastSection(true);
     trade_table->verticalHeader()->setVisible(false);
     // trade_table->setStyleSheet("QHeaderView { background-color: #111111;} QHeaderView::section { background-color:#555555;color:#eeeeee;font-weight: 400; }");
-    trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     trade_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     trade_table->setSelectionMode(QAbstractItemView::SingleSelection);
     /*trade_table->setStyleSheet("QTableView {selection-background-color: #EFB37F;"
@@ -517,7 +477,6 @@ MainWindow::MainWindow(QWidget *parent)
                                             "QHeaderView { background-color: #C0AAE5;color:#3D3D3D;} QHeaderView::section { background-color:#C0AAE5;color:#3D3D3D;font-weight: 400; }");*/
 
     trade_table->show();
-    restoreTradeTableViewColumnState(trade_table);
     /***********Init Order Book Window**************************/
 
     /************Positions Window********************************/
@@ -583,11 +542,10 @@ MainWindow::MainWindow(QWidget *parent)
         "   font-weight: 600; "
         "   line-height: normal;"
         );
-    connect(headerView_netpos, &QHeaderView::sectionMoved, this, &MainWindow::onNetposTableHeader_Rearranged);
     net_pos_table->setHorizontalHeader(headerView_netpos);
 
     net_pos_model = new Net_Position_Table_Model();
-    net_pos_table->setObjectName("netpos_table");
+
     net_pos_table->setModel(net_pos_model);
     net_pos_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
     net_pos_table->setColumnWidth(1,250);
@@ -604,10 +562,9 @@ MainWindow::MainWindow(QWidget *parent)
     net_pos_table->setSelectionMode(QAbstractItemView::SingleSelection);
     net_position_table_delegate* netpos_delegate=new net_position_table_delegate;
     net_pos_table->setItemDelegate(netpos_delegate);
-   net_pos_table->horizontalHeader()->setStretchLastSection(true);
+
     dock_win_net_pos->setWidget(net_pos_table);
     net_pos_table->show();
-    restoreNetposTableViewColumnState(net_pos_table);
     /************Net Position Window********************************/
 
     /************Liners Window********************************/
@@ -669,12 +626,10 @@ MainWindow::MainWindow(QWidget *parent)
         "   font-weight: 600; "
         "   line-height: normal;"
         );
-    connect(headerViewrs, &QHeaderView::sectionMoved, this, &MainWindow::onLinersTableHeader_Rearranged);
     liners_table->setHorizontalHeader(headerViewrs);
 
     liners_model = new Liners_Model();
     liners_delegate* liner_delegate=new liners_delegate;
-     liners_table->setObjectName("liners_table");
     liners_table->setModel(liners_model);
     liners_table->setItemDelegate(liner_delegate);
 
@@ -693,7 +648,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     dock_win_liners->setWidget(liners_table);
     liners_table->show();
-     restoreLinersTableViewColumnState(liners_table);
     /************Liners Window********************************/
 
 
@@ -876,7 +830,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->Positions_Close->setIcon(pixmapbuttonclose);
     ui->Liners_Close->setIcon(pixmapbuttonclose);
     ui->HP_Close->setIcon(pixmapbuttonclose);
-    ui->MissedTrade_Close->setIcon(pixmapbuttonclose);
+    ui->MissedTrade_Close_6->setIcon(pixmapbuttonclose);
     ui->Templates_Close->setIcon(pixmapbuttonclose);
 
     const char stylesheet_params[] = "color: #000000 ;""font-size: 12px;""font-style: normal;""font-weight: bold;""line-height: normal;";
@@ -1672,7 +1626,6 @@ void MainWindow::start_backend_comm_socket_worker()
     backend_comm_thread->start();
 }
 
-
 void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 
    // ui->textEdit->append(msg);
@@ -1686,16 +1639,12 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 #ifdef ENABLE_BACKEND_DEBUG_MSG
         qDebug()<<"Backend Data: Backend Socket Error"<<msg;
 #endif
- ui->label_3->setText("Connection Error");
-        ui->label_3->setStyleSheet("color: red;");
     }
     //ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(255, 32, 36);border-radius:6px;color:#000;");
     else if(msgType == SocketDataType::BACKEND_COMM_SOCKET_CONNECTED){
 #ifdef ENABLE_BACKEND_DEBUG_MSG
         qDebug()<<"Backend Data: Backend Socket Connected"<<msg;
 #endif
- ui->label_3->setText("Connected");
-          ui->label_3->setStyleSheet("color: green;");
     }
     // ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(94, 255, 107);border-radius:6px;color:#000;");
 }
@@ -1855,8 +1804,6 @@ void MainWindow::add_logs(QString str){
    // ui->textEdit->append(str);
     logsdata.append(str);
     emit logDataSignal(logsdata);
-     ui->label_5->setText(str);
-
 }
 
 void MainWindow::on_OrderBook_Button_clicked()
@@ -1937,15 +1884,15 @@ void MainWindow::on_HP_Close_clicked()
 void MainWindow::on_MissedTrade_Button_clicked()
 {
     dock_win_missed_trades->toggleView(true);
-    ui->MissedTrade_widget->setStyleSheet(stylesheetvis);
-    ui->MissedTrade_Close->setVisible(true);
+    ui->MissedTrade_widget_6->setStyleSheet(stylesheetvis);
+    ui->MissedTrade_Close_6->setVisible(true);
 }
 
 void MainWindow::on_MissedTrade_Close_clicked()
 {
     dock_win_missed_trades->toggleView(false);
-    ui->MissedTrade_widget->setStyleSheet("");
-    ui->MissedTrade_Close->setVisible(false);
+    ui->MissedTrade_widget_6->setStyleSheet("");
+    ui->MissedTrade_Close_6->setVisible(false);
 }
 
 void MainWindow::on_Templates_Button_clicked()
@@ -2127,10 +2074,10 @@ void MainWindow::OnHPDockWidgetVisiblityChanged(bool p_Visible)
 void MainWindow::OnMTDockWidgetVisiblityChanged(bool p_Visible)
 {
     if(p_Visible)
-        ui->MissedTrade_widget->setStyleSheet(stylesheetvis);
+        ui->MissedTrade_widget_6->setStyleSheet(stylesheetvis);
     else
-        ui->MissedTrade_widget->setStyleSheet("");
-    ui->MissedTrade_Close->setVisible(p_Visible);
+        ui->MissedTrade_widget_6->setStyleSheet("");
+    ui->MissedTrade_Close_6->setVisible(p_Visible);
 }
 
 
@@ -2293,7 +2240,6 @@ void MainWindow::slotAddLogForAddAlgoRecord(QString str)
    //  emit logDataSignal(str);
     logsdata.append(str);
     emit logDataSignal(logsdata);
-    ui->label_5->setText(str);
 }
 
 void MainWindow::slotHideProgressBar()
@@ -2721,7 +2667,6 @@ void MainWindow::saveTableViewColumnState(QTableView *tableView){
    settings.setValue(key,tableView->horizontalHeader()->saveState());
 
 }
-
 void MainWindow::restoreTableViewColumnState(QTableView *tableView){
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
     QSettings settings(appDataPath+"/table_view_sett.dat", QSettings::IniFormat);
@@ -2730,79 +2675,6 @@ void MainWindow::restoreTableViewColumnState(QTableView *tableView){
      QString key =tableView->objectName()+ "_HeaderState";
      if (settings.contains(key))
      {
-       tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
-     }
-}
-
-void MainWindow::onTradeTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
-     saveTradeTableViewColumnState(trade_table);
-
-}
-
-void MainWindow::saveTradeTableViewColumnState(QTableView *tableView) {
-     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
-     QString key = tableView->objectName() + "_HeaderState";
-
-     // Save the state of the trade table headers
-     settings.setValue(key, tableView->horizontalHeader()->saveState());
-}
-
-void MainWindow::restoreTradeTableViewColumnState(QTableView *tableView) {
-     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
-
-     // Restore the state of the trade table headers if available
-     QString key = tableView->objectName() + "_HeaderState";
-     if (settings.contains(key)) {
-       tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
-     }
-}
-void MainWindow::onNetposTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
-     saveNetposTableViewColumnState(net_pos_table);
-
-}
-
-void MainWindow::saveNetposTableViewColumnState(QTableView *tableView) {
-     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
-     QString key = tableView->objectName() + "_HeaderState";
-
-     // Save the state of the trade table headers
-     settings.setValue(key, tableView->horizontalHeader()->saveState());
-}
-
-void MainWindow::restoreNetposTableViewColumnState(QTableView *tableView) {
-     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
-
-     // Restore the state of the trade table headers if available
-     QString key = tableView->objectName() + "_HeaderState";
-     if (settings.contains(key)) {
-       tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
-     }
-}
-void MainWindow::onLinersTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
-     saveLinersTableViewColumnState(liners_table);
-
-}
-
-void MainWindow::saveLinersTableViewColumnState(QTableView *tableView) {
-     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
-     QString key = tableView->objectName() + "_HeaderState";
-
-     // Save the state of the trade table headers
-     settings.setValue(key, tableView->horizontalHeader()->saveState());
-}
-
-void MainWindow::restoreLinersTableViewColumnState(QTableView *tableView) {
-     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
-
-     // Restore the state of the trade table headers if available
-     QString key = tableView->objectName() + "_HeaderState";
-     if (settings.contains(key)) {
        tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
      }
 }
@@ -2865,37 +2737,48 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 
 
-void MainWindow::onSummaryActionTriggered(){
 
-    Summary_cards *SC = new Summary_cards(this);
-    Qt::WindowFlags flags = SC->windowFlags();
-    SC->setWindowFlags(flags | Qt::Tool);
-    SC->setAttribute(Qt::WA_DeleteOnClose);
-    connect(this, &MainWindow::data_summary_update_signal, SC, &Summary_cards::updateSummaryData);
 
-    SC->show();
+
+
+void MainWindow::on_comboBox_currentTextChanged(const QString &arg1)
+{
+
+    if (arg1 == "Logs")
+    {
+          Logs_cards *LC = new Logs_cards(this);
+          Qt::WindowFlags flags = LC->windowFlags();
+          LC->setWindowFlags(flags | Qt::Tool);
+          LC->setAttribute(Qt::WA_DeleteOnClose);
+          LC->logDataSignal_Slot(logsdata);
+          connect(this, &MainWindow::logDataSignal, LC, &Logs_cards::logDataSignal_Slot);
+
+          LC->show();
+
+    }
+    else if (arg1 == "Summary") {
+
+          Summary_cards *SC = new Summary_cards(this);
+          Qt::WindowFlags flags = SC->windowFlags();
+          SC->setWindowFlags(flags | Qt::Tool);
+          SC->setAttribute(Qt::WA_DeleteOnClose);
+          connect(this, &MainWindow::data_summary_update_signal, SC, &Summary_cards::updateSummaryData);
+
+          SC->show();
+    }
+    else if (arg1 == "Watch")
+    {
+         Watch_cards *WC = new Watch_cards(this);
+          Qt::WindowFlags flags = WC->windowFlags();
+          WC->setWindowFlags(flags | Qt::Tool);
+
+          WC->setAttribute(Qt::WA_DeleteOnClose);
+          //connect(this, &MainWindow::indicesDataRecv_Signal_watch_card(Indices_Data_Struct), WC, &Watch_cards::indicesDataRecv_Slot(Indices_Data_Struct));
+          connect(this, &MainWindow::indicesDataRecv_Signal_watch_card, WC, &Watch_cards::indicesDataRecv_Slot);
+
+
+          WC->show();
+    }
+
 }
-
-void MainWindow::onWatchActionTriggered(){
-    Watch_cards *WC = new Watch_cards(this);
-    Qt::WindowFlags flags = WC->windowFlags();
-    WC->setWindowFlags(flags | Qt::Tool);
-
-    WC->setAttribute(Qt::WA_DeleteOnClose);
-    //connect(this, &MainWindow::indicesDataRecv_Signal_watch_card(Indices_Data_Struct), WC, &Watch_cards::indicesDataRecv_Slot(Indices_Data_Struct));
-    connect(this, &MainWindow::indicesDataRecv_Signal_watch_card, WC, &Watch_cards::indicesDataRecv_Slot);
-    WC->show();
-}
-
-void MainWindow::onLogActionTriggered(){
-    Logs_cards *LC = new Logs_cards(this);
-    Qt::WindowFlags flags = LC->windowFlags();
-    LC->setWindowFlags(flags | Qt::Tool);
-    LC->setAttribute(Qt::WA_DeleteOnClose);
-    LC->logDataSignal_Slot(logsdata);
-    connect(this, &MainWindow::logDataSignal, LC, &Logs_cards::logDataSignal_Slot);
-
-    LC->show();
-}
-
 

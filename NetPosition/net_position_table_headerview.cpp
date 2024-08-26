@@ -4,9 +4,7 @@
 #include "defines.h"
 
 
-net_position_table_headerview::net_position_table_headerview(Qt::Orientation orientation, QWidget* parent) : QHeaderView(orientation, parent) {
-    setSectionsMovable(true);
-}
+net_position_table_headerview::net_position_table_headerview(Qt::Orientation orientation, QWidget* parent) : QHeaderView(orientation, parent) {}
 
 void net_position_table_headerview::paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const {
 

@@ -6,10 +6,7 @@
 
 
 
-tradetableheaderview::tradetableheaderview(Qt::Orientation orientation, QWidget* parent) : QHeaderView(orientation, parent) {
-    setSectionsMovable(true);
-
-}
+tradetableheaderview::tradetableheaderview(Qt::Orientation orientation, QWidget* parent) : QHeaderView(orientation, parent) {}
 
 void tradetableheaderview::paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const {
     // Create the portfolio header delegate

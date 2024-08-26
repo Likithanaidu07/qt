@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'logs_cards.ui'
 **
-** Created by: Qt User Interface Compiler version 6.7.2
+** Created by: Qt User Interface Compiler version 6.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -36,7 +36,7 @@ public:
     void setupUi(QDialog *Logs_cards)
     {
         if (Logs_cards->objectName().isEmpty())
-            Logs_cards->setObjectName("Logs_cards");
+            Logs_cards->setObjectName(QString::fromUtf8("Logs_cards"));
         Logs_cards->setWindowModality(Qt::NonModal);
         Logs_cards->resize(319, 232);
         QFont font;
@@ -46,10 +46,10 @@ public:
         Logs_cards->setContextMenuPolicy(Qt::CustomContextMenu);
         Logs_cards->setWindowTitle(QString::fromUtf8("Logs"));
         Logs_Widget = new QWidget(Logs_cards);
-        Logs_Widget->setObjectName("Logs_Widget");
+        Logs_Widget->setObjectName(QString::fromUtf8("Logs_Widget"));
         Logs_Widget->setEnabled(true);
         Logs_Widget->setGeometry(QRect(0, 0, 321, 231));
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Preferred);
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(Logs_Widget->sizePolicy().hasHeightForWidth());
@@ -63,24 +63,24 @@ public:
 "}"));
         verticalLayout_9 = new QVBoxLayout(Logs_Widget);
         verticalLayout_9->setSpacing(3);
-        verticalLayout_9->setObjectName("verticalLayout_9");
+        verticalLayout_9->setObjectName(QString::fromUtf8("verticalLayout_9"));
         verticalLayout_9->setContentsMargins(3, 3, 3, 3);
         widget_16 = new QWidget(Logs_Widget);
-        widget_16->setObjectName("widget_16");
+        widget_16->setObjectName(QString::fromUtf8("widget_16"));
         widget_16->setMaximumSize(QSize(16777215, 25));
         widget_16->setLayoutDirection(Qt::LeftToRight);
         widget_16->setAutoFillBackground(false);
         widget_16->setStyleSheet(QString::fromUtf8("background-color: rgb(77, 77, 115);\n"
 ""));
         horizontalLayout_12 = new QHBoxLayout(widget_16);
-        horizontalLayout_12->setObjectName("horizontalLayout_12");
+        horizontalLayout_12->setObjectName(QString::fromUtf8("horizontalLayout_12"));
         horizontalLayout_12->setContentsMargins(-1, 2, -1, 5);
-        horizontalSpacer_9 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        horizontalSpacer_9 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_12->addItem(horizontalSpacer_9);
 
         label_19 = new QLabel(widget_16);
-        label_19->setObjectName("label_19");
+        label_19->setObjectName(QString::fromUtf8("label_19"));
         label_19->setStyleSheet(QString::fromUtf8("#label_19{\n"
 "color: #FFFFFF;\n"
 "text-align: center;\n"
@@ -93,7 +93,7 @@ public:
 
         horizontalLayout_12->addWidget(label_19);
 
-        horizontalSpacer_10 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        horizontalSpacer_10 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_12->addItem(horizontalSpacer_10);
 
@@ -101,7 +101,7 @@ public:
         verticalLayout_9->addWidget(widget_16);
 
         textEdit = new QTextEdit(Logs_Widget);
-        textEdit->setObjectName("textEdit");
+        textEdit->setObjectName(QString::fromUtf8("textEdit"));
         textEdit->setStyleSheet(QString::fromUtf8("#textEdit{\n"
 "border-top-left-radius: 0px;\n"
 "    border-top-right-radius: 0px;\n"

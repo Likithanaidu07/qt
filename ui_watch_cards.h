@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'watch_cards.ui'
 **
-** Created by: Qt User Interface Compiler version 6.7.2
+** Created by: Qt User Interface Compiler version 6.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -66,12 +66,12 @@ public:
     void setupUi(QDialog *Watch_cards)
     {
         if (Watch_cards->objectName().isEmpty())
-            Watch_cards->setObjectName("Watch_cards");
+            Watch_cards->setObjectName(QString::fromUtf8("Watch_cards"));
         Watch_cards->resize(326, 324);
         watchWidget = new QWidget(Watch_cards);
-        watchWidget->setObjectName("watchWidget");
+        watchWidget->setObjectName(QString::fromUtf8("watchWidget"));
         watchWidget->setGeometry(QRect(0, 10, 327, 310));
-        QSizePolicy sizePolicy(QSizePolicy::Policy::Preferred, QSizePolicy::Policy::Expanding);
+        QSizePolicy sizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
         sizePolicy.setHorizontalStretch(0);
         sizePolicy.setVerticalStretch(0);
         sizePolicy.setHeightForWidth(watchWidget->sizePolicy().hasHeightForWidth());
@@ -81,22 +81,22 @@ public:
         watchWidget->setStyleSheet(QString::fromUtf8(""));
         verticalLayout_8 = new QVBoxLayout(watchWidget);
         verticalLayout_8->setSpacing(0);
-        verticalLayout_8->setObjectName("verticalLayout_8");
+        verticalLayout_8->setObjectName(QString::fromUtf8("verticalLayout_8"));
         verticalLayout_8->setContentsMargins(3, 3, 3, 3);
         widget_15 = new QWidget(watchWidget);
-        widget_15->setObjectName("widget_15");
+        widget_15->setObjectName(QString::fromUtf8("widget_15"));
         widget_15->setMaximumSize(QSize(16777215, 30));
         widget_15->setStyleSheet(QString::fromUtf8("background-color: rgba(43, 107, 111, 1);\n"
 ""));
         horizontalLayout_11 = new QHBoxLayout(widget_15);
-        horizontalLayout_11->setObjectName("horizontalLayout_11");
+        horizontalLayout_11->setObjectName(QString::fromUtf8("horizontalLayout_11"));
         horizontalLayout_11->setContentsMargins(-1, 5, -1, 5);
-        horizontalSpacer_7 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        horizontalSpacer_7 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_11->addItem(horizontalSpacer_7);
 
         label_18 = new QLabel(widget_15);
-        label_18->setObjectName("label_18");
+        label_18->setObjectName(QString::fromUtf8("label_18"));
         label_18->setStyleSheet(QString::fromUtf8("#label_18{\n"
 "color: #FFFFFF;\n"
 "text-align: center;\n"
@@ -109,7 +109,7 @@ public:
 
         horizontalLayout_11->addWidget(label_18);
 
-        watch = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        watch = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_11->addItem(watch);
 
@@ -118,10 +118,10 @@ public:
 
         verticalLayout_12 = new QVBoxLayout();
         verticalLayout_12->setSpacing(5);
-        verticalLayout_12->setObjectName("verticalLayout_12");
+        verticalLayout_12->setObjectName(QString::fromUtf8("verticalLayout_12"));
         verticalLayout_12->setContentsMargins(0, 10, 0, -1);
         lineEditWatchSearch = new QLineEdit(watchWidget);
-        lineEditWatchSearch->setObjectName("lineEditWatchSearch");
+        lineEditWatchSearch->setObjectName(QString::fromUtf8("lineEditWatchSearch"));
         lineEditWatchSearch->setMinimumSize(QSize(0, 30));
         lineEditWatchSearch->setStyleSheet(QString::fromUtf8("   background-image: url(:/search.png);\n"
 "    background-repeat: no-repeat;\n"
@@ -141,7 +141,7 @@ public:
         verticalLayout_12->addWidget(lineEditWatchSearch);
 
         listWidgetWatch = new QListWidget(watchWidget);
-        listWidgetWatch->setObjectName("listWidgetWatch");
+        listWidgetWatch->setObjectName(QString::fromUtf8("listWidgetWatch"));
         listWidgetWatch->setStyleSheet(QString::fromUtf8("#listWidgetWatch{\n"
 "background: #F3FEFF;\n"
 "border-bottom: 21px solid gray; /* Adjust border width for desired shadow size */\n"
@@ -166,12 +166,12 @@ public:
 
         verticalLayout_8->addLayout(verticalLayout_12);
 
-        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Policy::Minimum, QSizePolicy::Policy::Expanding);
+        verticalSpacer = new QSpacerItem(20, 40, QSizePolicy::Minimum, QSizePolicy::Expanding);
 
         verticalLayout_8->addItem(verticalSpacer);
 
         watchListSelectedDetails_Parent = new QWidget(watchWidget);
-        watchListSelectedDetails_Parent->setObjectName("watchListSelectedDetails_Parent");
+        watchListSelectedDetails_Parent->setObjectName(QString::fromUtf8("watchListSelectedDetails_Parent"));
         watchListSelectedDetails_Parent->setStyleSheet(QString::fromUtf8("#widget_17{\n"
 "	border-top-left-radius: 0px;\n"
 "    border-top-right-radius: 0px;\n"
@@ -185,39 +185,39 @@ public:
 "}"));
         verticalLayout_23 = new QVBoxLayout(watchListSelectedDetails_Parent);
         verticalLayout_23->setSpacing(12);
-        verticalLayout_23->setObjectName("verticalLayout_23");
+        verticalLayout_23->setObjectName(QString::fromUtf8("verticalLayout_23"));
         verticalLayout_23->setContentsMargins(-1, 8, 9, 9);
         horizontalLayout_13 = new QHBoxLayout();
         horizontalLayout_13->setSpacing(3);
-        horizontalLayout_13->setObjectName("horizontalLayout_13");
+        horizontalLayout_13->setObjectName(QString::fromUtf8("horizontalLayout_13"));
         Index_Name = new QLabel(watchListSelectedDetails_Parent);
-        Index_Name->setObjectName("Index_Name");
+        Index_Name->setObjectName(QString::fromUtf8("Index_Name"));
 
         horizontalLayout_13->addWidget(Index_Name);
 
         watch_val1 = new QLabel(watchListSelectedDetails_Parent);
-        watch_val1->setObjectName("watch_val1");
+        watch_val1->setObjectName(QString::fromUtf8("watch_val1"));
 
         horizontalLayout_13->addWidget(watch_val1);
 
         watch_indicator = new QLabel(watchListSelectedDetails_Parent);
-        watch_indicator->setObjectName("watch_indicator");
+        watch_indicator->setObjectName(QString::fromUtf8("watch_indicator"));
         watch_indicator->setMinimumSize(QSize(6, 10));
         watch_indicator->setMaximumSize(QSize(6, 10));
 
         horizontalLayout_13->addWidget(watch_indicator);
 
         watch_val2 = new QLabel(watchListSelectedDetails_Parent);
-        watch_val2->setObjectName("watch_val2");
+        watch_val2->setObjectName(QString::fromUtf8("watch_val2"));
 
         horizontalLayout_13->addWidget(watch_val2);
 
-        horizontalSpacer_11 = new QSpacerItem(40, 20, QSizePolicy::Policy::Expanding, QSizePolicy::Policy::Minimum);
+        horizontalSpacer_11 = new QSpacerItem(40, 20, QSizePolicy::Expanding, QSizePolicy::Minimum);
 
         horizontalLayout_13->addItem(horizontalSpacer_11);
 
         Buy_Watch_Button = new QPushButton(watchListSelectedDetails_Parent);
-        Buy_Watch_Button->setObjectName("Buy_Watch_Button");
+        Buy_Watch_Button->setObjectName(QString::fromUtf8("Buy_Watch_Button"));
         Buy_Watch_Button->setEnabled(true);
         Buy_Watch_Button->setMinimumSize(QSize(26, 26));
         Buy_Watch_Button->setMaximumSize(QSize(26, 26));
@@ -243,7 +243,7 @@ public:
         horizontalLayout_13->addWidget(Buy_Watch_Button);
 
         Sell_Watch_Button = new QPushButton(watchListSelectedDetails_Parent);
-        Sell_Watch_Button->setObjectName("Sell_Watch_Button");
+        Sell_Watch_Button->setObjectName(QString::fromUtf8("Sell_Watch_Button"));
         Sell_Watch_Button->setEnabled(true);
         Sell_Watch_Button->setMinimumSize(QSize(26, 26));
         Sell_Watch_Button->setMaximumSize(QSize(26, 26));
@@ -269,7 +269,7 @@ public:
         if (QIcon::hasThemeIcon(iconThemeName)) {
             icon = QIcon::fromTheme(iconThemeName);
         } else {
-            icon.addFile(QString::fromUtf8("../"), QSize(), QIcon::Mode::Normal, QIcon::State::Off);
+            icon.addFile(QString::fromUtf8("../"), QSize(), QIcon::Normal, QIcon::Off);
         }
         Sell_Watch_Button->setIcon(icon);
 
@@ -279,15 +279,15 @@ public:
         verticalLayout_23->addLayout(horizontalLayout_13);
 
         horizontalLayout_16 = new QWidget(watchListSelectedDetails_Parent);
-        horizontalLayout_16->setObjectName("horizontalLayout_16");
+        horizontalLayout_16->setObjectName(QString::fromUtf8("horizontalLayout_16"));
         watchListSelectedDetailsParent = new QHBoxLayout(horizontalLayout_16);
         watchListSelectedDetailsParent->setSpacing(9);
-        watchListSelectedDetailsParent->setObjectName("watchListSelectedDetailsParent");
+        watchListSelectedDetailsParent->setObjectName(QString::fromUtf8("watchListSelectedDetailsParent"));
         verticalLayout_24 = new QVBoxLayout();
         verticalLayout_24->setSpacing(2);
-        verticalLayout_24->setObjectName("verticalLayout_24");
+        verticalLayout_24->setObjectName(QString::fromUtf8("verticalLayout_24"));
         Open_Label = new QLabel(horizontalLayout_16);
-        Open_Label->setObjectName("Open_Label");
+        Open_Label->setObjectName(QString::fromUtf8("Open_Label"));
         QFont font;
         font.setPointSize(10);
         Open_Label->setFont(font);
@@ -296,7 +296,7 @@ public:
         verticalLayout_24->addWidget(Open_Label);
 
         Open_Num = new QLabel(horizontalLayout_16);
-        Open_Num->setObjectName("Open_Num");
+        Open_Num->setObjectName(QString::fromUtf8("Open_Num"));
         QFont font1;
         font1.setPointSize(11);
         Open_Num->setFont(font1);
@@ -309,9 +309,9 @@ public:
 
         verticalLayout_27 = new QVBoxLayout();
         verticalLayout_27->setSpacing(2);
-        verticalLayout_27->setObjectName("verticalLayout_27");
+        verticalLayout_27->setObjectName(QString::fromUtf8("verticalLayout_27"));
         High_Label = new QLabel(horizontalLayout_16);
-        High_Label->setObjectName("High_Label");
+        High_Label->setObjectName(QString::fromUtf8("High_Label"));
         High_Label->setFont(font);
         High_Label->setStyleSheet(QString::fromUtf8("color: #848484;"));
         High_Label->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
@@ -319,7 +319,7 @@ public:
         verticalLayout_27->addWidget(High_Label);
 
         High_Num = new QLabel(horizontalLayout_16);
-        High_Num->setObjectName("High_Num");
+        High_Num->setObjectName(QString::fromUtf8("High_Num"));
         High_Num->setFont(font1);
         High_Num->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
@@ -330,9 +330,9 @@ public:
 
         verticalLayout_30 = new QVBoxLayout();
         verticalLayout_30->setSpacing(2);
-        verticalLayout_30->setObjectName("verticalLayout_30");
+        verticalLayout_30->setObjectName(QString::fromUtf8("verticalLayout_30"));
         Low_Label = new QLabel(horizontalLayout_16);
-        Low_Label->setObjectName("Low_Label");
+        Low_Label->setObjectName(QString::fromUtf8("Low_Label"));
         Low_Label->setFont(font);
         Low_Label->setStyleSheet(QString::fromUtf8("color: #848484;"));
         Low_Label->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
@@ -340,7 +340,7 @@ public:
         verticalLayout_30->addWidget(Low_Label);
 
         Low_Num = new QLabel(horizontalLayout_16);
-        Low_Num->setObjectName("Low_Num");
+        Low_Num->setObjectName(QString::fromUtf8("Low_Num"));
         Low_Num->setFont(font1);
         Low_Num->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
@@ -351,9 +351,9 @@ public:
 
         verticalLayout_28 = new QVBoxLayout();
         verticalLayout_28->setSpacing(2);
-        verticalLayout_28->setObjectName("verticalLayout_28");
+        verticalLayout_28->setObjectName(QString::fromUtf8("verticalLayout_28"));
         Volume_Label = new QLabel(horizontalLayout_16);
-        Volume_Label->setObjectName("Volume_Label");
+        Volume_Label->setObjectName(QString::fromUtf8("Volume_Label"));
         Volume_Label->setFont(font);
         Volume_Label->setStyleSheet(QString::fromUtf8("color: #848484;"));
         Volume_Label->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
@@ -361,7 +361,7 @@ public:
         verticalLayout_28->addWidget(Volume_Label);
 
         Volume_Num = new QLabel(horizontalLayout_16);
-        Volume_Num->setObjectName("Volume_Num");
+        Volume_Num->setObjectName(QString::fromUtf8("Volume_Num"));
         Volume_Num->setFont(font1);
         Volume_Num->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
