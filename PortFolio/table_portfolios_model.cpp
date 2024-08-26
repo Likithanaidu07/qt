@@ -870,7 +870,7 @@ void Table_Portfolios_Model::setColumnWidths(QTableView *tableView) const {
 void Table_Portfolios_Model::updateMarketRate(const QHash<QString, MBP_Data_Struct>& MBP_Data_Hash){
 
     QMutexLocker locker(&mutex); // Lock the mutex automatically
-    if (slowDataPriceUpdateTimer.elapsed() >= 1000) {
+    if (slowDataPriceUpdateTimer.elapsed() >= 300) {
              PortfolioParser portfolioPareser;
             // qDebug()<<"updateMarketRate...";
 

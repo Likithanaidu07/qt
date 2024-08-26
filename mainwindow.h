@@ -127,7 +127,7 @@ private:
 
 
     ads::CDockManager* DockManagerMainPanel;
-    ads::CDockManager *DockManagerSidePanel;
+ //  ads::CDockManager *DockManagerSidePanel;
 
 
     void createINIFileIfNotExist();

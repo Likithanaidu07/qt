@@ -150,38 +150,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    /***********************Move Side Panel items to dock Widget**********************/
-
-//    DockManagerSidePanel = new CDockManager(ui->sidePanel);
-//    ui->sidePanel->layout()->addWidget(DockManagerSidePanel);
-//    CDockWidget* watchWidgetDockWidget = new CDockWidget("Watch");
-//    watchWidgetDockWidget->setWidget(ui->watchWidget);
-//    watchWidgetDockWidget->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
-//    watchWidgetDockWidget->resize(250, 150);
-//    watchWidgetDockWidget->setMinimumSize(200,150);
-//    DockManagerSidePanel->addDockWidget(DockWidgetArea::TopDockWidgetArea, watchWidgetDockWidget);
-
-//    ui->sidePanel->layout()->addWidget(DockManagerSidePanel);
-//    CDockWidget* summaryhWidgetDockWidget = new CDockWidget("Summary");
-//    summaryhWidgetDockWidget->setWidget(ui->summary_widget);
-//    summaryhWidgetDockWidget->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
-//    summaryhWidgetDockWidget->resize(250, 150);
-//    summaryhWidgetDockWidget->setMinimumSize(200,150);
-//    DockManagerSidePanel->addDockWidget(DockWidgetArea::CenterDockWidgetArea, summaryhWidgetDockWidget);
-
-//    ui->sidePanel->layout()->addWidget(DockManagerSidePanel);
-//    CDockWidget* loghWidgetDockWidget = new CDockWidget("Logs");
-//    loghWidgetDockWidget->setWidget(ui->Logs_Widget);
-//    loghWidgetDockWidget->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
-//    loghWidgetDockWidget->resize(250, 150);
-//    loghWidgetDockWidget->setMinimumSize(200,150);
-//    DockManagerSidePanel->addDockWidget(DockWidgetArea::BottomDockWidgetArea, loghWidgetDockWidget);
-
-
-
-    /**********************************************************************************/
-
-
     QVBoxLayout* Layout = new QVBoxLayout(ui->mainPanel);
     Layout->setContentsMargins(QMargins(0, 0, 0, 0));
 
@@ -2723,13 +2691,7 @@ void MainWindow::saveDockManagerState()
         file1.close();
     }
 
-    QByteArray state2 = DockManagerSidePanel->saveState();
-    QFile file2(appDataPath+"/dock_state_side_panel.dat");
-    if (file2.open(QIODevice::WriteOnly)) {
-        QDataStream out2(&file2);
-        out2 << state2;
-        file2.close();
-    }
+
 }
 
 
@@ -2748,14 +2710,7 @@ void MainWindow::restoreDockManagerState()
     }
 
 
-    QFile file2(appDataPath+"/dock_state_side_panel.dat");
-    if (file2.open(QIODevice::ReadOnly)) {
-        QByteArray state2;
-        QDataStream in2(&file2);
-        in2 >> state2;
-        DockManagerSidePanel->restoreState(state2);
-        file2.close();
-    }
+
 }
 
 
@@ -2904,7 +2859,6 @@ void MainWindow::closeEvent(QCloseEvent* event)
     // that all top level windows of the dock manager are properly closed
     saveDockManagerState();
 
-    DockManagerSidePanel->deleteLater();
     DockManagerMainPanel->deleteLater();
     QMainWindow::closeEvent(event);
 
