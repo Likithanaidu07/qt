@@ -26,6 +26,7 @@ public:
     {
 
     }
+
     QValidator::State validate(QString &s, int &i) const override
     {
         if (s.isEmpty() || s == "-") {
@@ -116,6 +117,7 @@ public:
 
     mutable QModelIndex currentIndex;
     mutable QAbstractItemModel *mutableModel;
+    void setHighlightText(const QString &text);
 
     bool editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) override;
 
@@ -125,7 +127,7 @@ signals:
 
 private:
 
-
+    QString m_highlightText;
     double price_diff_incrementer = 0.05;
     double quantity_incrementer = 1.0;
     QString market_type;

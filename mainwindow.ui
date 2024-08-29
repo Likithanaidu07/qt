@@ -46,32 +46,29 @@ background: #9DB4C0;
     <property name="spacing">
      <number>0</number>
     </property>
-    <item row="5" column="4">
-     <widget class="QLabel" name="label_2">
-      <property name="minimumSize">
-       <size>
-        <width>20</width>
-        <height>0</height>
-       </size>
-      </property>
+    <item row="5" column="2">
+     <widget class="QLabel" name="label_3">
       <property name="maximumSize">
        <size>
-        <width>100</width>
+        <width>150</width>
         <height>16777215</height>
        </size>
       </property>
       <property name="text">
-       <string>User Message : </string>
+       <string/>
       </property>
      </widget>
     </item>
-    <item row="4" column="0" colspan="7">
-     <widget class="QWidget" name="mainPanel" native="true">
-      <property name="minimumSize">
+    <item row="5" column="0">
+     <widget class="QLabel" name="label_5">
+      <property name="maximumSize">
        <size>
-        <width>500</width>
-        <height>0</height>
+        <width>300</width>
+        <height>16777215</height>
        </size>
+      </property>
+      <property name="text">
+       <string/>
       </property>
      </widget>
     </item>
@@ -227,22 +224,6 @@ background: transperent;
        </item>
       </layout>
      </widget>
-    </item>
-    <item row="5" column="6">
-     <spacer name="verticalSpacer_2">
-      <property name="orientation">
-       <enum>Qt::Vertical</enum>
-      </property>
-      <property name="sizeType">
-       <enum>QSizePolicy::Fixed</enum>
-      </property>
-      <property name="sizeHint" stdset="0">
-       <size>
-        <width>10</width>
-        <height>25</height>
-       </size>
-      </property>
-     </spacer>
     </item>
     <item row="3" column="0" colspan="7">
      <widget class="QWidget" name="widget_5" native="true">
@@ -761,31 +742,37 @@ background: #46454d;
       </layout>
      </widget>
     </item>
-    <item row="5" column="5">
-     <widget class="QLabel" name="label_5">
-      <property name="text">
-       <string/>
+    <item row="5" column="6">
+     <spacer name="verticalSpacer_2">
+      <property name="orientation">
+       <enum>Qt::Vertical</enum>
       </property>
-     </widget>
-    </item>
-    <item row="5" column="0">
-     <widget class="QLabel" name="label_4">
-      <property name="maximumSize">
+      <property name="sizeType">
+       <enum>QSizePolicy::Fixed</enum>
+      </property>
+      <property name="sizeHint" stdset="0">
        <size>
-        <width>80</width>
-        <height>16777215</height>
+        <width>10</width>
+        <height>20</height>
        </size>
       </property>
-      <property name="text">
-       <string>Status : </string>
+     </spacer>
+    </item>
+    <item row="4" column="0" colspan="7">
+     <widget class="QWidget" name="mainPanel" native="true">
+      <property name="minimumSize">
+       <size>
+        <width>500</width>
+        <height>0</height>
+       </size>
       </property>
      </widget>
     </item>
-    <item row="5" column="1">
-     <widget class="QLabel" name="label_3">
+    <item row="5" column="5">
+     <widget class="QLabel" name="label_6">
       <property name="maximumSize">
        <size>
-        <width>200</width>
+        <width>150</width>
         <height>16777215</height>
        </size>
       </property>
