@@ -1605,17 +1605,25 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
 
 
                 QString BuySellIndicator = query.value(rec.indexOf("BuySellIndicator")).toString();
+                if(BuySellIndicator=="1")
+                    BuySellIndicator = "Buy";
+                else
+                    BuySellIndicator = "Sell";
+
                 QString Type = query.value(rec.indexOf("Type")).toString();
-                QString Symbol = query.value(rec.indexOf("Symbol")).toString();
+                int token_number = query.value(rec.indexOf("Symbol")).toInt();
+                QString StockName = ContractDetail::getInstance().GetStockName(token_number,0);
                 QString Message = query.value(rec.indexOf("Message")).toString();
 
 
 
                 int Quantity = query.value(rec.indexOf("Quantity")).toInt();
+                Quantity = ContractDetail::getInstance().GetLotSize(token_number,0);
                 int Portfolio = query.value(rec.indexOf("Portfolio")).toInt();
-                int Price = query.value(rec.indexOf("Price")).toInt();
+                double Price = query.value(rec.indexOf("Price")).toDouble();
+                Price = Price/devicer;
 
-                QString PriceStr = QString::number(Price);
+                QString PriceStr = fixDecimal(Price,decimal_precision);
                 QString QuantityStr = QString::number(Quantity);
                 QString PortfolioStr = QString::number(Portfolio);
 
@@ -1627,7 +1635,7 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                 rowList.append(Type);
                 rowList.append(QuantityStr);
                 rowList.append(PortfolioStr);
-                rowList.append(Symbol);
+                rowList.append(StockName);
                 rowList.append(Message);
                 rowList.append(PriceStr);
                 rowList.append(DateTimeStr);

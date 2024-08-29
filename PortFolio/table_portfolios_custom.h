@@ -41,6 +41,7 @@ public slots:
 signals:
     void spaceKeySignal();
     void selectionChangedSignal(int currentRow);
+    void portFolioDeleteKeyPressed();
 
 };
 
