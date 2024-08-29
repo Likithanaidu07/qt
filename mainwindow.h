@@ -279,15 +279,15 @@ private slots:
     void on_close_clicked();
     void on_minimize_clicked();
     void on_OrderBook_Button_clicked();
-    void on_OrderBook_Close_clicked();
+ //   void on_OrderBook_Close_clicked();
     void on_Positions_Button_clicked();
-    void on_Positions_Close_clicked();
+  //  void on_Positions_Close_clicked();
     void on_Liners_Button_clicked();
-    void on_Liners_Close_clicked();
+  //  void on_Liners_Close_clicked();
     void on_HP_Button_clicked();
-    void on_HP_Close_clicked();
+ //   void on_HP_Close_clicked();
     void on_Templates_Button_clicked();
-    void on_Templates_Close_clicked();
+   // void on_Templates_Close_clicked();
     void on_maximize_clicked();
 
 
@@ -306,7 +306,7 @@ private slots:
     void OnMTDockWidgetVisiblityChanged(bool p_Visible);
     void OnLinersDockWidgetVisiblityChanged(bool p_Visible);
     void on_Algorithms_Button_clicked();
-    void on_Algorithms_Close_clicked();
+   // void on_Algorithms_Close_clicked();
 
 
     void ConvertAlgo_button_clicked();
@@ -321,7 +321,7 @@ private slots:
 
     void on_MissedTrade_Button_clicked();
 
-    void on_MissedTrade_Close_clicked();
+  //  void on_MissedTrade_Close_clicked();
 
   //  void on_comboBox_currentTextChanged(const QString &arg1);
 
