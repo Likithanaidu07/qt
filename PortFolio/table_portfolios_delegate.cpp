@@ -210,6 +210,7 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
     if (event->type() == QEvent::KeyPress) {
         int currentColIdx = currentIndex.column();
         QList<int> editableIDx = {
+            PortfolioData_Idx::_Alias,
             PortfolioData_Idx::_SellPriceDifference,
             PortfolioData_Idx::_BuyPriceDifference,
             PortfolioData_Idx::_SellTotalQuantity,
@@ -297,7 +298,7 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                 emit tabKeyPressed(nav_direction::nav_forward);
             }
         }
-        else if(PortfolioData_Idx::_Alias){
+        /*else if(PortfolioData_Idx::_Alias){
             QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
 
             if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return)
@@ -327,7 +328,7 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                 emit tabKeyPressed(nav_direction::nav_forward);
             }
 
-        }
+        }*/
     }
     return QStyledItemDelegate::eventFilter(obj, event);
 }

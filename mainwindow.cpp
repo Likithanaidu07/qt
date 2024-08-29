@@ -49,6 +49,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
     //ui->sidePanel->setVisible(false);
+    ui->Algorithms_Close->setVisible(false);
 
     showMessagOnceFlg = true;
    // connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
@@ -158,7 +159,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     /***********Init portfolio table Window**************************/
-    QPixmap pixmapdock_algorithms_close(":/dock_close.png");
+   // QPixmap pixmapdock_algorithms_close(":/dock_close.png");
 
     T_Portfolio_DockWin = new CDockWidget("Algorithms");// new QDockWidget(tr("Algorithms"), this);
     connect(T_Portfolio_DockWin, SIGNAL(visibilityChanged(bool)), this, SLOT(OnAlgorithmDockWidgetVisiblityChanged(bool)));
@@ -182,7 +183,7 @@ MainWindow::MainWindow(QWidget *parent)
         QSpacerItem* titlespc = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
         QToolButton* dockclose=new QToolButton();
         connect(dockclose, &QToolButton::clicked, [=](){ T_Portfolio_DockWin->close();});
-        dockclose->setIcon(pixmapdock_algorithms_close);
+       // dockclose->setIcon(pixmapdock_algorithms_close);
         dockclose->setIconSize(QSize(14, 14));
         fontlabel.setFamily("Work Sans");
         label->setFont(fontlabel);
@@ -215,28 +216,28 @@ MainWindow::MainWindow(QWidget *parent)
             QToolButton *ConvertAlgo_button = new QToolButton();
             connect(ConvertAlgo_button, SIGNAL(clicked()), this, SLOT(ConvertAlgo_button_clicked()));
             //Frame 364.png
-            ConvertAlgo_button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            ConvertAlgo_button->setIcon(QIcon(":/BuildAlgo.png"));
-            ConvertAlgo_button->setToolTip("Build Algo");
-            ConvertAlgo_button->setStyleSheet("text-align: center;");
+            ConvertAlgo_button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+          //  ConvertAlgo_button->setIcon(QIcon(":/BuildAlgo.png"));
+            ConvertAlgo_button->setText("Build Algo");
 
             const char convert_to_algo_button[]="QToolButton {"
                                                 //  "border-radius: 4px;" "border: 1px solid #188CCA;"
                                                   "background: #495057;"
+                                                  "text-align: center;"
                                                   "color: #FFF;"
                                                   "font-size: 12px;"
-                                                  "font-style: normal;"
-                                                  "font-weight: 500;"
-                                                  "line-height: normal;"
+//                                                  "font-style: normal;"
+//                                                  "font-weight: 500;"
+//                                                  "line-height: normal;"
                                                   "}"
                                                   "QToolButton:hover{"
                                                   "border-radius: 4px;"
                                                   "border: 1px solid #106B9A;"
                                                   "background: #106B9A;"
                                                   "}";
-            ConvertAlgo_button->setStyleSheet(convert_to_algo_button);
-            ConvertAlgo_button->setContentsMargins(10,-1,-1,-1);
-            ConvertAlgo_button->setFont(headerfont);
+           ConvertAlgo_button->setStyleSheet(convert_to_algo_button);
+           // ConvertAlgo_button->setContentsMargins(10,-1,-1,-1);
+            //ConvertAlgo_button->setFont(headerfont);
 
 
             QWidget *test=new QWidget;
@@ -249,33 +250,33 @@ MainWindow::MainWindow(QWidget *parent)
             QToolButton* button1 = new QToolButton();
             connect(button1, SIGNAL(clicked()), this, SLOT(startall_Button_clicked()));
 
-            button1->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+           // button1->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             button1->setIcon(QIcon(":/start_all.png"));
             button1->setToolTip("Start All");
 
             QToolButton* button2 = new QToolButton();
             connect(button2, SIGNAL(clicked()), this, SLOT(stopall_Button_clicked()));
-            button2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+           // button2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             button2->setIcon(QIcon(":/stop_all.png"));
             button2->setToolTip("Stop All");
 
             QToolButton* button3 = new QToolButton();
-            button3->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+           // button3->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             button3->setIcon(QIcon(":/import.png"));
             button3->setToolTip("Import");
 
             QToolButton* button4 = new QToolButton();
-            button4->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            //button4->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             button4->setIcon(QIcon(":/reset.png"));
             button4->setToolTip("Sorting");
             connect(button4, SIGNAL(clicked()), this, SLOT(sorting_Button_clicked()));
 
             QToolButton* button5 = new QToolButton();
-            button5->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            //button5->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             button5->setToolTip("Portfolio Colour");
 
             QToolButton* button6 = new QToolButton();
-            button6->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+          //  button6->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             button6->setIcon(QIcon(":/export.png"));
             button6->setToolTip("Export");
 
@@ -284,12 +285,12 @@ MainWindow::MainWindow(QWidget *parent)
                 "border-radius: 4px;"
                 "border: 1px solid #4F5D75;"
                 "background: #345D71;"
-                "color: #4F5D75;"
-                "font-style: normal;"
-                "font-size: 12px;"
-                "font-weight: 500;"
-                "line-height: normal;"
-                "padding: 2px 5px;"
+//                "color: #4F5D75;"
+//                "font-style: normal;"
+//                "font-size: 12px;"
+//                "font-weight: 500;"
+//                "line-height: normal;"
+//                "padding: 2px 5px;"
                 "}"
                 "QToolButton:hover {"
                 "border-radius: 4px;"
@@ -297,11 +298,11 @@ MainWindow::MainWindow(QWidget *parent)
                 "background: #4F5D75;"
                 "color: #FFF;"
                 "font-family: Work Sans;"
-                "font-size: 12px;"
-                "font-style: normal;"
-                "font-weight: 500;"
-                "line-height: normal;"
-                "padding: 2px 5px;"
+//                "font-size: 12px;"
+//                "font-style: normal;"
+//                "font-weight: 500;"
+//                "line-height: normal;"
+//                "padding: 2px 5px;"
                 "}";
 
             for (auto w : {button1, button2, button3, button4, button5, button6}) {
@@ -854,13 +855,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     //setting icons for top window widget
     QPixmap pixmapbuttonclose(":/button_close.png");
-    ui->Algorithms_Close->setIcon(pixmapbuttonclose);
-    ui->OrderBook_Close->setIcon(pixmapbuttonclose);
-    ui->Positions_Close->setIcon(pixmapbuttonclose);
-    ui->Liners_Close->setIcon(pixmapbuttonclose);
-    ui->HP_Close->setIcon(pixmapbuttonclose);
-    ui->MissedTrade_Close->setIcon(pixmapbuttonclose);
-    ui->Templates_Close->setIcon(pixmapbuttonclose);
+   // ui->Algorithms_Close->setIcon(pixmapbuttonclose);
+   // ui->OrderBook_Close->setIcon(pixmapbuttonclose);
+  //  ui->Positions_Close->setIcon(pixmapbuttonclose);
+  //  ui->Liners_Close->setIcon(pixmapbuttonclose);
+  //  ui->HP_Close->setIcon(pixmapbuttonclose);
+  //  ui->MissedTrade_Close->setIcon(pixmapbuttonclose);
+  //  ui->Templates_Close->setIcon(pixmapbuttonclose);
 
     const char stylesheet_params[] = "color: #000000 ;""font-size: 12px;""font-style: normal;""font-weight: bold;""line-height: normal;";
 //    for (auto w : {ui->Open_Label, ui->High_Label,ui->Low_Label,ui->Volume_Label}){
@@ -1390,7 +1391,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                                 " WHERE PortfolioNumber=" + PortfolioNumber;
                 bool success = db_conn->updateDB_Table(Query,msg);
                 if(success){
-                    db_conn->logToDB(logMsg+ " updated for PortfolioNumber="+PortfolioNumber);
+                    db_conn->logToDB(logMsg+ " updated for Algo No="+PortfolioNumber);
                 }
                 else{
                     QMessageBox msgBox;
@@ -1884,17 +1885,17 @@ void MainWindow::on_OrderBook_Button_clicked()
     dock_win_trade->toggleView(true);
 
     ui->OrderBook_Widget->setStyleSheet(stylesheetvis);
-    ui->OrderBook_Close->setVisible(true);
+   // ui->OrderBook_Close->setVisible(true);
 }
 
 
-void MainWindow::on_OrderBook_Close_clicked()
-{
-    //8
-    dock_win_trade->toggleView(false);
-    ui->OrderBook_Widget->setStyleSheet("");
-    ui->OrderBook_Close->setVisible(false);
-}
+//void MainWindow::on_OrderBook_Close_clicked()
+//{
+//    //8
+//    dock_win_trade->toggleView(false);
+//    ui->OrderBook_Widget->setStyleSheet("");
+//    ui->OrderBook_Close->setVisible(false);
+//}
 
 
 void MainWindow::on_Positions_Button_clicked()
@@ -1903,35 +1904,35 @@ void MainWindow::on_Positions_Button_clicked()
     dock_win_net_pos->toggleView(true);
 
     ui->Positions_Widget->setStyleSheet(stylesheetvis);
-    ui->Positions_Close->setVisible(true);
+   // ui->Positions_Close->setVisible(true);
 }
 
 
-void MainWindow::on_Positions_Close_clicked()
-{
-    //9
-    dock_win_net_pos->toggleView(false);
-    ui->Positions_Widget->setStyleSheet("");
-    ui->Positions_Close->setVisible(false);
-}
+//void MainWindow::on_Positions_Close_clicked()
+//{
+//    //9
+//    dock_win_net_pos->toggleView(false);
+//    ui->Positions_Widget->setStyleSheet("");
+//    ui->Positions_Close->setVisible(false);
+//}
 void MainWindow::on_Liners_Button_clicked()
 {
     //10
     dock_win_liners->toggleView(true);
     ui->Liners_Widget->setStyleSheet(stylesheetvis);
-    ui->Liners_Close->setVisible(true);
+   // ui->Liners_Close->setVisible(true);
 }
 
 
 
 
-void MainWindow::on_Liners_Close_clicked()
-{
-    //10
-    dock_win_liners->toggleView(false);
-    ui->Liners_Widget->setStyleSheet("");
-    ui->Liners_Close->setVisible(false);
-}
+//void MainWindow::on_Liners_Close_clicked()
+//{
+//    //10
+//    dock_win_liners->toggleView(false);
+//    ui->Liners_Widget->setStyleSheet("");
+//    ui->Liners_Close->setVisible(false);
+//}
 
 
 void MainWindow::on_HP_Button_clicked()
@@ -1939,47 +1940,47 @@ void MainWindow::on_HP_Button_clicked()
     //11
     dock_win_combined_tracker->toggleView(true);
     ui->HP_Widget->setStyleSheet(stylesheetvis);
-    ui->HP_Close->setVisible(true);
+   // ui->HP_Close->setVisible(true);
 }
 
 
-void MainWindow::on_HP_Close_clicked()
-{
-    //11
-    dock_win_combined_tracker->toggleView(false);
-    ui->HP_Widget->setStyleSheet("");
-    ui->HP_Close->setVisible(false);
-}
+//void MainWindow::on_HP_Close_clicked()
+//{
+//    //11
+//    dock_win_combined_tracker->toggleView(false);
+//    ui->HP_Widget->setStyleSheet("");
+//    ui->HP_Close->setVisible(false);
+//}
 
 
 void MainWindow::on_MissedTrade_Button_clicked()
 {
     dock_win_missed_trades->toggleView(true);
     ui->MissedTrade_widget->setStyleSheet(stylesheetvis);
-    ui->MissedTrade_Close->setVisible(true);
+   // ui->MissedTrade_Close->setVisible(true);
 }
 
-void MainWindow::on_MissedTrade_Close_clicked()
-{
-    dock_win_missed_trades->toggleView(false);
-    ui->MissedTrade_widget->setStyleSheet("");
-    ui->MissedTrade_Close->setVisible(false);
-}
+//void MainWindow::on_MissedTrade_Close_clicked()
+//{
+//    dock_win_missed_trades->toggleView(false);
+//    ui->MissedTrade_widget->setStyleSheet("");
+//    ui->MissedTrade_Close->setVisible(false);
+//}
 
 void MainWindow::on_Templates_Button_clicked()
 {
     //12
     ui->Templates_Widget->setStyleSheet(stylesheetvis);
-    ui->Templates_Close->setVisible(true);
+   // ui->Templates_Close->setVisible(true);
 }
 
 
-void MainWindow::on_Templates_Close_clicked()
-{
-    //12
-    ui->Templates_Widget->setStyleSheet("");
-    ui->Templates_Close->setVisible(false);
-}
+//void MainWindow::on_Templates_Close_clicked()
+//{
+//    //12
+//    ui->Templates_Widget->setStyleSheet("");
+//    ui->Templates_Close->setVisible(false);
+//}
 
 void MainWindow::on_close_clicked()
 {
@@ -2105,7 +2106,7 @@ void MainWindow::OnAlgorithmDockWidgetVisiblityChanged(bool p_Visible)
         ui->Algorithms_Widget->setStyleSheet(stylesheetvis);
     else
         ui->Algorithms_Widget->setStyleSheet("");
-    ui->Algorithms_Close->setVisible(p_Visible);
+  //  ui->Algorithms_Close->setVisible(p_Visible);
 }
 
 void MainWindow::OnOrderBookDockWidgetVisiblityChanged(bool p_Visible)
@@ -2114,7 +2115,7 @@ void MainWindow::OnOrderBookDockWidgetVisiblityChanged(bool p_Visible)
         ui->OrderBook_Widget->setStyleSheet(stylesheetvis);
     else
         ui->OrderBook_Widget->setStyleSheet("");
-    ui->OrderBook_Close->setVisible(p_Visible);
+  //  ui->OrderBook_Close->setVisible(p_Visible);
 }
 
 void MainWindow::OnPositionsDockWidgetVisiblityChanged(bool p_Visible)
@@ -2123,7 +2124,7 @@ void MainWindow::OnPositionsDockWidgetVisiblityChanged(bool p_Visible)
         ui->Positions_Widget->setStyleSheet(stylesheetvis);
     else
         ui->Positions_Widget->setStyleSheet("");
-    ui->Positions_Close->setVisible(p_Visible);
+   // ui->Positions_Close->setVisible(p_Visible);
 }
 void MainWindow::OnLinersDockWidgetVisiblityChanged(bool p_Visible)
 {
@@ -2131,7 +2132,7 @@ void MainWindow::OnLinersDockWidgetVisiblityChanged(bool p_Visible)
         ui->Liners_Widget->setStyleSheet(stylesheetvis);
     else
         ui->Liners_Widget->setStyleSheet("");
-    ui->Liners_Close->setVisible(p_Visible);
+   // ui->Liners_Close->setVisible(p_Visible);
 }
 
 void MainWindow::OnHPDockWidgetVisiblityChanged(bool p_Visible)
@@ -2140,7 +2141,7 @@ void MainWindow::OnHPDockWidgetVisiblityChanged(bool p_Visible)
         ui->HP_Widget->setStyleSheet(stylesheetvis);
     else
         ui->HP_Widget->setStyleSheet("");
-    ui->HP_Close->setVisible(p_Visible);
+   // ui->HP_Close->setVisible(p_Visible);
 }
 
 void MainWindow::OnMTDockWidgetVisiblityChanged(bool p_Visible)
@@ -2158,16 +2159,16 @@ void MainWindow::on_Algorithms_Button_clicked()
     T_Portfolio_DockWin->toggleView(true);
     //7
     ui->Algorithms_Widget->setStyleSheet(stylesheetvis);
-    ui->Algorithms_Close->setVisible(true);
+   // ui->Algorithms_Close->setVisible(true);
 }
 
 
-void MainWindow::on_Algorithms_Close_clicked()
-{
-    T_Portfolio_DockWin->toggleView(false);
-    ui->Algorithms_Widget->setStyleSheet("");
-    ui->Algorithms_Close->setVisible(false);
-}
+//void MainWindow::on_Algorithms_Close_clicked()
+//{
+//    T_Portfolio_DockWin->toggleView(false);
+//    ui->Algorithms_Widget->setStyleSheet("");
+//    ui->Algorithms_Close->setVisible(false);
+//}
 void MainWindow::ConvertAlgo_button_clicked(){
 
     if(!convertalgo){

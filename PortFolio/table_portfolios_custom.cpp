@@ -108,13 +108,14 @@ void table_portfolios_custom::mousePressEvent(QMouseEvent *event)
 int table_portfolios_custom::findNextEditableCell(int currentColIdx, nav_direction direction)
 {
     QList<int> editableIDx = {
+        PortfolioData_Idx::_Alias,
         PortfolioData_Idx::_SellPriceDifference,
         PortfolioData_Idx::_BuyPriceDifference,
         PortfolioData_Idx::_SellTotalQuantity,
         PortfolioData_Idx::_BuyTotalQuantity,
-        PortfolioData_Idx::_Status,
         PortfolioData_Idx::_OrderQuantity,
-        PortfolioData_Idx::_Alias,
+        PortfolioData_Idx::_Status,
+
     }; // These are the editable table cells in algo table
     std::sort(editableIDx.begin(), editableIDx.end());
 

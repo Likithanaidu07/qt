@@ -24,9 +24,7 @@
         <file>arrow_downward.png</file>
         <file>arrow_upward.png</file>
         <file>do_disturb.png</file>
-        <file>done_all.png</file>
         <file>format_color_fill.png</file>
-        <file>replay.png</file>
         <file>test_min.png</file>
         <file>Frame 398.png</file>
         <file>logo.ico</file>
@@ -39,6 +37,7 @@
         <file>stop_all.png</file>
         <file>reset.png</file>
         <file>import.png</file>
+        <file>BuildAlgo.png</file>
     </qresource>
     <qresource prefix="/style">
         <file>Style_Home.qss</file>
