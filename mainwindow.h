@@ -53,6 +53,7 @@
 #include "Cards/logs_cards.h"
 #include "Cards/summary_cards.h"
 #include "Cards/watch_cards.h"
+#include "PortFolio/portfolio_searchfilterproxymodel.h"
 using namespace ads;
 
 class mysql_conn;

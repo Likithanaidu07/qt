@@ -8,6 +8,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QCoreApplication>
 #include <QHeaderView>
+#include <QRegularExpression>
 #include <QShortcut>
 #include <QFontDatabase>
 #include <QTreeView>
@@ -26,6 +27,7 @@
 #include "Cards/summary_cards.h"
 #include "Cards/watch_cards.h"
 #include "QMenu"
+#include "PortFolio/portfolio_searchfilterproxymodel.h"
 
 //#define ENABLE_BACKEND_DEBUG_MSG
 
@@ -83,10 +85,10 @@ MainWindow::MainWindow(QWidget *parent)
         "}"
         );
     QFont font("Work Sans", 10, QFont::Bold); // Set the font to Work Sans, size 10, bold
-    ui->label_4->setFont(font);
-    ui->label_4->setText("status :");
-    ui->label_2->setFont(font);
-    ui->label_2->setText("User Message :");
+//    ui->label_4->setFont(font);
+//    ui->label_4->setText("status :");
+//    ui->label_2->setFont(font);
+//    ui->label_2->setText("User Message :");
 
     // Connect the actions to their respective slots (if needed)
     connect(summaryAction, &QAction::triggered, this, &MainWindow::onSummaryActionTriggered);
@@ -352,7 +354,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::updateDBOnDataChanged, this, &MainWindow::updatePortFolioStatus);
 
-    T_Portfolio_Table->setModel(T_Portfolio_Model);
+ //   T_Portfolio_Table->setModel(T_Portfolio_Model);
     T_Portfolio_Table->setItemDelegate(T_Portfolio_Delegate);
 
     connect(T_Portfolio_Table->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
@@ -361,7 +363,18 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(T_Portfolio_Table, &QTableView::doubleClicked, this, &MainWindow::T_Portfolio_Table_cellDoubleClicked);
 
+    QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
+    proxyModel->setSourceModel(T_Portfolio_Model);
+    proxyModel->setFilterKeyColumn(-1);  // Search across all columns
 
+    connect(line_edit_trade_search, &QLineEdit::textChanged, this, [=](const QString &text) {
+       // proxyModel->setFilterRegularExpression(QRegExp(text, Qt::CaseInsensitive, QRegularExpression::FixedString));
+        proxyModel->setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
+        T_Portfolio_Delegate->setHighlightText(text);
+        T_Portfolio_Table->viewport()->update();  // Redraw the view to apply the highlight
+    });
+
+    T_Portfolio_Table->setModel(proxyModel);
 
     PortfolioHeaderView* headerView = new PortfolioHeaderView(Qt::Horizontal, T_Portfolio_Table);
     headerView->setFixedHeight(32);
@@ -1703,7 +1716,7 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 #ifdef ENABLE_BACKEND_DEBUG_MSG
         qDebug()<<"Backend Data: Backend Socket Error"<<msg;
 #endif
- ui->label_3->setText("Connection Error");
+ ui->label_3->setText("Status :"  "Connection Error");
         ui->label_3->setStyleSheet("color: red;");
     }
     //ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(255, 32, 36);border-radius:6px;color:#000;");
@@ -1711,7 +1724,7 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 #ifdef ENABLE_BACKEND_DEBUG_MSG
         qDebug()<<"Backend Data: Backend Socket Connected"<<msg;
 #endif
- ui->label_3->setText("Connected");
+ ui->label_3->setText("Status :""Connected");
           ui->label_3->setStyleSheet("color: green;");
     }
     // ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(94, 255, 107);border-radius:6px;color:#000;");
@@ -1826,8 +1839,11 @@ void MainWindow::loggedIn(){
     //make sure the start_slowdata_worker in main thread
     QMetaObject::invokeMethod(this, [this]() {
        // ui->label_17->setText(userData.UserName+ "  " +"Summary");
-        QString formattedText =  userData.UserName + " <span style=\"font-weight:normal;\">Summary</span>";
-      //  ui->label_17->setText(formattedText);
+        QString formattedText =  userData.UserName /*+ " <span style=\"font-weight:normal;\">Summary</span>"*/;
+        ui->label_6->setText("User Name :" + formattedText);
+        QFont font = ui->label_6->font();
+        font.setBold(true);
+        ui->label_6->setFont(font);
 
         start_slowdata_worker();
         start_slowdata_indices_worker();
@@ -1880,7 +1896,7 @@ void MainWindow::add_logs(QString str){
    // ui->textEdit->append(str);
     logsdata.append(str);
     emit logDataSignal(logsdata);
-     ui->label_5->setText(str);
+     ui->label_5->setText("&nbsp;UserMessage : "+ str);
 
 }
 
@@ -2319,7 +2335,7 @@ void MainWindow::slotAddLogForAddAlgoRecord(QString str)
    //  emit logDataSignal(str);
     logsdata.append(str);
     emit logDataSignal(logsdata);
-    ui->label_5->setText(str);
+    ui->label_5->setText("&nbsp;UserMessage : "+str);
 }
 
 void MainWindow::slotHideProgressBar()

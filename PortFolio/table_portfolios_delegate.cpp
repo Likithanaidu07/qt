@@ -15,6 +15,7 @@
 
 Table_Portfolios_Delegate::Table_Portfolios_Delegate(QObject *parent)  : QStyledItemDelegate{parent}
 {
+
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
     QStringList groups = settings.childGroups();
@@ -33,6 +34,12 @@ Table_Portfolios_Delegate::Table_Portfolios_Delegate(QObject *parent)  : QStyled
     else{
         price_diff_incrementer = CDS_PRICE_DIFF_INCREMENTER;
     }
+
+}
+
+void Table_Portfolios_Delegate::setHighlightText(const QString &text) {
+    // Implement logic to store and handle highlight text
+   m_highlightText = text;
 
 }
 
@@ -352,6 +359,8 @@ QSize Table_Portfolios_Delegate::sizeHint(const QStyleOptionViewItem &option, co
 
 void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+
+
     auto c= index.column();
     auto r= index.row();
     QStyleOptionViewItem op(option);
@@ -752,4 +761,33 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
         QStyledItemDelegate::paint(painter, op, index);
     }
+
+    if (m_highlightText.isEmpty()) return;
+
+    QString text = index.data(Qt::DisplayRole).toString();
+    QTextOption textOption;
+    textOption.setAlignment(option.displayAlignment);
+    QRect rect = option.rect;
+    painter->save();
+
+    int startIndex = text.indexOf(m_highlightText, 0, Qt::CaseInsensitive);
+    if (startIndex >= 0) {
+        QString before = text.left(startIndex);
+        QString match = text.mid(startIndex, m_highlightText.length());
+        QString after = text.mid(startIndex + m_highlightText.length());
+
+        QRect beforeRect = painter->boundingRect(rect, Qt::AlignLeft, before);
+        QRect matchRect = painter->boundingRect(rect, Qt::AlignLeft, match);
+
+        painter->drawText(rect, before, textOption);
+
+        painter->setBrush(Qt::yellow);
+        painter->drawRect(QRect(beforeRect.right(), rect.top(), matchRect.width(), rect.height()));
+        painter->setPen(Qt::black);
+        painter->drawText(QRect(beforeRect.right(), rect.top(), matchRect.width(), rect.height()), match, textOption);
+
+        painter->drawText(QRect(beforeRect.right() + matchRect.width(), rect.top(), rect.width() - beforeRect.width() - matchRect.width(), rect.height()), after, textOption);
+    }
+
+    painter->restore();
 }
