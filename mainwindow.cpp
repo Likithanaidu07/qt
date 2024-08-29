@@ -27,7 +27,7 @@
 #include "Cards/watch_cards.h"
 #include "QMenu"
 
-#define ENABLE_BACKEND_DEBUG_MSG
+//#define ENABLE_BACKEND_DEBUG_MSG
 
 static const char stylesheetvis[]= "background: #596167;" "border-radius: 10px;";
 
@@ -167,6 +167,9 @@ MainWindow::MainWindow(QWidget *parent)
     T_Portfolio_DockWin->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
 
     T_Portfolio_DockWin->setMinimumSize(200,150);
+
+    T_Portfolio_DockWin->setWindowModality(Qt::NonModal);
+
    // const auto autoHideContainerPortfolioTable = DockManager->addAutoHideDockWidget(SideBarLocation::SideBarLeft, T_Portfolio_DockWin);
    // autoHideContainerPortfolioTable->setSize(480);
 
@@ -340,6 +343,9 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::editCompleted, this, &MainWindow::profolioTableEditFinshedSlot);
     QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::tabKeyPressed, T_Portfolio_Table, &table_portfolios_custom::handleTabKeyPressFromEditableCell);
     QObject::connect(T_Portfolio_Table, &table_portfolios_custom::spaceKeySignal, this, &MainWindow::updatePortFolioStatus);
+    QObject::connect(T_Portfolio_Table, &table_portfolios_custom::portFolioDeleteKeyPressed, this, &MainWindow::Delete_clicked_slot);
+
+
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::resizePortFolioTableColWidth, this, &MainWindow::resizePortFolioTableColWidthSlot);
    // QObject::connect(T_Portfolio_Table, &table_portfolios_custom::clicked, T_Portfolio_Model, &Table_Portfolios_Model::onItemChanged);
     QObject::connect(T_Portfolio_Table, &table_portfolios_custom::selectionChangedSignal, T_Portfolio_Model, &Table_Portfolios_Model::selectionChangedSlot);
