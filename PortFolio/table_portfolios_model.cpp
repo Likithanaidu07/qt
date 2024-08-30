@@ -891,3 +891,9 @@ void Table_Portfolios_Model::updateMarketRate(const QHash<QString, MBP_Data_Stru
             slowDataPriceUpdateTimer.restart();
         }
 }
+PortfolioObject* Table_Portfolios_Model::getPortFolioAt(int idx) const {
+    QMutexLocker locker(&mutex); // Lock the mutex automatically
+    return portfolio_data_list.at(idx);
+}
+
+

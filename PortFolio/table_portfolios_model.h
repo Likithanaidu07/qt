@@ -29,7 +29,9 @@ public:
     QHash<int,QString> editingDataHash; //data to store editing cell
     void clearTable();
 
-    QMutex mutex; // Define a QMutex to protect shared data
+    PortfolioObject * getPortFolioAt(int idx) const ;
+
+    mutable  QMutex mutex; // Define a QMutex to protect shared data
     void refreshTable();
     int switchstatetest() const;
 
