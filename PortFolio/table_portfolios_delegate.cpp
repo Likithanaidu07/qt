@@ -357,6 +357,9 @@ QSize Table_Portfolios_Delegate::sizeHint(const QStyleOptionViewItem &option, co
     return size;
 }
 
+#include "qsortfilterproxymodel.h"
+
+
 void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
 
@@ -364,6 +367,11 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
     auto c= index.column();
     auto r= index.row();
     QStyleOptionViewItem op(option);
+
+    const QSortFilterProxyModel *proxyModel = qobject_cast<const QSortFilterProxyModel*>(index.model());
+    const Table_Portfolios_Model *portfolioModal = qobject_cast<const Table_Portfolios_Model*>(proxyModel->sourceModel());
+    PortfolioObject *portfolio = portfolio = portfolioModal->portfolio_data_list.at(index.row());
+
 
     if(option.state & QStyle::State_MouseOver) {
         if(c==PortfolioData_Idx::_AlgoName)
@@ -386,8 +394,12 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         // Draw the pixmap with the updated position
         QRect rect(option.rect.left(), option.rect.top(), checkboxRect.width(), checkboxRect.height());  // Adjusted rect position
 
-        Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-        PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+
+
+
+
+       // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+       // PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
 
         //42A5F5
         QColor color("#42A5F5");
@@ -447,8 +459,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
     if (/*c == PortfolioData_Idx::_Status ||*/ c==PortfolioData_Idx::_PortfolioNumber || c==PortfolioData_Idx::_AlgoName)
     {
 
-        Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-        PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+      //  Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+     //   PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
 
         //42A5F5
         QColor color("#42A5F5");
@@ -525,8 +537,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
         }
 
-        Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-        PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+       // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+      //  PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
         if(portfolio->StatusVal.toInt()==portfolio_status::Active){
             QColor color("#D6FCF0");
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
@@ -582,8 +594,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
         }
 
-        Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-        PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+       // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+       // PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
         if(portfolio->StatusVal.toInt()==portfolio_status::Active){
             QColor color("#FED9D9");
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
@@ -656,8 +668,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
         }
 
-        Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-        PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+       // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+      //  PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
         if(portfolio->StatusVal.toInt()==portfolio_status::Active){
             QColor color("#E0F1FF");
             painter->fillRect(option.rect,  color);
@@ -708,8 +720,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
     }
     if (/*c == PortfolioData_Idx::_Status ||*/ c==PortfolioData_Idx::_OrderQuantity||c==PortfolioData_Idx::_Alias)
     {
-        Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-        PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+       // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+      //  PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
 
         //42A5F5
         QColor color("#42A5F5");
