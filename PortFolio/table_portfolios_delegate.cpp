@@ -12,6 +12,8 @@
 #include <QValidator>
 #include <QStandardPaths>
 #include <QCheckBox>
+#include "qsortfilterproxymodel.h"
+
 
 Table_Portfolios_Delegate::Table_Portfolios_Delegate(QObject *parent)  : QStyledItemDelegate{parent}
 {
@@ -357,7 +359,6 @@ QSize Table_Portfolios_Delegate::sizeHint(const QStyleOptionViewItem &option, co
     return size;
 }
 
-#include "qsortfilterproxymodel.h"
 
 
 void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
@@ -370,13 +371,14 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
     const QSortFilterProxyModel *proxyModel = qobject_cast<const QSortFilterProxyModel*>(index.model());
     const Table_Portfolios_Model *portfolioModal = qobject_cast<const Table_Portfolios_Model*>(proxyModel->sourceModel());
-    PortfolioObject *portfolio = portfolio = portfolioModal->portfolio_data_list.at(index.row());
+    PortfolioObject *portfolio =  portfolioModal->getPortFolioAt(index.row());//portfolioModal->portfolio_data_list.at(index.row());
 
 
     if(option.state & QStyle::State_MouseOver) {
         if(c==PortfolioData_Idx::_AlgoName)
             painter->fillRect(option.rect, Qt::black);
         QStyledItemDelegate::paint(painter, op, index);
+        return;
     }
 
     if(c == PortfolioData_Idx::_Status)
