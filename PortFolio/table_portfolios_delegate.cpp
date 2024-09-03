@@ -41,7 +41,7 @@ Table_Portfolios_Delegate::Table_Portfolios_Delegate(QObject *parent)  : QStyled
 
 void Table_Portfolios_Delegate::setHighlightText(const QString &text) {
     // Implement logic to store and handle highlight text
-   m_highlightText = text;
+    m_highlightText = text;
 
 }
 
@@ -84,7 +84,7 @@ QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOp
     }
     else if( c == PortfolioData_Idx::_Alias ){
         QLineEdit *editor = new QLineEdit(parent);
-      //  editor->setValidator(new QIntValidator(0, 9999));
+        //  editor->setValidator(new QIntValidator(0, 9999));
         editor->installEventFilter(const_cast<Table_Portfolios_Delegate *>(this));
         return editor;
     }
@@ -125,7 +125,7 @@ void Table_Portfolios_Delegate::setEditorData(QWidget *editor, const QModelIndex
         c==PortfolioData_Idx::_Alias)
     {
         QString value = index.model()->data(index, Qt::EditRole).toString();
-       // qDebug()<<"Table_Portfolios_Delegate::setEditorData: "<<value;
+        // qDebug()<<"Table_Portfolios_Delegate::setEditorData: "<<value;
 
         if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor))
         {
@@ -374,12 +374,12 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
     PortfolioObject *portfolio =  portfolioModal->getPortFolioAt(index.row());//portfolioModal->portfolio_data_list.at(index.row());
 
 
-    if(option.state & QStyle::State_MouseOver) {
-        if(c==PortfolioData_Idx::_AlgoName)
-            painter->fillRect(option.rect, Qt::black);
-        QStyledItemDelegate::paint(painter, op, index);
-        return;
-    }
+    //    if(option.state & QStyle::State_MouseOver) {
+    //        if(c==PortfolioData_Idx::_AlgoName)
+    //            painter->fillRect(option.rect, Qt::black);
+    //        QStyledItemDelegate::paint(painter, op, index);
+    //        return;
+    //    }
 
     if(c == PortfolioData_Idx::_Status)
     {
@@ -400,8 +400,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
 
 
-       // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-       // PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+        // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+        // PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
 
         //42A5F5
         QColor color("#42A5F5");
@@ -461,8 +461,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
     if (/*c == PortfolioData_Idx::_Status ||*/ c==PortfolioData_Idx::_PortfolioNumber || c==PortfolioData_Idx::_AlgoName)
     {
 
-      //  Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-     //   PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+        //  Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+        //   PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
 
         //42A5F5
         QColor color("#42A5F5");
@@ -539,8 +539,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
         }
 
-       // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-      //  PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+        // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+        //  PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
         if(portfolio->StatusVal.toInt()==portfolio_status::Active){
             QColor color("#D6FCF0");
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
@@ -596,8 +596,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
         }
 
-       // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-       // PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+        // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+        // PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
         if(portfolio->StatusVal.toInt()==portfolio_status::Active){
             QColor color("#FED9D9");
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
@@ -642,20 +642,20 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         QStyledItemDelegate::paint(painter, op, index);
     }
     else if(c==PortfolioData_Idx::_OrderQuantity
-               || c==PortfolioData_Idx::_Alias
-               || c == PortfolioData_Idx::_Leg1
-               || c==PortfolioData_Idx::_ExpiryDateTime
-               || c==PortfolioData_Idx::_Cost
-               || c==PortfolioData_Idx::_InstrumentName
-               || c==PortfolioData_Idx::_Leg2
-               || c==PortfolioData_Idx::_Leg3
-               || c==PortfolioData_Idx::_AdditionalData1
-               || c==PortfolioData_Idx::_PortfolioType
-               || c==PortfolioData_Idx::_Price
-            //   || c==PortfolioData_Idx::_SkipMarketStrike
-               || c==PortfolioData_Idx::_QuantityRatio
-               || c==PortfolioData_Idx::_BidLeg
-               || c==PortfolioData_Idx:: _FuturePrice)
+             || c==PortfolioData_Idx::_Alias
+             || c == PortfolioData_Idx::_Leg1
+             || c==PortfolioData_Idx::_ExpiryDateTime
+             || c==PortfolioData_Idx::_Cost
+             || c==PortfolioData_Idx::_InstrumentName
+             || c==PortfolioData_Idx::_Leg2
+             || c==PortfolioData_Idx::_Leg3
+             || c==PortfolioData_Idx::_AdditionalData1
+             || c==PortfolioData_Idx::_PortfolioType
+             || c==PortfolioData_Idx::_Price
+             //   || c==PortfolioData_Idx::_SkipMarketStrike
+             || c==PortfolioData_Idx::_QuantityRatio
+             || c==PortfolioData_Idx::_BidLeg
+             || c==PortfolioData_Idx:: _FuturePrice)
     {
         QStyleOptionViewItem op(option);
         QColor color("#42A5F5");
@@ -670,8 +670,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
         }
 
-       // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-      //  PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+        // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+        //  PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
         if(portfolio->StatusVal.toInt()==portfolio_status::Active){
             QColor color("#E0F1FF");
             painter->fillRect(option.rect,  color);
@@ -718,12 +718,16 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             p2.setX(p2.x()+5);
             painter->drawLine(p1,p2);
         }
+
+
+
+
         QStyledItemDelegate::paint(painter, op, index);
     }
     if (/*c == PortfolioData_Idx::_Status ||*/ c==PortfolioData_Idx::_OrderQuantity||c==PortfolioData_Idx::_Alias)
     {
-       // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-      //  PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+        // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+        //  PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
 
         //42A5F5
         QColor color("#42A5F5");
@@ -773,35 +777,41 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
         }
 
-        QStyledItemDelegate::paint(painter, op, index);
+        if (m_highlightText.isEmpty())
+            QStyledItemDelegate::paint(painter, op, index);
+        else{
+            QString text = index.data(Qt::DisplayRole).toString();
+            QTextOption textOption;
+            textOption.setAlignment(option.displayAlignment);
+            QRect rect = option.rect;
+            painter->save();
+
+            int startIndex = text.indexOf(m_highlightText, 0, Qt::CaseInsensitive);
+            if (startIndex >= 0) {
+                QString before = text.left(startIndex);
+                QString match = text.mid(startIndex, m_highlightText.length());
+                QString after = text.mid(startIndex + m_highlightText.length());
+
+                QRect beforeRect = painter->boundingRect(rect, Qt::AlignLeft, before);
+                QRect matchRect = painter->boundingRect(rect, Qt::AlignLeft, match);
+
+                painter->drawText(rect, before, textOption);
+
+                painter->setBrush(Qt::yellow);
+                painter->drawRect(QRect(beforeRect.right(), rect.top(), matchRect.width(), rect.height()));
+                painter->setPen(Qt::black);
+                painter->drawText(QRect(beforeRect.right(), rect.top(), matchRect.width(), rect.height()), match, textOption);
+
+                painter->drawText(QRect(beforeRect.right() + matchRect.width(), rect.top(), rect.width() - beforeRect.width() - matchRect.width(), rect.height()), after, textOption);
+            }
+
+            painter->restore();
+        }
+
+
+
+
     }
 
-    if (m_highlightText.isEmpty()) return;
 
-    QString text = index.data(Qt::DisplayRole).toString();
-    QTextOption textOption;
-    textOption.setAlignment(option.displayAlignment);
-    QRect rect = option.rect;
-    painter->save();
-
-    int startIndex = text.indexOf(m_highlightText, 0, Qt::CaseInsensitive);
-    if (startIndex >= 0) {
-        QString before = text.left(startIndex);
-        QString match = text.mid(startIndex, m_highlightText.length());
-        QString after = text.mid(startIndex + m_highlightText.length());
-
-        QRect beforeRect = painter->boundingRect(rect, Qt::AlignLeft, before);
-        QRect matchRect = painter->boundingRect(rect, Qt::AlignLeft, match);
-
-        painter->drawText(rect, before, textOption);
-
-        painter->setBrush(Qt::yellow);
-        painter->drawRect(QRect(beforeRect.right(), rect.top(), matchRect.width(), rect.height()));
-        painter->setPen(Qt::black);
-        painter->drawText(QRect(beforeRect.right(), rect.top(), matchRect.width(), rect.height()), match, textOption);
-
-        painter->drawText(QRect(beforeRect.right() + matchRect.width(), rect.top(), rect.width() - beforeRect.width() - matchRect.width(), rect.height()), after, textOption);
-    }
-
-    painter->restore();
 }
