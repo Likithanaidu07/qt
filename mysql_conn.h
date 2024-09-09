@@ -76,7 +76,7 @@ public:
     QString InstrumentTypeFilter;
 
     userInfo login( QString user_name,  QString password);
-    void  getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount,Table_Portfolios_Model* model,Combined_Tracker_Table_Model *comb_tracker_model,QHash<QString, PortfolioAvgPrice> &averagePriceList,QString user_id, QStringList TradedPortFolioList, QStringList &PortFoliosToDelete );
+    void  getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount,Combined_Tracker_Table_Model *comb_tracker_model,QHash<QString, PortfolioAvgPrice> &averagePriceList,QString user_id, QStringList TradedPortFolioList, QStringList &PortFoliosToDelete );
 
     QHash<QString, contract_table>  getContractTable( QHash<int , QStringList> &m_ContractDetails_Grouped_,userInfo userData);
 
@@ -125,6 +125,7 @@ private:
 
 signals:
     void display_log_text_signal(QString);
+    void updateModelDataListSignal(QList <PortfolioObject*> portfolio_data_list, bool clearTableFlg);
 
 };
 

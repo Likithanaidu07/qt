@@ -57,6 +57,7 @@ MainWindow::MainWindow(QWidget *parent)
     showMessagOnceFlg = true;
    // connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
     connect(this,SIGNAL(showMessageSignal(QString)),this,SLOT(showMessageSlot(QString)));
+    connect(this, SIGNAL(requestDeleteConfirmation(QStringList)), this, SLOT(onRequestDeleteConfirmation(QStringList)));
 
 
 
@@ -361,21 +362,22 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::editFinished, this, &MainWindow::profolioTableEditFinshedSlot);
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::editCompleted, this, &MainWindow::profolioTableEditFinshedSlot);
     QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::tabKeyPressed, T_Portfolio_Table, &table_portfolios_custom::handleTabKeyPressFromEditableCell);
-    QObject::connect(T_Portfolio_Table, &table_portfolios_custom::spaceKeySignal, this, &MainWindow::updatePortFolioStatus);
+    //QObject::connect(T_Portfolio_Table, &table_portfolios_custom::spaceKeySignal, this, &MainWindow::updatePortFolioStatus);
     QObject::connect(T_Portfolio_Table, &table_portfolios_custom::portFolioDeleteKeyPressed, this, &MainWindow::Delete_clicked_slot);
 
 
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::resizePortFolioTableColWidth, this, &MainWindow::resizePortFolioTableColWidthSlot);
    // QObject::connect(T_Portfolio_Table, &table_portfolios_custom::clicked, T_Portfolio_Model, &Table_Portfolios_Model::onItemChanged);
     QObject::connect(T_Portfolio_Table, &table_portfolios_custom::selectionChangedSignal, T_Portfolio_Model, &Table_Portfolios_Model::selectionChangedSlot);
+    QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::updateDBOnDataChanged, this, &MainWindow::updatePortFolioStatus, Qt::QueuedConnection);
+    QObject::connect(db_conn, &mysql_conn::updateModelDataListSignal, T_Portfolio_Model, &Table_Portfolios_Model::updateModelDataList, Qt::QueuedConnection);
 
-    QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::updateDBOnDataChanged, this, &MainWindow::updatePortFolioStatus);
+
 
  //   T_Portfolio_Table->setModel(T_Portfolio_Model);
     T_Portfolio_Table->setItemDelegate(T_Portfolio_Delegate);
 
-    connect(T_Portfolio_Table->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-            this, SLOT(T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&)));
+
 
 
     connect(T_Portfolio_Table, &QTableView::doubleClicked, this, &MainWindow::T_Portfolio_Table_cellDoubleClicked);
@@ -392,6 +394,9 @@ MainWindow::MainWindow(QWidget *parent)
     });
 
     T_Portfolio_Table->setModel(proxyModel);
+
+    connect(T_Portfolio_Table->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+            this, SLOT(T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&)));
 
     PortfolioHeaderView* headerView = new PortfolioHeaderView(Qt::Horizontal, T_Portfolio_Table);
     headerView->setFixedHeight(32);
@@ -1169,8 +1174,14 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
         }
 
         portfolio_table_updating_db.storeRelaxed(1);
-        QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
-        T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0);
+
+        PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());//portfolioModal->portfolio_data_list.at(index.row());
+        if (!P) {
+            qDebug()<<"profolioTableEditFinshedSlot----- portfolio null, need to debug this code.";
+            return;
+        }
+        QString PortfolioNumber = QString::number(P->PortfolioNumber);//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
+        T_Portfolio_Model->setEditingFlg(index.row(),0);//portfolio_data_list[index.row()]->edting.storeRelaxed(0);
 
         //Update status data to DB
         if(index.column()==PortfolioData_Idx::_Status){
@@ -1229,6 +1240,26 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 msgBox.exec();
             }
         }
+        else if(index.column() == PortfolioData_Idx::_MaxLoss) {
+            // Skip checking for duplicate alias names
+            double val = valStr.toDouble();
+            int valInt = val*devicer;
+            QString Query = "UPDATE Portfolios SET MaxLoss='" + QString::number(valInt) + "' WHERE PortfolioNumber=" + PortfolioNumber;
+            QString msg;
+            bool success = db_conn->updateDB_Table(Query, msg);
+
+            if (success) {
+                db_conn->logToDB(QString("Updated MaxLoss to " + valStr + " [" + PortfolioNumber + "]"));
+                // Refresh sorting
+                reloadSortSettFlg.storeRelaxed(1);
+            } else {
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("Update MaxLoss Failed");
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.setText(msg);
+                msgBox.exec();
+            }
+        }
 
         //Get edited cell data from portfolio table and update DB
         else{
@@ -1241,10 +1272,10 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 QString valStr = i.value();
                 switch (columnIdx) {
                 case PortfolioData_Idx::_OrderQuantity:{
-                    int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                    int lotSize = P->GetLotSize();//T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
                     double val = valStr.toDouble();
                     val=val*lotSize;
-                    double vfq = T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
+                    double vfq = P->VolumeFreezeQty;//T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
 
 
 
@@ -1258,8 +1289,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     else{
                         //write
                         int val1 = valStr.toInt();
-                        int BuyTotalQuantity = T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity;
-                        int SellTotalQuantity = T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity;
+                        int BuyTotalQuantity = P->BuyTotalQuantity;// T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity;
+                        int SellTotalQuantity = P->SellTotalQuantity;// T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity;
                         int qty = BuyTotalQuantity;
                         if(BuyTotalQuantity==0)
                             qty = SellTotalQuantity;
@@ -1289,9 +1320,9 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                     case PortfolioData_Idx::_BuyTotalQuantity:{
                     double TQ = valStr.toDouble();
-                    int bTTQ= T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTradedQuantity;
+                    int bTTQ= P->BuyTradedQuantity;//T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTradedQuantity;
 
-                    QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(T_Portfolio_Model->portfolio_data_list[index.row()]->Leg1TokenNo,T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioType.toInt());
+                    QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(P->Leg1TokenNo,P->PortfolioType.toInt());
 
 
                     if (InstrumentType == "OPTIDX" || InstrumentType == "FUTIDX") {
@@ -1315,7 +1346,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                         }
                     }
 
-                    double TTQ = T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTradedQuantity;
+                    double TTQ = P->BuyTradedQuantity;
 
                     if (TQ < TTQ) {
                             QMessageBox msgBox;
@@ -1326,7 +1357,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                         }
                         else {
 
-                            double OrderQty = T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity;
+                            double OrderQty = P->OrderQuantity;
                             if(TQ<OrderQty){
                                // show the error mesg here
                                 QMessageBox msgBox;
@@ -1335,10 +1366,10 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                                 msgBox.exec();
                             }
                             else{
-                                int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                                int lotSize = P->GetLotSize();
                                 double val = valStr.toDouble();
                                 val=val*lotSize;
-                                if(T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity==0){
+                                if(P->OrderQuantity==0){
                                     updateQueryList.append("OrderQuantity="+QString::number(lotSize));
                                 }
                                 updateQueryList.append("BuyTotalQuantity="+QString::number(val));
@@ -1353,8 +1384,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                     case PortfolioData_Idx::_SellTotalQuantity:{
                         double TQ = valStr.toDouble();
-                       int sTTQ= T_Portfolio_Model->portfolio_data_list[index.row()]->SellTradedQuantity;
-                        QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(T_Portfolio_Model->portfolio_data_list[index.row()]->Leg1TokenNo,T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioType.toInt());
+                       int sTTQ= P->SellTradedQuantity;
+                        QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(P->Leg1TokenNo,P->PortfolioType.toInt());
 
 
                         if (InstrumentType == "OPTIDX" || InstrumentType == "FUTIDX") {
@@ -1377,7 +1408,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                                 break;
                             }
                         }
-                        double TTQ = T_Portfolio_Model->portfolio_data_list[index.row()]->SellTradedQuantity;
+                        double TTQ = P->SellTradedQuantity;
 
                         if (TQ < TTQ) {
                             QMessageBox msgBox;
@@ -1386,7 +1417,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                             msgBox.exec();
                         }
                         else {
-                            double OrderQty = T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity;
+                            double OrderQty = P->OrderQuantity;
                             if(TQ<OrderQty){
                                 // show the error mesg here
                                 QMessageBox msgBox;
@@ -1395,10 +1426,10 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                                 msgBox.exec();
                             }
                             else{
-                                int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                                int lotSize = P->GetLotSize();
                                 double val = valStr.toDouble();
                                 val=val*lotSize;
-                                if(T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity==0){
+                                if(P->OrderQuantity==0){
                                     updateQueryList.append("OrderQuantity="+QString::number(lotSize));
                                 }
                                 updateQueryList.append("SellTotalQuantity="+QString::number(val));
@@ -1410,7 +1441,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     break;
 
                     case PortfolioData_Idx::_BuyPriceDifference:{
-                        QString BuyPriceDifference = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->BuyPriceDifference*devicer,'f',decimal_precision);
+                        QString BuyPriceDifference = QString::number(P->BuyPriceDifference*devicer,'f',decimal_precision);
                         updateQueryList.append("BuyPriceDifference="+BuyPriceDifference);
                         logMsg = logMsg+"BuyPriceDifference ["+BuyPriceDifference+"], ";
 
@@ -1418,7 +1449,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     break;
 
                     case PortfolioData_Idx::_SellPriceDifference:{
-                        QString SellPriceDifference = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->SellPriceDifference*devicer,'f',decimal_precision);
+                        QString SellPriceDifference = QString::number(P->SellPriceDifference*devicer,'f',decimal_precision);
                         updateQueryList.append("SellPriceDifference="+SellPriceDifference);
                         logMsg = logMsg+"SellPriceDifference ["+SellPriceDifference+"], ";
                     }
@@ -1461,6 +1492,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             backend_comm->insertData(msg);
 
             portfolio_table_updating_db.storeRelaxed(0);
+
+            delete P;
 
 }
 void MainWindow::loadContract(){
@@ -1603,16 +1636,23 @@ void MainWindow::loadDataAndUpdateTable(int table){
 
 
         QStringList PortFoliosToDelete;
-        db_conn->getPortfoliosTableData(reloadSortSettFlg,AlgoCount,T_Portfolio_Model,combined_tracker_model,averagePriceList,QString::number(userData.UserId),TradedPortFolioList,PortFoliosToDelete);
+        db_conn->getPortfoliosTableData(reloadSortSettFlg,AlgoCount,combined_tracker_model,averagePriceList,QString::number(userData.UserId),TradedPortFolioList,PortFoliosToDelete);
         if(PortFoliosToDelete.size()){
-          QString msg = "Token not exist in contract table for  Portfolios ('" + PortFoliosToDelete.join("','") + "')!. Deleting it.";
-          if(showMessagOnceFlg)
-            emit showMessageSignal(msg);
-          bool ret = db_conn->deleteAlgos(PortFoliosToDelete,msg);
-          if(!ret&&showMessagOnceFlg){
-            emit showMessageSignal(msg);
+         // QString msg = "Token not exist in contract table for  Portfolios ('" + PortFoliosToDelete.join("','") + "')!. Deleting it.";
+          if(showMessagOnceFlg){
+              emit requestDeleteConfirmation(PortFoliosToDelete);
+             showMessagOnceFlg = false;
           }
-          showMessagOnceFlg = false;
+
+
+          //  emit showMessageSignal(msg);
+
+
+//          bool ret = db_conn->deleteAlgos(PortFoliosToDelete,msg);
+//          if(!ret&&showMessagOnceFlg){
+//            emit showMessageSignal(msg);
+//          }
+          //showMessagOnceFlg = false;
         }
 
         emit data_loded_signal(T_Table::PORTFOLIO);
@@ -1662,6 +1702,25 @@ void MainWindow::loadDataAndUpdateTable(int table){
         break;
     }
 }
+
+void MainWindow::onRequestDeleteConfirmation(const QStringList &PortFoliosToDelete) {
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Delete Confirmation",
+                                  "Token not exist in contract table for Portfolios ('" + PortFoliosToDelete.join("','") + "')!. Delete those portfolios?",
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        QString msg; // You can define msg as per your requirement
+        bool ret = db_conn->deleteAlgos(PortFoliosToDelete, msg);
+
+        if (!ret) {
+            QMessageBox::warning(this, "Error", "Failed to delete the portfolios: " + msg);
+        }
+    } else {
+        this->on_close_clicked();
+    }
+}
+
 QString MainWindow::fixDecimal(double num,int decimal_precision){
     QString str = QString::number(num, 'f', decimal_precision+1);
     return str;
@@ -1795,18 +1854,23 @@ void MainWindow::updatePortFolioStatus(){
     QModelIndexList selection = T_Portfolio_Table->selectionModel()->selectedRows();
     for(int i=0; i< selection.count(); i++)
     {
-        QModelIndex index = selection.at(i);
+            QModelIndex index = selection.at(i);
 
+            PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());
+            if (!P) {
+                qDebug()<<"updatePortFolioStatus----- portfolio null, need to debug this code.";
+                continue;
+            }
+            QString PortfolioNumber = QString::number(P->PortfolioNumber);//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
+            T_Portfolio_Model->setEditingFlg(index.row(),1);//T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(1);
 
-            QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
-            T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(1);
-            portfolio_status status = static_cast<portfolio_status>(T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal.toInt());//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_Status).data().toString();
+            portfolio_status status = static_cast<portfolio_status>(P->StatusVal.toInt());// static_cast<portfolio_status>(T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal.toInt());//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_Status).data().toString();
             //status is in uncheck state so make it toggle(checked)
             if(status == portfolio_status::Filled || status == portfolio_status::DisabledByUser){
-                int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                //int lotSize = P->GetLotSize();
                 //check remaing qunatity is greater than 1 lot
-                    T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::Active);
-                    T_Portfolio_Model->refreshTable();
+                    T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::Active));//portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::Active);
+                   // T_Portfolio_Model->refreshTable();
                     QString Query = "UPDATE Portfolios SET Status='Active' where PortfolioNumber="+PortfolioNumber;
                     QString msg;
                     bool success = db_conn->updateDB_Table(Query,msg);
@@ -1825,8 +1889,8 @@ void MainWindow::updatePortFolioStatus(){
 
             //status is in check state so make it toggle(uncheck)
             else{
-                T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::DisabledByUser);
-                T_Portfolio_Model->refreshTable();
+                T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::DisabledByUser));//T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::DisabledByUser);
+               // T_Portfolio_Model->refreshTable();
                 QString Query = "UPDATE Portfolios SET Status='DisabledByUser' where PortfolioNumber="+PortfolioNumber;
                 QString msg;
                 bool success = db_conn->updateDB_Table(Query,msg);
@@ -1846,9 +1910,8 @@ void MainWindow::updatePortFolioStatus(){
 
 
 
-
-
-        T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0);
+        T_Portfolio_Model->setEditingFlg(index.row(),0);//T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0);
+        delete P;
 
     }
     portfolio_table_updating_db.storeRelaxed(0);
@@ -2120,12 +2183,12 @@ void MainWindow::startall_Button_clicked()
             return;
         }
 
-        QStringList portfolioNumbers;
-        for(int i = 0; i < T_Portfolio_Model->portfolio_data_list.size(); i++){
+        QStringList portfolioNumbers = T_Portfolio_Model->getAllPortfolioNumbers();
+        /*for(int i = 0; i < T_Portfolio_Model->portfolio_data_list.size(); i++){
             if (T_Portfolio_Model->portfolio_data_list[i]) {
             portfolioNumbers.append(QString::number(T_Portfolio_Model->portfolio_data_list[i]->PortfolioNumber));
             }
-        }
+        }*/
         QString joinedPortfolioNumbers = portfolioNumbers.join(", ");
         QString Query = "UPDATE Portfolios SET Status='Active' WHERE PortfolioNumber IN (" + joinedPortfolioNumbers + ")";
         QString msg;
@@ -2146,12 +2209,13 @@ void MainWindow::stopall_Button_clicked()
             return;
         }
 
-        QStringList portfolioNumbers;
-        for(int i=0;i<T_Portfolio_Model->portfolio_data_list.size();i++){
-            if (T_Portfolio_Model->portfolio_data_list[i]) {
-            portfolioNumbers.append(QString::number(T_Portfolio_Model->portfolio_data_list[i]->PortfolioNumber));
-            }
-        }
+        QStringList portfolioNumbers = T_Portfolio_Model->getAllPortfolioNumbers();
+
+//        for(int i=0;i<T_Portfolio_Model->portfolio_data_list.size();i++){
+//            if (T_Portfolio_Model->portfolio_data_list[i]) {
+//            portfolioNumbers.append(QString::number(T_Portfolio_Model->portfolio_data_list[i]->PortfolioNumber));
+//            }
+//        }
         QString joinedPortfolioNumbers = portfolioNumbers.join(", ");
         QString Query = "UPDATE Portfolios SET Status='DisabledByUser' WHERE PortfolioNumber IN (" + joinedPortfolioNumbers + ")";
 
@@ -2266,9 +2330,14 @@ void MainWindow::Delete_clicked_slot()
         for(int i=0; i< selection.count(); i++)
         {
             QModelIndex index = selection.at(i);
-            QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
-
-            if( T_Portfolio_Model->portfolio_data_list[index.row()]->Status == true)
+           //QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
+            PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());
+            if (!P) {
+                qDebug()<<"updatePortFolioStatus----- portfolio null, need to debug this code.";
+                continue;
+            }
+            QString PortfolioNumber = QString::number(P->PortfolioNumber);
+            if( P->Status == true)
             {
                 logs = "PortfolioNumber '"+PortfolioNumber+"' is Active, cannot delete.";
                 activeAlgoList.append(PortfolioNumber);
@@ -2289,6 +2358,7 @@ void MainWindow::Delete_clicked_slot()
                 db_conn->logToDB(logs);
                 qDebug()<<"PortfolioNumber: "<<PortfolioNumber<<" not Deleted, Info:"<<msg;
             }
+            delete P;
 
         }
         deletingPortFolioFlg.storeRelaxed(0);
@@ -2311,11 +2381,18 @@ void MainWindow::T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index){
         if(orderPopUpWin->isHidden())
             orderPopUpWin->show();
         // QString Expiry = T_Portfolio_Model->portfolio_data_list[index.row()]->Expiry;
-        QString PortfolioType =T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioType;
-        QString PortfolioNumber = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioNumber);
+        PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());
+        if (!P) {
+            qDebug()<<"updatePortFolioStatus----- portfolio null, need to debug this code.";
+
+        }
+
+        QString PortfolioType =P->PortfolioType;
+        QString PortfolioNumber = QString::number(P->PortfolioNumber);
         orderPopUpWin->getTradeDataFromDB(QString::number(userData.UserId), PortfolioNumber,PortfolioType);
-        orderPopUpWin->setData(T_Portfolio_Model->portfolio_data_list[index.row()]);
+        orderPopUpWin->setData(P);
         orderPopUpWin->activateWindow();
+        delete P;
     }
 
 }
@@ -2356,13 +2433,13 @@ void MainWindow::T_Portfolio_Table_cellClicked(const QItemSelection &selected, c
         int row = selectedRows[0];
         //current editing row is not same as selected row  so make last editing row uneditable
         if(portfolio_table_slected_idx_for_editing.load()!=-1&&portfolio_table_slected_idx_for_editing.load()!=row){
-            T_Portfolio_Model->portfolio_data_list[portfolio_table_slected_idx_for_editing.load()]->edting.storeRelaxed(0); // maked the row flg not editing, so the bg data will be updated.
+            T_Portfolio_Model->setEditingFlg(portfolio_table_slected_idx_for_editing.load(),0);//T_Portfolio_Model->portfolio_data_list[portfolio_table_slected_idx_for_editing.load()]->edting.storeRelaxed(0); // maked the row flg not editing, so the bg data will be updated.
             portfolio_table_slected_idx_for_editing.store(-1);
         }
     }
     //multiple row selected or no row selected, so make last editing row uneditable
     else if(portfolio_table_slected_idx_for_editing.load()!=-1){
-        T_Portfolio_Model->portfolio_data_list[portfolio_table_slected_idx_for_editing.load()]->edting.storeRelaxed(0); // maked the row flg not editing, so the bg data will be updated.
+        T_Portfolio_Model->setEditingFlg(portfolio_table_slected_idx_for_editing.load(),0);//T_Portfolio_Model->portfolio_data_list[portfolio_table_slected_idx_for_editing.load()]->edting.storeRelaxed(0); // maked the row flg not editing, so the bg data will be updated.
         portfolio_table_slected_idx_for_editing.store(-1);
     }
 

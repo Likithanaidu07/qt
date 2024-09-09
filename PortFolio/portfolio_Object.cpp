@@ -16,6 +16,7 @@ bool PortfolioObject::operator==(const PortfolioObject &other) const
         Status == other.Status &&
         PortfolioNumber == other.PortfolioNumber &&
         Alias == other.Alias &&
+        MaxLoss  == other.MaxLoss &&
         SellMarketRate == other.SellMarketRate &&
         SellAveragePrice == other.SellAveragePrice &&
         SellPriceDifference == other.SellPriceDifference &&

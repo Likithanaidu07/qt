@@ -20,14 +20,16 @@ public:
     QVariant data(const QModelIndex &index, int role = Qt::DisplayRole) const override;
     bool setData(const QModelIndex &index, const QVariant &value, int role = Qt::EditRole) override;
     Qt::ItemFlags flags(const QModelIndex &index) const override;
-    void setDataList(QList <PortfolioObject*> portfolio_data_list);
     QVariant headerData(int section, Qt::Orientation , int role)const override;
     QList <PortfolioObject*> portfolio_data_list;
     QList<int>  portfolio_tokens; //leg1,leg2,leg3,leg4,leg5,leg6
     QHash<QString,PortFolioData_Less> getPortFolioDataLess();
     QHash<QString,int> getPortFoliosLotSize();
     QHash<int,QString> editingDataHash; //data to store editing cell
-    void clearTable();
+    //void clearTable();
+    void setEditingFlg(int row,int val);
+    void updatePortFolioStatusValue(int row,QString statusVal);
+    QStringList getAllPortfolioNumbers();
 
     PortfolioObject * getPortFolioAt(int idx) const ;
 
@@ -48,7 +50,7 @@ private:
                           "BAvg","BDiff","BTQ",
                           "BTTQ","BRQ","SRate",
                           "SAvg", "SDiff","STQ",
-                          "STTQ","SRQ","Odr Qty","Expiry 1", /*"Expiry 2",*/
+                          "STTQ","SRQ","Odr Qty","Bid Price","Expiry 1", /*"Expiry 2",*/
                           "Cost" ,"Qty Ratio",
                           "Bid Leg", "Fut Price"};
 
@@ -67,6 +69,7 @@ private:
 public slots:
     void onItemChanged(const QModelIndex &index);
     void selectionChangedSlot(int currentIdx);
+    void updateModelDataList(QList <PortfolioObject*> portfolio_data_list,bool clearTableFlg);
 
 signals:
     void editCompleted(QString text, QModelIndex idx) const;

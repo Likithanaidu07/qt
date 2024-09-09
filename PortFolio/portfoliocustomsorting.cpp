@@ -20,27 +20,30 @@ void portfolioCustomSorting::loadSortConfig(){
     if (settings.contains("portfolio_sort_data"))
     {
       QString saveStr =  settings.value("portfolio_sort_data").toString();
-      QStringList saveStrList = saveStr.split(";");
-      for(int i=0;i<saveStrList.size();i++){
-          QStringList tok = saveStrList[i].split(":");
-          if(tok.length()==2){
+      if(saveStr!=""){
+          QStringList saveStrList = saveStr.split(";");
+          for(int i=0;i<saveStrList.size();i++){
+              QStringList tok = saveStrList[i].split(":");
+              if(tok.length()==2){
 
-              QString columnToSort = tok[0]; //"Algo Status","Algo Name", "Strategy","Expiry","Start Strike","End Strike","Option Type"
-              QString order = tok[1]; // Ascending or Descending or
-              int idx = columnNameToIDx(columnToSort);
-              if(idx!=-1){
-                 priorityColumnIdxs.append(idx);
-                 sortOrders.append(order);
+                  QString columnToSort = tok[0]; //"Algo Status","Algo Name", "Strategy","Expiry","Start Strike","End Strike","Option Type"
+                  QString order = tok[1]; // Ascending or Descending or
+                  int idx = columnNameToIDx(columnToSort);
+                  if(idx!=-1){
+                     priorityColumnIdxs.append(idx);
+                     sortOrders.append(order);
+                  }
+                  else{
+                      qDebug()<<"Error: portfolio_sort_data reade error, "<<columnToSort <<" not expected string";
+                  }
               }
               else{
-                  qDebug()<<"Error: portfolio_sort_data reade error, "<<columnToSort <<" not expected string";
+                  qDebug()<<"Error: portfolio_sort_data reade error, "<<saveStrList[i];
               }
-          }
-          else{
-              qDebug()<<"Error: portfolio_sort_data reade error, "<<saveStrList[i];
-          }
 
+          }
       }
+
            // Sort
           // Create a list of pairs
           QVector<QPair<int, QString>> pairs;

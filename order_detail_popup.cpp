@@ -167,6 +167,7 @@ void OrderDetail_Popup::updateUI(const QList<QHash<QString, QString>>& data){
 
 OrderDetail_Popup::~OrderDetail_Popup()
 {
+
     delete ui;
 }
 

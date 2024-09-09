@@ -28,42 +28,42 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         obj.Leg1TokenNo = query.value("Leg1TokenNo").toInt();
         if(obj.Leg1TokenNo>0){
             if(!ContractDetail::getInstance().checkTokenExist(obj.Leg1TokenNo)){
-               qDebug()<< "Leg1TokenNo: "<<obj.Leg1TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               qDebug()<< "Leg1TokenNo: "<<obj.Leg1TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", need to delete it.";
                return false;
             }
         }
         obj.Leg2TokenNo = query.value("Leg2TokenNo").toInt();
         if(obj.Leg2TokenNo>0){
             if(!ContractDetail::getInstance().checkTokenExist(obj.Leg2TokenNo)){
-               qDebug()<< "Leg2TokenNo: "<<obj.Leg2TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               qDebug()<< "Leg2TokenNo: "<<obj.Leg2TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", need to delete it.";
                return false;
             }
         }
         obj.Leg3TokenNo = query.value("Leg3TokenNo").toInt();
         if(obj.Leg3TokenNo>0){
             if(!ContractDetail::getInstance().checkTokenExist(obj.Leg3TokenNo)){
-               qDebug()<< "Leg3TokenNo: "<<obj.Leg3TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               qDebug()<< "Leg3TokenNo: "<<obj.Leg3TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", need to delete it.";
                return false;
             }
         }
         obj.Leg4TokenNo = query.value("Leg4TokenNo").toInt();
         if(obj.Leg4TokenNo>0){
             if(!ContractDetail::getInstance().checkTokenExist(obj.Leg4TokenNo)){
-               qDebug()<< "Leg4TokenNo: "<<obj.Leg4TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               qDebug()<< "Leg4TokenNo: "<<obj.Leg4TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<",  need to delete it.";
                return false;
             }
         }
         obj.Leg5TokenNo = query.value("Leg5TokenNo").toInt();
         if(obj.Leg5TokenNo>0){
             if(!ContractDetail::getInstance().checkTokenExist(obj.Leg5TokenNo)){
-               qDebug()<< "Leg5TokenNo: "<<obj.Leg5TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               qDebug()<< "Leg5TokenNo: "<<obj.Leg5TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<",  need to delete it.";
                return false;
             }
         }
         obj.Leg6TokenNo = query.value("Leg6TokenNo").toInt();
         if(obj.Leg6TokenNo>0){
             if(!ContractDetail::getInstance().checkTokenExist(obj.Leg6TokenNo)){
-               qDebug()<< "Leg6TokenNo: "<<obj.Leg6TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<", deleting it.";
+               qDebug()<< "Leg6TokenNo: "<<obj.Leg6TokenNo<<" not exist in Contract table for PortfolioNumber: "<<obj.PortfolioNumber<<",  need to delete it.";
                return false;
             }
         }
@@ -103,6 +103,8 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         obj.Alias = query.value("Alias").toString();
         if(obj.Alias=="")
             obj.Alias="-";
+
+        obj.MaxLoss = query.value("MaxLoss").toDouble()/devicer_;
         totalQty = query.value("BuyTotalQuantity").toInt() / lotSize;
         obj.BuyPriceDifference = query.value("BuyPriceDifference").toDouble()/devicer_;// convert->ToRupees(query.value("BuyPriceDifference").toDouble());
         obj.BuyTradedQuantity = query.value("BuyTradedQuantity").toInt() / lotSize;
@@ -118,7 +120,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
 //        if (obj.BuyTotalQuantity > 0 || obj.SellTotalQuantity > 0) {
 //            obj.OrderQuantity = 1;
 //        }
-       obj.OrderQuantity = query.value("OrderQuantity").toInt()/ lotSize;
+        obj.OrderQuantity = query.value("OrderQuantity").toInt()/ lotSize;
 
         obj.InstrumentName = ContractDetail::getInstance().GetInstrumentName(obj.GetFirstToken(),type);
 
