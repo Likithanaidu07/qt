@@ -16,6 +16,7 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     QCoreApplication::setApplicationName("New_SpeedTrade");
     QCoreApplication::setOrganizationName("New_AlgoMethods");
+
  #ifndef QT_DEBUG
     logger::initLogging("SpeedTradeLog_");
  #endif
@@ -39,7 +40,9 @@ int main(int argc, char *argv[])
     MainWindowObj = &mainWindow;
 
    // UiUtils::SetMainWindow(&mainWindow);
-    loginwindow loginWindow(MainWindowObj);
+    //loginwindow loginWindow(MainWindowObj);
+    loginwindow loginWindow;
+
     QObject::connect(&loginWindow, &loginwindow::loginStatus,&mainWindow, &MainWindow::loggedInSucessful);
     QObject::connect(&loginWindow, &loginwindow::loginStatus, [&](const userInfo& userInfo) {
         if (userInfo.loggedIn) {

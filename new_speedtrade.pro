@@ -15,9 +15,13 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    Cards/logs_cards.cpp \
+    Cards/summary_cards.cpp \
+    Cards/watch_cards.cpp \
     CombinedTracker/combined_tracker_table_model.cpp \
     Conversions.cpp \
     Convert_to_Algo/add_algo_con_rev.cpp \
+    Convert_to_Algo/add_algo_cr_jelly_bid.cpp \
     Convert_to_Algo/add_algo_f2f.cpp \
     Convert_to_Algo/convert_algo_shared_var.cpp \
     Convert_to_Algo/convert_algo_win.cpp \
@@ -36,6 +40,7 @@ SOURCES += \
     OrderBook/table_orderbook_delegate.cpp \
     PortFolio/PortfolioParser.cpp \
     PortFolio/portfolio_Object.cpp \
+    PortFolio/portfolio_searchfilterproxymodel.cpp \
     PortFolio/portfoliocustomsorting.cpp \
     PortFolio/portfolioheaderdelegate.cpp \
     PortFolio/portfolioheaderview.cpp \
@@ -47,6 +52,7 @@ SOURCES += \
     SlowDataIndices/slowdata_indices_socket.cpp \
     SlowDataIndices/slowdataindices.cpp \
     SwitchButton/switchbutton.cpp \
+    TradePosition/trade_table_filterproxymodel.cpp \
     TradePosition/trade_table_model.cpp \
     TradePosition/tradetableheaderview.cpp \
     backendcomm/backendcomm.cpp \
@@ -70,10 +76,14 @@ SOURCES += \
     watch_data_list_item.cpp
 
 HEADERS += \
+    Cards/logs_cards.h \
+    Cards/summary_cards.h \
+    Cards/watch_cards.h \
     CombinedTracker/combined_tracker_table_model.h \
     Common/macros.h \
     Conversions.h \
     Convert_to_Algo/add_algo_con_rev.h \
+    Convert_to_Algo/add_algo_cr_jelly_bid.h \
     Convert_to_Algo/add_algo_f2f.h \
     Convert_to_Algo/convert_algo_shared_var.h \
     Convert_to_Algo/convert_algo_win.h \
@@ -92,6 +102,7 @@ HEADERS += \
     OrderBook/table_orderbook_delegate.h \
     PortFolio/PortfolioParser.h \
     PortFolio/portfolio_Object.h \
+    PortFolio/portfolio_searchfilterproxymodel.h \
     PortFolio/portfoliocustomsorting.h \
     PortFolio/portfolioheaderdelegate.h \
     PortFolio/portfolioheaderview.h \
@@ -105,6 +116,7 @@ HEADERS += \
     SlowDataIndices/slowdataindices.h \
     SwitchButton/switchbutton.h \
     TradePosition/OrderBook_Object.h \
+    TradePosition/trade_table_filterproxymodel.h \
     TradePosition/trade_table_model.h \
     TradePosition/tradetableheaderview.h \
     backendcomm/backendcomm.h \
@@ -129,6 +141,9 @@ HEADERS += \
     watch_data_list_item.h
 
 FORMS += \
+    Cards/logs_cards.ui \
+    Cards/summary_cards.ui \
+    Cards/watch_cards.ui \
     F1_F2/f1_f2_buysell.ui \
     convert_algo_win.ui \
     loadingdatawindow.ui \

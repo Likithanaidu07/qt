@@ -434,6 +434,9 @@ void Slowdata_Indices_Socket::run()
 
     closesocket(sock);
     WSACleanup();
+
+    qDebug()<<"Exiting slow data indices socket thread....";
+
 }
 
 void Slowdata_Indices_Socket::sendUDP_TO_Quit(){

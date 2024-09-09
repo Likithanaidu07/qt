@@ -3,10 +3,14 @@
 #include <QApplication>
 #include "QPainter"
 #include "defines.h"
+#include "QComboBox"
 
 
+tradetableheaderview::tradetableheaderview(Qt::Orientation orientation, QWidget* parent) : QHeaderView(orientation, parent) {
+    setSectionsMovable(true);
+    setSectionsClickable(true);
 
-tradetableheaderview::tradetableheaderview(Qt::Orientation orientation, QWidget* parent) : QHeaderView(orientation, parent) {}
+}
 
 void tradetableheaderview::paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const {
     // Create the portfolio header delegate
@@ -76,7 +80,22 @@ void tradetableheaderview::paintSection(QPainter* painter, const QRect& rect, in
         painter->setPen(QColor("#6C757D"));
         painter->drawLine(rect.topRight(), rect.bottomRight());
     }
+    if (logicalIndex == OrderBook_Idx::OrderId_OB) {  // Customize for the first column, for example
+      //  QComboBox* comboBox = new QComboBox(this);
+        QComboBox* comboBox = new QComboBox(const_cast<tradetableheaderview*>(this));
 
+        comboBox->addItem("Order Id");
+//        comboBox->addItem("Option 1");
+//        comboBox->addItem("Option 2");
+        comboBox->setGeometry(rect);
+        comboBox->show();
+
+        connect(comboBox, &QComboBox::currentTextChanged, this, [this, logicalIndex](const QString& text) {
+            // Emit the signal using const_cast to handle constness
+            emit const_cast<tradetableheaderview*>(this)->filterChanged(logicalIndex, text);
+        });
+
+    }
 
 }
 

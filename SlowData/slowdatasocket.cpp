@@ -419,6 +419,9 @@ void SlowDataSocket::run()
 
     closesocket(sock);
     WSACleanup();
+
+    qDebug()<<"Exiting slow data socket thread....";
+
 }
 
 void SlowDataSocket::sendUDP_TO_Quit(){
@@ -455,6 +458,8 @@ void SlowDataSocket::sendUDP_TO_Quit(){
     }
     closesocket(s);
     WSACleanup();
+
+
 }
 
 

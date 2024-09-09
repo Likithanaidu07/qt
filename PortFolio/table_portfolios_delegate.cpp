@@ -12,9 +12,12 @@
 #include <QValidator>
 #include <QStandardPaths>
 #include <QCheckBox>
+#include "qsortfilterproxymodel.h"
+
 
 Table_Portfolios_Delegate::Table_Portfolios_Delegate(QObject *parent)  : QStyledItemDelegate{parent}
 {
+
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
     QStringList groups = settings.childGroups();
@@ -36,6 +39,12 @@ Table_Portfolios_Delegate::Table_Portfolios_Delegate(QObject *parent)  : QStyled
 
 }
 
+void Table_Portfolios_Delegate::setHighlightText(const QString &text) {
+    // Implement logic to store and handle highlight text
+    m_highlightText = text;
+
+}
+
 bool Table_Portfolios_Delegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)
 {
     if (event->type() == QEvent::MouseButtonRelease && index.column() == PortfolioData_Idx::_Status)
@@ -52,8 +61,43 @@ bool Table_Portfolios_Delegate::editorEvent(QEvent *event, QAbstractItemModel *m
         if (imageRect.contains(mouseEvent->pos()))
         {
             // Handle the click on the image
-            qDebug() << "Image Clicked!";
-            model->setData(index, index.data(Qt::ItemIsUserCheckable).value<Qt::CheckState>(), Qt::ItemIsUserCheckable);
+           // qDebug() << "Image Clicked!";
+           // qDebug() << "Model type:" << index.model()->metaObject()->className();
+          //  qDebug() << "Column:" << index.column() << "Row:" << index.row();
+            //model->setData(index, index.data(Qt::ItemIsUserCheckable).value<Qt::CheckState>(), Qt::ItemIsUserCheckable);
+            const QSortFilterProxyModel *proxyModel = qobject_cast<const QSortFilterProxyModel*>(index.model());
+
+            if (proxyModel) {
+                if (!index.isValid()) {
+                    qDebug() << "Invalid index passed!";
+                    return true;
+                }
+
+                QModelIndex sourceIndex = proxyModel->mapToSource(index);
+
+                if (!sourceIndex.isValid()) {
+                    qDebug() << "Invalid source index after mapping!";
+                    return true;
+                }
+
+                proxyModel->sourceModel()->setData(sourceIndex, sourceIndex.data(Qt::CheckStateRole).value<Qt::CheckState>(), Qt::CheckStateRole);
+            } else {
+                if (!index.isValid()) {
+                    qDebug() << "Invalid index passed to non-proxy model!";
+                    return true;
+                }
+
+                model->setData(index, index.data(Qt::CheckStateRole).value<Qt::CheckState>(), Qt::CheckStateRole);
+            }
+
+
+
+
+           // bool checked = index.data(Qt::CheckStateRole).toBool();
+           // model->setData(sourceIndex, !checked, Qt::CheckStateRole);
+           // model->setData(sourceIndex, sourceIndex.data(Qt::CheckStateRole).value<Qt::CheckState>(), Qt::ItemIsUserCheckable);
+            return true;
+
             // If you need to stop further processing of the event, you can use event->accept();
             // event->accept();
         }
@@ -75,7 +119,7 @@ QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOp
     }
     else if( c == PortfolioData_Idx::_Alias ){
         QLineEdit *editor = new QLineEdit(parent);
-      //  editor->setValidator(new QIntValidator(0, 9999));
+        //  editor->setValidator(new QIntValidator(0, 9999));
         editor->installEventFilter(const_cast<Table_Portfolios_Delegate *>(this));
         return editor;
     }
@@ -97,6 +141,16 @@ QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOp
 
         return editor;
     }
+    else if(c == PortfolioData_Idx::_MaxLoss){
+      QLineEdit *editor = new QLineEdit(parent);
+      if(market_type=="fo")
+          editor->setValidator(new DiffValidator(0, 9999.99, FO_DECIMAL_PRECISION,false, editor));
+      else
+          editor->setValidator(new DiffValidator(0, 9.9995, CDS_DECIMAL_PRECISION,true, editor));
+      editor->installEventFilter(const_cast<Table_Portfolios_Delegate *>(this));
+
+      return editor;
+  }
     else
     {
         return QStyledItemDelegate::createEditor(parent, option, index);
@@ -113,10 +167,11 @@ void Table_Portfolios_Delegate::setEditorData(QWidget *editor, const QModelIndex
         c==PortfolioData_Idx::_SellTotalQuantity ||
         c==PortfolioData_Idx::_BuyTotalQuantity ||
         c==PortfolioData_Idx::_OrderQuantity ||
-        c==PortfolioData_Idx::_Alias)
+        c==PortfolioData_Idx::_Alias||
+        c==PortfolioData_Idx::_MaxLoss)
     {
         QString value = index.model()->data(index, Qt::EditRole).toString();
-       // qDebug()<<"Table_Portfolios_Delegate::setEditorData: "<<value;
+        // qDebug()<<"Table_Portfolios_Delegate::setEditorData: "<<value;
 
         if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor))
         {
@@ -133,23 +188,11 @@ void Table_Portfolios_Delegate::setEditorData(QWidget *editor, const QModelIndex
 
 }
 
-
+/*
 void Table_Portfolios_Delegate::setModelData(QWidget *editor, QAbstractItemModel *model,  const QModelIndex &index) const
 {
     int c= index.column();
-    //clean-code remove code once status coulmn stable
-    // if(c == PortfolioData_Idx::_Status ){
-    //    QCheckBox* check = static_cast<QCheckBox*>(editor);
-    //    int value =check->isChecked();
 
-    //     if(value==SwitchState::Checked)
-    //         value = SwitchState::Unchecked;
-    //     else if (value==SwitchState::Unchecked)
-    //         value = SwitchState::Checked;
-
-    //     model->setData(index, value, Qt::EditRole);
-
-    // }
     if(c==PortfolioData_Idx::_SellPriceDifference ||
         c==PortfolioData_Idx::_BuyPriceDifference ||
         c==PortfolioData_Idx::_SellTotalQuantity ||
@@ -161,7 +204,7 @@ void Table_Portfolios_Delegate::setModelData(QWidget *editor, QAbstractItemModel
         {
             bool ok;
             QString str = lineEdit->text();
-            qDebug()<<"Table_Portfolios_Delegate::setModelData: "<<str;
+            //qDebug()<<"Table_Portfolios_Delegate::setModelData: "<<str;
             double value = str.toDouble(&ok);
             if (ok)
             {
@@ -197,6 +240,51 @@ void Table_Portfolios_Delegate::setModelData(QWidget *editor, QAbstractItemModel
 
     }
 
+}*/
+void Table_Portfolios_Delegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
+{
+    const QSortFilterProxyModel *proxyModel = qobject_cast<const QSortFilterProxyModel *>(model);
+    QModelIndex sourceIndex = index;
+
+    // If the model is a proxy model, map to the source index
+    if (proxyModel) {
+        sourceIndex = proxyModel->mapToSource(index);
+        model = const_cast<QAbstractItemModel *>(proxyModel->sourceModel());
+    }
+
+    int c = sourceIndex.column();
+
+    // Process numerical columns
+    if (c == PortfolioData_Idx::_SellPriceDifference ||
+        c == PortfolioData_Idx::_BuyPriceDifference ||
+        c == PortfolioData_Idx::_SellTotalQuantity ||
+        c == PortfolioData_Idx::_BuyTotalQuantity ||
+        c == PortfolioData_Idx::_OrderQuantity ||
+        c == PortfolioData_Idx::_MaxLoss)
+    {
+        if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor)) {
+            bool ok;
+            QString str = lineEdit->text();
+            double value = str.toDouble(&ok);
+
+            if (ok) {
+                model->setData(sourceIndex, value, Qt::EditRole);
+                lineEdit->setAlignment(Qt::AlignCenter);
+            }
+        } else {
+            QStyledItemDelegate::setModelData(editor, model, sourceIndex);
+        }
+    }
+    // Process alias column
+    else if (c == PortfolioData_Idx::_Alias) {
+        if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor)) {
+            QString str = lineEdit->text();
+            model->setData(sourceIndex, str, Qt::EditRole);
+            lineEdit->setAlignment(Qt::AlignCenter);
+        } else {
+            QStyledItemDelegate::setModelData(editor, model, sourceIndex);
+        }
+    }
 }
 
 void Table_Portfolios_Delegate::updateEditorGeometry(QWidget *editor, const QStyleOptionViewItem &option,  const QModelIndex &/* index */) const
@@ -214,13 +302,16 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
             PortfolioData_Idx::_BuyPriceDifference,
             PortfolioData_Idx::_SellTotalQuantity,
             PortfolioData_Idx::_BuyTotalQuantity,
-            PortfolioData_Idx::_OrderQuantity
+            PortfolioData_Idx::_OrderQuantity,
+            PortfolioData_Idx::_MaxLoss
         }; // these are the editable table cell indexes in the algo table
 
         if (editableIDx.contains(currentColIdx))
         {
             double incStep = quantity_incrementer;
-            if (currentColIdx == PortfolioData_Idx::_SellPriceDifference || currentColIdx == PortfolioData_Idx::_BuyPriceDifference){
+            if (currentColIdx == PortfolioData_Idx::_SellPriceDifference ||
+                currentColIdx == PortfolioData_Idx::_BuyPriceDifference ||
+                currentColIdx == PortfolioData_Idx::_MaxLoss){
                 incStep = price_diff_incrementer;
             }
             QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
@@ -278,8 +369,20 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                         double currentValue = lineEdit->text().toDouble();
                         double multiplied = round(currentValue * 20.0);
                         double newvalue = multiplied / 20.0;
-                        mutableModel = const_cast<QAbstractItemModel *>(currentIndex.model());
-                        mutableModel->setData(currentIndex, newvalue, Qt::EditRole);
+                      //  mutableModel = const_cast<QAbstractItemModel *>(currentIndex.model());
+                      //  mutableModel->setData(currentIndex, newvalue, Qt::EditRole);
+                        const QSortFilterProxyModel *proxyModel = qobject_cast<const QSortFilterProxyModel *>(currentIndex.model());
+                        QModelIndex sourceIndex = currentIndex;
+                        if (proxyModel) {
+                            sourceIndex = proxyModel->mapToSource(currentIndex);
+                            mutableModel = const_cast<QAbstractItemModel *>(proxyModel->sourceModel());
+                        } else {
+                            mutableModel = const_cast<QAbstractItemModel *>(currentIndex.model());
+                        }
+                        mutableModel->setData(sourceIndex, newvalue, Qt::EditRole);
+
+
+
                         // Close the editor and commit the data
                         emit commitData(lineEdit);
                         emit closeEditor(lineEdit);
@@ -308,8 +411,16 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                     {
                         QString  currentValue = lineEdit->text();
 
-                        mutableModel = const_cast<QAbstractItemModel *>(currentIndex.model());
-                        mutableModel->setData(currentIndex, currentValue, Qt::EditRole);
+                        const QSortFilterProxyModel *proxyModel = qobject_cast<const QSortFilterProxyModel *>(currentIndex.model());
+                        QModelIndex sourceIndex = currentIndex;
+                        if (proxyModel) {
+                            sourceIndex = proxyModel->mapToSource(currentIndex);
+                            mutableModel = const_cast<QAbstractItemModel *>(proxyModel->sourceModel());
+                        } else {
+                            mutableModel = const_cast<QAbstractItemModel *>(currentIndex.model());
+                        }
+                        mutableModel->setData(sourceIndex, currentValue, Qt::EditRole);
+
                         // Close the editor and commit the data
                         emit commitData(lineEdit);
                         emit closeEditor(lineEdit);
@@ -349,25 +460,40 @@ QSize Table_Portfolios_Delegate::sizeHint(const QStyleOptionViewItem &option, co
     return size;
 }
 
+
+
 void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
+
+
     auto c= index.column();
-    auto r= index.row();
     QStyleOptionViewItem op(option);
 
-    if(option.state & QStyle::State_MouseOver) {
-        if(c==PortfolioData_Idx::_AlgoName)
-            painter->fillRect(option.rect, Qt::black);
-        QStyledItemDelegate::paint(painter, op, index);
+    const QSortFilterProxyModel *proxyModel = qobject_cast<const QSortFilterProxyModel*>(index.model());
+    QModelIndex sourceIndex = proxyModel->mapToSource(index);
+    const Table_Portfolios_Model *portfolioModel = qobject_cast<const Table_Portfolios_Model*>(proxyModel->sourceModel());
+    PortfolioObject *portfolio = portfolioModel->getPortFolioAt(sourceIndex.row());
+
+
+    if (!portfolio) {
+        return;
     }
+
+    QColor textColor(108, 117, 125);
+    QPen pen(textColor);
+
+    pen.setWidthF(0.5);
+    painter->setPen(pen);
+    QColor HighlightColor("#42A5F5");
+
 
     if(c == PortfolioData_Idx::_Status)
     {
         QPixmap checkboxPixmap(10,10);
         checkboxPixmap.fill(Qt::transparent); // Fill with transparent background
-
         QStyleOptionButton checkboxOption;
-        checkboxOption.state |= index.data(Qt::ItemIsUserCheckable).toBool() ? QStyle::State_On : QStyle::State_Off;
+        checkboxOption.state |= (index.data(Qt::CheckStateRole).toInt() == Qt::Checked) ? QStyle::State_On : QStyle::State_Off;
+
         checkboxOption.rect = checkboxPixmap.rect(); // Adjust rect for drawing on the pixmap
 
         // Manually draw the checkbox on the pixmap
@@ -376,10 +502,6 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         // Draw the pixmap with the updated position
         QRect rect(option.rect.left(), option.rect.top(), checkboxRect.width(), checkboxRect.height());  // Adjusted rect position
 
-        Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-        PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
-
-        //42A5F5
         QColor color("#42A5F5");
         op.palette.setColor(QPalette::Highlight , color);
 
@@ -389,11 +511,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText , Qt::black);
             painter->fillRect(option.rect,  color);
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
+
             QPoint p1= option.rect.bottomLeft();
             QPoint p2= option.rect.bottomRight();
             p1.setX(p1.x()-5);
@@ -413,11 +531,6 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         {
             QColor color("#FFF");
             painter->fillRect(option.rect, color);
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
 
             // Load an example image (replace with your logic to get the image)
@@ -434,26 +547,20 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
     }
 
-    if (/*c == PortfolioData_Idx::_Status ||*/ c==PortfolioData_Idx::_PortfolioNumber || c==PortfolioData_Idx::_AlgoName)
+    else if (c==PortfolioData_Idx::_PortfolioNumber || c==PortfolioData_Idx::_AlgoName)
     {
 
-        Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-        PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+        //  Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+        //   PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
 
         //42A5F5
-        QColor color("#42A5F5");
-        op.palette.setColor(QPalette::Highlight , color);
-
+       op.palette.setColor(QPalette::Highlight , HighlightColor);
 
         if(portfolio->StatusVal.toInt()==portfolio_status::Active){
-            QColor color("#E0F1FF");
-            painter->fillRect(option.rect, color);
-
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
+            if (option.state & QStyle::State_Selected)
+                painter->fillRect(option.rect, HighlightColor);
+            else
+                painter->fillRect(option.rect, QColor("#E0F1FF"));
             QPoint p1= option.rect.bottomLeft();
             QPoint p2= option.rect.bottomRight();
             p1.setX(p1.x()-5);
@@ -463,36 +570,28 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         else if(portfolio->StatusVal.toInt()==portfolio_status::Filled)
         {
             QColor color("#E0F1FF");
-            painter->fillRect(option.rect, color);
-
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
+            if (option.state & QStyle::State_Selected)
+                painter->fillRect(option.rect, HighlightColor);
+            else
+                painter->fillRect(option.rect, color);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
         }
         else if(portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser){
             QColor color("#FFF");
-            painter->fillRect(option.rect, color);
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
+            if (option.state & QStyle::State_Selected)
+                painter->fillRect(option.rect, HighlightColor);
+            else
+                painter->fillRect(option.rect, color);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
         }
 
 
         if(portfolio->TradedHighlight== true ){
             QColor color("#cfc0ce");
-            painter->fillRect(option.rect, color);
-
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
+            if (option.state & QStyle::State_Selected)
+                painter->fillRect(option.rect, HighlightColor);
+            else
+                painter->fillRect(option.rect, color);
             QPoint p1= option.rect.bottomLeft();
             QPoint p2= option.rect.bottomRight();
             p1.setX(p1.x()-5);
@@ -500,33 +599,20 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->drawLine(p1,p2);
         }
 
-        QStyledItemDelegate::paint(painter, op, index);
+        //QStyledItemDelegate::paint(painter, op, index);
     }
     else if(c==PortfolioData_Idx::_BuyMarketRate || c==PortfolioData_Idx::_BuyAveragePrice || c==PortfolioData_Idx::_BuyPriceDifference || c==PortfolioData_Idx::_BuyTotalQuantity || c==PortfolioData_Idx::_BuyTradedQuantity || c==PortfolioData_Idx::_BuyRemainingQuantity){
         QStyleOptionViewItem op(option);
 
 
-        if(c==PortfolioData_Idx::_BuyMarketRate){
-            double borderWidth = 1;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
+        if(c==PortfolioData_Idx::_BuyMarketRate){            
             painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
         }
-
-        Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-        PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
         if(portfolio->StatusVal.toInt()==portfolio_status::Active){
             QColor color("#D6FCF0");
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText , Qt::black);
             painter->fillRect(option.rect,  color);
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
             QPoint p1= option.rect.bottomLeft();
             QPoint p2= option.rect.bottomRight();
             p1.setX(p1.x()-5);
@@ -539,11 +625,6 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText , Qt::black);
             painter->fillRect(option.rect, color);
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
         }
         else if(portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser){
@@ -551,39 +632,24 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText , Qt::black);
             painter->fillRect(option.rect, color);
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
         }
-        QStyledItemDelegate::paint(painter, op, index);
+        //QStyledItemDelegate::paint(painter, op, index);
     }
     else if(c==PortfolioData_Idx::_SellMarketRate || c==PortfolioData_Idx::_SellAveragePrice || c==PortfolioData_Idx::_SellPriceDifference || c==PortfolioData_Idx::_SellTotalQuantity || c==PortfolioData_Idx::_SellTradedQuantity || c==PortfolioData_Idx::_SellRemainingQuantity){
         QStyleOptionViewItem op(option);
 
-        if(c==PortfolioData_Idx::_SellMarketRate){
-            double borderWidth = 1;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
+        if(c==PortfolioData_Idx::_SellMarketRate){           
             painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
         }
 
-        Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-        PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+        // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+        // PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
         if(portfolio->StatusVal.toInt()==portfolio_status::Active){
             QColor color("#FED9D9");
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText , Qt::black);
             painter->fillRect(option.rect,  color);
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
             QPoint p1= option.rect.bottomLeft();
             QPoint p2= option.rect.bottomRight();
             p1.setX(p1.x()-5);
@@ -596,11 +662,6 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText , Qt::black);
             painter->fillRect(option.rect, color);
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
         }
         else if(portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser){
@@ -608,98 +669,82 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText , Qt::black);
             painter->fillRect(option.rect, color);
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
         }
-        QStyledItemDelegate::paint(painter, op, index);
+        //QStyledItemDelegate::paint(painter, op, index);
     }
     else if(c==PortfolioData_Idx::_OrderQuantity
-               || c==PortfolioData_Idx::_Alias
-               || c == PortfolioData_Idx::_Leg1
-               || c==PortfolioData_Idx::_ExpiryDateTime
-               || c==PortfolioData_Idx::_Cost
-               || c==PortfolioData_Idx::_InstrumentName
-               || c==PortfolioData_Idx::_Leg2
-               || c==PortfolioData_Idx::_Leg3
-               || c==PortfolioData_Idx::_AdditionalData1
-               || c==PortfolioData_Idx::_PortfolioType
-               || c==PortfolioData_Idx::_Price
-            //   || c==PortfolioData_Idx::_SkipMarketStrike
-               || c==PortfolioData_Idx::_QuantityRatio
-               || c==PortfolioData_Idx::_BidLeg
-               || c==PortfolioData_Idx:: _FuturePrice)
+             || c==PortfolioData_Idx::_Alias
+             || c==PortfolioData_Idx::_MaxLoss
+             || c == PortfolioData_Idx::_Leg1
+             || c==PortfolioData_Idx::_ExpiryDateTime
+             || c==PortfolioData_Idx::_Cost
+             || c==PortfolioData_Idx::_InstrumentName
+             || c==PortfolioData_Idx::_Leg2
+             || c==PortfolioData_Idx::_Leg3
+             || c==PortfolioData_Idx::_AdditionalData1
+             || c==PortfolioData_Idx::_PortfolioType
+             || c==PortfolioData_Idx::_Price
+             //   || c==PortfolioData_Idx::_SkipMarketStrike
+             || c==PortfolioData_Idx::_QuantityRatio
+             || c==PortfolioData_Idx::_BidLeg
+             || c==PortfolioData_Idx:: _FuturePrice)
     {
         QStyleOptionViewItem op(option);
         QColor color("#42A5F5");
         op.palette.setColor(QPalette::Highlight , color);
 
         if(c==PortfolioData_Idx::_ExpiryDateTime){
-            double borderWidth = 1;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
             painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
         }
 
-        Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-        PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+        // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+        //  PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
         if(portfolio->StatusVal.toInt()==portfolio_status::Active){
             QColor color("#E0F1FF");
             painter->fillRect(option.rect,  color);
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
         }
         else if(portfolio->StatusVal.toInt()==portfolio_status::Filled){
             QColor color("#E0F1FF");
             painter->fillRect(option.rect, color);
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
         }
         else if(portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser){
             QColor color("#FFF");
             painter->fillRect(option.rect, color);
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
         }
 
         if(portfolio->TradedHighlight== true ){
             QColor color("#cfc0ce");
             painter->fillRect(option.rect, color);
-
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
             QPoint p1= option.rect.bottomLeft();
             QPoint p2= option.rect.bottomRight();
             p1.setX(p1.x()-5);
             p2.setX(p2.x()+5);
             painter->drawLine(p1,p2);
         }
-        QStyledItemDelegate::paint(painter, op, index);
+
+
+
+        if (option.state & QStyle::State_Selected && (c==PortfolioData_Idx::_AlgoName ||
+                                                      c==PortfolioData_Idx::_MaxLoss||
+                                                      c==PortfolioData_Idx::_ExpiryDateTime ||
+                                                      c==PortfolioData_Idx::_Cost||
+                                                      c==PortfolioData_Idx::_QuantityRatio||
+                                                      c==PortfolioData_Idx::_BidLeg||
+                                                      c==PortfolioData_Idx::_FuturePrice)){
+            painter->fillRect(option.rect, HighlightColor);
+        }
+
+
+       // QStyledItemDelegate::paint(painter, op, index);
     }
-    if (/*c == PortfolioData_Idx::_Status ||*/ c==PortfolioData_Idx::_OrderQuantity||c==PortfolioData_Idx::_Alias)
+    if (c==PortfolioData_Idx::_OrderQuantity||c==PortfolioData_Idx::_Alias)
     {
-        Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
-        PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
+        // Table_Portfolios_Model *model = (Table_Portfolios_Model*) index.model();
+        //  PortfolioObject *portfolio = model->portfolio_data_list.at(index.row());
 
         //42A5F5
         QColor color("#42A5F5");
@@ -710,12 +755,6 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText , Qt::black);
             painter->fillRect(option.rect, color);
-
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
             QPoint p1= option.rect.bottomLeft();
             QPoint p2= option.rect.bottomRight();
             p1.setX(p1.x()-5);
@@ -728,12 +767,6 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText , Qt::black);
             painter->fillRect(option.rect, color);
-
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
         }
         else if(portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser){
@@ -741,14 +774,133 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             op.palette.setColor(QPalette::Highlight , Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText , Qt::black);
             painter->fillRect(option.rect, color);
-            double borderWidth = 0.5;
-            QColor myColor(108, 117, 125);
-            QPen pen(myColor);
-            pen.setWidthF(borderWidth);
-            painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
         }
 
-        QStyledItemDelegate::paint(painter, op, index);
+
+
     }
+
+    //draw  text section
+    if(c!=PortfolioData_Idx::_Status){
+
+        QString text = index.data(Qt::DisplayRole).toString();
+        int startIndex = text.indexOf(m_highlightText, 0, Qt::CaseInsensitive);
+        QStyleOptionViewItem opt = option;
+        initStyleOption(&opt, index);
+
+
+        // Set a clipping region to ensure drawing only happens within the cell bounds
+        painter->save();  // Save the painter state
+        painter->setClipRect(opt.rect);  // Set the clipping area to the cell's rectangle
+        if (option.state & QStyle::State_Selected && (c==PortfolioData_Idx::_AlgoName ||
+                                                      c==PortfolioData_Idx::_ExpiryDateTime ||
+                                                      c==PortfolioData_Idx::_Cost||
+                                                      c==PortfolioData_Idx::_QuantityRatio||
+                                                      c==PortfolioData_Idx::_BidLeg||
+                                                      c==PortfolioData_Idx::_FuturePrice)){
+            painter->setPen(opt.palette.color(QPalette::Light));  // Set the text color
+        }
+        else{
+            painter->setPen(opt.palette.color(QPalette::Text));  // Set the text color
+        }
+
+        painter->setFont(opt.font);
+
+        //if match found draw text and background hilight color
+        if (startIndex >= 0) {
+            // Split the text into before, match, and after parts
+            QString before = text.left(startIndex);
+            QString match = text.mid(startIndex, m_highlightText.length());
+            QString after = text.mid(startIndex + m_highlightText.length());
+
+            // Measure the width of the entire text (before + match + after) centered
+            QRect fullTextRect = painter->boundingRect(opt.rect, Qt::AlignCenter, text);
+
+            // Calculate the width of the "before" part
+            int beforeWidth = painter->fontMetrics().horizontalAdvance(before);
+
+            // Calculate the width of the highlighted "match" part
+            int matchWidth = painter->fontMetrics().horizontalAdvance(match);
+
+            // Calculate the position of the highlighted text relative to the centered text
+            int highlightStartX = fullTextRect.left() + beforeWidth;
+            QRect highlightRect(highlightStartX, opt.rect.top(), matchWidth, opt.rect.height());
+
+            // Fill the background with yellow for the highlighted part
+            painter->fillRect(highlightRect, Qt::yellow);
+
+
+
+            // Draw the entire text, centered
+            painter->drawText(opt.rect, Qt::AlignCenter, before + match + after);
+
+
+        }
+        else {
+            // If no match, just draw the text normally
+            painter->drawText(option.rect, Qt::AlignCenter, text);
+
+        }
+        painter->restore();
+
+    }
+
+    /*if(c!=PortfolioData_Idx::_Status){
+        if (m_highlightText.isEmpty()) {
+            QStyledItemDelegate::paint(painter, option, index);
+        }
+        else {
+            QString text = index.data(Qt::DisplayRole).toString();
+            QTextOption textOption;
+            textOption.setAlignment(option.displayAlignment);
+            QRect rect = option.rect;
+
+            // Save painter state
+            painter->save();
+
+            // Use the default font and alignment from option
+            painter->setFont(option.font);
+            painter->setPen(option.palette.color(QPalette::Text));
+
+            // Find the start index of the search text (case-insensitive)
+            int startIndex = text.indexOf(m_highlightText, 0, Qt::CaseInsensitive);
+            if (startIndex >= 0) {
+                // Split the text into before, match, and after parts
+                QString before = text.left(startIndex);
+                QString match = text.mid(startIndex, m_highlightText.length());
+                QString after = text.mid(startIndex + m_highlightText.length());
+
+                // Draw the "before" text (non-highlighted)
+                QRect beforeRect = painter->boundingRect(rect, Qt::AlignLeft, before);
+                painter->drawText(beforeRect, before, textOption);
+
+                // Calculate the rectangle for the highlighted text
+                QRect matchRect = painter->boundingRect(rect, Qt::AlignLeft, before + match);
+
+                // Set yellow background for the highlighted text
+                QRect highlightRect(beforeRect.right(), rect.top(), matchRect.width() - beforeRect.width(), rect.height());
+                painter->fillRect(highlightRect, Qt::yellow);  // Fill with yellow color
+
+                // Draw the highlighted text on top of the yellow background
+                painter->setPen(Qt::black);  // Change pen color to black for highlighted text
+                painter->drawText(highlightRect, match, textOption);
+
+                // Draw the "after" text (non-highlighted)
+                QRect afterRect = painter->boundingRect(rect, Qt::AlignLeft, text);
+                afterRect.setLeft(matchRect.right());
+                painter->setPen(option.palette.color(QPalette::Text));  // Reset pen to default color
+                painter->drawText(afterRect, after, textOption);
+            } else {
+                // If no match, draw the entire text as normal
+                painter->drawText(rect, text, textOption);
+            }
+
+            // Restore painter state
+            painter->restore();
+        }
+    }*/
+
+
+   delete portfolio;
 }

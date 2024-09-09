@@ -119,7 +119,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
         bool ok = checkDBOpened(msg);
         userLoginInfo.loginResponse = msg;
         if(ok){
-            QSqlQuery query("SELECT UserId, UserName,Password,STKOpenLimit,IDXOpenLimit,MaxPortfolioCount,BFLY_BIDInFilter,BYInFilter,F2FInFilter,CRInFilter FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
+            QSqlQuery query("SELECT UserId, UserName,Password,STKOpenLimit,IDXOpenLimit,MaxPortfolioCount,BFLY_BIDInFilter,BYInFilter,F2FInFilter,CRInFilter,F1_F2InFilter FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
             if(!query.exec())
             {
                 // Error Handling, check query.lastError(), probably return
@@ -165,10 +165,25 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
 
                     userLoginInfo.UserName = query.value(rec.indexOf("UserName")).toString();
                     userNameLogged=userLoginInfo.UserName;
-                    userLoginInfo.algoFilterMap[PortfolioType::BFLY_BID] = query.value(rec.indexOf("BFLY_BIDInFilter")).toString();
-                    userLoginInfo.algoFilterMap[PortfolioType::BY] = query.value(rec.indexOf("BYInFilter")).toString();
-                    userLoginInfo.algoFilterMap[PortfolioType::F2F] = query.value(rec.indexOf("F2FInFilter")).toString();
-                    userLoginInfo.algoFilterMap[PortfolioType::CR] = query.value(rec.indexOf("CRInFilter")).toString();
+
+                    QStringList InstrumentTypeAll;
+                    InstrumentTypeAll << "FUTIDX" << "OPTIDX" << "FUTSTK" << "OPTSTK";
+
+                    QString BFLY_BIDInFilter = query.value(rec.indexOf("BFLY_BIDInFilter")).toString();
+                    userLoginInfo.algoFilterMap[PortfolioType::BFLY_BID] =  (BFLY_BIDInFilter.isNull() || BFLY_BIDInFilter.trimmed().isEmpty())  ? InstrumentTypeAll  : BFLY_BIDInFilter.split(",");
+
+                    QString BYInFilter = query.value(rec.indexOf("BYInFilter")).toString();
+                    userLoginInfo.algoFilterMap[PortfolioType::BY] =  (BYInFilter.isNull() || BYInFilter.trimmed().isEmpty())  ? InstrumentTypeAll  : BYInFilter.split(",");
+
+                    QString F2FInFilter = query.value(rec.indexOf("F2FInFilter")).toString();
+                    userLoginInfo.algoFilterMap[PortfolioType::F2F] =  (F2FInFilter.isNull() || F2FInFilter.trimmed().isEmpty())  ? InstrumentTypeAll  : F2FInFilter.split(",");
+
+                    QString CRInFilter = query.value(rec.indexOf("CRInFilter")).toString();
+                    userLoginInfo.algoFilterMap[PortfolioType::CR] =  (CRInFilter.isNull() || CRInFilter.trimmed().isEmpty())  ? InstrumentTypeAll  : CRInFilter.split(",");
+
+
+                    QString F1_F2InFilter = query.value(rec.indexOf("F1_F2InFilter")).toString();
+                    userLoginInfo.algoFilterMap[PortfolioType::F1_F2] =  (F1_F2InFilter.isNull() || F1_F2InFilter.trimmed().isEmpty())  ? InstrumentTypeAll  : F1_F2InFilter.split(",");
 
                     userLoginInfo.UserId = query.value(rec.indexOf("UserId")).toInt();
                     userLoginInfo.MaxPortfolioCount = query.value(rec.indexOf("MaxPortfolioCount")).toInt();
@@ -303,7 +318,7 @@ void  mysql_conn::getSummaryTableData(int &OrderCount,QString user_id)
 
 
 
-void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount,Table_Portfolios_Model *model, Combined_Tracker_Table_Model *comb_tracker_model, QHash<QString, PortfolioAvgPrice> &averagePriceList, QString user_id, QStringList TradedPortFolioList )
+void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount, Combined_Tracker_Table_Model *comb_tracker_model, QHash<QString, PortfolioAvgPrice> &averagePriceList, QString user_id, QStringList TradedPortFolioList,QStringList &PortFoliosToDelete )
 {
     QMutexLocker lock(&mutex);
     // int editing_state = portfolio_table_editing.loadRelaxed();
@@ -368,6 +383,10 @@ void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoC
                 PortfolioObject *o = new PortfolioObject();
                 if(!p.ToObject(query,*o,MBP_Data_Hash,averagePriceList,devicer,decimal_precision)){
                     //show warning an delete portfolio
+                    PortFoliosToDelete.append(QString::number(o->PortfolioNumber));
+                    delete o;
+
+                    continue;
                 }
                 //o->BuyTotalQuantity = QDateTime::currentSecsSinceEpoch(); // this need to remove
 
@@ -422,12 +441,12 @@ void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoC
             //if(portfolio_table_editing.loadRelaxed()==0&&editing_state==portfolio_table_editing.loadRelaxed())
 
             //sort PortfolioObjectList based on the custom sort order
-
+            bool clearTableFlg = false;
             if(portfolio_table_updating_db.loadRelaxed()==0){
                 if(reloadSortSettFlg.loadRelaxed()==1){
                     reloadSortSettFlg.storeRelaxed(0);
                     portfolioCustomSort->loadSortConfig();
-                    model->clearTable();
+                    clearTableFlg=true;//model->clearTable();
                 }
                 QVector<int> sortRank = portfolioCustomSort->sortPortFolio(algoNameList);
                 QList<PortfolioObject*> PortfolioObjectList_Sorted(PortfolioObjectList.size(), nullptr);
@@ -438,8 +457,8 @@ void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoC
                    }
                 PortfolioObjectList.clear();
 
-
-                model->setDataList(PortfolioObjectList_Sorted);
+                emit updateModelDataListSignal(PortfolioObjectList_Sorted,clearTableFlg);
+                //model->setDataList(PortfolioObjectList_Sorted);
             }
         }
     }
@@ -588,6 +607,40 @@ QSqlQuery mysql_conn::runQuery(QString qry_str){
 
 }
 
+
+bool mysql_conn::resetPassword(const QString &new_password, QString user_id,QString &msg)
+{
+   // QString reset_querystr;
+   // QString reset_querystr = "UPDATE rt_usertable SET OldPassword03 = OldPassword02,OldPassword02 = OldPassword01,OldPassword01 = Password, Password = '"+new_password+"' WHERE UserId = '"+user_id+"'";
+    QString reset_querystr = "UPDATE rt_usertable SET OldPassword03 = OldPassword02, OldPassword02 = OldPassword01, OldPassword01 = Password, Password = '"+new_password+"' WHERE UserId ='"+user_id+"';";
+   // QSqlQuery query(reset_querystr, db);
+
+    qDebug()<<"DB Update Query: "<<reset_querystr;
+    QMutexLocker lock(&mutex);
+
+    bool ret = false;
+
+
+    bool ok = checkDBOpened(msg);
+    if(ok){
+
+        QSqlQuery query(reset_querystr, db);
+        if( !query.exec() )
+        {
+
+            msg = reset_querystr+" failed, "+ query.lastError().text();
+            ret = false;
+        }
+        else{
+            qDebug()<<"Updated Data base successfully.";
+            ret = true;
+        }
+
+    }
+
+    return ret;
+}
+
 bool mysql_conn::updateDB_Table(QString query_str, QString &msg)
 {
     qDebug()<<"DB Update Query: "<<query_str;
@@ -636,6 +689,12 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
     }
     else if(algo_type==PortfolioType::CR){
         Algo_Name = "CR-";//Nifty-17000";
+        //            QString StockName = ContractDetail::getInstance().GetStockName(leg2_token_number);
+        //            StockName.chop(2);
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type);
+    }
+    else if(algo_type==PortfolioType::CR_JELLY){
+        Algo_Name = "CRJELLY-";//Nifty-17000";
         //            QString StockName = ContractDetail::getInstance().GetStockName(leg2_token_number);
         //            StockName.chop(2);
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type);
@@ -746,6 +805,20 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
                     break;
                 }
                 case PortfolioType::CR:{
+                    int strikePrice = ContractDetail::getInstance().GetStrikePrice(leg2_token_number,portfolio_type).toInt();
+                    if(Leg1BuySellIndicator==1){
+                        float diff = -leg1Price - leg3Price + leg2Price + strikePrice;
+                        Exch_Price_val = static_cast<double>(diff) / devicer;
+                    }
+                    else{
+                        float diff = -leg2Price - strikePrice + leg3Price + leg1Price;
+                        Exch_Price_val = static_cast<double>(diff) / devicer;
+                    }
+
+
+                    break;
+                }
+                case PortfolioType::CR_JELLY:{
                     int strikePrice = ContractDetail::getInstance().GetStrikePrice(leg2_token_number,portfolio_type).toInt();
                     if(Leg1BuySellIndicator==1){
                         float diff = -leg1Price - leg3Price + leg2Price + strikePrice;
@@ -980,6 +1053,9 @@ QList <QStringList> liners_listTmp;
                 else if(Leg1_OrderState==7){
                     Leg1_OrderStateStr = "Traded";
                 }
+                else if(Leg1_OrderState==11){
+                    Leg1_OrderStateStr = "Modified";
+                }
                 else if(Leg1_OrderState==9){
                     Leg1_OrderStateStr = "Open";
                 }
@@ -1014,6 +1090,9 @@ QList <QStringList> liners_listTmp;
                 }
                 else if(Leg3_OrderState==9){
                     Leg3_OrderStateStr = "Open";
+                }
+                else if(Leg3_OrderState==11){
+                    Leg3_OrderStateStr = "Modified";
                 }
                 else if(Leg3_OrderState==10){
                     Leg3_OrderStateStr = "ModifyPending";
@@ -1067,22 +1146,27 @@ QList <QStringList> liners_listTmp;
                 //Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")";
                // Leg1_OrderStateStr = Leg1_OrderStateStr+" ("+(QString::number(Leg1_OrderState))+")";
                // Leg3_OrderStateStr = Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")";
-                Leg2_OrderStateStr = Leg2_OrderStateStr+" ("+(QString::number(Leg2_OrderState))+")";
+                Leg2_OrderStateStr = Leg2_OrderStateStr;
+                              //       +" ("+(QString::number(Leg2_OrderState))+")";
                 if(Leg1_OrderState==8)
                 {
-                   Leg1_OrderStateStr = Leg1_OrderStateStr+" ("+(QString::number(Leg1_OrderState))+")"+" "+"["+(QString::number(Leg1_Total_Volume/lotSize))+"]";
+                   Leg1_OrderStateStr = Leg1_OrderStateStr+"["+(QString::number(Leg1_Total_Volume/lotSize))+"]";
+                   // +" ("+(QString::number(Leg1_OrderState))+")"+" "
                 }
                 else
                 {
-                    Leg1_OrderStateStr = Leg1_OrderStateStr+" ("+(QString::number(Leg1_OrderState))+")";
+                   Leg1_OrderStateStr = Leg1_OrderStateStr;
+                                        //+" ("+(QString::number(Leg1_OrderState))+")";
                 }
                 if(Leg3_OrderState==8)
                 {
-                    Leg3_OrderStateStr = Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")"+" "+"["+(QString::number(Leg3_Total_Volume/lotSize))+"]";
+                    Leg3_OrderStateStr = Leg3_OrderStateStr+"["+(QString::number(Leg3_Total_Volume/lotSize))+"]";
+                  // +" ("+(QString::number(Leg3_OrderState))+")"+" "
                 }
                 else
                 {
-                    Leg3_OrderStateStr = Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")";
+                    Leg3_OrderStateStr = Leg3_OrderStateStr;
+                                         //+" ("+(QString::number(Leg3_OrderState))+")";
                 }
 
                 QString Exch_Price = "0";
@@ -1109,6 +1193,21 @@ QList <QStringList> liners_listTmp;
                     break;
                 }
                 case PortfolioType::CR:{
+                    int strikePrice = ContractDetail::getInstance().GetStrikePrice(leg2_token_number,portfolio_type).toInt();
+                    strikePrice = strikePrice * devicer; // GetStrikePrice function will return strikePrice devided by devicer, and in below eqution again devide by devicer, to prevent it multipley it with debvicer
+                    if(Leg1BuySellIndicator==1){
+                        float diff = -leg1Price - leg3Price + leg2Price + strikePrice;
+                        Exch_Price_val = static_cast<double>(diff) / devicer;
+                    }
+                    else{
+                        float diff = -leg2Price - strikePrice + leg3Price + leg1Price;
+                        Exch_Price_val = static_cast<double>(diff) / devicer;
+                    }
+
+
+                    break;
+                }
+                case PortfolioType::CR_JELLY:{
                     int strikePrice = ContractDetail::getInstance().GetStrikePrice(leg2_token_number,portfolio_type).toInt();
                     strikePrice = strikePrice * devicer; // GetStrikePrice function will return strikePrice devided by devicer, and in below eqution again devide by devicer, to prevent it multipley it with debvicer
                     if(Leg1BuySellIndicator==1){
@@ -1540,17 +1639,25 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
 
 
                 QString BuySellIndicator = query.value(rec.indexOf("BuySellIndicator")).toString();
+                if(BuySellIndicator=="1")
+                    BuySellIndicator = "Buy";
+                else
+                    BuySellIndicator = "Sell";
+
                 QString Type = query.value(rec.indexOf("Type")).toString();
-                QString Symbol = query.value(rec.indexOf("Symbol")).toString();
+                int token_number = query.value(rec.indexOf("Symbol")).toInt();
+                QString StockName = ContractDetail::getInstance().GetStockName(token_number,0);
                 QString Message = query.value(rec.indexOf("Message")).toString();
 
 
 
                 int Quantity = query.value(rec.indexOf("Quantity")).toInt();
+                Quantity = ContractDetail::getInstance().GetLotSize(token_number,0);
                 int Portfolio = query.value(rec.indexOf("Portfolio")).toInt();
-                int Price = query.value(rec.indexOf("Price")).toInt();
+                double Price = query.value(rec.indexOf("Price")).toDouble();
+                Price = Price/devicer;
 
-                QString PriceStr = QString::number(Price);
+                QString PriceStr = fixDecimal(Price,decimal_precision);
                 QString QuantityStr = QString::number(Quantity);
                 QString PortfolioStr = QString::number(Portfolio);
 
@@ -1562,7 +1669,7 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                 rowList.append(Type);
                 rowList.append(QuantityStr);
                 rowList.append(PortfolioStr);
-                rowList.append(Symbol);
+                rowList.append(StockName);
                 rowList.append(Message);
                 rowList.append(PriceStr);
                 rowList.append(DateTimeStr);
@@ -1719,26 +1826,115 @@ void mysql_conn::getNetPosTableData_BackUp(double &BuyValue_summary,double &Sell
     }
 }
 
-QMap <int, QHash<QString, contract_table>> mysql_conn::getContractTable(
-    QHash<QString, QStringList> &_m_ContractDetailsFiltered,
-    QStringList &F2F_data_list_Sorted_Key,
-    QStringList &BFLY_data_list_Sorted_Key,
-    QStringList &BFLY_BID_data_list_Sorted_Key,
-    QStringList &CR_data_list_Sorted_Key,
-    userInfo userData)
+QList<PortfolioType> mysql_conn::getPortfolioTypesForInstrumentType(const QString& data, const QMap<PortfolioType, QStringList>& algoFilterMap) {
+    QList<PortfolioType> matchingPortfolios;
+
+    // Iterate through each PortfolioType and QStringList in algoFilterMap
+    for (auto it = algoFilterMap.begin(); it != algoFilterMap.end(); ++it) {
+        // Check if the QStringList for this PortfolioType contains the data
+        if (it.value().contains(data)) {
+            // If found, add the corresponding PortfolioType to the list
+            matchingPortfolios.append(it.key());
+        }
+    }
+
+    return matchingPortfolios;
+}
+
+QHash<QString, contract_table>  mysql_conn::getContractTable( QHash<int , QStringList> &m_ContractDetails_Grouped_,userInfo userData)
 {
 
     QMutexLocker lock(&mutex);
+    QString  queryStr = "SELECT InstrumentType, InstrumentName, OptionType, StrikePrice, LotSize, ExpiryDate, Token, StockName, MinSpread,VolumeFreezeQty,OperatingRangeslowPriceRange,OperatingRangeshighPriceRange FROM Contract ORDER BY ExpiryDate,Token, InstrumentName, OptionType, StrikePrice";
 
-    QMap <int, QHash<QString, contract_table>> contractTableData;
+
+    QHash<QString, contract_table> contractTableData;
     QString msg;
     bool ok = checkDBOpened(msg);
     if(ok)
     {
-        contractTableData[PortfolioType::BFLY_BID] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::BFLY_BID, userData),&db, BFLY_BID_data_list_Sorted_Key);
-        contractTableData[PortfolioType::BY] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::BY,userData),&db, BFLY_data_list_Sorted_Key);
-        contractTableData[PortfolioType::F2F] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::F2F,userData),&db,F2F_data_list_Sorted_Key);
-        contractTableData[PortfolioType::CR] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::CR,userData),&db,CR_data_list_Sorted_Key);
+        QSqlQuery query(queryStr, db);
+        if( !query.exec() )
+        {
+            // Error Handling, check query.lastError(), probably return
+            qDebug()<<"getContractTable: "<<query.lastError().text();
+        }
+        else{
+
+            bool writeContract = true;
+            QString directory = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
+            QDir().mkpath(directory);
+           // QString filename = directory + "/contracts_"+QString::number(userData.UserId)+".bin";
+            QString filename = directory + "/contracts.bin";
+
+            QFile file(filename);
+            if (!file.open(QIODevice::WriteOnly)) {
+                qDebug() << "Waring: Failed to open file: " << filename <<" for contract writing.";
+                writeContract = false;
+            }
+
+           // int size =  m_ContractDetails.size();
+            QDataStream out;
+            if(writeContract)
+                out.setDevice(&file);
+
+            QSqlRecord rec = query.record();
+            while (query.next())
+            {
+                contract_table contractTableTmp;
+                contractTableTmp.InstrumentType = query.value(rec.indexOf("InstrumentType")).toString();
+                contractTableTmp.InstrumentName = query.value(rec.indexOf("InstrumentName")).toString();
+                contractTableTmp.OptionType = query.value(rec.indexOf("OptionType")).toString();
+                contractTableTmp.StrikePrice = query.value(rec.indexOf("StrikePrice")).toInt();
+                contractTableTmp.LotSize = query.value(rec.indexOf("LotSize")).toInt();
+                contractTableTmp.Expiry = query.value(rec.indexOf("ExpiryDate")).toLongLong();
+                contractTableTmp.TokenNumber = query.value(rec.indexOf("Token")).toInt();
+                contractTableTmp.StockName = query.value(rec.indexOf("StockName")).toString();
+                contractTableTmp.MinimumSpread = query.value(rec.indexOf("MinSpread")).toInt();
+                contractTableTmp.VolumeFreezeQty = query.value(rec.indexOf("VolumeFreezeQty")).toDouble();
+                contractTableTmp.OperatingRangeslowPriceRange = query.value(rec.indexOf("OperatingRangeslowPriceRange")).toInt();
+                contractTableTmp.OperatingRangeshighPriceRange = query.value(rec.indexOf("OperatingRangeshighPriceRange")).toInt();
+
+                contractTableData.insert( query.value(rec.indexOf("Token")).toString(), contractTableTmp);
+
+                QStringList PortfolioAll;
+                QList<PortfolioType>  portfolio_types = getPortfolioTypesForInstrumentType(contractTableTmp.InstrumentType,userData.algoFilterMap);
+                for(int i=0;i<portfolio_types.length();i++){
+                    m_ContractDetails_Grouped_[portfolio_types[i]].append(QString::number(contractTableTmp.TokenNumber));
+                    PortfolioAll.append(QString::number(portfolio_types[i]));
+                }
+
+
+                //write contract to output file
+                if(writeContract){
+                    if(PortfolioAll.size()>0){
+                        out << PortfolioAll.join(",")
+                            << contractTableTmp.TokenNumber
+                            << contractTableTmp.InstrumentType
+                            << contractTableTmp.InstrumentName
+                            << contractTableTmp.OptionType
+                            << contractTableTmp.StrikePrice
+                            << contractTableTmp.LotSize
+                            << contractTableTmp.Expiry
+                            << contractTableTmp.TokenNumber
+                            << contractTableTmp.StockName
+                            << contractTableTmp.MinimumSpread
+                            << contractTableTmp.VolumeFreezeQty;
+                    }
+                    else{
+                        qDebug()<<"Waring: Cannot find portfolio type(InstrumentType) for contract table token = "<<contractTableTmp.TokenNumber;
+                    }
+                }
+
+            }
+
+            if(writeContract)
+                file.close();  // Close the file after writing
+        }
+        //contractTableData[PortfolioType::BFLY_BID] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::BFLY_BID, userData),&db, BFLY_BID_data_list_Sorted_Key);
+        //contractTableData[PortfolioType::BY] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::BY,userData),&db, BFLY_data_list_Sorted_Key);
+        //contractTableData[PortfolioType::F2F] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::F2F,userData),&db,F2F_data_list_Sorted_Key);
+        //contractTableData[PortfolioType::CR] = prpareContractDataFromDB(getAlgoTypeQuery(PortfolioType::CR,userData),&db,CR_data_list_Sorted_Key);
     }
     return contractTableData;
 }
@@ -1803,6 +1999,47 @@ bool mysql_conn::deleteAlgo(QString PortfolioNumber,QString &msg)
     return ret;
 }
 
+bool mysql_conn::deleteAlgos(QStringList PortfolioNumbers,QString &msg)
+{
+    QMutexLocker lock(&mutex);
+
+    bool ret = false;
+    {
+        bool ok = checkDBOpened(msg);
+        if(ok){
+            QSqlQuery query(db);
+            QString str = "DELETE FROM Portfolios WHERE PortfolioNumber IN ('" + PortfolioNumbers.join("','") + "')";
+
+
+            query.prepare(str);
+            if( !query.exec() )
+            {
+                msg = query.lastError().text();
+                qDebug()<<query.lastError().text();
+            }
+            else{
+                int rowsAffected = query.numRowsAffected();
+                if (rowsAffected > 0) {
+                    ret = true;  //delet scuccess
+                    msg = "Portfolios "+PortfolioNumbers.join("','")+" Deleted successfully.";
+                }
+                else {
+                    msg = "Deleted failed.";
+                    ret = false;
+                }
+            }
+
+        }
+        else{
+            qDebug()<<"Delete Portfolio  Cannot connect Database: "+db.lastError().text();
+            msg="Delete Portfolio Cannot connect Database: "+db.lastError().text();
+        }
+
+        //db.close();
+    }
+    return ret;
+}
+
 algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,int MaxPortfolioCount,QString &msg){
     QMutexLocker lock(&mutex);
     algo_data_insert_status ret = algo_data_insert_status::FAILED;
@@ -1842,6 +2079,14 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                               " and Leg3TokenNo="+data.Leg3_token_number;
                     //CON-REV
                     else if(data.algo_type==QString::number(PortfolioType::CR))
+                        str = "select  TraderID from Portfolios where TraderID="+data.user_id+
+                              " and PortfolioType="+ data.algo_type+
+                              " and Leg1TokenNo="+data.Leg1_token_number+
+                              " and Leg2TokenNo="+data.Leg2_token_number+
+                              " and Leg3TokenNo="+data.Leg3_token_number;
+
+                    //CRJELLY
+                    else if(data.algo_type==QString::number(PortfolioType::CR_JELLY))
                         str = "select  TraderID from Portfolios where TraderID="+data.user_id+
                               " and PortfolioType="+ data.algo_type+
                               " and Leg1TokenNo="+data.Leg1_token_number+
@@ -1970,6 +2215,34 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                             }
                             //CON-REV
                             else if(data.algo_type==QString::number(PortfolioType::CR)){
+                                query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
+                                              "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
+                                              ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                                              "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
+                                              "OrderQuantity) "
+                                              "VALUES (:PortfolioType, :TraderID, :Status,"
+                                              ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
+                                              ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                                              ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
+                                              ":OrderQuantity)");
+                                query.bindValue(":PortfolioType", data.algo_type);
+                                query.bindValue(":TraderID", data.user_id);
+                                query.bindValue(":Status", data.Algo_Status);
+                                query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
+                                query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
+                                query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
+                                query.bindValue(":BuyPriceDifference", 0);
+                                query.bindValue(":BuyTotalQuantity", 0);
+                                query.bindValue(":BuyTradedQuantity", 0);
+                                query.bindValue(":SellPriceDifference", 0);
+                                query.bindValue(":SellTotalQuantity", 0);
+                                query.bindValue(":SellTradedQuantity", 0);
+                                query.bindValue(":OrderQuantity", 0);
+
+                            }
+
+                            //CRJELLY
+                            else if(data.algo_type==QString::number(PortfolioType::CR_JELLY)){
                                 query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
                                               "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
                                               ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
@@ -2157,7 +2430,7 @@ QString mysql_conn::getAlgoTypeQuery(PortfolioType type, userInfo userLoginInfo)
 {
     QString whereStr = " WHERE InstrumentType IN (";
 
-    for(const auto &algoFilter: userLoginInfo.algoFilterMap[type].split(","))
+    for(const auto &algoFilter: userLoginInfo.algoFilterMap[type])
     {
         whereStr += "'";
         whereStr += algoFilter;

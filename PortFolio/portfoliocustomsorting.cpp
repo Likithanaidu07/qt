@@ -20,27 +20,30 @@ void portfolioCustomSorting::loadSortConfig(){
     if (settings.contains("portfolio_sort_data"))
     {
       QString saveStr =  settings.value("portfolio_sort_data").toString();
-      QStringList saveStrList = saveStr.split(";");
-      for(int i=0;i<saveStrList.size();i++){
-          QStringList tok = saveStrList[i].split(":");
-          if(tok.length()==2){
+      if(saveStr!=""){
+          QStringList saveStrList = saveStr.split(";");
+          for(int i=0;i<saveStrList.size();i++){
+              QStringList tok = saveStrList[i].split(":");
+              if(tok.length()==2){
 
-              QString columnToSort = tok[0]; //"Algo Status","Algo Name", "Strategy","Expiry","Start Strike","End Strike","Option Type"
-              QString order = tok[1]; // Ascending or Descending or
-              int idx = columnNameToIDx(columnToSort);
-              if(idx!=-1){
-                 priorityColumnIdxs.append(idx);
-                 sortOrders.append(order);
+                  QString columnToSort = tok[0]; //"Algo Status","Algo Name", "Strategy","Expiry","Start Strike","End Strike","Option Type"
+                  QString order = tok[1]; // Ascending or Descending or
+                  int idx = columnNameToIDx(columnToSort);
+                  if(idx!=-1){
+                     priorityColumnIdxs.append(idx);
+                     sortOrders.append(order);
+                  }
+                  else{
+                      qDebug()<<"Error: portfolio_sort_data reade error, "<<columnToSort <<" not expected string";
+                  }
               }
               else{
-                  qDebug()<<"Error: portfolio_sort_data reade error, "<<columnToSort <<" not expected string";
+                  qDebug()<<"Error: portfolio_sort_data reade error, "<<saveStrList[i];
               }
-          }
-          else{
-              qDebug()<<"Error: portfolio_sort_data reade error, "<<saveStrList[i];
-          }
 
+          }
       }
+
            // Sort
           // Create a list of pairs
           QVector<QPair<int, QString>> pairs;
@@ -79,8 +82,6 @@ int portfolioCustomSorting::columnNameToIDx(QString colStr){
         return 5;
     else if(colStr=="Option Type")
         return 6;
-    else if(colStr=="Alias")
-        return 7;
     else
      return -1;
 }
@@ -98,6 +99,14 @@ bool portfolioCustomSorting::customComparator(const QString &a, const QString &b
 
             auto aVal = aParts[colIndex];
             auto bVal = bParts[colIndex];
+
+            // Handle the special case for PE/CE/ZE in case of CR jelly and CR where optiontype is not there and for camparison a tmp value of ZE given, also the strike diff give 0 so it will automatticaly sodrt
+                        if ((aVal == "ZE" && (bVal == "PE" || bVal == "CE")) ||
+                            (bVal == "ZE" && (aVal == "PE" || aVal == "CE"))) {
+                            // Always put ZE last
+                            return (aVal == "ZE") ? false : true;
+                        }
+
             //means its "algostatus", "Middle Strike" or "strike diff" so it shold consider as number sorting, rest all should be
             // alphabetical sort
             bool isNumaric = false;
@@ -144,7 +153,7 @@ bool portfolioCustomSorting::customComparator(const QString &a, const QString &b
 
 
             //CE should come first so sort Ascending order
-            if (order == "CE") {
+            /*if (order == "CE") {
                 if (aParts[colIndex] < bParts[colIndex]) {
                     return true;
                 } else if (aParts[colIndex] > bParts[colIndex]) {
@@ -158,7 +167,28 @@ bool portfolioCustomSorting::customComparator(const QString &a, const QString &b
                 } else if (aParts[colIndex] < bParts[colIndex]) {
                     return false;
                 }
-            }
+            }*/
+
+
+            // CE should come first (Ascending order)
+                        if (order == "CE") {
+                            if (aVal < bVal) {
+                                return true;
+                            } else if (aVal > bVal) {
+                                return false;
+                            }
+                        }
+                        // PE should come first (Descending order)
+                        else if (order == "PE") {
+                            if (aVal > bVal) {
+                                return true;
+                            } else if (aVal < bVal) {
+                                return false;
+                            }
+                        }
+
+
+
             //Disabled algo(status=0) should come first so sort Ascending order
             if (order == "Disabled") {
 

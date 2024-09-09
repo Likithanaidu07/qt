@@ -3,7 +3,9 @@
 #include "QPainter"
 #include "defines.h"
 
-linersheaderview::linersheaderview(Qt::Orientation orientation, QWidget* parent) : QHeaderView(orientation, parent) {}
+linersheaderview::linersheaderview(Qt::Orientation orientation, QWidget* parent) : QHeaderView(orientation, parent) {
+    setSectionsMovable(true);
+}
 
 void linersheaderview::paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const {
     // Create the portfolio header delegate

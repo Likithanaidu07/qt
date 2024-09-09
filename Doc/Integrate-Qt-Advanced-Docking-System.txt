@@ -16,4 +16,4 @@
     INCLUDEPATH += $${ADS_OUT_ROOT}/src
     DEPENDPATH += $${ADS_OUT_ROOT}/src
 
-8. While deploying copy the project copy "qtadvanceddocking.dll" from 'Qt-Advanced-Docking-System\lib' folder to exe location.
+8. While deploying  copy "qtadvanceddocking.dll" from 'Qt-Advanced-Docking-System\lib' folder to exe location.

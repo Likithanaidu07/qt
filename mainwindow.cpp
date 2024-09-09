@@ -8,6 +8,7 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QCoreApplication>
 #include <QHeaderView>
+#include <QRegularExpression>
 #include <QShortcut>
 #include <QFontDatabase>
 #include <QTreeView>
@@ -22,7 +23,12 @@
 #include "Liners/liners_delegate.h"
 #include "NetPosition/net_position_table_delegate.h"
 #include "NetPosition/net_position_table_headerview.h"
-
+#include "Cards/logs_cards.h"
+#include "Cards/summary_cards.h"
+#include "Cards/watch_cards.h"
+#include "QMenu"
+#include "PortFolio/portfolio_searchfilterproxymodel.h"
+#include "TradePosition/trade_table_filterproxymodel.h"
 
 //#define ENABLE_BACKEND_DEBUG_MSG
 
@@ -45,9 +51,77 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->setupUi(this);
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    //ui->sidePanel->setVisible(false);
+    ui->Algorithms_Close->setVisible(false);
+
+    showMessagOnceFlg = true;
+   // connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
+    connect(this,SIGNAL(showMessageSignal(QString)),this,SLOT(showMessageSlot(QString)));
+    connect(this, SIGNAL(requestDeleteConfirmation(QStringList)), this, SLOT(onRequestDeleteConfirmation(QStringList)));
 
 
-    connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
+
+    // Create the Card menu
+    QMenu *cardMenu = new QMenu("Card", this);
+
+    // Create actions
+    QAction *summaryAction = new QAction("Summary", this);
+    QAction *watchAction = new QAction("Watch", this);
+    QAction *LogAction = new QAction("Logs", this);
+
+    // Add actions to the Card menu
+    cardMenu->addAction(summaryAction);
+    cardMenu->addAction(watchAction);
+     cardMenu->addAction(LogAction);
+
+
+    // Create a ToolButton to act as the menu title on ui->card
+    ui->toolButtonCards->setMenu(cardMenu);
+    ui->toolButtonCards->setPopupMode(QToolButton::InstantPopup);
+
+    ui->toolButtonCards->setStyleSheet(
+        "QToolButton {"
+        "    color: white;"
+        "    font-family: 'Work Sans';"
+        "    font-weight: bold;"
+        "}"
+        );
+    QFont font("Work Sans", 10, QFont::Bold); // Set the font to Work Sans, size 10, bold
+//    ui->label_4->setFont(font);
+//    ui->label_4->setText("status :");
+//    ui->label_2->setFont(font);
+//    ui->label_2->setText("User Message :");
+
+    QMenu *resetMenu = new QMenu("Tool", this);
+
+    // Create actions
+    QAction *changepasswordAction = new QAction("ChangePassword", this);
+
+
+    // Add actions to the Card menu
+    resetMenu->addAction(changepasswordAction);
+
+
+    // Create a ToolButton to act as the menu title on ui->card
+    ui->menu->setMenu(resetMenu);
+    ui->menu->setPopupMode(QToolButton::InstantPopup);
+    connect(changepasswordAction, &QAction::triggered, this, &MainWindow::onChangepasswordActionTriggered);
+
+
+    // Connect the actions to their respective slots (if needed)
+    connect(summaryAction, &QAction::triggered, this, &MainWindow::onSummaryActionTriggered);
+    connect(watchAction, &QAction::triggered, this, &MainWindow::onWatchActionTriggered);
+    connect(LogAction, &QAction::triggered, this, &MainWindow::onLogActionTriggered);
+
+
+
+   // ui->sidePanel->setVisible(false);
+    //ui->widget_3->setVisible(false);
+      ui->widget_5->setVisible(true);
+    //ui->widget_4->setVisible(false);
+    //ui->toggle_Button_1->setVisible(false);
+  //  connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
+
     connect(this,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
     loadingDataWinodw = new loadingdatawindow(this);
     connect(this,SIGNAL(signalHideProgressBar()),this,SLOT(slotHideProgressBar()));
@@ -97,38 +171,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    /***********************Move Side Panel items to dock Widget**********************/
-
-    DockManagerSidePanel = new CDockManager(ui->sidePanel);
-    ui->sidePanel->layout()->addWidget(DockManagerSidePanel);
-    CDockWidget* watchWidgetDockWidget = new CDockWidget("Watch");
-    watchWidgetDockWidget->setWidget(ui->watchWidget);
-    watchWidgetDockWidget->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
-    watchWidgetDockWidget->resize(250, 150);
-    watchWidgetDockWidget->setMinimumSize(200,150);
-    DockManagerSidePanel->addDockWidget(DockWidgetArea::TopDockWidgetArea, watchWidgetDockWidget);
-
-    ui->sidePanel->layout()->addWidget(DockManagerSidePanel);
-    CDockWidget* summaryhWidgetDockWidget = new CDockWidget("Summary");
-    summaryhWidgetDockWidget->setWidget(ui->summary_widget);
-    summaryhWidgetDockWidget->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
-    summaryhWidgetDockWidget->resize(250, 150);
-    summaryhWidgetDockWidget->setMinimumSize(200,150);
-    DockManagerSidePanel->addDockWidget(DockWidgetArea::CenterDockWidgetArea, summaryhWidgetDockWidget);
-
-    ui->sidePanel->layout()->addWidget(DockManagerSidePanel);
-    CDockWidget* loghWidgetDockWidget = new CDockWidget("Logs");
-    loghWidgetDockWidget->setWidget(ui->Logs_Widget);
-    loghWidgetDockWidget->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
-    loghWidgetDockWidget->resize(250, 150);
-    loghWidgetDockWidget->setMinimumSize(200,150);
-    DockManagerSidePanel->addDockWidget(DockWidgetArea::BottomDockWidgetArea, loghWidgetDockWidget);
-
-
-
-    /**********************************************************************************/
-
-
     QVBoxLayout* Layout = new QVBoxLayout(ui->mainPanel);
     Layout->setContentsMargins(QMargins(0, 0, 0, 0));
 
@@ -137,7 +179,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     /***********Init portfolio table Window**************************/
-    QPixmap pixmapdock_algorithms_close(":/dock_close.png");
+   // QPixmap pixmapdock_algorithms_close(":/dock_close.png");
 
     T_Portfolio_DockWin = new CDockWidget("Algorithms");// new QDockWidget(tr("Algorithms"), this);
     connect(T_Portfolio_DockWin, SIGNAL(visibilityChanged(bool)), this, SLOT(OnAlgorithmDockWidgetVisiblityChanged(bool)));
@@ -145,6 +187,9 @@ MainWindow::MainWindow(QWidget *parent)
     T_Portfolio_DockWin->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
 
     T_Portfolio_DockWin->setMinimumSize(200,150);
+
+    T_Portfolio_DockWin->setWindowModality(Qt::NonModal);
+
    // const auto autoHideContainerPortfolioTable = DockManager->addAutoHideDockWidget(SideBarLocation::SideBarLeft, T_Portfolio_DockWin);
    // autoHideContainerPortfolioTable->setSize(480);
 
@@ -161,7 +206,7 @@ MainWindow::MainWindow(QWidget *parent)
         QSpacerItem* titlespc = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
         QToolButton* dockclose=new QToolButton();
         connect(dockclose, &QToolButton::clicked, [=](){ T_Portfolio_DockWin->close();});
-        dockclose->setIcon(pixmapdock_algorithms_close);
+       // dockclose->setIcon(pixmapdock_algorithms_close);
         dockclose->setIconSize(QSize(14, 14));
         fontlabel.setFamily("Work Sans");
         label->setFont(fontlabel);
@@ -192,30 +237,30 @@ MainWindow::MainWindow(QWidget *parent)
             line_edit_trade_search->setStyleSheet(lineedit_dock_SS);
 
             QToolButton *ConvertAlgo_button = new QToolButton();
-            connect(ConvertAlgo_button, SIGNAL(clicked()), this, SLOT(on_ConvertAlgo_button_clicked()));
+            connect(ConvertAlgo_button, SIGNAL(clicked()), this, SLOT(ConvertAlgo_button_clicked()));
             //Frame 364.png
-            ConvertAlgo_button->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-
+            ConvertAlgo_button->setToolButtonStyle(Qt::ToolButtonIconOnly);
+          //  ConvertAlgo_button->setIcon(QIcon(":/BuildAlgo.png"));
             ConvertAlgo_button->setText("Build Algo");
-            ConvertAlgo_button->setStyleSheet("text-align: center;");
 
             const char convert_to_algo_button[]="QToolButton {"
                                                 //  "border-radius: 4px;" "border: 1px solid #188CCA;"
                                                   "background: #495057;"
+                                                  "text-align: center;"
                                                   "color: #FFF;"
                                                   "font-size: 12px;"
-                                                  "font-style: normal;"
-                                                  "font-weight: 500;"
-                                                  "line-height: normal;"
+//                                                  "font-style: normal;"
+//                                                  "font-weight: 500;"
+//                                                  "line-height: normal;"
                                                   "}"
                                                   "QToolButton:hover{"
                                                   "border-radius: 4px;"
                                                   "border: 1px solid #106B9A;"
                                                   "background: #106B9A;"
                                                   "}";
-            ConvertAlgo_button->setStyleSheet(convert_to_algo_button);
-            ConvertAlgo_button->setContentsMargins(10,-1,-1,-1);
-            ConvertAlgo_button->setFont(headerfont);
+           ConvertAlgo_button->setStyleSheet(convert_to_algo_button);
+           // ConvertAlgo_button->setContentsMargins(10,-1,-1,-1);
+            //ConvertAlgo_button->setFont(headerfont);
 
 
             QWidget *test=new QWidget;
@@ -225,68 +270,78 @@ MainWindow::MainWindow(QWidget *parent)
             test->setLayout(internalLayout);
             internalLayout->setContentsMargins(10,-1,-1,-1);
             QSpacerItem* spc = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
-            QToolButton* button1=new QToolButton();
-            connect(button1, SIGNAL(clicked()), this, SLOT(on_startall_Button_clicked()));
-            button1->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            //button1->setIcon(QIcon(":/done_all.png"));
-            button1->setText("Start All");
-            QToolButton* button2=new QToolButton();
-            connect(button2, SIGNAL(clicked()), this, SLOT(on_stopall_Button_clicked()));
-            button2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            //button2->setIcon(QIcon(a2));
-            button2->setText("Stop All");
-            QToolButton* button3=new QToolButton();
-            button3->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            //button3->setIcon(QIcon(a3));
-            button3->setText("Import");
-            QToolButton* button6=new QToolButton();
-            button6->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            //button6->setIcon(QIcon(a4));
-            button6->setText("Export");
-            QToolButton* button4=new QToolButton();
-            button4->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            //button4->setIcon(QIcon(a5));
-            button4->setText("Sorting");
-            connect(button4, SIGNAL(clicked()), this, SLOT(on_sorting_Button_clicked()));
+            QToolButton* button1 = new QToolButton();
+            connect(button1, SIGNAL(clicked()), this, SLOT(startall_Button_clicked()));
 
-            QToolButton* button5=new QToolButton();
-            button5->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            //button5->setIcon(QIcon(a6));
-           // button5->setText("Portfolio Colour");
-            const char stylesheet_tb[] ="QToolButton {"
-                                        "border-radius: 4px;"
-                                        "border: 1px solid #4F5D75;"
-                                        "background: #F7F7FF;"
-                                        "color: #4F5D75;"
-                                        "font-style: normal;"
-                                        "font-size: 12px;"
-                                        "font-weight: 500;"
-                                        "line-height: normal;"
-                                        "}"
-                                        "QToolButton:hover {"
-                                        "border-radius: 4px;"
-                                        "border: 1px solid #4F5D75;"
-                                        "background: #4F5D75;"
-                                        "color: #FFF; "
-                                        "font-family: Work Sans;"
-                                        "font-size: 12px;"
-                                        "font-style: normal;"
-                                        "font-weight: 500;"
-                                        "line-height: normal;"
-                                        "}";
-            for (auto w : {button1,button2,button3,button4,button5,button6}){
-                w->setStyleSheet(stylesheet_tb);
-                QFont font=w->font();
-                font.setFamily("Work Sans");
-                w->setFont(font);
+           // button1->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            button1->setIcon(QIcon(":/start_all.png"));
+            button1->setToolTip("Start All");
+
+            QToolButton* button2 = new QToolButton();
+            connect(button2, SIGNAL(clicked()), this, SLOT(stopall_Button_clicked()));
+           // button2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            button2->setIcon(QIcon(":/stop_all.png"));
+            button2->setToolTip("Stop All");
+
+            QToolButton* button3 = new QToolButton();
+           // button3->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            button3->setIcon(QIcon(":/import.png"));
+            button3->setToolTip("Import");
+
+            QToolButton* button4 = new QToolButton();
+            //button4->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            button4->setIcon(QIcon(":/reset.png"));
+            button4->setToolTip("Sorting");
+            connect(button4, SIGNAL(clicked()), this, SLOT(sorting_Button_clicked()));
+
+            QToolButton* button5 = new QToolButton();
+            //button5->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            button5->setToolTip("Portfolio Colour");
+
+            QToolButton* button6 = new QToolButton();
+          //  button6->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            button6->setIcon(QIcon(":/export.png"));
+            button6->setToolTip("Export");
+
+            const char stylesheet_tb[] =
+                "QToolButton {"
+                "border-radius: 4px;"
+                "border: 1px solid #4F5D75;"
+                "background: #345D71;"
+//                "color: #4F5D75;"
+//                "font-style: normal;"
+//                "font-size: 12px;"
+//                "font-weight: 500;"
+//                "line-height: normal;"
+//                "padding: 2px 5px;"
+                "}"
+                "QToolButton:hover {"
+                "border-radius: 4px;"
+                "border: 1px solid #4F5D75;"
+                "background: #4F5D75;"
+                "color: #FFF;"
+                "font-family: Work Sans;"
+//                "font-size: 12px;"
+//                "font-style: normal;"
+//                "font-weight: 500;"
+//                "line-height: normal;"
+//                "padding: 2px 5px;"
+                "}";
+
+            for (auto w : {button1, button2, button3, button4, button5, button6}) {
+        w->setStyleSheet(stylesheet_tb);
+        QFont font = w->font();
+        font.setFamily("Work Sans");
+        w->setFont(font);
             }
+
 
 
 
                 internalLayout->addWidget(ConvertAlgo_button);
                 internalLayout->addSpacerItem(spc);
                 internalLayout->addWidget(line_edit_trade_search);
-                //internalLayout->addSpacerItem(spc);
+                internalLayout->addSpacerItem(spc);
                 internalLayout->addWidget(button1);
                 internalLayout->addWidget(button2);
                 internalLayout->addWidget(button3);
@@ -298,6 +353,7 @@ MainWindow::MainWindow(QWidget *parent)
                 lay->addWidget(test, 0, 0);
 
     T_Portfolio_Table = new table_portfolios_custom(T_Portfolio_DockWin);
+    T_Portfolio_Table->setObjectName("algo_table");
     T_Portfolio_Table->setStyleSheet(scroll_bar_SS);
     // T_Portfolio_Table->viewport()->setFocusPolicy(Qt::NoFocus);
     T_Portfolio_Model = new Table_Portfolios_Model();
@@ -305,24 +361,42 @@ MainWindow::MainWindow(QWidget *parent)
     //connect(T_Portfolio_Model,SIGNAL(edit_Started(int,int)),this,SLOT(edit_Started_PortFolio_Table(int,int)));
     QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::editFinished, this, &MainWindow::profolioTableEditFinshedSlot);
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::editCompleted, this, &MainWindow::profolioTableEditFinshedSlot);
-     QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::tabKeyPressed, T_Portfolio_Table, &table_portfolios_custom::handleTabKeyPressFromEditableCell);
-    QObject::connect(T_Portfolio_Table, &table_portfolios_custom::spaceKeySignal, this, &MainWindow::updatePortFolioStatus);
+    QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::tabKeyPressed, T_Portfolio_Table, &table_portfolios_custom::handleTabKeyPressFromEditableCell);
+    //QObject::connect(T_Portfolio_Table, &table_portfolios_custom::spaceKeySignal, this, &MainWindow::updatePortFolioStatus);
+    QObject::connect(T_Portfolio_Table, &table_portfolios_custom::portFolioDeleteKeyPressed, this, &MainWindow::Delete_clicked_slot);
+
+
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::resizePortFolioTableColWidth, this, &MainWindow::resizePortFolioTableColWidthSlot);
    // QObject::connect(T_Portfolio_Table, &table_portfolios_custom::clicked, T_Portfolio_Model, &Table_Portfolios_Model::onItemChanged);
     QObject::connect(T_Portfolio_Table, &table_portfolios_custom::selectionChangedSignal, T_Portfolio_Model, &Table_Portfolios_Model::selectionChangedSlot);
+    QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::updateDBOnDataChanged, this, &MainWindow::updatePortFolioStatus, Qt::QueuedConnection);
+    QObject::connect(db_conn, &mysql_conn::updateModelDataListSignal, T_Portfolio_Model, &Table_Portfolios_Model::updateModelDataList, Qt::QueuedConnection);
 
-    QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::updateDBOnDataChanged, this, &MainWindow::updatePortFolioStatus);
 
-    T_Portfolio_Table->setModel(T_Portfolio_Model);
+
+ //   T_Portfolio_Table->setModel(T_Portfolio_Model);
     T_Portfolio_Table->setItemDelegate(T_Portfolio_Delegate);
 
-    connect(T_Portfolio_Table->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
-            this, SLOT(T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&)));
+
 
 
     connect(T_Portfolio_Table, &QTableView::doubleClicked, this, &MainWindow::T_Portfolio_Table_cellDoubleClicked);
 
+    QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
+    proxyModel->setSourceModel(T_Portfolio_Model);
+    proxyModel->setFilterKeyColumn(-1);  // Search across all columns
 
+    connect(line_edit_trade_search, &QLineEdit::textChanged, this, [=](const QString &text) {
+       // proxyModel->setFilterRegularExpression(QRegExp(text, Qt::CaseInsensitive, QRegularExpression::FixedString));
+        proxyModel->setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
+        T_Portfolio_Delegate->setHighlightText(text);
+        T_Portfolio_Table->viewport()->update();  // Redraw the view to apply the highlight
+    });
+
+    T_Portfolio_Table->setModel(proxyModel);
+
+    connect(T_Portfolio_Table->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
+            this, SLOT(T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&)));
 
     PortfolioHeaderView* headerView = new PortfolioHeaderView(Qt::Horizontal, T_Portfolio_Table);
     headerView->setFixedHeight(32);
@@ -423,6 +497,8 @@ MainWindow::MainWindow(QWidget *parent)
     trade_table->setShowGrid(false);
     trade_table->setAlternatingRowColors(true);
 
+
+
     tradetableheaderview* headerViews = new tradetableheaderview(Qt::Horizontal, trade_table);
     headerViews->setFixedHeight(32);
     headerViews->setFont(headerfont);
@@ -436,11 +512,26 @@ MainWindow::MainWindow(QWidget *parent)
         "   font-weight: 600; "
         "   line-height: normal;"
         );
+//    headerViews->setSectionsMovable(true);
+//    headerViews->setHighlightSections(true);
+     connect(headerViews, &QHeaderView::sectionMoved, this, &MainWindow::onTradeTableHeader_Rearranged);
+    //trade_table->setHorizontalHeader(headerViews);
+     trade_table_filterproxymodel *trades_tableproxyModel = new trade_table_filterproxymodel(this);
+     trades_tableproxyModel->setSourceModel(trade_model);
+     trades_tableproxyModel->setFilterKeyColumn(-1);  // Search across all columns
+
+
+    // trade_table->setModel(trade_model);
+
+    // Add data to model...
+    trade_table->setModel(trades_tableproxyModel);
+    connect(headerViews, &tradetableheaderview::filterChanged, trades_tableproxyModel, &trade_table_filterproxymodel::setFilter);
     trade_table->setHorizontalHeader(headerViews);
 
     lay_Trade_Window->addWidget(trade_table, 1, 0, 1, 3);
 
     trade_model = new Trade_Table_Model();
+    trade_table->setObjectName("trade_table");
     Table_OrderBook_Delegate* trade_delegate=new Table_OrderBook_Delegate;
     trade_table->setModel(trade_model);
     trade_table->setItemDelegate(trade_delegate);
@@ -448,12 +539,13 @@ MainWindow::MainWindow(QWidget *parent)
     //trade_table->setItemDelegate(T_order_Delegate);
 
     // Configure column resizing
-    trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
+    //trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
     trade_table->setColumnWidth(1,300);
 
     trade_table->horizontalHeader()->setStretchLastSection(true);
     trade_table->verticalHeader()->setVisible(false);
     // trade_table->setStyleSheet("QHeaderView { background-color: #111111;} QHeaderView::section { background-color:#555555;color:#eeeeee;font-weight: 400; }");
+    trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
     trade_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     trade_table->setSelectionMode(QAbstractItemView::SingleSelection);
     /*trade_table->setStyleSheet("QTableView {selection-background-color: #EFB37F;"
@@ -463,6 +555,7 @@ MainWindow::MainWindow(QWidget *parent)
                                             "QHeaderView { background-color: #C0AAE5;color:#3D3D3D;} QHeaderView::section { background-color:#C0AAE5;color:#3D3D3D;font-weight: 400; }");*/
 
     trade_table->show();
+    restoreTradeTableViewColumnState(trade_table);
     /***********Init Order Book Window**************************/
 
     /************Positions Window********************************/
@@ -528,10 +621,11 @@ MainWindow::MainWindow(QWidget *parent)
         "   font-weight: 600; "
         "   line-height: normal;"
         );
+    connect(headerView_netpos, &QHeaderView::sectionMoved, this, &MainWindow::onNetposTableHeader_Rearranged);
     net_pos_table->setHorizontalHeader(headerView_netpos);
 
     net_pos_model = new Net_Position_Table_Model();
-
+    net_pos_table->setObjectName("netpos_table");
     net_pos_table->setModel(net_pos_model);
     net_pos_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
     net_pos_table->setColumnWidth(1,250);
@@ -548,9 +642,10 @@ MainWindow::MainWindow(QWidget *parent)
     net_pos_table->setSelectionMode(QAbstractItemView::SingleSelection);
     net_position_table_delegate* netpos_delegate=new net_position_table_delegate;
     net_pos_table->setItemDelegate(netpos_delegate);
-
+   net_pos_table->horizontalHeader()->setStretchLastSection(true);
     dock_win_net_pos->setWidget(net_pos_table);
     net_pos_table->show();
+    restoreNetposTableViewColumnState(net_pos_table);
     /************Net Position Window********************************/
 
     /************Liners Window********************************/
@@ -612,10 +707,12 @@ MainWindow::MainWindow(QWidget *parent)
         "   font-weight: 600; "
         "   line-height: normal;"
         );
+    connect(headerViewrs, &QHeaderView::sectionMoved, this, &MainWindow::onLinersTableHeader_Rearranged);
     liners_table->setHorizontalHeader(headerViewrs);
 
     liners_model = new Liners_Model();
     liners_delegate* liner_delegate=new liners_delegate;
+     liners_table->setObjectName("liners_table");
     liners_table->setModel(liners_model);
     liners_table->setItemDelegate(liner_delegate);
 
@@ -634,6 +731,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     dock_win_liners->setWidget(liners_table);
     liners_table->show();
+     restoreLinersTableViewColumnState(liners_table);
     /************Liners Window********************************/
 
 
@@ -779,14 +877,14 @@ MainWindow::MainWindow(QWidget *parent)
    // connect(ui->toggle_Button, SIGNAL(clicked()), this, SLOT(on_toggle_Button_clicked()));
 
     //stylesheet for summary window title labels
-    const char stylesheet_userinfo[] = "color: #2F3339;" "text-align: center;""font-size: 12px;""font-style: normal;""font-weight: bold;""line-height: normal;";
-    for (auto w : {ui->label_7, ui->label_9,ui->label_10,ui->label_8,ui->label_2,ui->label_20,ui->label_6,ui->label_16,ui->label_15,ui->label_14,ui->m2mlabel,ui->label_13}){
-        w->setStyleSheet(stylesheet_userinfo);
-        QFont font=w->font();
-        font.setFamily("Work Sans");
-        w->setFont(font);
-        w->setWordWrap(true);
-    }
+//    const char stylesheet_userinfo[] = "color: #2F3339;" "text-align: center;""font-size: 12px;""font-style: normal;""font-weight: bold;""line-height: normal;";
+//    for (auto w : {ui->label_7, ui->label_9,ui->label_10,ui->label_8,ui->label_2,ui->label_20,ui->label_6,ui->label_16,ui->label_15,ui->label_14,ui->m2mlabel,ui->label_13}){
+//        w->setStyleSheet(stylesheet_userinfo);
+//        QFont font=w->font();
+//        font.setFamily("Work Sans");
+//        w->setFont(font);
+//        w->setWordWrap(true);
+//    }
 
 //    ui->label_3->setText(QString::number(AlgoCount));
 //    ui->label_25->setText(QString::number(OrderCount));
@@ -798,11 +896,11 @@ MainWindow::MainWindow(QWidget *parent)
     ui->HP_Close->setVisible(false);
     ui->Templates_Close->setVisible(false);
 
-    ui->lineEditWatchSearch->setPlaceholderText("Search...");
-    ui->lineEditWatchSearch->setStyleSheet("font-family: 'Work Sans';"
-                                           "font-size: 12px;"
-                                           "font-weight: 400;"
-                                           );
+//    ui->lineEditWatchSearch->setPlaceholderText("Search...");
+//    ui->lineEditWatchSearch->setStyleSheet("font-family: 'Work Sans';"
+//                                           "font-size: 12px;"
+//                                           "font-weight: 400;"
+//                                           );
     QPixmap pixmapmenu(":/menu.png");
     ui->close->setIcon(pixmapclose);
     ui->minimize->setIcon(pixmapminimize);
@@ -811,39 +909,39 @@ MainWindow::MainWindow(QWidget *parent)
 
     //setting icons for top window widget
     QPixmap pixmapbuttonclose(":/button_close.png");
-    ui->Algorithms_Close->setIcon(pixmapbuttonclose);
-    ui->OrderBook_Close->setIcon(pixmapbuttonclose);
-    ui->Positions_Close->setIcon(pixmapbuttonclose);
-    ui->Liners_Close->setIcon(pixmapbuttonclose);
-    ui->HP_Close->setIcon(pixmapbuttonclose);
-    ui->MissedTrade_Close->setIcon(pixmapbuttonclose);
-    ui->Templates_Close->setIcon(pixmapbuttonclose);
+   // ui->Algorithms_Close->setIcon(pixmapbuttonclose);
+   // ui->OrderBook_Close->setIcon(pixmapbuttonclose);
+  //  ui->Positions_Close->setIcon(pixmapbuttonclose);
+  //  ui->Liners_Close->setIcon(pixmapbuttonclose);
+  //  ui->HP_Close->setIcon(pixmapbuttonclose);
+  //  ui->MissedTrade_Close->setIcon(pixmapbuttonclose);
+  //  ui->Templates_Close->setIcon(pixmapbuttonclose);
 
     const char stylesheet_params[] = "color: #000000 ;""font-size: 12px;""font-style: normal;""font-weight: bold;""line-height: normal;";
-    for (auto w : {ui->Open_Label, ui->High_Label,ui->Low_Label,ui->Volume_Label}){
-        w->setStyleSheet(stylesheet_params);
-        QFont font=w->font();
-        font.setFamily("Work Sans");
-        w->setFont(font);
-    }
+//    for (auto w : {ui->Open_Label, ui->High_Label,ui->Low_Label,ui->Volume_Label}){
+//        w->setStyleSheet(stylesheet_params);
+//        QFont font=w->font();
+//        font.setFamily("Work Sans");
+//        w->setFont(font);
+//    }
 
     const char stylesheet_params_nos[] = "color: #4f3c7f ;""font-family: Work Sans;" "font-size: 14px;" "font-style: normal;" "font-weight: bold;""line-height: normal;";
-    for (auto w : {ui->Open_Num, ui->High_Num,ui->Low_Num,ui->Volume_Num}){
-        w->setStyleSheet(stylesheet_params_nos);
-        QFont font=w->font();
-        font.setFamily("Work Sans");
-        w->setFont(font);
-    }
+//    for (auto w : {ui->Open_Num, ui->High_Num,ui->Low_Num,ui->Volume_Num}){
+//        w->setStyleSheet(stylesheet_params_nos);
+//        QFont font=w->font();
+//        font.setFamily("Work Sans");
+//        w->setFont(font);
+//    }
 
-    QFont fontbuy=ui->Buy_Watch_Button->font();
-    QFont fontsell=ui->Sell_Watch_Button->font();
-    fontbuy.setFamily("Work Sans");
-    fontsell.setFamily("Work Sans");
-    ui->Buy_Watch_Button->setFont(fontbuy);
-    ui->Sell_Watch_Button->setFont(fontsell);
+//    QFont fontbuy=ui->Buy_Watch_Button->font();
+//    QFont fontsell=ui->Sell_Watch_Button->font();
+//    fontbuy.setFamily("Work Sans");
+//    fontsell.setFamily("Work Sans");
+//    ui->Buy_Watch_Button->setFont(fontbuy);
+//    ui->Sell_Watch_Button->setFont(fontsell);
 
-    ui->listWidgetWatch->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Hides vertical scroll bar
-    ui->listWidgetWatch->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Hides horizontal scroll bar
+//    ui->listWidgetWatch->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Hides vertical scroll bar
+//    ui->listWidgetWatch->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff); // Hides horizontal scroll bar
 
 
 
@@ -860,9 +958,8 @@ MainWindow::MainWindow(QWidget *parent)
     // db_conn =new mysql_conn(this,"main_db_conn");
     // connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
    //loadContract();
-    initWatchWindow();
-    // this should be called after all dock widget are set
-    restoreDockManagerState();
+    //initWatchWindow();
+
 }
 
 
@@ -875,6 +972,9 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::update_ui_slot(int type){
+
+    // this should be called after all dock widget are set
+    restoreDockManagerState();
 
     switch (type) {
     case LOADED_MODEL:
@@ -1028,13 +1128,13 @@ void MainWindow::loadSettings(){
         settings.beginGroup("GeneralSettings");
         if (settings.contains("market_type"))
             market_type = settings.value("market_type").toString();
-        if(settings.contains("Watch_InstrumentNames")){
-           QString watch=  settings.value("Watch_InstrumentNames").toString();
-            if(watch=="")
-               savedWatchItems.clear();
-            else
-                savedWatchItems = watch.split(";");
-        }
+//        if(settings.contains("Watch_InstrumentNames")){
+//           QString watch=  settings.value("Watch_InstrumentNames").toString();
+//            if(watch=="")
+//               savedWatchItems.clear();
+//            else
+//                savedWatchItems = watch.split(";");
+//        }
         settings.endGroup();
     }
     //currently hardcoded for FO
@@ -1074,8 +1174,14 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
         }
 
         portfolio_table_updating_db.storeRelaxed(1);
-        QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
-        T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0);
+
+        PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());//portfolioModal->portfolio_data_list.at(index.row());
+        if (!P) {
+            qDebug()<<"profolioTableEditFinshedSlot----- portfolio null, need to debug this code.";
+            return;
+        }
+        QString PortfolioNumber = QString::number(P->PortfolioNumber);//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
+        T_Portfolio_Model->setEditingFlg(index.row(),0);//portfolio_data_list[index.row()]->edting.storeRelaxed(0);
 
         //Update status data to DB
         if(index.column()==PortfolioData_Idx::_Status){
@@ -1134,6 +1240,26 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 msgBox.exec();
             }
         }
+        else if(index.column() == PortfolioData_Idx::_MaxLoss) {
+            // Skip checking for duplicate alias names
+            double val = valStr.toDouble();
+            int valInt = val*devicer;
+            QString Query = "UPDATE Portfolios SET MaxLoss='" + QString::number(valInt) + "' WHERE PortfolioNumber=" + PortfolioNumber;
+            QString msg;
+            bool success = db_conn->updateDB_Table(Query, msg);
+
+            if (success) {
+                db_conn->logToDB(QString("Updated MaxLoss to " + valStr + " [" + PortfolioNumber + "]"));
+                // Refresh sorting
+                reloadSortSettFlg.storeRelaxed(1);
+            } else {
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("Update MaxLoss Failed");
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.setText(msg);
+                msgBox.exec();
+            }
+        }
 
         //Get edited cell data from portfolio table and update DB
         else{
@@ -1146,10 +1272,10 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 QString valStr = i.value();
                 switch (columnIdx) {
                 case PortfolioData_Idx::_OrderQuantity:{
-                    int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                    int lotSize = P->GetLotSize();//T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
                     double val = valStr.toDouble();
                     val=val*lotSize;
-                    double vfq = T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
+                    double vfq = P->VolumeFreezeQty;//T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
 
 
 
@@ -1163,8 +1289,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     else{
                         //write
                         int val1 = valStr.toInt();
-                        int BuyTotalQuantity = T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity;
-                        int SellTotalQuantity = T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity;
+                        int BuyTotalQuantity = P->BuyTotalQuantity;// T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity;
+                        int SellTotalQuantity = P->SellTotalQuantity;// T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity;
                         int qty = BuyTotalQuantity;
                         if(BuyTotalQuantity==0)
                             qty = SellTotalQuantity;
@@ -1185,21 +1311,18 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                         }
                         else{
                             updateQueryList.append("OrderQuantity="+QString::number(val));
-                            logMsg = logMsg+"OrderQuantity ["+QString::number(val)+"], ";
+                            logMsg = logMsg+"OrderQuantity ["+QString::number(val1)+"], ";
                         }
                     }
                 }
-
-
-
 
                     break;
 
                     case PortfolioData_Idx::_BuyTotalQuantity:{
                     double TQ = valStr.toDouble();
-                    int bTTQ= T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTradedQuantity;
+                    int bTTQ= P->BuyTradedQuantity;//T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTradedQuantity;
 
-                    QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(T_Portfolio_Model->portfolio_data_list[index.row()]->Leg1TokenNo,T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioType.toInt());
+                    QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(P->Leg1TokenNo,P->PortfolioType.toInt());
 
 
                     if (InstrumentType == "OPTIDX" || InstrumentType == "FUTIDX") {
@@ -1223,7 +1346,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                         }
                     }
 
-                    double TTQ = T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTradedQuantity;
+                    double TTQ = P->BuyTradedQuantity;
 
                     if (TQ < TTQ) {
                             QMessageBox msgBox;
@@ -1234,7 +1357,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                         }
                         else {
 
-                            double OrderQty = T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity;
+                            double OrderQty = P->OrderQuantity;
                             if(TQ<OrderQty){
                                // show the error mesg here
                                 QMessageBox msgBox;
@@ -1243,10 +1366,10 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                                 msgBox.exec();
                             }
                             else{
-                                int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                                int lotSize = P->GetLotSize();
                                 double val = valStr.toDouble();
                                 val=val*lotSize;
-                                if(T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity==0){
+                                if(P->OrderQuantity==0){
                                     updateQueryList.append("OrderQuantity="+QString::number(lotSize));
                                 }
                                 updateQueryList.append("BuyTotalQuantity="+QString::number(val));
@@ -1261,8 +1384,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                     case PortfolioData_Idx::_SellTotalQuantity:{
                         double TQ = valStr.toDouble();
-                       int sTTQ= T_Portfolio_Model->portfolio_data_list[index.row()]->SellTradedQuantity;
-                        QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(T_Portfolio_Model->portfolio_data_list[index.row()]->Leg1TokenNo,T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioType.toInt());
+                       int sTTQ= P->SellTradedQuantity;
+                        QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(P->Leg1TokenNo,P->PortfolioType.toInt());
 
 
                         if (InstrumentType == "OPTIDX" || InstrumentType == "FUTIDX") {
@@ -1285,7 +1408,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                                 break;
                             }
                         }
-                        double TTQ = T_Portfolio_Model->portfolio_data_list[index.row()]->SellTradedQuantity;
+                        double TTQ = P->SellTradedQuantity;
 
                         if (TQ < TTQ) {
                             QMessageBox msgBox;
@@ -1294,7 +1417,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                             msgBox.exec();
                         }
                         else {
-                            double OrderQty = T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity;
+                            double OrderQty = P->OrderQuantity;
                             if(TQ<OrderQty){
                                 // show the error mesg here
                                 QMessageBox msgBox;
@@ -1303,10 +1426,10 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                                 msgBox.exec();
                             }
                             else{
-                                int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                                int lotSize = P->GetLotSize();
                                 double val = valStr.toDouble();
                                 val=val*lotSize;
-                                if(T_Portfolio_Model->portfolio_data_list[index.row()]->OrderQuantity==0){
+                                if(P->OrderQuantity==0){
                                     updateQueryList.append("OrderQuantity="+QString::number(lotSize));
                                 }
                                 updateQueryList.append("SellTotalQuantity="+QString::number(val));
@@ -1318,7 +1441,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     break;
 
                     case PortfolioData_Idx::_BuyPriceDifference:{
-                        QString BuyPriceDifference = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->BuyPriceDifference*devicer,'f',decimal_precision);
+                        QString BuyPriceDifference = QString::number(P->BuyPriceDifference*devicer,'f',decimal_precision);
                         updateQueryList.append("BuyPriceDifference="+BuyPriceDifference);
                         logMsg = logMsg+"BuyPriceDifference ["+BuyPriceDifference+"], ";
 
@@ -1326,7 +1449,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     break;
 
                     case PortfolioData_Idx::_SellPriceDifference:{
-                        QString SellPriceDifference = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->SellPriceDifference*devicer,'f',decimal_precision);
+                        QString SellPriceDifference = QString::number(P->SellPriceDifference*devicer,'f',decimal_precision);
                         updateQueryList.append("SellPriceDifference="+SellPriceDifference);
                         logMsg = logMsg+"SellPriceDifference ["+SellPriceDifference+"], ";
                     }
@@ -1348,7 +1471,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                                 " WHERE PortfolioNumber=" + PortfolioNumber;
                 bool success = db_conn->updateDB_Table(Query,msg);
                 if(success){
-                    db_conn->logToDB(logMsg+ " updated for PortfolioNumber="+PortfolioNumber);
+                    db_conn->logToDB(logMsg+ " updated for Algo No="+PortfolioNumber);
                 }
                 else{
                     QMessageBox msgBox;
@@ -1369,6 +1492,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             backend_comm->insertData(msg);
 
             portfolio_table_updating_db.storeRelaxed(0);
+
+            delete P;
 
 }
 void MainWindow::loadContract(){
@@ -1465,17 +1590,29 @@ void MainWindow::refreshTableIn_Intervel(){
     //QTimer::singleShot(2000, this, &MainWindow::refreshTableIn_Intervel);
 }
 
+
+// This data will received from exchange and used to update alog table rate column
 void MainWindow::start_slowdata_worker()
 {
     // SlowData& slowData = SlowData::getInstance();
     //  slowData.startSlowDataSocket();
     slowData = new SlowData();
+    QObject::connect(slowData, SIGNAL(newSlowDataReceivedSignal(const QHash<QString, MBP_Data_Struct> &)), this, SLOT(slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct> &)));
+
     slowData->startSlowDataSocket();
 }
 
 void MainWindow::stop_slowdata_worker(){
     slowData->stopSlowDataSocket();
 }
+
+//This slot will be called when new slow date received
+void MainWindow::slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct>& data){
+
+    T_Portfolio_Model->updateMarketRate(data);
+}
+
+
 
 void MainWindow::start_slowdata_indices_worker()
 {
@@ -1497,16 +1634,36 @@ void MainWindow::loadDataAndUpdateTable(int table){
             TradedPortFolioList.removeAll(item);
         }
 
-        db_conn->getPortfoliosTableData(reloadSortSettFlg,AlgoCount,T_Portfolio_Model,combined_tracker_model,averagePriceList,QString::number(userData.UserId),TradedPortFolioList);
+
+        QStringList PortFoliosToDelete;
+        db_conn->getPortfoliosTableData(reloadSortSettFlg,AlgoCount,combined_tracker_model,averagePriceList,QString::number(userData.UserId),TradedPortFolioList,PortFoliosToDelete);
+        if(PortFoliosToDelete.size()){
+         // QString msg = "Token not exist in contract table for  Portfolios ('" + PortFoliosToDelete.join("','") + "')!. Deleting it.";
+          if(showMessagOnceFlg){
+              emit requestDeleteConfirmation(PortFoliosToDelete);
+             showMessagOnceFlg = false;
+          }
+
+
+          //  emit showMessageSignal(msg);
+
+
+//          bool ret = db_conn->deleteAlgos(PortFoliosToDelete,msg);
+//          if(!ret&&showMessagOnceFlg){
+//            emit showMessageSignal(msg);
+//          }
+          //showMessagOnceFlg = false;
+        }
+
         emit data_loded_signal(T_Table::PORTFOLIO);
-        emit data_summary_update_signal();
+        updateSummaryLabels();
         break;
        }
 
     case T_Table::SUMMARY:
         db_conn->getSummaryTableData(OrderCount,QString::number(userData.UserId) );  // Correctly get the count
         emit data_loded_signal(T_Table::SUMMARY);
-        emit data_summary_update_signal();
+        updateSummaryLabels();
         break;
 
     case T_Table::TRADE:{
@@ -1514,7 +1671,7 @@ void MainWindow::loadDataAndUpdateTable(int table){
         QHash<QString, PortFolioData_Less> PortFolioHash = T_Portfolio_Model->getPortFolioDataLess();
         db_conn->getTradeTableData(TraderCount,trade_model,liners_model,QString::number(userData.UserId),PortFolioHash);
         emit data_loded_signal(T_Table::TRADE);
-        emit data_summary_update_signal();
+        updateSummaryLabels();
         break;
     }
    /* case T_Table::Liners:{
@@ -1529,7 +1686,7 @@ void MainWindow::loadDataAndUpdateTable(int table){
         QHash<QString,int> PortFoliosLotSizeHash = T_Portfolio_Model->getPortFoliosLotSize();
         db_conn->getNetPosTableData(BuyValue,SellValue,Profit,BuyQty_summary,SellQty_summary,NetQty,net_pos_model,QString::number(userData.UserId),PortFoliosLotSizeHash);
         emit data_loded_signal(T_Table::NET_POS);
-        emit data_summary_update_signal();
+        updateSummaryLabels();
         break;
     }
 
@@ -1545,48 +1702,83 @@ void MainWindow::loadDataAndUpdateTable(int table){
         break;
     }
 }
+
+void MainWindow::onRequestDeleteConfirmation(const QStringList &PortFoliosToDelete) {
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Delete Confirmation",
+                                  "Token not exist in contract table for Portfolios ('" + PortFoliosToDelete.join("','") + "')!. Delete those portfolios?",
+                                  QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        QString msg; // You can define msg as per your requirement
+        bool ret = db_conn->deleteAlgos(PortFoliosToDelete, msg);
+
+        if (!ret) {
+            QMessageBox::warning(this, "Error", "Failed to delete the portfolios: " + msg);
+        }
+    } else {
+        this->on_close_clicked();
+    }
+}
+
 QString MainWindow::fixDecimal(double num,int decimal_precision){
     QString str = QString::number(num, 'f', decimal_precision+1);
     return str;
 }
 void MainWindow::updateSummaryLabels()
 {
-    ui->label_3->setText(QString::number(AlgoCount));
-    ui->label_3->setAlignment(Qt::AlignCenter);
+    QStringList summarydatList;
+    summarydatList.append(QString::number(AlgoCount));
+    summarydatList.append(QString::number(OrderCount));
+    summarydatList.append(QString::number(TraderCount));
+    summarydatList.append(QString::number(BuyValue));
+    summarydatList.append(QString::number(SellValue));
+    summarydatList.append(QString::number(Profit));
+    summarydatList.append(QString::number(BuyQty_summary));
+    summarydatList.append(QString::number(SellQty_summary));
+    summarydatList.append(QString::number(NetQty));
 
-    ui->label_25->setText(QString::number(OrderCount));
-    ui->label_25->setAlignment(Qt::AlignCenter);
+    data_summary_update_signal(summarydatList); // Call the method directly
 
-    ui->label_30->setText(QString::number(TraderCount));
-    ui->label_30->setAlignment(Qt::AlignCenter);
 
-    int decimal_precision = 1;
-    ui->label_23->setText(fixDecimal(BuyValue, decimal_precision));
-    ui->label_23->setAlignment(Qt::AlignCenter);
 
-    ui->label_26->setText(fixDecimal(SellValue, decimal_precision));
-    ui->label_26->setAlignment(Qt::AlignCenter);
 
-    ui->label_31->setText(fixDecimal(Profit, decimal_precision));
-    ui->label_31->setAlignment(Qt::AlignCenter);
+//    ui->label_3->setText(QString::number(AlgoCount));
+//    ui->label_3->setAlignment(Qt::AlignCenter);
 
-    ui->label_24->setText(QString::number(BuyQty_summary));
-    ui->label_24->setAlignment(Qt::AlignCenter);
+//    ui->label_25->setText(QString::number(OrderCount));
+//    ui->label_25->setAlignment(Qt::AlignCenter);
 
-    ui->label_27->setText(QString::number(SellQty_summary));
-    ui->label_27->setAlignment(Qt::AlignCenter);
+//    ui->label_30->setText(QString::number(TraderCount));
+//    ui->label_30->setAlignment(Qt::AlignCenter);
 
-    ui->label_32->setText(QString::number(NetQty));
-    ui->label_32->setAlignment(Qt::AlignCenter);
+//    int decimal_precision = 1;
+//    ui->label_23->setText(fixDecimal(BuyValue, decimal_precision));
+//    ui->label_23->setAlignment(Qt::AlignCenter);
 
-    ui->label_33->setText("-");
-    ui->label_33->setAlignment(Qt::AlignCenter);
+//    ui->label_26->setText(fixDecimal(SellValue, decimal_precision));
+//    ui->label_26->setAlignment(Qt::AlignCenter);
 
-    ui->label_28->setText("-");
-    ui->label_28->setAlignment(Qt::AlignCenter);
+//    ui->label_31->setText(fixDecimal(Profit, decimal_precision));
+//    ui->label_31->setAlignment(Qt::AlignCenter);
 
-    ui->label_34->setText("-");
-    ui->label_34->setAlignment(Qt::AlignCenter);
+//    ui->label_24->setText(QString::number(BuyQty_summary));
+//    ui->label_24->setAlignment(Qt::AlignCenter);
+
+//    ui->label_27->setText(QString::number(SellQty_summary));
+//    ui->label_27->setAlignment(Qt::AlignCenter);
+
+//    ui->label_32->setText(QString::number(NetQty));
+//    ui->label_32->setAlignment(Qt::AlignCenter);
+
+//    ui->label_33->setText("-");
+//    ui->label_33->setAlignment(Qt::AlignCenter);
+
+//    ui->label_28->setText("-");
+//    ui->label_28->setAlignment(Qt::AlignCenter);
+
+//    ui->label_34->setText("-");
+//    ui->label_34->setAlignment(Qt::AlignCenter);
 }
 
 void MainWindow::start_backend_comm_socket_worker()
@@ -1598,6 +1790,7 @@ void MainWindow::start_backend_comm_socket_worker()
     connect(backend_comm,SIGNAL(socketData(QString,SocketDataType)),this,SLOT(backend_comm_Data_Slot(QString,SocketDataType)));
     backend_comm_thread->start();
 }
+
 
 void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 
@@ -1612,18 +1805,26 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 #ifdef ENABLE_BACKEND_DEBUG_MSG
         qDebug()<<"Backend Data: Backend Socket Error"<<msg;
 #endif
+ ui->label_3->setText("Status :"  "Connection Error");
+        ui->label_3->setStyleSheet("color: red;");
     }
     //ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(255, 32, 36);border-radius:6px;color:#000;");
     else if(msgType == SocketDataType::BACKEND_COMM_SOCKET_CONNECTED){
 #ifdef ENABLE_BACKEND_DEBUG_MSG
         qDebug()<<"Backend Data: Backend Socket Connected"<<msg;
 #endif
+ ui->label_3->setText("Status :""Connected");
+        ui->label_3->setStyleSheet("color: #013220;");
+
     }
     // ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(94, 255, 107);border-radius:6px;color:#000;");
 }
 void MainWindow::stop_backend_comm_socket_worker(){
-    //delete socket_Conn;
     backend_comm->quitDataFetchThread();
+
+    // Quit the thread's event loop and wait for it to finish
+    backend_comm_thread->quit();
+    backend_comm_thread->wait();
     backend_comm_thread->deleteLater();
 }
 
@@ -1653,18 +1854,23 @@ void MainWindow::updatePortFolioStatus(){
     QModelIndexList selection = T_Portfolio_Table->selectionModel()->selectedRows();
     for(int i=0; i< selection.count(); i++)
     {
-        QModelIndex index = selection.at(i);
+            QModelIndex index = selection.at(i);
 
+            PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());
+            if (!P) {
+                qDebug()<<"updatePortFolioStatus----- portfolio null, need to debug this code.";
+                continue;
+            }
+            QString PortfolioNumber = QString::number(P->PortfolioNumber);//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
+            T_Portfolio_Model->setEditingFlg(index.row(),1);//T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(1);
 
-            QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
-            T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(1);
-            portfolio_status status = static_cast<portfolio_status>(T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal.toInt());//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_Status).data().toString();
+            portfolio_status status = static_cast<portfolio_status>(P->StatusVal.toInt());// static_cast<portfolio_status>(T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal.toInt());//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_Status).data().toString();
             //status is in uncheck state so make it toggle(checked)
             if(status == portfolio_status::Filled || status == portfolio_status::DisabledByUser){
-                int lotSize = T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                //int lotSize = P->GetLotSize();
                 //check remaing qunatity is greater than 1 lot
-                    T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::Active);
-                    T_Portfolio_Model->refreshTable();
+                    T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::Active));//portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::Active);
+                   // T_Portfolio_Model->refreshTable();
                     QString Query = "UPDATE Portfolios SET Status='Active' where PortfolioNumber="+PortfolioNumber;
                     QString msg;
                     bool success = db_conn->updateDB_Table(Query,msg);
@@ -1683,8 +1889,8 @@ void MainWindow::updatePortFolioStatus(){
 
             //status is in check state so make it toggle(uncheck)
             else{
-                T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::DisabledByUser);
-                T_Portfolio_Model->refreshTable();
+                T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::DisabledByUser));//T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::DisabledByUser);
+               // T_Portfolio_Model->refreshTable();
                 QString Query = "UPDATE Portfolios SET Status='DisabledByUser' where PortfolioNumber="+PortfolioNumber;
                 QString msg;
                 bool success = db_conn->updateDB_Table(Query,msg);
@@ -1704,9 +1910,8 @@ void MainWindow::updatePortFolioStatus(){
 
 
 
-
-
-        T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0);
+        T_Portfolio_Model->setEditingFlg(index.row(),0);//T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0);
+        delete P;
 
     }
     portfolio_table_updating_db.storeRelaxed(0);
@@ -1728,8 +1933,11 @@ void MainWindow::loggedIn(){
     //make sure the start_slowdata_worker in main thread
     QMetaObject::invokeMethod(this, [this]() {
        // ui->label_17->setText(userData.UserName+ "  " +"Summary");
-        QString formattedText =  userData.UserName + " <span style=\"font-weight:normal;\">Summary</span>";
-        ui->label_17->setText(formattedText);
+        QString formattedText =  userData.UserName /*+ " <span style=\"font-weight:normal;\">Summary</span>"*/;
+        ui->label_6->setText("User Name :" + formattedText);
+        QFont font = ui->label_6->font();
+        font.setBold(true);
+        ui->label_6->setFont(font);
 
         start_slowdata_worker();
         start_slowdata_indices_worker();
@@ -1759,22 +1967,31 @@ void MainWindow::loggedInSucessful(userInfo userData)
 
 }
 
+void MainWindow::stopBG_Threads(){
+    stop_dataLoadingThread();
+    stop_slowdata_worker();
+    stop_slowdata_indices_worker();
+    stop_backend_comm_socket_worker();
+}
+
+
 void MainWindow::loggedOut(){
 
 
 
     loggedInFlg.storeRelaxed(0);
-    stop_slowdata_worker();
-    stop_slowdata_indices_worker();
-    stop_dataLoadingThread();
-    stop_backend_comm_socket_worker();
+    stopBG_Threads();
     emit logoutRequested();
 
 
 }
 
 void MainWindow::add_logs(QString str){
-    ui->textEdit->append(str);
+   // ui->textEdit->append(str);
+    logsdata.append(str);
+    emit logDataSignal(logsdata);
+     ui->label_5->setText("&nbsp;UserMessage : "+ str);
+
 }
 
 void MainWindow::on_OrderBook_Button_clicked()
@@ -1784,17 +2001,17 @@ void MainWindow::on_OrderBook_Button_clicked()
     dock_win_trade->toggleView(true);
 
     ui->OrderBook_Widget->setStyleSheet(stylesheetvis);
-    ui->OrderBook_Close->setVisible(true);
+   // ui->OrderBook_Close->setVisible(true);
 }
 
 
-void MainWindow::on_OrderBook_Close_clicked()
-{
-    //8
-    dock_win_trade->toggleView(false);
-    ui->OrderBook_Widget->setStyleSheet("");
-    ui->OrderBook_Close->setVisible(false);
-}
+//void MainWindow::on_OrderBook_Close_clicked()
+//{
+//    //8
+//    dock_win_trade->toggleView(false);
+//    ui->OrderBook_Widget->setStyleSheet("");
+//    ui->OrderBook_Close->setVisible(false);
+//}
 
 
 void MainWindow::on_Positions_Button_clicked()
@@ -1803,35 +2020,35 @@ void MainWindow::on_Positions_Button_clicked()
     dock_win_net_pos->toggleView(true);
 
     ui->Positions_Widget->setStyleSheet(stylesheetvis);
-    ui->Positions_Close->setVisible(true);
+   // ui->Positions_Close->setVisible(true);
 }
 
 
-void MainWindow::on_Positions_Close_clicked()
-{
-    //9
-    dock_win_net_pos->toggleView(false);
-    ui->Positions_Widget->setStyleSheet("");
-    ui->Positions_Close->setVisible(false);
-}
+//void MainWindow::on_Positions_Close_clicked()
+//{
+//    //9
+//    dock_win_net_pos->toggleView(false);
+//    ui->Positions_Widget->setStyleSheet("");
+//    ui->Positions_Close->setVisible(false);
+//}
 void MainWindow::on_Liners_Button_clicked()
 {
     //10
     dock_win_liners->toggleView(true);
     ui->Liners_Widget->setStyleSheet(stylesheetvis);
-    ui->Liners_Close->setVisible(true);
+   // ui->Liners_Close->setVisible(true);
 }
 
 
 
 
-void MainWindow::on_Liners_Close_clicked()
-{
-    //10
-    dock_win_liners->toggleView(false);
-    ui->Liners_Widget->setStyleSheet("");
-    ui->Liners_Close->setVisible(false);
-}
+//void MainWindow::on_Liners_Close_clicked()
+//{
+//    //10
+//    dock_win_liners->toggleView(false);
+//    ui->Liners_Widget->setStyleSheet("");
+//    ui->Liners_Close->setVisible(false);
+//}
 
 
 void MainWindow::on_HP_Button_clicked()
@@ -1839,53 +2056,54 @@ void MainWindow::on_HP_Button_clicked()
     //11
     dock_win_combined_tracker->toggleView(true);
     ui->HP_Widget->setStyleSheet(stylesheetvis);
-    ui->HP_Close->setVisible(true);
+   // ui->HP_Close->setVisible(true);
 }
 
 
-void MainWindow::on_HP_Close_clicked()
-{
-    //11
-    dock_win_combined_tracker->toggleView(false);
-    ui->HP_Widget->setStyleSheet("");
-    ui->HP_Close->setVisible(false);
-}
+//void MainWindow::on_HP_Close_clicked()
+//{
+//    //11
+//    dock_win_combined_tracker->toggleView(false);
+//    ui->HP_Widget->setStyleSheet("");
+//    ui->HP_Close->setVisible(false);
+//}
 
 
 void MainWindow::on_MissedTrade_Button_clicked()
 {
     dock_win_missed_trades->toggleView(true);
     ui->MissedTrade_widget->setStyleSheet(stylesheetvis);
-    ui->MissedTrade_Close->setVisible(true);
+   // ui->MissedTrade_Close->setVisible(true);
 }
 
-void MainWindow::on_MissedTrade_Close_clicked()
-{
-    dock_win_missed_trades->toggleView(false);
-    ui->MissedTrade_widget->setStyleSheet("");
-    ui->MissedTrade_Close->setVisible(false);
-}
+//void MainWindow::on_MissedTrade_Close_clicked()
+//{
+//    dock_win_missed_trades->toggleView(false);
+//    ui->MissedTrade_widget->setStyleSheet("");
+//    ui->MissedTrade_Close->setVisible(false);
+//}
 
 void MainWindow::on_Templates_Button_clicked()
 {
     //12
     ui->Templates_Widget->setStyleSheet(stylesheetvis);
-    ui->Templates_Close->setVisible(true);
+   // ui->Templates_Close->setVisible(true);
 }
 
 
-void MainWindow::on_Templates_Close_clicked()
-{
-    //12
-    ui->Templates_Widget->setStyleSheet("");
-    ui->Templates_Close->setVisible(false);
-}
+//void MainWindow::on_Templates_Close_clicked()
+//{
+//    //12
+//    ui->Templates_Widget->setStyleSheet("");
+//    ui->Templates_Close->setVisible(false);
+//}
 
 void MainWindow::on_close_clicked()
 {
     db_conn->logToDB("Logged Out");
     //loggedOut();
     //portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser;
+    stopBG_Threads();
     close();
 }
 
@@ -1894,6 +2112,16 @@ void MainWindow::on_minimize_clicked()
 {
     showMinimized();
 }
+
+//void MainWindow::on_menu_clicked()
+//{
+
+//}
+
+
+
+
+
 
 void MainWindow::mousePressEvent(QMouseEvent *event) {
     QLabel *child = static_cast<QLabel*>(childAt(event->pos()));
@@ -1946,7 +2174,7 @@ void MainWindow::mouseDoubleClickEvent(QMouseEvent *event) {
 }
 
 
-void MainWindow::on_startall_Button_clicked()
+void MainWindow::startall_Button_clicked()
 {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "Confirmation", "Are you sure you want to activate all selected algos?",
@@ -1955,12 +2183,12 @@ void MainWindow::on_startall_Button_clicked()
             return;
         }
 
-        QStringList portfolioNumbers;
-        for(int i = 0; i < T_Portfolio_Model->portfolio_data_list.size(); i++){
+        QStringList portfolioNumbers = T_Portfolio_Model->getAllPortfolioNumbers();
+        /*for(int i = 0; i < T_Portfolio_Model->portfolio_data_list.size(); i++){
             if (T_Portfolio_Model->portfolio_data_list[i]) {
             portfolioNumbers.append(QString::number(T_Portfolio_Model->portfolio_data_list[i]->PortfolioNumber));
             }
-        }
+        }*/
         QString joinedPortfolioNumbers = portfolioNumbers.join(", ");
         QString Query = "UPDATE Portfolios SET Status='Active' WHERE PortfolioNumber IN (" + joinedPortfolioNumbers + ")";
         QString msg;
@@ -1972,7 +2200,7 @@ void MainWindow::on_startall_Button_clicked()
 
 
 }
-void MainWindow::on_stopall_Button_clicked()
+void MainWindow::stopall_Button_clicked()
 {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "Confirmation", "Are you sure you want to Disable all selected algos?",
@@ -1981,12 +2209,13 @@ void MainWindow::on_stopall_Button_clicked()
             return;
         }
 
-        QStringList portfolioNumbers;
-        for(int i=0;i<T_Portfolio_Model->portfolio_data_list.size();i++){
-            if (T_Portfolio_Model->portfolio_data_list[i]) {
-            portfolioNumbers.append(QString::number(T_Portfolio_Model->portfolio_data_list[i]->PortfolioNumber));
-            }
-        }
+        QStringList portfolioNumbers = T_Portfolio_Model->getAllPortfolioNumbers();
+
+//        for(int i=0;i<T_Portfolio_Model->portfolio_data_list.size();i++){
+//            if (T_Portfolio_Model->portfolio_data_list[i]) {
+//            portfolioNumbers.append(QString::number(T_Portfolio_Model->portfolio_data_list[i]->PortfolioNumber));
+//            }
+//        }
         QString joinedPortfolioNumbers = portfolioNumbers.join(", ");
         QString Query = "UPDATE Portfolios SET Status='DisabledByUser' WHERE PortfolioNumber IN (" + joinedPortfolioNumbers + ")";
 
@@ -2004,7 +2233,7 @@ void MainWindow::OnAlgorithmDockWidgetVisiblityChanged(bool p_Visible)
         ui->Algorithms_Widget->setStyleSheet(stylesheetvis);
     else
         ui->Algorithms_Widget->setStyleSheet("");
-    ui->Algorithms_Close->setVisible(p_Visible);
+  //  ui->Algorithms_Close->setVisible(p_Visible);
 }
 
 void MainWindow::OnOrderBookDockWidgetVisiblityChanged(bool p_Visible)
@@ -2013,7 +2242,7 @@ void MainWindow::OnOrderBookDockWidgetVisiblityChanged(bool p_Visible)
         ui->OrderBook_Widget->setStyleSheet(stylesheetvis);
     else
         ui->OrderBook_Widget->setStyleSheet("");
-    ui->OrderBook_Close->setVisible(p_Visible);
+  //  ui->OrderBook_Close->setVisible(p_Visible);
 }
 
 void MainWindow::OnPositionsDockWidgetVisiblityChanged(bool p_Visible)
@@ -2022,7 +2251,7 @@ void MainWindow::OnPositionsDockWidgetVisiblityChanged(bool p_Visible)
         ui->Positions_Widget->setStyleSheet(stylesheetvis);
     else
         ui->Positions_Widget->setStyleSheet("");
-    ui->Positions_Close->setVisible(p_Visible);
+   // ui->Positions_Close->setVisible(p_Visible);
 }
 void MainWindow::OnLinersDockWidgetVisiblityChanged(bool p_Visible)
 {
@@ -2030,7 +2259,7 @@ void MainWindow::OnLinersDockWidgetVisiblityChanged(bool p_Visible)
         ui->Liners_Widget->setStyleSheet(stylesheetvis);
     else
         ui->Liners_Widget->setStyleSheet("");
-    ui->Liners_Close->setVisible(p_Visible);
+   // ui->Liners_Close->setVisible(p_Visible);
 }
 
 void MainWindow::OnHPDockWidgetVisiblityChanged(bool p_Visible)
@@ -2039,7 +2268,7 @@ void MainWindow::OnHPDockWidgetVisiblityChanged(bool p_Visible)
         ui->HP_Widget->setStyleSheet(stylesheetvis);
     else
         ui->HP_Widget->setStyleSheet("");
-    ui->HP_Close->setVisible(p_Visible);
+   // ui->HP_Close->setVisible(p_Visible);
 }
 
 void MainWindow::OnMTDockWidgetVisiblityChanged(bool p_Visible)
@@ -2057,17 +2286,17 @@ void MainWindow::on_Algorithms_Button_clicked()
     T_Portfolio_DockWin->toggleView(true);
     //7
     ui->Algorithms_Widget->setStyleSheet(stylesheetvis);
-    ui->Algorithms_Close->setVisible(true);
+   // ui->Algorithms_Close->setVisible(true);
 }
 
 
-void MainWindow::on_Algorithms_Close_clicked()
-{
-    T_Portfolio_DockWin->toggleView(false);
-    ui->Algorithms_Widget->setStyleSheet("");
-    ui->Algorithms_Close->setVisible(false);
-}
-void MainWindow::on_ConvertAlgo_button_clicked(){
+//void MainWindow::on_Algorithms_Close_clicked()
+//{
+//    T_Portfolio_DockWin->toggleView(false);
+//    ui->Algorithms_Widget->setStyleSheet("");
+//    ui->Algorithms_Close->setVisible(false);
+//}
+void MainWindow::ConvertAlgo_button_clicked(){
 
     if(!convertalgo){
         convertalgo=new ConvertAlgo_Win(this);
@@ -2101,9 +2330,14 @@ void MainWindow::Delete_clicked_slot()
         for(int i=0; i< selection.count(); i++)
         {
             QModelIndex index = selection.at(i);
-            QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
-
-            if( T_Portfolio_Model->portfolio_data_list[index.row()]->Status == true)
+           //QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
+            PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());
+            if (!P) {
+                qDebug()<<"updatePortFolioStatus----- portfolio null, need to debug this code.";
+                continue;
+            }
+            QString PortfolioNumber = QString::number(P->PortfolioNumber);
+            if( P->Status == true)
             {
                 logs = "PortfolioNumber '"+PortfolioNumber+"' is Active, cannot delete.";
                 activeAlgoList.append(PortfolioNumber);
@@ -2124,6 +2358,7 @@ void MainWindow::Delete_clicked_slot()
                 db_conn->logToDB(logs);
                 qDebug()<<"PortfolioNumber: "<<PortfolioNumber<<" not Deleted, Info:"<<msg;
             }
+            delete P;
 
         }
         deletingPortFolioFlg.storeRelaxed(0);
@@ -2146,11 +2381,18 @@ void MainWindow::T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index){
         if(orderPopUpWin->isHidden())
             orderPopUpWin->show();
         // QString Expiry = T_Portfolio_Model->portfolio_data_list[index.row()]->Expiry;
-        QString PortfolioType =T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioType;
-        QString PortfolioNumber = QString::number(T_Portfolio_Model->portfolio_data_list[index.row()]->PortfolioNumber);
+        PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());
+        if (!P) {
+            qDebug()<<"updatePortFolioStatus----- portfolio null, need to debug this code.";
+
+        }
+
+        QString PortfolioType =P->PortfolioType;
+        QString PortfolioNumber = QString::number(P->PortfolioNumber);
         orderPopUpWin->getTradeDataFromDB(QString::number(userData.UserId), PortfolioNumber,PortfolioType);
-        orderPopUpWin->setData(T_Portfolio_Model->portfolio_data_list[index.row()]);
+        orderPopUpWin->setData(P);
         orderPopUpWin->activateWindow();
+        delete P;
     }
 
 }
@@ -2191,13 +2433,13 @@ void MainWindow::T_Portfolio_Table_cellClicked(const QItemSelection &selected, c
         int row = selectedRows[0];
         //current editing row is not same as selected row  so make last editing row uneditable
         if(portfolio_table_slected_idx_for_editing.load()!=-1&&portfolio_table_slected_idx_for_editing.load()!=row){
-            T_Portfolio_Model->portfolio_data_list[portfolio_table_slected_idx_for_editing.load()]->edting.storeRelaxed(0); // maked the row flg not editing, so the bg data will be updated.
+            T_Portfolio_Model->setEditingFlg(portfolio_table_slected_idx_for_editing.load(),0);//T_Portfolio_Model->portfolio_data_list[portfolio_table_slected_idx_for_editing.load()]->edting.storeRelaxed(0); // maked the row flg not editing, so the bg data will be updated.
             portfolio_table_slected_idx_for_editing.store(-1);
         }
     }
     //multiple row selected or no row selected, so make last editing row uneditable
     else if(portfolio_table_slected_idx_for_editing.load()!=-1){
-        T_Portfolio_Model->portfolio_data_list[portfolio_table_slected_idx_for_editing.load()]->edting.storeRelaxed(0); // maked the row flg not editing, so the bg data will be updated.
+        T_Portfolio_Model->setEditingFlg(portfolio_table_slected_idx_for_editing.load(),0);//T_Portfolio_Model->portfolio_data_list[portfolio_table_slected_idx_for_editing.load()]->edting.storeRelaxed(0); // maked the row flg not editing, so the bg data will be updated.
         portfolio_table_slected_idx_for_editing.store(-1);
     }
 
@@ -2206,8 +2448,12 @@ void MainWindow::T_Portfolio_Table_cellClicked(const QItemSelection &selected, c
 void MainWindow::slotAddLogForAddAlgoRecord(QString str)
 {
     // To show the latest log at top
-    htmlLogsContent.prepend(str);
-     ui->textEdit->setText(htmlLogsContent);
+//    htmlLogsContent.prepend(str);
+//     ui->textEdit->setText(htmlLogsContent);
+   //  emit logDataSignal(str);
+    logsdata.append(str);
+    emit logDataSignal(logsdata);
+    ui->label_5->setText("&nbsp;UserMessage : "+str);
 }
 
 void MainWindow::slotHideProgressBar()
@@ -2217,359 +2463,362 @@ void MainWindow::slotHideProgressBar()
 
 /*********************Watch data section*************************/
 
-QDataStream &operator<<(QDataStream &out, const Indices_Data_Struct &data) {
-    out << data.indexName << data.indexValue << data.change << data.percentagechange
-        << data.netChangeIndicator << data.openingIdx << data.closingIdx
-        << data.highIndexValue << data.lowIndexValue << data.marketCapitialisation
-        << data.display_widget_idx;
-    return out;
-}
+//QDataStream &operator<<(QDataStream &out, const Indices_Data_Struct &data) {
+//    out << data.indexName << data.indexValue << data.change << data.percentagechange
+//        << data.netChangeIndicator << data.openingIdx << data.closingIdx
+//        << data.highIndexValue << data.lowIndexValue << data.marketCapitialisation
+//        << data.display_widget_idx;
+//    return out;
+//}
 
-QDataStream &operator>>(QDataStream &in, Indices_Data_Struct &data) {
-    in >> data.indexName >> data.indexValue >> data.change >> data.percentagechange
-        >> data.netChangeIndicator >> data.openingIdx >> data.closingIdx
-        >> data.highIndexValue >> data.lowIndexValue >> data.marketCapitialisation
-        >> data.display_widget_idx;
-    return in;
-}
-void MainWindow::initWatchWindow(){
-    loadIndicesDataListFromFile(indicesDataList);
-    showSaveWatchOnListView();
+//QDataStream &operator>>(QDataStream &in, Indices_Data_Struct &data) {
+//    in >> data.indexName >> data.indexValue >> data.change >> data.percentagechange
+//        >> data.netChangeIndicator >> data.openingIdx >> data.closingIdx
+//        >> data.highIndexValue >> data.lowIndexValue >> data.marketCapitialisation
+//        >> data.display_widget_idx;
+//    return in;
+//}
+//void MainWindow::initWatchWindow(){
+//    loadIndicesDataListFromFile(indicesDataList);
+//    showSaveWatchOnListView();
 
-}
+//}
 
 
-void MainWindow::saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList) {
-    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QString fileName = appDataPath+"/Data/watch_cache.bin";
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly)) {
-        qWarning("Could not open file for writing.");
-        return;
-    }
-    QDataStream out(&file);
-    out << indicesDataList;
-    file.close();
-}
+//void MainWindow::saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList) {
+//    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+//    QString fileName = appDataPath+"/Data/watch_cache.bin";
+//    QFile file(fileName);
+//    if (!file.open(QIODevice::WriteOnly)) {
+//        qWarning("Could not open file for writing.");
+//        return;
+//    }
+//    QDataStream out(&file);
+//    out << indicesDataList;
+//    file.close();
+//}
 
-void MainWindow::loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList) {
-    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QString fileName = appDataPath+"/Data/watch_cache.bin";
-    QFile file(fileName);
-    if (!file.open(QIODevice::ReadOnly)) {
-        qWarning("Could not open file for reading--> watch_cache.bin");
-        return;
-    }
-    QDataStream in(&file);
-    in >> indicesDataList;
-    file.close();
-}
+//void MainWindow::loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList) {
+//    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+//    QString fileName = appDataPath+"/Data/watch_cache.bin";
+//    QFile file(fileName);
+//    if (!file.open(QIODevice::ReadOnly)) {
+//        qWarning("Could not open file for reading--> watch_cache.bin");
+//        return;
+//    }
+//    QDataStream in(&file);
+//    in >> indicesDataList;
+//    file.close();
+//}
 
 
 void MainWindow::indicesDataRecv_Slot(Indices_Data_Struct data){
-    bool newIndicesData = false;
-    indicesDataMutex.lock();
-    if(!indicesDataList.contains(data.indexName)){
-        indicesDataList.insert(data.indexName,data);
-        newIndicesData = true;
-    }
-    //check any of the value changed
-    else if((indicesDataList[data.indexName].indexValue!=data.indexValue) || (indicesDataList[data.indexName].change!=data.change) || (indicesDataList[data.indexName].percentagechange!=data.percentagechange)){
-        indicesDataList[data.indexName]=data;
-        newIndicesData = true;
-    }
+    emit indicesDataRecv_Signal_watch_card(data);
 
-    indicesDataMutex.unlock();
-   // qDebug()<<"indicesDataRecv_Slot: " <<data.indexName;
+    //remove below code
+//    bool newIndicesData = false;
+//    indicesDataMutex.lock();
+//    if(!indicesDataList.contains(data.indexName)){
+//        indicesDataList.insert(data.indexName,data);
+//        newIndicesData = true;
+//    }
+//    //check any of the value changed
+//    else if((indicesDataList[data.indexName].indexValue!=data.indexValue) || (indicesDataList[data.indexName].change!=data.change) || (indicesDataList[data.indexName].percentagechange!=data.percentagechange)){
+//        indicesDataList[data.indexName]=data;
+//        newIndicesData = true;
+//    }
 
-    if(newIndicesData==true&&ui->lineEditWatchSearch->text()=="")
-        showSaveWatchOnListView();
+//    indicesDataMutex.unlock();
+//   // qDebug()<<"indicesDataRecv_Slot: " <<data.indexName;
 
-    if(newIndicesData==true){
+//    if(newIndicesData==true&&ui->lineEditWatchSearch->text()=="")
+//        showSaveWatchOnListView();
 
-        QListWidgetItem *item = ui->listWidgetWatch->currentItem();
-        if (item) {
-            watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(item));
-            if (widget) {
-                updateSelecteWatch_UI( widget->data);
-            }
-        }
+//    if(newIndicesData==true){
 
-        saveIndicesDataListToFile(indicesDataList);
+//        QListWidgetItem *item = ui->listWidgetWatch->currentItem();
+//        if (item) {
+//            watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(item));
+//            if (widget) {
+//                updateSelecteWatch_UI( widget->data);
+//            }
+//        }
 
-    }
+//        saveIndicesDataListToFile(indicesDataList);
 
-}
-void MainWindow::on_lineEditWatchSearch_textChanged(const QString &text)
-{
-    if(text==""){
-        showSaveWatchOnListView();
-        return;
-    }
-
-    indicesDataMutex.lock();
-
-    QHash<QString, Indices_Data_Struct> indicesDataListTmp = indicesDataList;
-    indicesDataListTmp.detach();
-    indicesDataMutex.unlock();
-
-
-    /*QStringList nameList;
-    nameList.append("Nifty50");
-    nameList.append("BankNifty");
-    nameList.append("FinNifty");
-    nameList.append("SmallCap");
-    nameList.append("ABC");
-    nameList.append("DDD");
-    nameList.append("ee");
-    nameList.append("dd");
-    nameList.append("ABC");
-    nameList.append("de");
-    nameList.append("ddd");
-    nameList.append("wsd");
-    nameList.append("dfe");
-    nameList.append("fg");
-    nameList.append("gf");
-    nameList.append("rt");
-    nameList.append("fg");*/
-
-
-    QRegularExpression regex(text, QRegularExpression::CaseInsensitiveOption);
-    QStringList filteredList;
-
-    for (auto it = indicesDataListTmp.constBegin(); it != indicesDataListTmp.constEnd(); ++it) {
-        const QString &key = it.key();
-        if (regex.match(key).hasMatch()) {
-            filteredList.append(key);
-        }
-       // const Indices_Data_Struct &value = it.value();
-    }
-
-    /*for(const QString &name : nameList) {
-        if (regex.match(name).hasMatch()) {
-            filteredList.append(name);
-        }
-    }*/
-
-    ui->listWidgetWatch->clear();
-    int selecteIDx = -1;
-    for(int i=0;i<filteredList.size();i++){
-        auto item = new QListWidgetItem();
-        auto widget1 = new watch_Data_List_Item(this);
-        Indices_Data_Struct data = indicesDataListTmp[filteredList[i]];        
-        widget1->setData(data);
-        item->setSizeHint(widget1->sizeHint());
-
-        ui->listWidgetWatch->addItem(item);
-        ui->listWidgetWatch->setItemWidget(item, widget1);
-        if(data.indexName==watchItemSelectedindexName)
-            selecteIDx = ui->listWidgetWatch->count()-1;
-    }
-    if(selecteIDx>-1){
-        ui->listWidgetWatch->setCurrentRow(selecteIDx);
-    }
-
+//    }
 
 }
-void MainWindow::showSaveWatchOnListView(){
+//void MainWindow::on_lineEditWatchSearch_textChanged(const QString &text)
+//{
+//    if(text==""){
+//        showSaveWatchOnListView();
+//        return;
+//    }
 
-    ui->listWidgetWatch->clear();
-    if(savedWatchItems.size()==0){
-        ui->watchListSelectedDetails_Parent->setVisible(false);
-        return;
-    }
-    indicesDataMutex.lock();
-    QHash<QString, Indices_Data_Struct> indicesDataListTmp = indicesDataList;
-    indicesDataListTmp.detach();
-    indicesDataMutex.unlock();
-    int selecteIDx = -1;
-    for(int i=0;i<savedWatchItems.length();i++){
-        if(indicesDataListTmp.contains(savedWatchItems[i])){
-            auto item = new QListWidgetItem();
-            auto widget1 = new watch_Data_List_Item(this);
-            Indices_Data_Struct data = indicesDataListTmp[savedWatchItems[i]];
-            widget1->setData(data);
-            item->setSizeHint(widget1->sizeHint());
-            ui->listWidgetWatch->addItem(item);
-            ui->listWidgetWatch->setItemWidget(item, widget1);
-            if(data.indexName==watchItemSelectedindexName)
-                selecteIDx = ui->listWidgetWatch->count()-1;
-        }
-    }
-    if(selecteIDx>-1){
-        ui->listWidgetWatch->setCurrentRow(selecteIDx);
-    }
-    if(ui->listWidgetWatch->selectedItems().count()==0){
-        ui->watchListSelectedDetails_Parent->setVisible(false);
-    }
-}
+//    indicesDataMutex.lock();
 
-void MainWindow::on_listWidgetWatch_itemClicked(QListWidgetItem *item)
-{
-    if (!item) {
-        ui->watchListSelectedDetails_Parent->setHidden(true);
-        return; // Handle no item clicked scenario
-    }
-
-    watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(item));
-    if (!widget) {
-        ui->watchListSelectedDetails_Parent->setHidden(true);
-        return; // Handle case where no widget is associated with the item
-    }
-
-    watchItemSelectedindexName = widget->data.indexName;
-
-    updateSelecteWatch_UI(widget->data);
-
-}
-
-void MainWindow::updateSelecteWatch_UI( Indices_Data_Struct data){
-    ui->watchListSelectedDetails_Parent->setVisible(true);
-
-    bool redArrow = true;
-    //if(data.netChangeIndicator=="+")
-    // redArrow = false;
-    if(data.change.toDouble()>=0)
-        redArrow = false;
-
-    if(redArrow){
-        QPixmap pixmap(":/arrow_red.png");
-        pixmap = pixmap.scaled(ui->watch_indicator->width(),ui->watch_indicator->height(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        ui->watch_indicator->setPixmap(pixmap);
-        ui->watch_indicator->setMask(pixmap.mask());
-        ui->watch_indicator->setStyleSheet("font-family: 'Work Sans';"
-                                           "font-size: 10px;"
-                                           "font-weight: 500;"
-                                           "color:#CC3437"
-                                           );
-    }
-    else{
-        QPixmap pixmap(":/arrow_green.png");
-        pixmap = pixmap.scaled(ui->watch_indicator->width(),ui->watch_indicator->height(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
-        ui->watch_indicator->setPixmap(pixmap);
-        ui->watch_indicator->setMask(pixmap.mask());
-
-        ui->watch_val1->setStyleSheet("font-family: 'Work Sans';"
-                                      "font-size: 10px;"
-                                      "font-weight: 500;"
-                                      "color:#008000"
-                                      );
-    }
-
-    QString percent = (data.change+"("+data.percentagechange+"%)");
-    ui->Index_Name->setText(data.indexName);
-    ui->watch_val1->setText(data.indexValue);
-    ui->watch_val2->setText(percent);
-    ui->Open_Num->setText(data.openingIdx);
-    ui->High_Num->setText(data.highIndexValue);
-    ui->Low_Num->setText(data.lowIndexValue);
-    ui->Volume_Num->setText(data.marketCapitialisation);
+//    QHash<QString, Indices_Data_Struct> indicesDataListTmp = indicesDataList;
+//    indicesDataListTmp.detach();
+//    indicesDataMutex.unlock();
 
 
-
-}
-
-void MainWindow::on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item)
-{
-    QListWidgetItem *selectedItem = ui->listWidgetWatch->currentItem();
-    if (selectedItem) {
-        watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(selectedItem));
-
-        //if selected item already in saved item list remove from else or add it
-        if(savedWatchItems.contains(widget->data.indexName)){
-            removeFromSavedWatchItems(widget->data);
-        }
-        else{
-            addToSavedWatchItems(widget->data);
-        }
-
-        ui->lineEditWatchSearch->clear();
-    }
-    else {
-        QMessageBox msgBox;
-        msgBox.setText("Please select an item from Watch.");
-        msgBox.setIcon(QMessageBox::Warning);
-        msgBox.exec();
-    }
-
-}
-
-void MainWindow::addToSavedWatchItems(Indices_Data_Struct data)
-{
-        if(!savedWatchItems.contains(data.indexName)){
-            savedWatchItems.append(data.indexName);
-            QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-            QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
-            settings.beginGroup("GeneralSettings");
-            if(savedWatchItems.length()==1)
-                settings.setValue("Watch_InstrumentNames",savedWatchItems[0]);
-            else
-                settings.setValue("Watch_InstrumentNames",savedWatchItems.join(";"));
-            settings.endGroup();
-
-            if(ui->lineEditWatchSearch->text()=="")
-                showSaveWatchOnListView();
-
-        }
-        else{
-            QMessageBox msgBox;
-            msgBox.setText("IndexName already added.");
-            msgBox.setIcon(QMessageBox::Warning);
-            msgBox.exec();
-        }
-}
-
-void MainWindow::removeFromSavedWatchItems( Indices_Data_Struct data)
-{
-        if(savedWatchItems.contains(data.indexName)){
-            savedWatchItems.removeOne(data.indexName);
-            QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-            QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
-            settings.beginGroup("GeneralSettings");
-            if(savedWatchItems.length()==1)
-                settings.setValue("Watch_InstrumentNames",savedWatchItems[0]);
-            else
-                settings.setValue("Watch_InstrumentNames",savedWatchItems.join(";"));
-            settings.endGroup();
-            if(ui->lineEditWatchSearch->text()=="")
-                showSaveWatchOnListView();
+//    /*QStringList nameList;
+//    nameList.append("Nifty50");
+//    nameList.append("BankNifty");
+//    nameList.append("FinNifty");
+//    nameList.append("SmallCap");
+//    nameList.append("ABC");
+//    nameList.append("DDD");
+//    nameList.append("ee");
+//    nameList.append("dd");
+//    nameList.append("ABC");
+//    nameList.append("de");
+//    nameList.append("ddd");
+//    nameList.append("wsd");
+//    nameList.append("dfe");
+//    nameList.append("fg");
+//    nameList.append("gf");
+//    nameList.append("rt");
+//    nameList.append("fg");*/
 
 
-        }
-        else{
-            QMessageBox msgBox;
-            msgBox.setText("IndexName not exist in Saved List.");
-            msgBox.setIcon(QMessageBox::Warning);
-            msgBox.exec();
-        }
+//    QRegularExpression regex(text, QRegularExpression::CaseInsensitiveOption);
+//    QStringList filteredList;
 
-}
-void MainWindow::on_listWidgetWatch_itemSelectionChanged()
-{
-    if(ui->listWidgetWatch->selectedItems().count()==0){
-        ui->watchListSelectedDetails_Parent->setVisible(false);
-    }
-}
+//    for (auto it = indicesDataListTmp.constBegin(); it != indicesDataListTmp.constEnd(); ++it) {
+//        const QString &key = it.key();
+//        if (regex.match(key).hasMatch()) {
+//            filteredList.append(key);
+//        }
+//       // const Indices_Data_Struct &value = it.value();
+//    }
+
+//    /*for(const QString &name : nameList) {
+//        if (regex.match(name).hasMatch()) {
+//            filteredList.append(name);
+//        }
+//    }*/
+
+//    ui->listWidgetWatch->clear();
+//    int selecteIDx = -1;
+//    for(int i=0;i<filteredList.size();i++){
+//        auto item = new QListWidgetItem();
+//        auto widget1 = new watch_Data_List_Item(this);
+//        Indices_Data_Struct data = indicesDataListTmp[filteredList[i]];
+//        widget1->setData(data);
+//        item->setSizeHint(widget1->sizeHint());
+
+//        ui->listWidgetWatch->addItem(item);
+//        ui->listWidgetWatch->setItemWidget(item, widget1);
+//        if(data.indexName==watchItemSelectedindexName)
+//            selecteIDx = ui->listWidgetWatch->count()-1;
+//    }
+//    if(selecteIDx>-1){
+//        ui->listWidgetWatch->setCurrentRow(selecteIDx);
+//    }
+
+
+//}
+//void MainWindow::showSaveWatchOnListView(){
+
+//    ui->listWidgetWatch->clear();
+//    if(savedWatchItems.size()==0){
+//        ui->watchListSelectedDetails_Parent->setVisible(false);
+//        return;
+//    }
+//    indicesDataMutex.lock();
+//    QHash<QString, Indices_Data_Struct> indicesDataListTmp = indicesDataList;
+//    indicesDataListTmp.detach();
+//    indicesDataMutex.unlock();
+//    int selecteIDx = -1;
+//    for(int i=0;i<savedWatchItems.length();i++){
+//        if(indicesDataListTmp.contains(savedWatchItems[i])){
+//            auto item = new QListWidgetItem();
+//            auto widget1 = new watch_Data_List_Item(this);
+//            Indices_Data_Struct data = indicesDataListTmp[savedWatchItems[i]];
+//            widget1->setData(data);
+//            item->setSizeHint(widget1->sizeHint());
+//            ui->listWidgetWatch->addItem(item);
+//            ui->listWidgetWatch->setItemWidget(item, widget1);
+//            if(data.indexName==watchItemSelectedindexName)
+//                selecteIDx = ui->listWidgetWatch->count()-1;
+//        }
+//    }
+//    if(selecteIDx>-1){
+//        ui->listWidgetWatch->setCurrentRow(selecteIDx);
+//    }
+//    if(ui->listWidgetWatch->selectedItems().count()==0){
+//        ui->watchListSelectedDetails_Parent->setVisible(false);
+//    }
+//}
+
+//void MainWindow::on_listWidgetWatch_itemClicked(QListWidgetItem *item)
+//{
+//    if (!item) {
+//        ui->watchListSelectedDetails_Parent->setHidden(true);
+//        return; // Handle no item clicked scenario
+//    }
+
+//    watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(item));
+//    if (!widget) {
+//        ui->watchListSelectedDetails_Parent->setHidden(true);
+//        return; // Handle case where no widget is associated with the item
+//    }
+
+//    watchItemSelectedindexName = widget->data.indexName;
+
+//    updateSelecteWatch_UI(widget->data);
+
+//}
+
+//void MainWindow::updateSelecteWatch_UI( Indices_Data_Struct data){
+//    ui->watchListSelectedDetails_Parent->setVisible(true);
+
+//    bool redArrow = true;
+//    //if(data.netChangeIndicator=="+")
+//    // redArrow = false;
+//    if(data.change.toDouble()>=0)
+//        redArrow = false;
+
+//    if(redArrow){
+//        QPixmap pixmap(":/arrow_red.png");
+//        pixmap = pixmap.scaled(ui->watch_indicator->width(),ui->watch_indicator->height(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
+//        ui->watch_indicator->setPixmap(pixmap);
+//        ui->watch_indicator->setMask(pixmap.mask());
+//        ui->watch_indicator->setStyleSheet("font-family: 'Work Sans';"
+//                                           "font-size: 10px;"
+//                                           "font-weight: 500;"
+//                                           "color:#CC3437"
+//                                           );
+//    }
+//    else{
+//        QPixmap pixmap(":/arrow_green.png");
+//        pixmap = pixmap.scaled(ui->watch_indicator->width(),ui->watch_indicator->height(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
+//        ui->watch_indicator->setPixmap(pixmap);
+//        ui->watch_indicator->setMask(pixmap.mask());
+
+//        ui->watch_val1->setStyleSheet("font-family: 'Work Sans';"
+//                                      "font-size: 10px;"
+//                                      "font-weight: 500;"
+//                                      "color:#008000"
+//                                      );
+//    }
+
+//    QString percent = (data.change+"("+data.percentagechange+"%)");
+//    ui->Index_Name->setText(data.indexName);
+//    ui->watch_val1->setText(data.indexValue);
+//    ui->watch_val2->setText(percent);
+//    ui->Open_Num->setText(data.openingIdx);
+//    ui->High_Num->setText(data.highIndexValue);
+//    ui->Low_Num->setText(data.lowIndexValue);
+//    ui->Volume_Num->setText(data.marketCapitialisation);
+
+
+
+//}
+
+//void MainWindow::on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item)
+//{
+//    QListWidgetItem *selectedItem = ui->listWidgetWatch->currentItem();
+//    if (selectedItem) {
+//        watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(selectedItem));
+
+//        //if selected item already in saved item list remove from else or add it
+//        if(savedWatchItems.contains(widget->data.indexName)){
+//            removeFromSavedWatchItems(widget->data);
+//        }
+//        else{
+//            addToSavedWatchItems(widget->data);
+//        }
+
+//        ui->lineEditWatchSearch->clear();
+//    }
+//    else {
+//        QMessageBox msgBox;
+//        msgBox.setText("Please select an item from Watch.");
+//        msgBox.setIcon(QMessageBox::Warning);
+//        msgBox.exec();
+//    }
+
+//}
+
+//void MainWindow::addToSavedWatchItems(Indices_Data_Struct data)
+//{
+//        if(!savedWatchItems.contains(data.indexName)){
+//            savedWatchItems.append(data.indexName);
+//            QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+//            QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
+//            settings.beginGroup("GeneralSettings");
+//            if(savedWatchItems.length()==1)
+//                settings.setValue("Watch_InstrumentNames",savedWatchItems[0]);
+//            else
+//                settings.setValue("Watch_InstrumentNames",savedWatchItems.join(";"));
+//            settings.endGroup();
+
+//            if(ui->lineEditWatchSearch->text()=="")
+//                showSaveWatchOnListView();
+
+//        }
+//        else{
+//            QMessageBox msgBox;
+//            msgBox.setText("IndexName already added.");
+//            msgBox.setIcon(QMessageBox::Warning);
+//            msgBox.exec();
+//        }
+//}
+
+//void MainWindow::removeFromSavedWatchItems( Indices_Data_Struct data)
+//{
+//        if(savedWatchItems.contains(data.indexName)){
+//            savedWatchItems.removeOne(data.indexName);
+//            QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+//            QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
+//            settings.beginGroup("GeneralSettings");
+//            if(savedWatchItems.length()==1)
+//                settings.setValue("Watch_InstrumentNames",savedWatchItems[0]);
+//            else
+//                settings.setValue("Watch_InstrumentNames",savedWatchItems.join(";"));
+//            settings.endGroup();
+//            if(ui->lineEditWatchSearch->text()=="")
+//                showSaveWatchOnListView();
+
+
+//        }
+//        else{
+//            QMessageBox msgBox;
+//            msgBox.setText("IndexName not exist in Saved List.");
+//            msgBox.setIcon(QMessageBox::Warning);
+//            msgBox.exec();
+//        }
+
+//}
+//void MainWindow::on_listWidgetWatch_itemSelectionChanged()
+//{
+//    if(ui->listWidgetWatch->selectedItems().count()==0){
+//        ui->watchListSelectedDetails_Parent->setVisible(false);
+//    }
+//}
 
 
 /****************************************************************/
 
 
 
-void MainWindow::on_toggle_Button_1_clicked()
-{
-    bool currentVisibility = ui->sidePanel->isVisible();
-    if (currentVisibility) {
-        ui->sidePanel->setVisible(false);
-        QPixmap pixmapRight(":/right_arrow.png");
-        ui->toggle_Button_1->setIcon(pixmapRight);
+//void MainWindow::on_toggle_Button_1_clicked()
+//{
+//    bool currentVisibility = ui->sidePanel->isVisible();
+//    if (currentVisibility) {
+//        ui->sidePanel->setVisible(false);
+//        QPixmap pixmapRight(":/right_arrow.png");
+//        ui->toggle_Button_1->setIcon(pixmapRight);
 
-    } else {
-        ui->sidePanel->setVisible(true);
-        QPixmap pixmapLeft(":/left_arrow.png");
-        ui->toggle_Button_1->setIcon(pixmapLeft);
-    }
-}
+//    } else {
+//        ui->sidePanel->setVisible(true);
+//        QPixmap pixmapLeft(":/left_arrow.png");
+//        ui->toggle_Button_1->setIcon(pixmapLeft);
+//    }
+//}
 
 
 void MainWindow::saveDockManagerState()
@@ -2583,13 +2832,7 @@ void MainWindow::saveDockManagerState()
         file1.close();
     }
 
-    QByteArray state2 = DockManagerSidePanel->saveState();
-    QFile file2(appDataPath+"/dock_state_side_panel.dat");
-    if (file2.open(QIODevice::WriteOnly)) {
-        QDataStream out2(&file2);
-        out2 << state2;
-        file2.close();
-    }
+
 }
 
 
@@ -2608,14 +2851,7 @@ void MainWindow::restoreDockManagerState()
     }
 
 
-    QFile file2(appDataPath+"/dock_state_side_panel.dat");
-    if (file2.open(QIODevice::ReadOnly)) {
-        QByteArray state2;
-        QDataStream in2(&file2);
-        in2 >> state2;
-        DockManagerSidePanel->restoreState(state2);
-        file2.close();
-    }
+
 }
 
 
@@ -2632,6 +2868,7 @@ void MainWindow::saveTableViewColumnState(QTableView *tableView){
    settings.setValue(key,tableView->horizontalHeader()->saveState());
 
 }
+
 void MainWindow::restoreTableViewColumnState(QTableView *tableView){
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
     QSettings settings(appDataPath+"/table_view_sett.dat", QSettings::IniFormat);
@@ -2643,9 +2880,81 @@ void MainWindow::restoreTableViewColumnState(QTableView *tableView){
        tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
      }
 }
-void MainWindow::on_sorting_Button_clicked(){
 
+void MainWindow::onTradeTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
+     saveTradeTableViewColumnState(trade_table);
 
+}
+
+void MainWindow::saveTradeTableViewColumnState(QTableView *tableView) {
+     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
+     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
+     QString key = tableView->objectName() + "_HeaderState";
+
+     // Save the state of the trade table headers
+     settings.setValue(key, tableView->horizontalHeader()->saveState());
+}
+
+void MainWindow::restoreTradeTableViewColumnState(QTableView *tableView) {
+     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
+     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
+
+     // Restore the state of the trade table headers if available
+     QString key = tableView->objectName() + "_HeaderState";
+     if (settings.contains(key)) {
+       tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
+     }
+}
+void MainWindow::onNetposTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
+     saveNetposTableViewColumnState(net_pos_table);
+
+}
+
+void MainWindow::saveNetposTableViewColumnState(QTableView *tableView) {
+     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
+     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
+     QString key = tableView->objectName() + "_HeaderState";
+
+     // Save the state of the trade table headers
+     settings.setValue(key, tableView->horizontalHeader()->saveState());
+}
+
+void MainWindow::restoreNetposTableViewColumnState(QTableView *tableView) {
+     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
+     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
+
+     // Restore the state of the trade table headers if available
+     QString key = tableView->objectName() + "_HeaderState";
+     if (settings.contains(key)) {
+       tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
+     }
+}
+void MainWindow::onLinersTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
+     saveLinersTableViewColumnState(liners_table);
+
+}
+
+void MainWindow::saveLinersTableViewColumnState(QTableView *tableView) {
+     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
+     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
+     QString key = tableView->objectName() + "_HeaderState";
+
+     // Save the state of the trade table headers
+     settings.setValue(key, tableView->horizontalHeader()->saveState());
+}
+
+void MainWindow::restoreLinersTableViewColumnState(QTableView *tableView) {
+     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
+     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
+
+     // Restore the state of the trade table headers if available
+     QString key = tableView->objectName() + "_HeaderState";
+     if (settings.contains(key)) {
+       tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
+     }
+}
+
+void MainWindow::sorting_Button_clicked(){
       if (!sortWin) {
            sortWin = new SortSettingPopUp();
            connect(sortWin, &SortSettingPopUp::reloadSortSettingSignal, [this]() {
@@ -2691,7 +3000,6 @@ void MainWindow::closeEvent(QCloseEvent* event)
     // that all top level windows of the dock manager are properly closed
     saveDockManagerState();
 
-    DockManagerSidePanel->deleteLater();
     DockManagerMainPanel->deleteLater();
     QMainWindow::closeEvent(event);
 
@@ -2699,10 +3007,103 @@ void MainWindow::closeEvent(QCloseEvent* event)
 
 }
 
+void MainWindow::showMessageSlot(QString msg){
+    QMessageBox msgBox;
+    msgBox.setText(msg);
+    msgBox.setIcon(QMessageBox::Information);
+    msgBox.exec();
+}
+
+void MainWindow::onChangepasswordActionTriggered() {
+    QDialog resetDialog(this);
+    resetDialog.setWindowTitle("Reset Password");
+
+    QVBoxLayout *layout = new QVBoxLayout(&resetDialog);
+
+    // Create the new password input fields
+    QLabel *newPasswordLabel = new QLabel("New password:", &resetDialog);
+    QLineEdit *newPasswordLineEdit = new QLineEdit(&resetDialog);
+    newPasswordLineEdit->setEchoMode(QLineEdit::Password); // Hide text for password input
+
+    // Create the confirm password input fields
+    QLabel *confirmPasswordLabel = new QLabel("Confirm password:", &resetDialog);
+    QLineEdit *confirmPasswordLineEdit = new QLineEdit(&resetDialog);
+    confirmPasswordLineEdit->setEchoMode(QLineEdit::Password);
+
+    // Create reset button
+    QPushButton *resetButton = new QPushButton("Reset Password", &resetDialog);
+
+    // Add widgets to the layout
+    layout->addWidget(newPasswordLabel);
+    layout->addWidget(newPasswordLineEdit);
+    layout->addWidget(confirmPasswordLabel);
+    layout->addWidget(confirmPasswordLineEdit);
+    layout->addWidget(resetButton);
+
+    // Connect the reset button to handle password reset
+    connect(resetButton, &QPushButton::clicked, [this, &resetDialog, newPasswordLineEdit, confirmPasswordLineEdit]() {
+        QString newPassword = newPasswordLineEdit->text();
+        QString confirmPassword = confirmPasswordLineEdit->text();
+      //  QString user_id = "YourUserID"; // Replace with the actual user ID retrieval logic
+
+        // Call the method to handle the password reset with three arguments
+        resetPassword(newPassword, confirmPassword);
+
+        // Close the dialog
+        resetDialog.accept();
+    });
+
+    // Show the dialog as a modal window
+    resetDialog.exec();
+}
+
+void MainWindow::resetPassword(const QString &newPassword, const QString &confirmPassword)
+{
+    // Check if the new password and confirm password match
+    if (newPassword != confirmPassword) {
+          QMessageBox::warning(this, "Error", "The new password and confirmation password do not match.");
+          return;
+    }
+
+    QString msg;
+    bool success = db_conn->resetPassword(newPassword, QString::number(userData.UserId),msg);
+
+    // Implement further logic to reset the password
+    QMessageBox::information(this, "Success", "Password has been reset successfully.");
+}
 
 
+void MainWindow::onSummaryActionTriggered(){
 
+    Summary_cards *SC = new Summary_cards(this);
+    Qt::WindowFlags flags = SC->windowFlags();
+    SC->setWindowFlags(flags | Qt::Tool);
+    SC->setAttribute(Qt::WA_DeleteOnClose);
+    connect(this, &MainWindow::data_summary_update_signal, SC, &Summary_cards::updateSummaryData);
 
+    SC->show();
+}
 
+void MainWindow::onWatchActionTriggered(){
+    Watch_cards *WC = new Watch_cards(this);
+    Qt::WindowFlags flags = WC->windowFlags();
+    WC->setWindowFlags(flags | Qt::Tool);
+
+    WC->setAttribute(Qt::WA_DeleteOnClose);
+    //connect(this, &MainWindow::indicesDataRecv_Signal_watch_card(Indices_Data_Struct), WC, &Watch_cards::indicesDataRecv_Slot(Indices_Data_Struct));
+    connect(this, &MainWindow::indicesDataRecv_Signal_watch_card, WC, &Watch_cards::indicesDataRecv_Slot);
+    WC->show();
+}
+
+void MainWindow::onLogActionTriggered(){
+    Logs_cards *LC = new Logs_cards(this);
+    Qt::WindowFlags flags = LC->windowFlags();
+    LC->setWindowFlags(flags | Qt::Tool);
+    LC->setAttribute(Qt::WA_DeleteOnClose);
+    LC->logDataSignal_Slot(logsdata);
+    connect(this, &MainWindow::logDataSignal, LC, &Logs_cards::logDataSignal_Slot);
+
+    LC->show();
+}
 
 

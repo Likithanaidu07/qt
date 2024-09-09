@@ -97,3 +97,13 @@ target.path=$$PREFIX/lib
 INSTALLS += headers target
 
 DISTFILES +=
+
+
+win32:CONFIG(release, debug|release) {
+    QMAKE_POST_LINK += $$QMAKE_COPY \"$$DESTDIR\\qtadvanceddocking.dll\" \"$$OUT_PWD\\..\\..\\release\\\"
+}
+
+win32:CONFIG(debug, debug|release) {
+    QMAKE_POST_LINK += $$QMAKE_COPY \"$$DESTDIR\\qtadvanceddockingd.dll\" \"$$OUT_PWD\\..\\..\\debug\\\"
+}
+

@@ -33,7 +33,7 @@ struct net_pos_data_{
     double Sell_Price;
     double Buy_Avg_Price;
     double Sell_Avg_Price;
-    double BuyValue_summary;
+    double BuyValue;
     double SellValue;
     double Net_Qty;
   int lotSize;
@@ -76,12 +76,13 @@ public:
     QString InstrumentTypeFilter;
 
     userInfo login( QString user_name,  QString password);
-    void  getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount,Table_Portfolios_Model* model,Combined_Tracker_Table_Model *comb_tracker_model,QHash<QString, PortfolioAvgPrice> &averagePriceList,QString user_id, QStringList TradedPortFolioList );
+    void  getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount,Combined_Tracker_Table_Model *comb_tracker_model,QHash<QString, PortfolioAvgPrice> &averagePriceList,QString user_id, QStringList TradedPortFolioList, QStringList &PortFoliosToDelete );
 
-    QMap<int, QHash<QString, contract_table>> getContractTable(QHash<QString, QStringList> &_m_ContractDetailsFiltered, QStringList &F2F_data_list_Sorted_Key, QStringList &BFLY_data_list_Sorted_Key, QStringList &BFLY_BID_data_list_Sorted_Key, QStringList &CR_data_list_Sorted_Key , userInfo userData);
+    QHash<QString, contract_table>  getContractTable( QHash<int , QStringList> &m_ContractDetails_Grouped_,userInfo userData);
 
     QSqlQuery runQuery(QString qry_str);
     bool updateDB_Table(QString query_str,QString &msg);
+    bool resetPassword(const QString &new_password,QString user_id,QString &msg);
     QString get_Algo_Name(int algo_type,int leg1_token_number,int leg2_token_number,int leg3_token_number,double devicer,int decimal_precision);
     void  getTradeTableData(int &TraderCount,Trade_Table_Model *model,Liners_Model *liners_model ,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
     void  getNetPosTableData(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash);
@@ -94,6 +95,8 @@ public:
     QString fixDecimal(double num,int decimal_precision);
     algo_data_insert_status insertToAlgoTable(algo_data_to_insert data,int MaxPortfolioCount,QString &msg);
     bool deleteAlgo(QString PortfolioNumber,QString &msg);
+    bool deleteAlgos(QStringList PortfolioNumbers,QString &msg);
+
     void logToDB(QString logMessage);
 
     QList<QHash<QString,QString>> getOrderPopUPData(QString user_id, QString portfolioNumber,QString PortfolioType);
@@ -104,6 +107,7 @@ public:
     ///
     void loadCurrentDayLogs();
     QHash<QString, contract_table> prpareContractDataFromDB(QString queryStr, QSqlDatabase *db,QStringList &tokenData);
+    QList<PortfolioType> getPortfolioTypesForInstrumentType(const QString& data, const QMap<PortfolioType, QStringList>& algoFilterMap);
 
 private:
     bool checkDBOpened( QString &mesg);
@@ -121,6 +125,7 @@ private:
 
 signals:
     void display_log_text_signal(QString);
+    void updateModelDataListSignal(QList <PortfolioObject*> portfolio_data_list, bool clearTableFlg);
 
 };
 

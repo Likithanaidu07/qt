@@ -36,6 +36,7 @@ loginwindow::loginwindow(QWidget *parent) :
 
     ui->lineEditUsername->setFocus();
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+
     QPixmap pixmap(":/ALGO METHODS.png");
 
 

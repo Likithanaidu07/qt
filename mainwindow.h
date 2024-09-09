@@ -50,6 +50,10 @@
 #include "F1_F2/f1_f2_buysell.h"
 
 #include "MissedTrades/missed_trade_table_model.h"
+#include "Cards/logs_cards.h"
+#include "Cards/summary_cards.h"
+#include "Cards/watch_cards.h"
+#include "PortFolio/portfolio_searchfilterproxymodel.h"
 using namespace ads;
 
 class mysql_conn;
@@ -78,8 +82,8 @@ public:
     TradeDetailsPopup *tradePopUpWin;
 
     //void updateLabels();
-
-
+ void resetPassword(const QString &newPassword, const QString &confirmPassword);
+   //void resetPassword(const QString &newPassword);
 
 //    QStandardItemModel *model_searchInstrument_BOX_Leg1;
     QString foo_token_number_start_strike;// this for start strike input of F2F
@@ -94,15 +98,20 @@ signals:
     void display_log_text_signal(QString);
     void update_ui_signal(int);
     void signalHideProgressBar();
-    void data_summary_update_signal();
-
+    void data_summary_update_signal(QStringList);
+    void indicesDataRecv_Signal_watch_card(Indices_Data_Struct);
+    void logDataSignal(QStringList);
+    void showMessageSignal(QString);
+    void requestDeleteConfirmation(const QStringList &portfoliosToDelete);
 
 private:
     Ui::MainWindow *ui;
+    QStringList logsdata;
 
     loadingdatawindow *loadingDataWinodw;
     SortSettingPopUp *sortWin; // Add this line
 
+    bool showMessagOnceFlg;
     int AlgoCount;
     int OrderCount;
     int TraderCount;
@@ -120,7 +129,7 @@ private:
 
 
     ads::CDockManager* DockManagerMainPanel;
-    ads::CDockManager *DockManagerSidePanel;
+ //  ads::CDockManager *DockManagerSidePanel;
 
 
     void createINIFileIfNotExist();
@@ -154,6 +163,7 @@ private:
     void stop_dataLoadingThread();
     void refreshTableIn_Intervel();
     void loggedOut();
+    void stopBG_Threads();
 
     Table_Portfolios_Model  *T_Portfolio_Model;
     table_portfolios_custom *T_Portfolio_Table;
@@ -212,21 +222,28 @@ private:
 
     QMutex indicesDataMutex; //list to store indices data for watch
     QString watchItemSelectedindexName;
-    QStringList savedWatchItems; // saved watch item to display on watch
+   // QStringList savedWatchItems; // saved watch item to display on watch
     void showSaveWatchOnListView();
-    void initWatchWindow();
+   // void initWatchWindow();
     void updateSelecteWatch_UI( Indices_Data_Struct data);
     void addToSavedWatchItems(Indices_Data_Struct data);
     void removeFromSavedWatchItems(Indices_Data_Struct data);
-    void saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList);
-    void loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList);
+ //   void saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList);
+ //   void loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList);
 
     void saveDockManagerState();
      void restoreDockManagerState();
      void restoreTableViewColumnState(QTableView *tableView);
+    void restoreTradeTableViewColumnState(QTableView *tableView);
+      void restoreNetposTableViewColumnState(QTableView *tableView);
+     void restoreLinersTableViewColumnState(QTableView *tableView);
      void saveTableViewColumnState(QTableView *tableView);
+      void saveTradeTableViewColumnState(QTableView *tableView);
+     void saveNetposTableViewColumnState(QTableView *tableView);
+      void saveLinersTableViewColumnState(QTableView *tableView);
 public slots:
     void profolioTableEditFinshedSlot(QString val,QModelIndex);
+    void onRequestDeleteConfirmation(const QStringList &PortFoliosToDelete);
 //    void edit_Started_PortFolio_Table(int row,int col);
 //    void tradeTableSerachNext();
 //    void tradeTableSerachTxtChanged();
@@ -238,6 +255,7 @@ public slots:
     void F2_clicked_slot();
 
     void indicesDataRecv_Slot(Indices_Data_Struct data);
+    void slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct>& data);
     void backend_comm_Data_Slot(QString msg,SocketDataType msgType);
 //    void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
     void updatePortFolioStatus();
@@ -248,25 +266,34 @@ public slots:
 
     void slotAddLogForAddAlgoRecord(QString str);
     void slotHideProgressBar();
-    void on_startall_Button_clicked();
-    void on_stopall_Button_clicked();
+    void startall_Button_clicked();
+    void stopall_Button_clicked();
     void updateSummaryLabels();
-    void on_sorting_Button_clicked();
+    void showMessageSlot(QString);
+    void sorting_Button_clicked();
     void onPortFolioTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
-
+    void onTradeTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
+    void onNetposTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
+    void onLinersTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
+    void onSummaryActionTriggered();
+    void onChangepasswordActionTriggered();
+    void onWatchActionTriggered();
+    void onLogActionTriggered();
 private slots:
     void on_close_clicked();
     void on_minimize_clicked();
+ //   void  on_menu_clicked();
+   // void showResetPasswordDialog();
     void on_OrderBook_Button_clicked();
-    void on_OrderBook_Close_clicked();
+ //   void on_OrderBook_Close_clicked();
     void on_Positions_Button_clicked();
-    void on_Positions_Close_clicked();
+  //  void on_Positions_Close_clicked();
     void on_Liners_Button_clicked();
-    void on_Liners_Close_clicked();
+  //  void on_Liners_Close_clicked();
     void on_HP_Button_clicked();
-    void on_HP_Close_clicked();
+ //   void on_HP_Close_clicked();
     void on_Templates_Button_clicked();
-    void on_Templates_Close_clicked();
+   // void on_Templates_Close_clicked();
     void on_maximize_clicked();
 
 
@@ -285,21 +312,24 @@ private slots:
     void OnMTDockWidgetVisiblityChanged(bool p_Visible);
     void OnLinersDockWidgetVisiblityChanged(bool p_Visible);
     void on_Algorithms_Button_clicked();
-    void on_Algorithms_Close_clicked();
+   // void on_Algorithms_Close_clicked();
 
-    void on_ConvertAlgo_button_clicked();
-    void on_lineEditWatchSearch_textChanged(const QString &arg1);
-    void on_listWidgetWatch_itemClicked(QListWidgetItem *item);
 
-    void on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item);
-    void on_listWidgetWatch_itemSelectionChanged();
+    void ConvertAlgo_button_clicked();
+   // void on_lineEditWatchSearch_textChanged(const QString &arg1);
+   // void on_listWidgetWatch_itemClicked(QListWidgetItem *item);
 
-    void on_toggle_Button_1_clicked();
+ //   void on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item);
+   // void on_listWidgetWatch_itemSelectionChanged();
+
+  //  void on_toggle_Button_1_clicked();
 
 
     void on_MissedTrade_Button_clicked();
 
-    void on_MissedTrade_Close_clicked();
+  //  void on_MissedTrade_Close_clicked();
+
+  //  void on_comboBox_currentTextChanged(const QString &arg1);
 
 protected:
     virtual void closeEvent(QCloseEvent* event) override;

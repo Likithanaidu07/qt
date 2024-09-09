@@ -13,8 +13,8 @@ public:
     static AddAlgoSharedVar& getInstance();
 
     QHash<QString, contract_table> contract_table_hash;
-    QHash<QString, contract_table> curr_contract_table_hash; // this contract table for curr
-    QHash<QString, contract_table> fo_contract_table_hash; // this contract table for fo
+   // QHash<QString, contract_table> curr_contract_table_hash; // this contract table for curr
+   // QHash<QString, contract_table> fo_contract_table_hash; // this contract table for fo
     QStringList FO_F2F_data_list_Sorted_Key;
     QStringList FO_BFLY_data_list_Sorted_Key;
     QStringList FO_BFLY_BID_data_list_Sorted_Key;

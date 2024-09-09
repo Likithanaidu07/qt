@@ -28,6 +28,7 @@ private slots:
     void dataExchangeSlot(MBP_Data_Struct data);
 
 signals:
+   void newSlowDataReceivedSignal(const QHash<QString, MBP_Data_Struct> &data);
 
 };
 

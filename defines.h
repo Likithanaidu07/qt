@@ -68,6 +68,7 @@ enum PortfolioData_Idx
     _SellTradedQuantity,
     _SellRemainingQuantity,
     _OrderQuantity,
+    _MaxLoss,
     _ExpiryDateTime,
     _Cost, //currently up to this the data is displayed on portfolio table in the same order as the enum
     _QuantityRatio,
@@ -174,6 +175,8 @@ enum PortfolioType
     F1_F2 = 207,
     BFLY_BID = 250,
     CR = 251,
+    CR_JELLY= 252,
+    BX_BID=254,
     JBX,
     JBX_3L,
     JBX_2L,
@@ -292,7 +295,7 @@ struct userInfo{
     int IDXOpenLimit;
     int STKOpenLimit;
 
-    QMap<PortfolioType,QString> algoFilterMap;
+    QMap<PortfolioType,QStringList> algoFilterMap;
 
 };
 
