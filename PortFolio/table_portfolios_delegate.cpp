@@ -792,8 +792,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
                 QString match = text.mid(startIndex, m_highlightText.length());
                 QString after = text.mid(startIndex + m_highlightText.length());
 
-                QRect beforeRect = painter->boundingRect(rect, Qt::AlignLeft, before);
-                QRect matchRect = painter->boundingRect(rect, Qt::AlignLeft, match);
+                QRect beforeRect = painter->boundingRect(rect, Qt::AlignVCenter, before);
+                QRect matchRect = painter->boundingRect(rect, Qt::AlignVCenter, match);
 
                 painter->drawText(rect, before, textOption);
 
@@ -803,6 +803,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
                 painter->drawText(QRect(beforeRect.right(), rect.top(), matchRect.width(), rect.height()), match, textOption);
 
                 painter->drawText(QRect(beforeRect.right() + matchRect.width(), rect.top(), rect.width() - beforeRect.width() - matchRect.width(), rect.height()), after, textOption);
+
             }
 
             painter->restore();
