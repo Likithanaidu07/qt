@@ -82,8 +82,8 @@ public:
     TradeDetailsPopup *tradePopUpWin;
 
     //void updateLabels();
-
-
+ void resetPassword(const QString &newPassword, const QString &confirmPassword);
+   //void resetPassword(const QString &newPassword);
 
 //    QStandardItemModel *model_searchInstrument_BOX_Leg1;
     QString foo_token_number_start_strike;// this for start strike input of F2F
@@ -273,14 +273,17 @@ public slots:
     void sorting_Button_clicked();
     void onPortFolioTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
     void onTradeTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
-     void onNetposTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
-     void onLinersTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
+    void onNetposTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
+    void onLinersTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
     void onSummaryActionTriggered();
+    void onChangepasswordActionTriggered();
     void onWatchActionTriggered();
     void onLogActionTriggered();
 private slots:
     void on_close_clicked();
     void on_minimize_clicked();
+ //   void  on_menu_clicked();
+   // void showResetPasswordDialog();
     void on_OrderBook_Button_clicked();
  //   void on_OrderBook_Close_clicked();
     void on_Positions_Button_clicked();

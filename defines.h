@@ -176,6 +176,7 @@ enum PortfolioType
     BFLY_BID = 250,
     CR = 251,
     CR_JELLY= 252,
+    BX_BID=254,
     JBX,
     JBX_3L,
     JBX_2L,

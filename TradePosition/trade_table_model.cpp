@@ -28,6 +28,15 @@ QVariant Trade_Table_Model::data(const QModelIndex &index, int role) const
         return QVariant();
 
     switch (role) {
+    case Qt::BackgroundRole: {
+        int Leg1_OrderState = trade_data_list[r][OrderBook_Idx::Leg1StateVal_OB].toInt();
+        int Leg3_OrderState = trade_data_list[r][OrderBook_Idx::Leg3StateVal_OB].toInt();
+        if (Leg1_OrderState == 6 || Leg3_OrderState == 6) {
+          return QVariant::fromValue(QColor(215, 207, 232));; // Red color for highlighting
+        } else {
+            return QVariant(); // Default background
+        }
+    }
 
     case Qt::ForegroundRole :
         //        //jackpot background color

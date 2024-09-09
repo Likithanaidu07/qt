@@ -870,6 +870,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
                 QString before = text.left(startIndex);
                 QString match = text.mid(startIndex, m_highlightText.length());
                 QString after = text.mid(startIndex + m_highlightText.length());
+
                 // Draw the "before" text (non-highlighted)
                 QRect beforeRect = painter->boundingRect(rect, Qt::AlignLeft, before);
                 painter->drawText(beforeRect, before, textOption);

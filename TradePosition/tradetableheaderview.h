@@ -10,6 +10,8 @@ public:
 
 protected:
     void paintSection(QPainter* painter, const QRect& rect, int logicalIndex) const override;
+signals:
+     void filterChanged(int column, const QString& text);
 };
 
 #endif // TRADETABLEHEADERVIEW_H

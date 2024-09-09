@@ -28,6 +28,7 @@
 #include "Cards/watch_cards.h"
 #include "QMenu"
 #include "PortFolio/portfolio_searchfilterproxymodel.h"
+#include "TradePosition/trade_table_filterproxymodel.h"
 
 //#define ENABLE_BACKEND_DEBUG_MSG
 
@@ -90,6 +91,22 @@ MainWindow::MainWindow(QWidget *parent)
 //    ui->label_4->setText("status :");
 //    ui->label_2->setFont(font);
 //    ui->label_2->setText("User Message :");
+
+    QMenu *resetMenu = new QMenu("Tool", this);
+
+    // Create actions
+    QAction *changepasswordAction = new QAction("ChangePassword", this);
+
+
+    // Add actions to the Card menu
+    resetMenu->addAction(changepasswordAction);
+
+
+    // Create a ToolButton to act as the menu title on ui->card
+    ui->menu->setMenu(resetMenu);
+    ui->menu->setPopupMode(QToolButton::InstantPopup);
+    connect(changepasswordAction, &QAction::triggered, this, &MainWindow::onChangepasswordActionTriggered);
+
 
     // Connect the actions to their respective slots (if needed)
     connect(summaryAction, &QAction::triggered, this, &MainWindow::onSummaryActionTriggered);
@@ -480,6 +497,8 @@ MainWindow::MainWindow(QWidget *parent)
     trade_table->setShowGrid(false);
     trade_table->setAlternatingRowColors(true);
 
+
+
     tradetableheaderview* headerViews = new tradetableheaderview(Qt::Horizontal, trade_table);
     headerViews->setFixedHeight(32);
     headerViews->setFont(headerfont);
@@ -496,6 +515,17 @@ MainWindow::MainWindow(QWidget *parent)
 //    headerViews->setSectionsMovable(true);
 //    headerViews->setHighlightSections(true);
      connect(headerViews, &QHeaderView::sectionMoved, this, &MainWindow::onTradeTableHeader_Rearranged);
+    //trade_table->setHorizontalHeader(headerViews);
+     trade_table_filterproxymodel *trades_tableproxyModel = new trade_table_filterproxymodel(this);
+     trades_tableproxyModel->setSourceModel(trade_model);
+     trades_tableproxyModel->setFilterKeyColumn(-1);  // Search across all columns
+
+
+    // trade_table->setModel(trade_model);
+
+    // Add data to model...
+    trade_table->setModel(trades_tableproxyModel);
+    connect(headerViews, &tradetableheaderview::filterChanged, trades_tableproxyModel, &trade_table_filterproxymodel::setFilter);
     trade_table->setHorizontalHeader(headerViews);
 
     lay_Trade_Window->addWidget(trade_table, 1, 0, 1, 3);
@@ -1784,7 +1814,8 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
         qDebug()<<"Backend Data: Backend Socket Connected"<<msg;
 #endif
  ui->label_3->setText("Status :""Connected");
-          ui->label_3->setStyleSheet("color: green;");
+        ui->label_3->setStyleSheet("color: #013220;");
+
     }
     // ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(94, 255, 107);border-radius:6px;color:#000;");
 }
@@ -2081,6 +2112,16 @@ void MainWindow::on_minimize_clicked()
 {
     showMinimized();
 }
+
+//void MainWindow::on_menu_clicked()
+//{
+
+//}
+
+
+
+
+
 
 void MainWindow::mousePressEvent(QMouseEvent *event) {
     QLabel *child = static_cast<QLabel*>(childAt(event->pos()));
@@ -2973,6 +3014,63 @@ void MainWindow::showMessageSlot(QString msg){
     msgBox.exec();
 }
 
+void MainWindow::onChangepasswordActionTriggered() {
+    QDialog resetDialog(this);
+    resetDialog.setWindowTitle("Reset Password");
+
+    QVBoxLayout *layout = new QVBoxLayout(&resetDialog);
+
+    // Create the new password input fields
+    QLabel *newPasswordLabel = new QLabel("New password:", &resetDialog);
+    QLineEdit *newPasswordLineEdit = new QLineEdit(&resetDialog);
+    newPasswordLineEdit->setEchoMode(QLineEdit::Password); // Hide text for password input
+
+    // Create the confirm password input fields
+    QLabel *confirmPasswordLabel = new QLabel("Confirm password:", &resetDialog);
+    QLineEdit *confirmPasswordLineEdit = new QLineEdit(&resetDialog);
+    confirmPasswordLineEdit->setEchoMode(QLineEdit::Password);
+
+    // Create reset button
+    QPushButton *resetButton = new QPushButton("Reset Password", &resetDialog);
+
+    // Add widgets to the layout
+    layout->addWidget(newPasswordLabel);
+    layout->addWidget(newPasswordLineEdit);
+    layout->addWidget(confirmPasswordLabel);
+    layout->addWidget(confirmPasswordLineEdit);
+    layout->addWidget(resetButton);
+
+    // Connect the reset button to handle password reset
+    connect(resetButton, &QPushButton::clicked, [this, &resetDialog, newPasswordLineEdit, confirmPasswordLineEdit]() {
+        QString newPassword = newPasswordLineEdit->text();
+        QString confirmPassword = confirmPasswordLineEdit->text();
+      //  QString user_id = "YourUserID"; // Replace with the actual user ID retrieval logic
+
+        // Call the method to handle the password reset with three arguments
+        resetPassword(newPassword, confirmPassword);
+
+        // Close the dialog
+        resetDialog.accept();
+    });
+
+    // Show the dialog as a modal window
+    resetDialog.exec();
+}
+
+void MainWindow::resetPassword(const QString &newPassword, const QString &confirmPassword)
+{
+    // Check if the new password and confirm password match
+    if (newPassword != confirmPassword) {
+          QMessageBox::warning(this, "Error", "The new password and confirmation password do not match.");
+          return;
+    }
+
+    QString msg;
+    bool success = db_conn->resetPassword(newPassword, QString::number(userData.UserId),msg);
+
+    // Implement further logic to reset the password
+    QMessageBox::information(this, "Success", "Password has been reset successfully.");
+}
 
 
 void MainWindow::onSummaryActionTriggered(){
