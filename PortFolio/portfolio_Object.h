@@ -28,6 +28,7 @@ public:
     int PortfolioNumber; // "P.No";
     QString AlgoName; // new column added on Qt
     QString Alias;
+    double MaxLoss;
 
     double SellMarketRate; //"-MR";
     QString SellAveragePrice; //"-APD"

@@ -318,7 +318,7 @@ void  mysql_conn::getSummaryTableData(int &OrderCount,QString user_id)
 
 
 
-void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount,Table_Portfolios_Model *model, Combined_Tracker_Table_Model *comb_tracker_model, QHash<QString, PortfolioAvgPrice> &averagePriceList, QString user_id, QStringList TradedPortFolioList,QStringList &PortFoliosToDelete )
+void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount, Combined_Tracker_Table_Model *comb_tracker_model, QHash<QString, PortfolioAvgPrice> &averagePriceList, QString user_id, QStringList TradedPortFolioList,QStringList &PortFoliosToDelete )
 {
     QMutexLocker lock(&mutex);
     // int editing_state = portfolio_table_editing.loadRelaxed();
@@ -441,12 +441,12 @@ void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoC
             //if(portfolio_table_editing.loadRelaxed()==0&&editing_state==portfolio_table_editing.loadRelaxed())
 
             //sort PortfolioObjectList based on the custom sort order
-
+            bool clearTableFlg = false;
             if(portfolio_table_updating_db.loadRelaxed()==0){
                 if(reloadSortSettFlg.loadRelaxed()==1){
                     reloadSortSettFlg.storeRelaxed(0);
                     portfolioCustomSort->loadSortConfig();
-                    model->clearTable();
+                    clearTableFlg=true;//model->clearTable();
                 }
                 QVector<int> sortRank = portfolioCustomSort->sortPortFolio(algoNameList);
                 QList<PortfolioObject*> PortfolioObjectList_Sorted(PortfolioObjectList.size(), nullptr);
@@ -457,8 +457,8 @@ void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoC
                    }
                 PortfolioObjectList.clear();
 
-
-                model->setDataList(PortfolioObjectList_Sorted);
+                emit updateModelDataListSignal(PortfolioObjectList_Sorted,clearTableFlg);
+                //model->setDataList(PortfolioObjectList_Sorted);
             }
         }
     }
@@ -1888,7 +1888,7 @@ QHash<QString, contract_table>  mysql_conn::getContractTable( QHash<int , QStrin
                             << contractTableTmp.VolumeFreezeQty;
                     }
                     else{
-                        qDebug()<<"Waring: Cannot find portfolio type for contract table token = "<<contractTableTmp.TokenNumber;
+                        qDebug()<<"Waring: Cannot find portfolio type(InstrumentType) for contract table token = "<<contractTableTmp.TokenNumber;
                     }
                 }
 

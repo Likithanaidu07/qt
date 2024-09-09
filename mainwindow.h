@@ -102,6 +102,7 @@ signals:
     void indicesDataRecv_Signal_watch_card(Indices_Data_Struct);
     void logDataSignal(QStringList);
     void showMessageSignal(QString);
+    void requestDeleteConfirmation(const QStringList &portfoliosToDelete);
 
 private:
     Ui::MainWindow *ui;
@@ -242,6 +243,7 @@ private:
       void saveLinersTableViewColumnState(QTableView *tableView);
 public slots:
     void profolioTableEditFinshedSlot(QString val,QModelIndex);
+    void onRequestDeleteConfirmation(const QStringList &PortFoliosToDelete);
 //    void edit_Started_PortFolio_Table(int row,int col);
 //    void tradeTableSerachNext();
 //    void tradeTableSerachTxtChanged();

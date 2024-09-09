@@ -68,6 +68,7 @@ enum PortfolioData_Idx
     _SellTradedQuantity,
     _SellRemainingQuantity,
     _OrderQuantity,
+    _MaxLoss,
     _ExpiryDateTime,
     _Cost, //currently up to this the data is displayed on portfolio table in the same order as the enum
     _QuantityRatio,

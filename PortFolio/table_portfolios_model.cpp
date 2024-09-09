@@ -14,6 +14,9 @@
 #include <QVBoxLayout>
 #include <QWidget>
 #include "PortFolio/PortfolioParser.h"
+
+#define MUTEX_DEBUG_LOG
+
 struct CustomFormatting {
     QColor color;
     QFont font;
@@ -67,8 +70,13 @@ void Table_Portfolios_Model::onItemChanged(const QModelIndex &index)
 }
 
 void Table_Portfolios_Model::selectionChangedSlot(int currentIdx){
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Entering---selectionChangedSlot";
+#endif
     QMutexLocker locker(&mutex); // Lock the mutex automatically
-
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Setting Mutex---selectionChangedSlot";
+#endif
     if(currentIdx!=-1){
         if(portfolio_data_list[currentIdx]->TradedHighlight == true){
             portfolio_data_list[currentIdx]->TradedHighlight = false; // make this flag false when click on portfolio row so it will un-highlight
@@ -89,6 +97,9 @@ void Table_Portfolios_Model::selectionChangedSlot(int currentIdx){
         editingDataHash.clear();
 
     }
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Exiting---selectionChangedSlot";
+#endif
 
 }
 //This function retrun what portfolio clicked when it trade
@@ -128,7 +139,7 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
     PortfolioObject *portfolio = portfolio_data_list.at(index.row());
     switch (role) {
 
-    case Qt::ItemIsUserCheckable:
+    case Qt::CheckStateRole :
     {
         if (index.column() == PortfolioData_Idx::_Status) {
             if (portfolio->StatusVal==QString::number(Qt::Checked))
@@ -136,6 +147,8 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
             else
                 return Qt::Unchecked;
         }
+        else
+         return QVariant();
     }
 
     case Qt::ForegroundRole: {
@@ -183,7 +196,8 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
                  c == PortfolioData_Idx::_QuantityRatio ||
              //    c == PortfolioData_Idx::_SkipMarketStrike||
                  c == PortfolioData_Idx::_BidLeg ||
-                   c == PortfolioData_Idx::_Alias){
+                   c == PortfolioData_Idx::_Alias||
+                c == PortfolioData_Idx::_MaxLoss){
 
             return font;
         }
@@ -234,7 +248,11 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         }
         else if(index.column()==PortfolioData_Idx::_Alias){
             return Qt::AlignCenter;
-    }
+        }
+        else if(index.column()==PortfolioData_Idx::_MaxLoss){
+            return Qt::AlignCenter;
+        }
+
     }
 
 
@@ -305,6 +323,9 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         }
         else if (index.column() == PortfolioData_Idx::_Alias) {
             return portfolio->Alias;
+        }
+        else if (index.column() == PortfolioData_Idx::_MaxLoss) {
+                return portfolio->MaxLoss;
         }
         else if (index.column() == PortfolioData_Idx::_ExpiryDateTime) {
             QString ExpiryDateTimeStr = "-";
@@ -397,6 +418,10 @@ case Qt::EditRole:{
         emit edit_Started(r,c);
         return portfolio->Alias;
     }
+    else if(c==PortfolioData_Idx::_MaxLoss){
+        emit edit_Started(r,c);
+        return portfolio->MaxLoss;
+    }
     else
         return QVariant();
 }
@@ -413,32 +438,47 @@ return QVariant();
 // This called when  the user edits a cell and the delegate commits the new value to the model.
 bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &value, int role)
 {
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Entering---setData";
+#endif
     QMutexLocker locker(&mutex); // Lock the mutex automatically
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Setting Mutex---setData";
+#endif
     int c=index.column();
 
 
     //editing row swithced, make previous row flg not editing
     if(current_editingRow!=index.row()){
         if(current_editingRow!=-1)
-            portfolio_data_list[current_editingRow]->edting.storeRelaxed(0);;
+            portfolio_data_list[current_editingRow]->edting.storeRelaxed(0);
         editingDataHash.clear();
     }
 
     current_editingRow = index.row();
 
 
-    if (role == Qt::ItemIsUserCheckable
+    if (role == Qt::CheckStateRole
         && index.column() == PortfolioData_Idx::_Status)
     {
         portfolio_data_list[index.row()]->StatusVal = QString::number(value.toInt());
         emit dataChanged(index, index, {role});
         emit updateDBOnDataChanged(index);
+#ifdef MUTEX_DEBUG_LOG
+        qDebug()<<"Exiting---setData";
+#endif
+
         return true;
     }
     if(role== Qt::EditRole)
     {
-        if (!checkIndex(index))
+        if (!checkIndex(index)){
+#ifdef MUTEX_DEBUG_LOG
+        qDebug()<<"Exiting---setData";
+#endif
+
             return false;
+        }
         if(c==PortfolioData_Idx::_SellPriceDifference){
             //store data to editing hash if it not equal to previous value
             if(portfolio_data_list[index.row()]->SellPriceDifference != value.toDouble())
@@ -446,6 +486,10 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
 
             portfolio_data_list[index.row()]->SellPriceDifference = value.toDouble();
             emit dataChanged(index, index);
+#ifdef MUTEX_DEBUG_LOG
+        qDebug()<<"Exiting---setData";
+#endif
+
             return true;
         }
         else if(c==PortfolioData_Idx::_BuyPriceDifference){
@@ -455,6 +499,10 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
 
             portfolio_data_list[index.row()]->BuyPriceDifference = value.toDouble();
             emit dataChanged(index, index);
+#ifdef MUTEX_DEBUG_LOG
+        qDebug()<<"Exiting---setData";
+#endif
+
             return true;
 
 
@@ -466,6 +514,10 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
 
             portfolio_data_list[index.row()]->SellTotalQuantity = value.toDouble();
             emit dataChanged(index, index);
+#ifdef MUTEX_DEBUG_LOG
+        qDebug()<<"Exiting---setData";
+#endif
+
             return true;
 
 
@@ -477,6 +529,10 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
 
             portfolio_data_list[index.row()]->BuyTotalQuantity = value.toDouble();
             emit dataChanged(index, index);
+#ifdef MUTEX_DEBUG_LOG
+        qDebug()<<"Exiting---setData";
+#endif
+
             return true;
 
 
@@ -488,6 +544,10 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
 
             portfolio_data_list[index.row()]->OrderQuantity = value.toDouble();
             emit dataChanged(index, index);
+#ifdef MUTEX_DEBUG_LOG
+        qDebug()<<"Exiting---setData";
+#endif
+
             return true;
 
         }
@@ -498,13 +558,41 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
 
             portfolio_data_list[index.row()]->Alias = value.toString();
             emit dataChanged(index, index);
+#ifdef MUTEX_DEBUG_LOG
+        qDebug()<<"Exiting---setData";
+#endif
+
             return true;
 
         }
-        else
+
+        else if(c==PortfolioData_Idx::_MaxLoss){
+            //store data to editing hash if it not equal to previous value
+            if(portfolio_data_list[index.row()]->MaxLoss != value.toDouble())
+                editingDataHash[c] = value.toString();
+
+            portfolio_data_list[index.row()]->MaxLoss = value.toDouble();
+            emit dataChanged(index, index);
+#ifdef MUTEX_DEBUG_LOG
+        qDebug()<<"Exiting---setData";
+#endif
+
+            return true;
+
+        }
+
+
+        else{
+#ifdef MUTEX_DEBUG_LOG
+        qDebug()<<"Exiting---setData";
+#endif
             return false;
+        }
 
     }
+#ifdef MUTEX_DEBUG_LOG
+        qDebug()<<"Exiting---setData";
+#endif
     return false;
 }
 
@@ -627,11 +715,35 @@ for(int i = 0;i<portfolio_ids_ToRemove.length();i++){
 /*  portfolio_ids_ToRemove.clear();
 }*/
 
-void Table_Portfolios_Model::setDataList(QList <PortfolioObject*> portfolio_data_list_new){
-
+void Table_Portfolios_Model::updateModelDataList(QList <PortfolioObject*> portfolio_data_list_new,bool clearTableFlg){
+#ifdef MUTEX_DEBUG_LOG
+        qDebug()<<"Entering---updateModelDataList";
+#endif
     QMutexLocker locker(&mutex); // Lock the mutex automatically
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Setting Mutex---updateModelDataList";
+#endif
+
 
     slowDataPriceUpdateTimer.restart(); // The price is already updated so do it on next slow date receive
+
+    if(clearTableFlg == true){
+//        QList <int> portfolio_ids_ToRemove;
+//        for(int i=0;i<portfolio_data_list.length();i++){
+//           portfolio_ids_ToRemove.append(i);
+//        }
+//        for(int i = 0;i<portfolio_ids_ToRemove.length();i++){
+//            beginRemoveRows(QModelIndex(), portfolio_ids_ToRemove[i]-i, portfolio_ids_ToRemove[i]-i); //substract i means each time one item removed the index need to be decrement by 1
+//            PortfolioObject* portfolio = portfolio_data_list[portfolio_ids_ToRemove[i]-i];
+//            portfolio_data_list.removeOne(portfolio);//substract i means each time one item removed the index need to be decrement by 1
+//            delete portfolio;
+//            endRemoveRows();
+//        }
+            beginResetModel();  // Signals that a massive change is happening.
+            qDeleteAll(portfolio_data_list);  // Deletes all portfolio objects.
+            portfolio_data_list.clear();      // Clears the list.
+            endResetModel();  // Signals that the model data has been reset.
+    }
 
     //new data so insert all to the list
     bool newTokenFound = false;
@@ -731,7 +843,14 @@ void Table_Portfolios_Model::setDataList(QList <PortfolioObject*> portfolio_data
             portfolio_ids_ToRemove.append(i);
     }
 
-    //remove rows
+
+    /// --- Note:Block Signals Temporarily:
+    ///  beginRemoveRows() triggers internal model signals (like selectionChanged), which leads to a deadlock when the same mutex is locked inside both the updateModelDataList()
+    ///  and selectionChangedSlot() functions.
+    ///  The blockSignals(true) call disables all signals from the model during the row removal process.
+    ///  This prevents the selectionChangedSlot from being triggered during the row removal.
+    bool signalsBlocked = this->blockSignals(true);
+  //remove rows
     for(int i = 0;i<portfolio_ids_ToRemove.length();i++){
         beginRemoveRows(QModelIndex(), portfolio_ids_ToRemove[i]-i, portfolio_ids_ToRemove[i]-i); //substract i means each time one item removed the index need to be decrement by 1
         PortfolioObject* portfolio = portfolio_data_list[portfolio_ids_ToRemove[i]-i];
@@ -740,14 +859,19 @@ void Table_Portfolios_Model::setDataList(QList <PortfolioObject*> portfolio_data
         endRemoveRows();
     }
 
+    this->blockSignals(signalsBlocked);
+
     portfolio_ids_ToRemove.clear();
     for (PortfolioObject* portfolioDel : portfolio_data_list_new)
     {
         delete portfolioDel;
     }
     portfolio_data_list_new.clear();
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Exiting---updateModelDataList";
+#endif
 }
-
+/*
 void Table_Portfolios_Model::clearTable(){
     QMutexLocker locker(&mutex); // Lock the mutex automatically
 
@@ -763,7 +887,7 @@ void Table_Portfolios_Model::clearTable(){
         endRemoveRows();
     }
 }
-
+*/
 
 
 
@@ -776,7 +900,8 @@ Qt::ItemFlags Table_Portfolios_Model::flags(const QModelIndex &index) const
         c==PortfolioData_Idx::_SellTotalQuantity ||
         c==PortfolioData_Idx::_BuyTotalQuantity ||
         c==PortfolioData_Idx::_OrderQuantity ||
-        c==PortfolioData_Idx::_Alias)
+        c==PortfolioData_Idx::_Alias||
+        c==PortfolioData_Idx::_MaxLoss)
     {
         return Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     }
@@ -802,8 +927,13 @@ QVariant Table_Portfolios_Model::headerData(int section, Qt::Orientation orienta
 }
 
 QHash<QString,PortFolioData_Less> Table_Portfolios_Model::getPortFolioDataLess(){
-
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Entering---getPortFolioDataLess";
+#endif
     QMutexLocker locker(&mutex); // Lock the mutex automatically
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Setting Mutex---getPortFolioDataLess";
+#endif
     QHash<QString,PortFolioData_Less>  PortFolioDataHash;
     for(int i=0;i<portfolio_data_list.length();i++){
         PortFolioData_Less P;
@@ -812,12 +942,20 @@ QHash<QString,PortFolioData_Less> Table_Portfolios_Model::getPortFolioDataLess()
         PortFolioDataHash.insert(QString::number(portfolio_data_list[i]->PortfolioNumber),P);
 
     }
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Exiting---getPortFolioDataLess";
+#endif
     return PortFolioDataHash;
 }
 
 QHash<QString,int> Table_Portfolios_Model::getPortFoliosLotSize(){
-
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Entering---getPortFoliosLotSize";
+#endif
     QMutexLocker locker(&mutex); // Lock the mutex automatically
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Setting Mutex---getPortFoliosLotSize";
+#endif
     QHash<QString,int>  PortFolioLotSizeHash;
     for(int i=0;i<portfolio_data_list.length();i++){
         PortFolioData_Less P;
@@ -825,6 +963,9 @@ QHash<QString,int> Table_Portfolios_Model::getPortFoliosLotSize(){
         PortFolioLotSizeHash.insert(QString::number(portfolio_data_list[i]->PortfolioNumber),lotSize);
 
     }
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Exiting---getPortFoliosLotSize";
+#endif
     return PortFolioLotSizeHash;
 }
 
@@ -868,8 +1009,13 @@ void Table_Portfolios_Model::setColumnWidths(QTableView *tableView) const {
 
 // This function will be called when slow data receved
 void Table_Portfolios_Model::updateMarketRate(const QHash<QString, MBP_Data_Struct>& MBP_Data_Hash){
-
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Entering---updateMarketRate";
+#endif
     QMutexLocker locker(&mutex); // Lock the mutex automatically
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Setting Mutex---updateMarketRate";
+#endif
     if (slowDataPriceUpdateTimer.elapsed() >= 300) {
              PortfolioParser portfolioPareser;
             // qDebug()<<"updateMarketRate...";
@@ -890,10 +1036,82 @@ void Table_Portfolios_Model::updateMarketRate(const QHash<QString, MBP_Data_Stru
             // Reset the timer
             slowDataPriceUpdateTimer.restart();
         }
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Exiting---updateMarketRate";
+#endif
 }
 PortfolioObject* Table_Portfolios_Model::getPortFolioAt(int idx) const {
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Entering---getPortFolioAt";
+#endif
     QMutexLocker locker(&mutex); // Lock the mutex automatically
-    return portfolio_data_list.at(idx);
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Setting Mutex---getPortFolioAt";
+#endif
+
+
+        // Check if the index is within the valid range
+        if (idx < 0 || idx >= portfolio_data_list.size()) {
+            return nullptr; // Return a null pointer if idx is out of range
+        }
+
+        // Get the portfolio at the specified index
+           PortfolioObject* originalPortfolio = portfolio_data_list.at(idx);
+
+           // Create a deep copy of the portfolio object
+           PortfolioObject* copiedPortfolio = new PortfolioObject(*originalPortfolio);
+#ifdef MUTEX_DEBUG_LOG
+           qDebug()<<"Exiting---getPortFolioAt";
+#endif
+           return copiedPortfolio; // Return the deep copy
+}
+
+void Table_Portfolios_Model::updatePortFolioStatusValue(int row,QString statusVal) {
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Entering---updatePortFolioStatusValue";
+#endif
+    QMutexLocker locker(&mutex); // Lock the mutex automatically
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Setting Mutex---updatePortFolioStatusValue";
+#endif
+    portfolio_data_list[row]->StatusVal = statusVal;
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Exiting---updatePortFolioStatusValue";
+#endif
+}
+
+void Table_Portfolios_Model::setEditingFlg(int row,int val) {
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Entering---setEditingFlg";
+#endif
+    QMutexLocker locker(&mutex); // Lock the mutex automatically
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Setting Mutex---setEditingFlg";
+#endif
+    portfolio_data_list[row]->edting.storeRelaxed(val);
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Exiting---setEditingFlg";
+#endif
+
+}
+QStringList Table_Portfolios_Model::getAllPortfolioNumbers() {
+    QStringList portfolioNumbers;
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Entering---getAllPortfolioNumbers";
+#endif
+    QMutexLocker locker(&mutex); // Lock the mutex automatically
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Setting Mutex---getAllPortfolioNumbers";
+#endif
+    for(int i = 0; i < portfolio_data_list.size(); i++){
+        if (portfolio_data_list[i]) {
+            portfolioNumbers.append(QString::number(portfolio_data_list[i]->PortfolioNumber));
+        }
+    }
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Exiting---getAllPortfolioNumbers";
+#endif
+   return portfolioNumbers;
 }
 
 
