@@ -80,7 +80,7 @@ void tradetableheaderview::paintSection(QPainter* painter, const QRect& rect, in
         painter->setPen(QColor("#6C757D"));
         painter->drawLine(rect.topRight(), rect.bottomRight());
     }
-    if (logicalIndex == OrderBook_Idx::OrderId_OB) {  // Customize for the first column, for example
+   /*if (logicalIndex == OrderBook_Idx::OrderId_OB) {  // Customize for the first column, for example
       //  QComboBox* comboBox = new QComboBox(this);
         QComboBox* comboBox = new QComboBox(const_cast<tradetableheaderview*>(this));
 
@@ -95,7 +95,7 @@ void tradetableheaderview::paintSection(QPainter* painter, const QRect& rect, in
             emit const_cast<tradetableheaderview*>(this)->filterChanged(logicalIndex, text);
         });
 
-    }
+    }*/
 
 }
 

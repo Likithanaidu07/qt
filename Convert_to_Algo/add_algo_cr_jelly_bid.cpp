@@ -550,6 +550,7 @@ void add_algo_cr_jelly_bid::generateAlgo(){
         msgBox.exec();
     }
 
+    tableWidget->resizeColumnsToContents();
 
 }
 void add_algo_cr_jelly_bid::itemSelectedFut(QModelIndex index)

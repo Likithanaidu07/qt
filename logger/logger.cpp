@@ -61,7 +61,7 @@ void initLogFileName(QString app)
     }
 }
 
-bool initLogging(const QString &loggingApplication)
+bool  initLogging(const QString &loggingApplication)
 {
     initializeUmask();
     qDebug("applicationDirPath [%s]", QCoreApplication::applicationDirPath().toStdString().c_str());

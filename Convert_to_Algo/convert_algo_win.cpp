@@ -11,7 +11,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 {
     ui->setupUi(this);
     MainWindowObj = (MainWindow*) parent;
-    setWindowModality(Qt::ApplicationModal);
+    //setWindowModality(Qt::ApplicationModal);
 
 
   //  ui->tableWidget->setFocusPolicy(Qt::NoFocus);
@@ -66,7 +66,11 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
         ui->lineEdit_EndStrike_BtfyBid,
         ui->lineEdit_EndStrike_ConvRev,
         ui->lineEdit_EndStrike_f2f,
-        ui->lineEdit_Fut_ConvRev}){
+        ui->lineEdit_Fut_ConvRev,
+        ui->lineEdit_Start_strike_BoxBid,
+        ui->lineEdit_EndStrike_BoxBid,
+        ui->lineEdit_StrikeDifference_BoxBid
+    }){
         w->setStyleSheet(LineEdit_SS);
         QFont font=w->font();
         font.setFamily("Work Sans");
@@ -143,6 +147,11 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     algoCRJellyBid->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_CRJellyBid,ui->lineEdit_EndStrike_CRJellyBid,ui->lineEdit_Fut_CRJellyBid);
     /*******Class to generate algoCRJellyBid algos************/
 
+    /*******Class to generate BtFly-bid algos************/
+    algoBoxBid= new convert_to_algo_box_bid();
+    algoBoxBid->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_BoxBid,ui->lineEdit_EndStrike_BoxBid,ui->lineEdit_StrikeDifference_BoxBid);
+    /*******Class to generate BtFly-bid algos************/
+
 
 
 
@@ -191,7 +200,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     ui->comboBox_AlgoType->setEditable(false);  // Set it back to non-editable to function as a normal combo box
 
     // Add the items to the dropdown
-    ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
+        ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
 //        ui->comboBox_AlgoType->clear();
 //        ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
       //  ui->comboBox_AlgoType->addItem("F2F");
@@ -202,6 +211,8 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 //        ui->comboBox_AlgoType->addItem("Open-BOX");
 
         ui->comboBox_AlgoType->addItem("CRJELLY-BID");
+        ui->comboBox_AlgoType->addItem("BX-BID");
+
         ui->comboBox_AlgoType->setStyleSheet(
             "QComboBox {"
             "    font-weight: bold;"
@@ -283,6 +294,9 @@ void ConvertAlgo_Win::hideAnyListViewVisible(){
     algoCRJellyBid->slotEndHide("");
     algoCRJellyBid->slotFutHide("");
 
+    algoBoxBid->slotStartHide("");
+    algoBoxBid->slotEndHide("");
+
 
 }
 
@@ -304,11 +318,14 @@ void ConvertAlgo_Win::keyPressEvent(QKeyEvent *event)
         ui->lineEdit_Start_strike_BtfyBid->clear();
         ui->lineEdit_Start_strike_ConvRev->clear();
         ui->lineEdit_Start_strike_f2f->clear();
+        ui->lineEdit_Start_strike_BoxBid->clear();
+
         ui->lineEdit_EndStrike_Btfy->clear();
         ui->lineEdit_EndStrike_BtfyBid->clear();
         ui->lineEdit_EndStrike_ConvRev->clear();
         ui->lineEdit_EndStrike_f2f->clear();
         ui->lineEdit_Fut_ConvRev->clear();
+        ui->lineEdit_EndStrike_BoxBid->clear();
         on_comboBox_AlgoType_currentTextChanged(ui->comboBox_AlgoType->currentText());
 
 
@@ -359,6 +376,8 @@ void ConvertAlgo_Win::update_contract_tableData(QString foo_user_id_,int MaxPort
     algoBtFlyBid->sorted_keys_BFLY_BID = sharedData->FO_BFLY_BID_data_list_Sorted_Key;
     algoBtFlyBid->model_start_strike_BFLY_BID = ContractDetail::getInstance().Get_model_start_strike_BFLY_BID();  //get the model generated from contract class for start strike
 
+    algoBoxBid->filtered_tokens_BX_BID = ContractDetail::getInstance().Get_BOX_BID_data_list_Sorted_Key();//sharedData->FO_BFLY_BID_data_list_Sorted_Key;
+    algoBoxBid->model_start_strike_BOX_BID = ContractDetail::getInstance().Get_model_start_strike_BOX_BID();  //get the model generated from contract class for start strike
 
 
     algoConRev->sorted_keys_CON_REV = sharedData->FO_BFLY_data_list_Sorted_Key;
@@ -509,6 +528,10 @@ void ConvertAlgo_Win::resetTableWidget(){
         headers = {"Algo Name","Strike/Expiry1","Strike/Expiry2","Strike/Expiry3","Buy Diff","Sell Diff","Status"};
     }
 
+    else if(algoType=="BX-BID"){
+        headers = {"Algo Name","Expiry","Strike1","Strike2","Strike3","Strike4","Reserved","Reserved","Status"};
+    }
+
     ui->tableWidget->clear();
     ui->tableWidget->setRowCount(0);
     ui->tableWidget->setColumnCount(headers.size());
@@ -536,6 +559,7 @@ void ConvertAlgo_Win::enable_disable_UIElement(bool enable)
     ui->lineEdit_StrikeDifference_BtfyBid->setEnabled(enable);
     ui->lineEdit_Start_strike_Btfy->setEnabled(enable);
     ui->lineEdit_Start_strike_BtfyBid->setEnabled(enable);
+
     ui->lineEdit_Start_strike_ConvRev->setEnabled(enable);
     ui->lineEdit_Start_strike_f2f->setEnabled(enable);
     ui->lineEdit_EndStrike_Btfy->setEnabled(enable);
@@ -549,6 +573,10 @@ void ConvertAlgo_Win::enable_disable_UIElement(bool enable)
     ui->pushButton_Reset->setEnabled(enable);
     ui->pushButtonDelete->setEnabled(enable);
     ui->pushButtonUpload->setEnabled(enable);
+
+    ui->lineEdit_Start_strike_BoxBid->setEnabled(enable);
+    ui->lineEdit_EndStrike_BoxBid->setEnabled(enable);
+
 }
 
 
@@ -587,6 +615,9 @@ void ConvertAlgo_Win::on_pushButtonAdd_clicked()
 
     else if(algo_type=="CRJELLY-BID"){
         algoCRJellyBid->generateAlgo();
+    }
+    else if(algo_type=="BX-BID"){
+        algoBoxBid->generateAlgo();
     }
 //    if(algo_type=="BOX"){
 //        algoBOX->generateAlgo();
@@ -633,16 +664,21 @@ void ConvertAlgo_Win::on_comboBox_AlgoType_currentTextChanged(const QString algo
         ui->stackedWidget->setCurrentWidget(ui->pageConvRev);
         algoConRev->selectedAction();
     }
-    if(algoType==BFLY_BID_TYPE){
+    else if(algoType==BFLY_BID_TYPE){
 
         ui->stackedWidget->setCurrentWidget(ui->pageBtfyBid);
         algoBtFlyBid->selectedAction();
     }
 
-    if(algoType=="CRJELLY-BID"){
+    else if(algoType=="CRJELLY-BID"){
 
         ui->stackedWidget->setCurrentWidget(ui->pageCRJellyBid);
         algoCRJellyBid->selectedAction();
+    }
+
+    else if(algoType=="BX-BID"){
+        ui->stackedWidget->setCurrentWidget(ui->pagBoxBid);
+        algoBoxBid->selectedAction();
     }
 //    else if(algoType=="2L Straddle"){
 
@@ -753,6 +789,8 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                     algo_type="BFLY_BID_TYPE";
                 else if(algo_type==QString::number(PortfolioType::CR_JELLY))
                     algo_type="CRJELLY";
+                else if(algo_type==QString::number(PortfolioType::BX_BID))
+                    algo_type="BX-BID";
 
 
 
@@ -814,6 +852,9 @@ void ConvertAlgo_Win::on_pushButton_Reset_clicked()
     ui->lineEdit_EndStrike_CRJellyBid->clear();
     ui->lineEdit_Fut_CRJellyBid->clear();
     ui->lineEdit_Start_strike_CRJellyBid->clear();
+
+    ui->lineEdit_Start_strike_BoxBid->clear();
+    ui->lineEdit_EndStrike_BoxBid->clear();
 }
 
 

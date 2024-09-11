@@ -167,18 +167,27 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
             obj.QuantityRatio="1:1:1";
 
         }
+        else if(obj.PortfolioType==QString::number(PortfolioType::BX_BID)){
+            obj.QuantityRatio="1:1:1:1";
+        }
         else{
             obj.QuantityRatio="N/A";
         }
 
-        obj.BidLeg = ContractDetail::getInstance().GetStockName(obj.Leg2TokenNo,obj.PortfolioType.toInt());
 
         if(obj.PortfolioType==QString::number(PortfolioType::CR)){
             obj.BidLeg = ContractDetail::getInstance().GetStockName(obj.Leg1TokenNo,obj.PortfolioType.toInt());
         }
 
-        if(obj.PortfolioType==QString::number(PortfolioType::CR_JELLY)){
+        else if(obj.PortfolioType==QString::number(PortfolioType::CR_JELLY)){
             obj.BidLeg = ContractDetail::getInstance().GetStockName(obj.Leg1TokenNo,obj.PortfolioType.toInt());
+        }
+        else if(obj.PortfolioType==QString::number(PortfolioType::BX_BID)){
+            obj.BidLeg = "-";
+        }
+        else{
+            obj.BidLeg = ContractDetail::getInstance().GetStockName(obj.Leg2TokenNo,obj.PortfolioType.toInt());
+
         }
 
         //obj.SkipMarketStrike= "-";
@@ -490,6 +499,15 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
             obj.AdditionalData1 = query.value("AdditionalData1").toString();//.Convert.ToString(reader["AdditionalData1"]);
             break;
 
+        case PortfolioType::BX_BID:
+            obj.Leg1 = ContractDetail::getInstance().GetStrikePrice(obj.Leg1TokenNo,type);
+            obj.Leg2 = ContractDetail::getInstance().GetStrikePrice(obj.Leg2TokenNo,type);
+            obj.Leg3 = ContractDetail::getInstance().GetStrikePrice(obj.Leg3TokenNo,type);
+            obj.Leg4 = ContractDetail::getInstance().GetStrikePrice(obj.Leg4TokenNo,type);
+
+            obj.AdditionalData1 = query.value("AdditionalData1").toString();//.Convert.ToString(reader["AdditionalData1"]);
+            break;
+
         default:
             break;
         }
@@ -641,13 +659,13 @@ QString PortfolioParser::get_Algo_Name(PortfolioType algo_type,int leg1_token_nu
 
     }
     else if(algo_type==PortfolioType::BOX){
-        Algo_Name = "BOX-";//18100-18200";
+        Algo_Name = "BX-";//18100-18200";
         //            QString StockNameLeg1 = ContractDetail::getInstance().GetStockName(leg1_token_number);
         //            StockNameLeg1.chop(2);
         //            QString StockNameLeg3 = ContractDetail::getInstance().GetStockName(leg3_token_number);
         //            StockNameLeg3.chop(2);
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg1_token_number,"ddMMM",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type);
-        Algo_Name_For_Sorting = "BOX-"+ContractDetail::getInstance().GetInstrumentName(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg1_token_number,"ddMMMyyyy",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type);
+        Algo_Name_For_Sorting = "BX-"+ContractDetail::getInstance().GetInstrumentName(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg1_token_number,"ddMMMyyyy",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type);
 
     }
     else if(algo_type==PortfolioType::OPEN_BOX){
@@ -666,6 +684,13 @@ QString PortfolioParser::get_Algo_Name(PortfolioType algo_type,int leg1_token_nu
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+"-"+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
         Algo_Name_For_Sorting = "Bfly-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+"-"+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
     }
+    else if(algo_type==PortfolioType::BX_BID){
+        Algo_Name = "BX-";//Nifty-18000-CE-200";
+        double diff = (ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff);
+        Algo_Name_For_Sorting = "BX-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff);
+    }
+
 
     return Algo_Name.toUpper();
 }
@@ -1017,7 +1042,8 @@ void PortfolioParser::CalculateAveragePrice(PortfolioObject &portfolio,    QHash
 
         break;
     }
-    case PortfolioType::BOX:{
+    case PortfolioType::BOX:
+    case PortfolioType::BX_BID:{
         double leg1BuyPrice = DBL_MAX;
         double leg1SellPrice =DBL_MAX;
         double leg2BuyPrice = DBL_MAX;
@@ -1276,6 +1302,8 @@ void PortfolioParser::CalculateAveragePrice(PortfolioObject &portfolio,    QHash
         break;
     }
 
+
+
     default:
         break;
     }
@@ -1306,10 +1334,12 @@ void PortfolioParser::CalculatePriceDifference(PortfolioObject &portfolio, QHash
 
         case PortfolioType::BX_MKT:
         case PortfolioType::BOX:
+        case PortfolioType::BX_BID:
             return CalculateBoxPriceDifference(portfolio,MBP_Data_Hash,devicer,decimal_precision,portfolio.PortfolioTypeEnum);
 
         case PortfolioType::OPEN_BOX:
             return CalculateOpenBoxPriceDifference(portfolio,MBP_Data_Hash,devicer,decimal_precision,portfolio.PortfolioTypeEnum);
+
 
             /* case PortfolioType::R2L:
                      return CalculateR2LPriceDifference(portfolio);
@@ -1340,6 +1370,8 @@ void PortfolioParser::CalculatePriceDifference(PortfolioObject &portfolio, QHash
                      return CalculateBYC6LPriceDifference(portfolio);*/
         case PortfolioType::BFLY_BID:
             return CalculateBFLYPriceDifference(portfolio,MBP_Data_Hash,devicer,decimal_precision,portfolio.PortfolioTypeEnum);
+
+
         default:
             break;
         }

@@ -466,6 +466,8 @@ void add_algo_f2f::generateAlgo(){
         msgBox.setIcon(QMessageBox::Warning);
         msgBox.exec();
     }
+    tableWidget->resizeColumnsToContents();
+
 }
 
 
