@@ -1704,6 +1704,7 @@ void MainWindow::loadDataAndUpdateTable(int table){
 }
 
 void MainWindow::onRequestDeleteConfirmation(const QStringList &PortFoliosToDelete) {
+
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Delete Confirmation",
                                   "Token not exist in contract table for Portfolios ('" + PortFoliosToDelete.join("','") + "')!. Delete those portfolios?",
