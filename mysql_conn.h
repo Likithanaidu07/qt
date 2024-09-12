@@ -82,6 +82,7 @@ public:
 
     QSqlQuery runQuery(QString qry_str);
     bool updateDB_Table(QString query_str,QString &msg);
+    bool modifytype(QString value,QString user_id,QString &msg);
     bool resetPassword(const QString &new_password,QString user_id,QString &msg);
     QString get_Algo_Name(int algo_type,int leg1_token_number,int leg2_token_number,int leg3_token_number,double devicer,int decimal_precision);
     void  getTradeTableData(int &TraderCount,Trade_Table_Model *model,Liners_Model *liners_model ,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);

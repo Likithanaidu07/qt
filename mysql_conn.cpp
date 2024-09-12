@@ -641,6 +641,41 @@ bool mysql_conn::resetPassword(const QString &new_password, QString user_id,QStr
     return ret;
 }
 
+
+bool mysql_conn::modifytype(QString value,QString user_id,QString &msg)
+{
+    // QString reset_querystr;
+    // QString reset_querystr = "UPDATE rt_usertable SET OldPassword03 = OldPassword02,OldPassword02 = OldPassword01,OldPassword01 = Password, Password = '"+new_password+"' WHERE UserId = '"+user_id+"'";
+    QString modify_querystr = "UPDATE Portfolios SET ModifyType = '" + value + "' WHERE TraderID = '" +user_id + "';";
+
+    // QSqlQuery query(reset_querystr, db);
+
+    qDebug()<<"DB Update Query: "<<modify_querystr;
+    QMutexLocker lock(&mutex);
+
+    bool ret = false;
+
+
+    bool ok = checkDBOpened(msg);
+    if(ok){
+
+        QSqlQuery query(modify_querystr, db);
+        if( !query.exec() )
+        {
+
+            msg = modify_querystr+" failed, "+ query.lastError().text();
+            ret = false;
+        }
+        else{
+            qDebug()<<"Updated Data base successfully.";
+            ret = true;
+        }
+
+    }
+
+    return ret;
+}
+
 bool mysql_conn::updateDB_Table(QString query_str, QString &msg)
 {
     qDebug()<<"DB Update Query: "<<query_str;

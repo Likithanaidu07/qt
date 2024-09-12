@@ -28,12 +28,13 @@ public:
    explicit Table_OrderBook_Delegate(QObject *parent = nullptr);
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
 //   QList<OrderBookObject*> OrderBook_Data_List;
+     void setHighlightText(const QString &text);
 
 protected:
     bool eventFilter(QObject *object, QEvent *event) override;
 private:
 
-
+  QString m_highlightText;
     double price_diff_incrementer = 0.05;
     double quantity_incrementer = 1.0;
     QString market_type;

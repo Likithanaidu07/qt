@@ -15,7 +15,7 @@
 #include <QWidget>
 #include "PortFolio/PortfolioParser.h"
 
-#define MUTEX_DEBUG_LOG
+//#define MUTEX_DEBUG_LOG
 
 struct CustomFormatting {
     QColor color;

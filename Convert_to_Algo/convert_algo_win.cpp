@@ -194,7 +194,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
 //        ui->comboBox_AlgoType->clear();
 //        ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
-      //  ui->comboBox_AlgoType->addItem("F2F");
+
       //  ui->comboBox_AlgoType->addItem("BFLY");
         ui->comboBox_AlgoType->addItem("CR-BID");
 //        ui->comboBox_AlgoType->addItem("BOX");
@@ -202,6 +202,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 //        ui->comboBox_AlgoType->addItem("Open-BOX");
 
         ui->comboBox_AlgoType->addItem("CRJELLY-BID");
+         ui->comboBox_AlgoType->addItem("F2F");
         ui->comboBox_AlgoType->setStyleSheet(
             "QComboBox {"
             "    font-weight: bold;"
