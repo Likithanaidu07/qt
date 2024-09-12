@@ -17,6 +17,8 @@ QStandardItemModel* ContractDetail::model_start_strike_BFLY = nullptr;
 QStandardItemModel* ContractDetail::model_searchInstrument_F2F_Leg1 = nullptr;
 QStandardItemModel* ContractDetail::model_FUT_CON_REV = nullptr;
 QStandardItemModel* ContractDetail::model_start_strike_BFLY_BID = nullptr;
+QStandardItemModel* ContractDetail::model_start_strike_BOX_BID = nullptr;
+
 QStandardItemModel* ContractDetail::model_F1_F2 = nullptr;
 
 double ContractDetail::devicer_contract;
@@ -31,6 +33,8 @@ ContractDetail::ContractDetail() noexcept
     model_searchInstrument_F2F_Leg1 = new QStandardItemModel;
     model_FUT_CON_REV = new QStandardItemModel;
     model_start_strike_BFLY_BID = new QStandardItemModel;
+    model_start_strike_BOX_BID = new QStandardItemModel;
+
     model_F1_F2 = new QStandardItemModel;
 }
 
@@ -137,6 +141,7 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
     model_searchInstrument_F2F_Leg1->clear();
     model_FUT_CON_REV->clear();
     model_start_strike_BFLY_BID->clear();
+    model_start_strike_BOX_BID->clear();
     model_F1_F2->clear();
 
     QSet<QString> model_data_name_set;
@@ -338,6 +343,35 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
         /********************************************************************/
     }
 
+    /**********Create model for BX_BID*************************/
+    QStringList BX_BID_Tokens  = m_ContractDetails_Grouped[PortfolioType::BX_BID];
+
+    for(int i=0;i<BX_BID_Tokens.length();i++){
+        const auto& contract = m_ContractDetails_Hash[BX_BID_Tokens[i]];
+        //Only CE record need to avoaid duplicate
+        if(contract.OptionType=="PE")
+            continue;
+        unsigned int unix_time= contract.Expiry;
+        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+        dt = dt.addYears(10);
+        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
+        QString instrument_name = contract.InstrumentName;
+
+        QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract);
+        QStandardItem *itemBOX_BID = new QStandardItem;
+        itemBOX_BID->setText(algo_combination);
+        itemBOX_BID->setData(contract.TokenNumber, Qt::UserRole + 1);
+
+        QString strik_price = QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract);
+        // Create custom data for sorting
+        QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd") + "-" + strik_price;
+        // Set the composite key as data for sorting
+        itemBOX_BID->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+        model_start_strike_BOX_BID->appendRow(itemBOX_BID);
+   }
+    /********************************************************************/
+
+
 
 
 
@@ -364,6 +398,11 @@ QStandardItemModel* ContractDetail::Get_model_start_strike_BFLY_BID()
 {
     return model_start_strike_BFLY_BID;
 }
+QStandardItemModel* ContractDetail::Get_model_start_strike_BOX_BID()
+{
+    return model_start_strike_BOX_BID;
+}
+
 
 QStandardItemModel* ContractDetail::Get_model_F1_F2()
 {
@@ -382,6 +421,11 @@ QStringList ContractDetail::Get_BFLY_data_list_Sorted_Key()
 QStringList ContractDetail::Get_BFLY_BID_data_list_Sorted_Key()
 {
     return m_ContractDetails_Grouped[PortfolioType::BFLY_BID];
+}
+
+QStringList ContractDetail::Get_BOX_BID_data_list_Sorted_Key()
+{
+    return m_ContractDetails_Grouped[PortfolioType::BX_BID];
 }
 /*Hash<QString, contract_table> ContractDetail::GetFutureContracts()
 {

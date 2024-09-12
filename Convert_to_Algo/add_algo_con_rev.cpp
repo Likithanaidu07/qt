@@ -531,6 +531,8 @@ void add_algo_con_rev::generateAlgo(){
         msgBox.setIcon(QMessageBox::Warning);
         msgBox.exec();
     }
+    tableWidget->resizeColumnsToContents();
+
 
 
 }

@@ -455,6 +455,7 @@ void add_algo_btfly::generateAlgo()
         msgBox.exec();
     }
 
+    tableWidget->resizeColumnsToContents();
 
 }
 

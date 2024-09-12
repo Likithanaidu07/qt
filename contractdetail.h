@@ -48,6 +48,8 @@ public:
     static QStandardItemModel* model_searchInstrument_F2F_Leg1;
     static QStandardItemModel* model_FUT_CON_REV;
     static QStandardItemModel *model_start_strike_BFLY_BID;
+    static QStandardItemModel *model_start_strike_BOX_BID;
+
     static QStandardItemModel* model_F1_F2;
 
     static ContractDetail& getInstance();
@@ -57,6 +59,8 @@ public:
     QStringList Get_F2F_data_list_Sorted_Key();
     QStringList Get_BFLY_data_list_Sorted_Key();
     QStringList Get_BFLY_BID_data_list_Sorted_Key();
+    QStringList Get_BOX_BID_data_list_Sorted_Key();
+
    // QHash<QString, contract_table> GetFutureContracts();
     QHash<QString, contract_table> GetContracts(QString type);
 
@@ -78,7 +82,10 @@ public:
     QStandardItemModel *Get_model_searchInstrument_F2F_Leg1();
     QStandardItemModel *Get_model_FUT_CON_REV();
     QStandardItemModel *Get_model_start_strike_BFLY();
+
     QStandardItemModel *Get_model_start_strike_BFLY_BID();
+    QStandardItemModel *Get_model_start_strike_BOX_BID();
+
     QStandardItemModel* Get_model_F1_F2();
 
 #ifdef STORE_CONTRACT_LOCALLY

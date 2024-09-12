@@ -71,7 +71,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Add actions to the Card menu
     cardMenu->addAction(summaryAction);
     cardMenu->addAction(watchAction);
-     cardMenu->addAction(LogAction);
+    cardMenu->addAction(LogAction);
 
 
     // Create a ToolButton to act as the menu title on ui->card
@@ -1764,6 +1764,7 @@ void MainWindow::loadDataAndUpdateTable(int table){
 }
 
 void MainWindow::onRequestDeleteConfirmation(const QStringList &PortFoliosToDelete) {
+
     QMessageBox::StandardButton reply;
     reply = QMessageBox::question(this, "Delete Confirmation",
                                   "Token not exist in contract table for Portfolios ('" + PortFoliosToDelete.join("','") + "')!. Delete those portfolios?",
@@ -2360,6 +2361,8 @@ void MainWindow::ConvertAlgo_button_clicked(){
 
     if(!convertalgo){
         convertalgo=new ConvertAlgo_Win(this);
+        Qt::WindowFlags flags = convertalgo->windowFlags();
+        convertalgo->setWindowFlags(flags | Qt::Tool);
         qDebug()<<"Creating convertalgo....";
     }
 

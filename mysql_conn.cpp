@@ -169,8 +169,16 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                     QStringList InstrumentTypeAll;
                     InstrumentTypeAll << "FUTIDX" << "OPTIDX" << "FUTSTK" << "OPTSTK";
 
+                    QStringList OPT_Instruments;
+                    OPT_Instruments  << "OPTIDX" <<  "OPTSTK";
+                    QStringList FUT_Instruments;
+                    FUT_Instruments  << "FUTSTK" <<  "FUTIDX";
+
+
                     QString BFLY_BIDInFilter = query.value(rec.indexOf("BFLY_BIDInFilter")).toString();
                     userLoginInfo.algoFilterMap[PortfolioType::BFLY_BID] =  (BFLY_BIDInFilter.isNull() || BFLY_BIDInFilter.trimmed().isEmpty())  ? InstrumentTypeAll  : BFLY_BIDInFilter.split(",");
+
+                    userLoginInfo.algoFilterMap[PortfolioType::BX_BID] =  OPT_Instruments;//(BOX_BIDInFilter.isNull() || BOX_BIDInFilter.trimmed().isEmpty())  ? InstrumentTypeAll  : BOX_BIDInFilter.split(",");
 
                     QString BYInFilter = query.value(rec.indexOf("BYInFilter")).toString();
                     userLoginInfo.algoFilterMap[PortfolioType::BY] =  (BYInFilter.isNull() || BYInFilter.trimmed().isEmpty())  ? InstrumentTypeAll  : BYInFilter.split(",");
@@ -611,7 +619,7 @@ QSqlQuery mysql_conn::runQuery(QString qry_str){
 bool mysql_conn::resetPassword(const QString &new_password, QString user_id,QString &msg)
 {
    // QString reset_querystr;
-   // QString reset_querystr = "UPDATE rt_usertable SET OldPassword03 = OldPassword02,OldPassword02 = OldPassword01,OldPassword01 = Password, Password = '"+new_password+"' WHERE UserId = '"+user_id+"'";
+   // QString reset_querystr = "UPDATE rt_usertable SET OldPassword03 = OldPassword02,OldPassword02 = OldPassword01,OldPassword01 = Password, Password = '"+new_password+"' WHERE UserId = '"+user_id+"'";
     QString reset_querystr = "UPDATE rt_usertable SET OldPassword03 = OldPassword02, OldPassword02 = OldPassword01, OldPassword01 = Password, Password = '"+new_password+"' WHERE UserId ='"+user_id+"';";
    // QSqlQuery query(reset_querystr, db);
 
@@ -754,7 +762,15 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
         Algo_Name = "Bfly-";//Nifty-18000-CE-200";
         double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+"-"+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
-    }return Algo_Name.toUpper();
+    }
+
+    else if(algo_type==PortfolioType::BX_BID){
+        Algo_Name = "BoxBid-";//Nifty-18000-CE-200";
+        double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+"-"+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
+    }
+
+    return Algo_Name.toUpper();
 }
 
   QList<QHash<QString,QString>>  mysql_conn::getOrderPopUPData(QString user_id, QString portfolioNumber,QString PortfolioType){
@@ -868,6 +884,17 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
                     break;
                 }
                 case PortfolioType::BFLY_BID:{
+                    if(Leg1BuySellIndicator==1){
+                        Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
+                    }
+                    else{
+                        Exch_Price_val = static_cast<double>((leg3Price + leg1Price) * 1.0 - (2.0 * leg2Price)) / devicer;
+                    }
+
+                    break;
+                }
+
+                case PortfolioType::BX_BID:{
                     if(Leg1BuySellIndicator==1){
                         Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
                     }
@@ -1258,6 +1285,16 @@ QList <QStringList> liners_listTmp;
                     break;
                 }
                 case PortfolioType::BFLY_BID:{
+                    if(Leg1BuySellIndicator==1){
+                        Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
+                    }
+                    else{
+                        Exch_Price_val = static_cast<double>((leg3Price + leg1Price) * 1.0 - (2.0 * leg2Price)) / devicer;
+                    }
+
+                    break;
+                }
+                case PortfolioType::BX_BID:{
                     if(Leg1BuySellIndicator==1){
                         Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
                     }
@@ -1916,6 +1953,9 @@ QHash<QString, contract_table>  mysql_conn::getContractTable( QHash<int , QStrin
             QSqlRecord rec = query.record();
             while (query.next())
             {
+                int token =  query.value(rec.indexOf("Token")).toInt();
+                if(token==0)
+                    continue;
                 contract_table contractTableTmp;
                 contractTableTmp.InstrumentType = query.value(rec.indexOf("InstrumentType")).toString();
                 contractTableTmp.InstrumentName = query.value(rec.indexOf("InstrumentName")).toString();
@@ -1923,7 +1963,7 @@ QHash<QString, contract_table>  mysql_conn::getContractTable( QHash<int , QStrin
                 contractTableTmp.StrikePrice = query.value(rec.indexOf("StrikePrice")).toInt();
                 contractTableTmp.LotSize = query.value(rec.indexOf("LotSize")).toInt();
                 contractTableTmp.Expiry = query.value(rec.indexOf("ExpiryDate")).toLongLong();
-                contractTableTmp.TokenNumber = query.value(rec.indexOf("Token")).toInt();
+                contractTableTmp.TokenNumber = token;
                 contractTableTmp.StockName = query.value(rec.indexOf("StockName")).toString();
                 contractTableTmp.MinimumSpread = query.value(rec.indexOf("MinSpread")).toInt();
                 contractTableTmp.VolumeFreezeQty = query.value(rec.indexOf("VolumeFreezeQty")).toDouble();
@@ -2170,6 +2210,15 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                               " and Leg1TokenNo="+data.Leg1_token_number+
                               " and Leg2TokenNo="+data.Leg2_token_number+
                               " and Leg3TokenNo="+data.Leg3_token_number;
+
+                    //BOX-BID
+                    else if(data.algo_type==QString::number(PortfolioType::BX_BID))
+                        str = "select  TraderID from Portfolios where TraderID="+data.user_id+
+                              " and PortfolioType="+ data.algo_type+
+                              " and Leg1TokenNo="+data.Leg1_token_number+
+                              " and Leg2TokenNo="+data.Leg2_token_number+
+                              " and Leg3TokenNo="+data.Leg3_token_number+
+                              " and Leg4TokenNo="+data.Leg4_token_number;
 
                     //CON-REV
                     //2L Straddle
@@ -2420,6 +2469,35 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                 query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
                                 query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
                                 query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
+                                query.bindValue(":BuyPriceDifference", 0);
+                                query.bindValue(":BuyTotalQuantity", 0);
+                                query.bindValue(":BuyTradedQuantity", 0);
+                                query.bindValue(":SellPriceDifference", 0);
+                                query.bindValue(":SellTotalQuantity", 0);
+                                query.bindValue(":SellTradedQuantity", 0);
+                                query.bindValue(":OrderQuantity", 0);
+
+                            }
+
+                            //BFLY_BID
+                            else if(data.algo_type==QString::number(PortfolioType::BX_BID)){
+                                query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
+                                              "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo,Leg4TokenNo"
+                                              ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                                              "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
+                                              "OrderQuantity) "
+                                              "VALUES (:PortfolioType, :TraderID, :Status,"
+                                              ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo,:Leg4TokenNo"
+                                              ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                                              ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
+                                              ":OrderQuantity)");
+                                query.bindValue(":PortfolioType", data.algo_type);
+                                query.bindValue(":TraderID", data.user_id);
+                                query.bindValue(":Status", data.Algo_Status);
+                                query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
+                                query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
+                                query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
+                                query.bindValue(":Leg4TokenNo", data.Leg4_token_number);
                                 query.bindValue(":BuyPriceDifference", 0);
                                 query.bindValue(":BuyTotalQuantity", 0);
                                 query.bindValue(":BuyTradedQuantity", 0);

@@ -8,12 +8,13 @@
 #include "ui_convert_algo_win.h"
 #include "convert_algo_shared_var.h"
 #include "convert_to_algo_bfly.h"
-#include "add_algo_f2f.h"
+#include "Convert_to_Algo/convert_to_algo_box_bid.h"
 #include "add_algo_con_rev.h"
 #include "mysql_conn.h"
 #include "convert_to_algo_bfly_bid.h"
 #include "Common/macros.h"
 #include "add_algo_cr_jelly_bid.h"
+#include "add_algo_f2f.h"
 enum UI_UPDATE_TYPE{
     LOADED_MODEL=0
 };
@@ -71,11 +72,14 @@ private:
     QAtomicInt dataSorted;
     mysql_conn *db_conn;
     add_algo_btfly *algoBtFly;
+
     add_algo_f2f *algoF2F;
     add_algo_con_rev *algoConRev;
     add_algo_cr_jelly_bid *algoCRJellyBid;
 
     add_algo_btfly_bid *algoBtFlyBid;
+    convert_to_algo_box_bid *algoBoxBid;
+
 
     void sort_data_and_populate_model(QHash<QString, contract_table> contract_table_/*,QHash<QString, contract_table> cd_contract_table_*/);
     void resetTableWidget();

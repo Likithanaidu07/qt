@@ -237,6 +237,7 @@ struct algo_data_to_insert{
     QString Leg1_Strike;
     QString Leg2_Strike;
     QString Leg3_Strike;
+    QString Leg4_Strike;
     QString option_type;
     QString  Algo_Name;
     QString exchange;
