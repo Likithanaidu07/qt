@@ -53,8 +53,8 @@ SOURCES += \
     SlowDataIndices/slowdata_indices_socket.cpp \
     SlowDataIndices/slowdataindices.cpp \
     SwitchButton/switchbutton.cpp \
-    TradePosition/trade_table_filterproxymodel.cpp \
     TradePosition/trade_table_model.cpp \
+    TradePosition/tradetable_searchfilterproxymodel.cpp \
     TradePosition/tradetableheaderview.cpp \
     backendcomm/backendcomm.cpp \
     contractdetail.cpp \
@@ -118,8 +118,8 @@ HEADERS += \
     SlowDataIndices/slowdataindices.h \
     SwitchButton/switchbutton.h \
     TradePosition/OrderBook_Object.h \
-    TradePosition/trade_table_filterproxymodel.h \
     TradePosition/trade_table_model.h \
+    TradePosition/tradetable_searchfilterproxymodel.h \
     TradePosition/tradetableheaderview.h \
     backendcomm/backendcomm.h \
     contractdetail.h \

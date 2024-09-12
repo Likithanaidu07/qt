@@ -828,7 +828,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             QRect highlightRect(highlightStartX, opt.rect.top(), matchWidth, opt.rect.height());
 
             // Fill the background with yellow for the highlighted part
-            painter->fillRect(highlightRect, Qt::yellow);
+         painter->fillRect(highlightRect, QColor(163, 163, 161));
 
 
 

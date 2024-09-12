@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
-
+#include <QCheckBox>
 #include <QEvent>
 #include <QPropertyAnimation>
 #include <QParallelAnimationGroup>
@@ -28,7 +28,8 @@
 #include "Cards/watch_cards.h"
 #include "QMenu"
 #include "PortFolio/portfolio_searchfilterproxymodel.h"
-#include "TradePosition/trade_table_filterproxymodel.h"
+#include "TradePosition/tradetable_searchfilterproxymodel.h"
+
 
 //#define ENABLE_BACKEND_DEBUG_MSG
 
@@ -59,9 +60,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this,SIGNAL(showMessageSignal(QString)),this,SLOT(showMessageSlot(QString)));
     connect(this, SIGNAL(requestDeleteConfirmation(QStringList)), this, SLOT(onRequestDeleteConfirmation(QStringList)));
 
-
-
-    // Create the Card menu
+    //    // Create the Card menu
     QMenu *cardMenu = new QMenu("Card", this);
 
     // Create actions
@@ -112,6 +111,22 @@ MainWindow::MainWindow(QWidget *parent)
     connect(summaryAction, &QAction::triggered, this, &MainWindow::onSummaryActionTriggered);
     connect(watchAction, &QAction::triggered, this, &MainWindow::onWatchActionTriggered);
     connect(LogAction, &QAction::triggered, this, &MainWindow::onLogActionTriggered);
+
+    ui->lineEditSearch->setPlaceholderText("Search...");
+    ui->lineEditSearch->setStyleSheet(
+        "QLineEdit {"
+        "    font-family: 'Work Sans';"
+        "    font-size: 10pt;"
+        "}"
+        );
+    ui->lineEditSearch->setMaximumWidth(360);
+    ui->lineEditSearch->setMaximumHeight(1500);
+    ui->lineEditSearch->setPlaceholderText("Search Algo");
+    QAction* search_action = new QAction(QIcon(":/search.png"), "", ui->lineEditSearch);
+
+    // Add the action to the QLineEdit
+    ui->lineEditSearch->addAction(search_action, QLineEdit::LeadingPosition);
+    ui->lineEditSearch->setStyleSheet(lineedit_dock_SS);
 
 
 
@@ -226,15 +241,15 @@ MainWindow::MainWindow(QWidget *parent)
             lay->setRowStretch(0, 0); //set minimum hieght for first row
             lay->setRowStretch(1, 1);//set maximum hieght for second row table
 
-            QLineEdit* line_edit_trade_search = new QLineEdit;
-            line_edit_trade_search->setMaximumWidth(360);
-            line_edit_trade_search->setMaximumHeight(1500);
-            line_edit_trade_search->setPlaceholderText("Search Algo");
-            QAction* search_action = new QAction(QIcon(":/search.png"), "", line_edit_trade_search);
+//            QLineEdit* line_edit_trade_search = new QLineEdit;
+//            line_edit_trade_search->setMaximumWidth(360);
+//            line_edit_trade_search->setMaximumHeight(1500);
+//            line_edit_trade_search->setPlaceholderText("Search Algo");
+//            QAction* search_action = new QAction(QIcon(":/search.png"), "", line_edit_trade_search);
 
-            // Add the action to the QLineEdit
-            line_edit_trade_search->addAction(search_action, QLineEdit::LeadingPosition);
-            line_edit_trade_search->setStyleSheet(lineedit_dock_SS);
+//            // Add the action to the QLineEdit
+//            line_edit_trade_search->addAction(search_action, QLineEdit::LeadingPosition);
+//            line_edit_trade_search->setStyleSheet(lineedit_dock_SS);
 
             QToolButton *ConvertAlgo_button = new QToolButton();
             connect(ConvertAlgo_button, SIGNAL(clicked()), this, SLOT(ConvertAlgo_button_clicked()));
@@ -303,6 +318,48 @@ MainWindow::MainWindow(QWidget *parent)
             button6->setIcon(QIcon(":/export.png"));
             button6->setToolTip("Export");
 
+            // Apply custom stylesheet
+//            QCheckBox *switchBox = new QCheckBox(this);
+//            switchBox->setText("OFF"); // Set the initial text to "OFF"
+//            switchBox->setFixedSize(40, 25);
+
+//            // Apply custom stylesheet
+//            switchBox->setStyleSheet(
+//                "QCheckBox {"
+//                "    font-size: 14px;"     // Font size for the checkbox text
+//                "    color: white;"        // Default text color
+//                "    background-color: #444;" // Background color for the checkbox
+//                "    border: 1px solid #888;" // Border to make the checkbox visible
+//                "    padding: 5px;"        // Padding around the text
+//                "}"
+//                "QCheckBox::indicator {"
+//                "    width: 0px;"          // Hide the default checkbox indicator
+//                "    height: 0px;"         // Hide the default checkbox indicator
+//                "}"
+//                "QCheckBox:unchecked {"
+//                "    color: red;"          // Text color for unchecked state
+//                "}"
+//                "QCheckBox:checked {"
+//                "    color: green;"        // Text color for checked state
+//                "}"
+//                );
+
+//            // Connect the stateChanged signal to update the text dynamically
+//            connect(switchBox, &QCheckBox::stateChanged, this, [this, switchBox](int state) {
+//                if (state == Qt::Checked) {
+//                     QString msg;
+//                    bool ret = db_conn->modifytype("1", QString::number(userData.UserId), msg);
+//                    switchBox->setText("ON");  // Set text to "ON" when checked
+//                } else {
+//                     QString msg;
+//                    bool ret = db_conn->modifytype("2", QString::number(userData.UserId), msg);
+//                    switchBox->setText("OFF"); // Set text to "OFF" when unchecked
+//                }
+//            });
+
+
+
+
             const char stylesheet_tb[] =
                 "QToolButton {"
                 "border-radius: 4px;"
@@ -339,8 +396,9 @@ MainWindow::MainWindow(QWidget *parent)
 
 
                 internalLayout->addWidget(ConvertAlgo_button);
+            //    internalLayout->addWidget(switchBox);
                 internalLayout->addSpacerItem(spc);
-                internalLayout->addWidget(line_edit_trade_search);
+                //internalLayout->addWidget(line_edit_trade_search);
                 internalLayout->addSpacerItem(spc);
                 internalLayout->addWidget(button1);
                 internalLayout->addWidget(button2);
@@ -386,12 +444,15 @@ MainWindow::MainWindow(QWidget *parent)
     proxyModel->setSourceModel(T_Portfolio_Model);
     proxyModel->setFilterKeyColumn(-1);  // Search across all columns
 
-    connect(line_edit_trade_search, &QLineEdit::textChanged, this, [=](const QString &text) {
-       // proxyModel->setFilterRegularExpression(QRegExp(text, Qt::CaseInsensitive, QRegularExpression::FixedString));
-        proxyModel->setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
-        T_Portfolio_Delegate->setHighlightText(text);
-        T_Portfolio_Table->viewport()->update();  // Redraw the view to apply the highlight
+    connect(ui->lineEditSearch, &QLineEdit::textChanged, this, [=](const QString &text) {
+        // Check if the relevant window or widget is open/visible
+        if (T_Portfolio_Table->isVisible()) { // Replace 'this' with the specific window or widget if needed
+            proxyModel->setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
+            T_Portfolio_Delegate->setHighlightText(text);
+            T_Portfolio_Table->viewport()->update();  // Redraw the view to apply the highlight
+        }
     });
+
 
     T_Portfolio_Table->setModel(proxyModel);
 
@@ -497,8 +558,6 @@ MainWindow::MainWindow(QWidget *parent)
     trade_table->setShowGrid(false);
     trade_table->setAlternatingRowColors(true);
 
-
-
     tradetableheaderview* headerViews = new tradetableheaderview(Qt::Horizontal, trade_table);
     headerViews->setFixedHeight(32);
     headerViews->setFont(headerfont);
@@ -516,16 +575,6 @@ MainWindow::MainWindow(QWidget *parent)
 //    headerViews->setHighlightSections(true);
      connect(headerViews, &QHeaderView::sectionMoved, this, &MainWindow::onTradeTableHeader_Rearranged);
     //trade_table->setHorizontalHeader(headerViews);
-     trade_table_filterproxymodel *trades_tableproxyModel = new trade_table_filterproxymodel(this);
-     trades_tableproxyModel->setSourceModel(trade_model);
-     trades_tableproxyModel->setFilterKeyColumn(-1);  // Search across all columns
-
-
-    // trade_table->setModel(trade_model);
-
-    // Add data to model...
-    trade_table->setModel(trades_tableproxyModel);
-    connect(headerViews, &tradetableheaderview::filterChanged, trades_tableproxyModel, &trade_table_filterproxymodel::setFilter);
     trade_table->setHorizontalHeader(headerViews);
 
     lay_Trade_Window->addWidget(trade_table, 1, 0, 1, 3);
@@ -538,6 +587,17 @@ MainWindow::MainWindow(QWidget *parent)
     //T_order_Delegate =  new trade_table_delegate();
     //trade_table->setItemDelegate(T_order_Delegate);
 
+    QSortFilterProxyModel *tradetableproxyModel = new QSortFilterProxyModel(this);
+    tradetableproxyModel->setSourceModel(trade_model);
+    tradetableproxyModel->setFilterKeyColumn(-1);  // Search across all columns
+
+    connect(ui->lineEditSearch, &QLineEdit::textChanged, this, [=](const QString &text) {
+        // proxyModel->setFilterRegularExpression(QRegExp(text, Qt::CaseInsensitive, QRegularExpression::FixedString));
+        tradetableproxyModel->setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
+        trade_delegate->setHighlightText(text);
+        trade_table->viewport()->update();  // Redraw the view to apply the highlight
+    });
+    trade_table->setModel(tradetableproxyModel);
     // Configure column resizing
     //trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
     trade_table->setColumnWidth(1,300);
