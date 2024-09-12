@@ -155,7 +155,7 @@ enum NET_POS
 
 enum PortfolioType
 {
-    F2F = 1,
+
     BY,
 
     BOX,
@@ -176,6 +176,7 @@ enum PortfolioType
     BFLY_BID = 250,
     CR = 251,
     CR_JELLY= 252,
+     F2F = 253,
     BX_BID=254,
     JBX,
     JBX_3L,
