@@ -130,7 +130,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-   // ui->sidePanel->setVisible(false);
+    ui->HP_Widget->setVisible(false);
     //ui->widget_3->setVisible(false);
       ui->widget_5->setVisible(true);
     //ui->widget_4->setVisible(false);
@@ -802,6 +802,7 @@ MainWindow::MainWindow(QWidget *parent)
     QPixmap pixmapdock_hp_close(":/dock_close.png");
 
     dock_win_combined_tracker =  new CDockWidget(tr("Historical Positions"));
+    dock_win_combined_tracker->setToolTip("Coming Soon");
     connect(dock_win_combined_tracker, SIGNAL(visibilityChanged(bool)), this, SLOT(OnHPDockWidgetVisiblityChanged(bool)));
     //dock_win_combined_tracker->setAllowedAreas(Qt::AllDockWidgetAreas );
     dock_win_combined_tracker->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);

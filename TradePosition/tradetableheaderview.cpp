@@ -50,7 +50,8 @@ void tradetableheaderview::paintSection(QPainter* painter, const QRect& rect, in
     else if(logicalIndex == OrderBook_Idx::TradeTime_OB||
              logicalIndex == OrderBook_Idx::BidLegState_OB||
              logicalIndex == OrderBook_Idx::Leg1State_OB ||
-             logicalIndex == OrderBook_Idx::Leg3State_OB)
+             logicalIndex == OrderBook_Idx::Leg3State_OB ||
+             logicalIndex == OrderBook_Idx::Leg4State_OB)
     {
         //        painter->fillRect(rect, QColor::fromRgba(qRgba(108,117,125,255)));
     }
@@ -70,7 +71,7 @@ void tradetableheaderview::paintSection(QPainter* painter, const QRect& rect, in
     // Add a right-side border
     //    painter->setPen(QColor::fromRgba(qRgba(50, 50, 50, 53))); // Set the border color
     if(logicalIndex == OrderBook_Idx::AlgoName_OB
-        || logicalIndex == OrderBook_Idx::Leg3State_OB
+        || logicalIndex == OrderBook_Idx::Leg4State_OB
         || logicalIndex == OrderBook_Idx::RemainingLot_OB){
         //painter->setPen(QColor("#6C757D"));
         painter->drawLine(rect.topRight(), rect.bottomRight());

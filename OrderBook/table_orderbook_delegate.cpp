@@ -35,11 +35,6 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
     QStringList order_list = model->trade_data_list.at(index.row());
     QList<QString> fifthColumnValues;
 
-    if (order_list.at(7) == "Sell") {
-
-    } else {
-
-    }
 
     if (c == OrderBook_Idx::ExchPrice_OB ||
         c == OrderBook_Idx::UserPrice_OB ||
@@ -88,19 +83,43 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
                c == OrderBook_Idx::AlgoNo_OB ||
                c == OrderBook_Idx::Leg1State_OB ||
                c == OrderBook_Idx::Leg3State_OB ||
+               c == OrderBook_Idx::Leg4State_OB   ||
                c == OrderBook_Idx::BidLegState_OB ||
                c == OrderBook_Idx::TradeTime_OB) {
 
         QColor textColor(108, 117, 125);
+        QColor bgColor("#E0F1FF");
+        QString Leg1_OrderState = order_list[OrderBook_Idx::Leg1StateVal_OB];
+        QString Leg3_OrderState = order_list[OrderBook_Idx::Leg3StateVal_OB];
+        QString Leg4_OrderState = order_list[OrderBook_Idx::Leg4StateVal_OB];
+        QString Leg2_OrderState = order_list[OrderBook_Idx::BidLegStateVal_OB];
+
+        if (Leg1_OrderState == "6" || Leg3_OrderState == "6" || Leg4_OrderState == "6" || Leg2_OrderState == "6") {
+            bgColor = QColor(215, 207, 232);  // Light purple background color
+        }
+
+        // Set the background color
+        painter->fillRect(option.rect, bgColor);
+
+        // Set the text color and draw the text
+        painter->setPen(textColor);
+        painter->drawText(option.rect, index.data().toString(), QTextOption(Qt::AlignCenter));
+
+        // Optionally call the base class method for default painting
+        QStyledItemDelegate::paint(painter, option, index);
+
+
         QPen pen(textColor);
         pen.setWidthF(0.5);
         painter->setPen(pen);
         QColor HighlightColor("#42A5F5");
 
+
+
         if (option.state & QStyle::State_Selected)
             painter->fillRect(option.rect, HighlightColor);
         else
-            painter->fillRect(option.rect, QColor("#E0F1FF"));
+            painter->fillRect(option.rect, bgColor);
 
         QPoint p1 = option.rect.bottomLeft();
         QPoint p2 = option.rect.bottomRight();
@@ -169,4 +188,35 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
     }
 
     painter->restore();
+    int orderState = index.model()->data(index, Qt::UserRole).toInt();
+
+    // Determine the text color based on the order state
+    QColor textColor;
+    switch (orderState) {
+    case 5:
+    case 13:
+        textColor = QColor(203, 5, 5); // Red
+        break;
+    case 6:
+        textColor = QColor(250, 42, 85); // Pinkish
+        break;
+    case 8:
+        textColor = QColor(0, 128, 0); // Green
+        break;
+    case 10:
+        textColor = QColor(0, 0, 139); // Dark Blue
+        break;
+    default:
+        textColor = QColor(0, 0, 0); // Black
+        break;
+    }
+
+    // Set the text color in the palette
+    opt.palette.setColor(QPalette::Text, textColor);
+
+    // Call the base class paint method to handle the rest
+    QStyledItemDelegate::paint(painter, opt, index);
+
+
+
 }
