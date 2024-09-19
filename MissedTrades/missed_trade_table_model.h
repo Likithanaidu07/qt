@@ -24,7 +24,7 @@ public:
 
 private:
     int col_count;
-    QStringList header={  "ID",
+    QStringList header={  "Order Id",
                           "Buy/Sell",
                           "Type",
                           "Quantity",

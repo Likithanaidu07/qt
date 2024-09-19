@@ -38,9 +38,10 @@ private:
                           "Remaining Lot",
                           //"Buy/Sell",
                           "Time",
-                          "BidLeg State",
-                          "Leg1 State",
-                          "Leg3 State",
+                          "L2",
+                          "L1",
+                          "L3",
+                          "L4",
                           "Algo No"};
 
 
