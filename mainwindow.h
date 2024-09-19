@@ -15,7 +15,7 @@
 #include <QBoxLayout>
 #include <QStandardItemModel>
 #include <QListView>
-
+#include "settings_window.h"
 #include <mysql_conn.h>
 #include "ContractDetail.h"
 #include "SlowData/slowdata.h"
@@ -108,6 +108,7 @@ signals:
 private:
     Ui::MainWindow *ui;
     QStringList logsdata;
+    Settings_Window *sett_win= nullptr;
 
     loadingdatawindow *loadingDataWinodw;
     SortSettingPopUp *sortWin; // Add this line
@@ -242,7 +243,12 @@ private:
       void saveTradeTableViewColumnState(QTableView *tableView);
      void saveNetposTableViewColumnState(QTableView *tableView);
       void saveLinersTableViewColumnState(QTableView *tableView);
+      void initializeGlobalHotKeys();
+      QHash<QString, QShortcut*> HotKeyShortcutObjects;
+
+
 public slots:
+    void openSettingsWindow();
     void profolioTableEditFinshedSlot(QString val,QModelIndex);
     void onRequestDeleteConfirmation(const QStringList &PortFoliosToDelete);
 //    void edit_Started_PortFolio_Table(int row,int col);
@@ -280,6 +286,8 @@ public slots:
     void onChangepasswordActionTriggered();
     void onWatchActionTriggered();
     void onLogActionTriggered();
+    void updateHotKeysSlot(QStringList actions);
+
 private slots:
     void on_close_clicked();
     void on_minimize_clicked();

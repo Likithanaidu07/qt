@@ -1042,8 +1042,7 @@ void PortfolioParser::CalculateAveragePrice(PortfolioObject &portfolio,    QHash
 
         break;
     }
-    case PortfolioType::BOX:
-    case PortfolioType::BX_BID:{
+    case PortfolioType::BOX:{
         double leg1BuyPrice = DBL_MAX;
         double leg1SellPrice =DBL_MAX;
         double leg2BuyPrice = DBL_MAX;
@@ -1126,6 +1125,102 @@ void PortfolioParser::CalculateAveragePrice(PortfolioObject &portfolio,    QHash
         {
             double diff = strikeDiff - ((leg1SellPrice + leg4SellPrice) - (leg2BuyPrice + leg3BuyPrice));
 
+            QString d = QString::number(diff, 'f', decimal_precision);
+
+            if (portfolio.SellAveragePrice != d)
+            {
+                portfolio.AverageUpdateTime = QDateTime::currentDateTime();
+                portfolio.SellAveragePrice = d;
+            }
+        }
+
+
+        break;
+    }
+
+    case PortfolioType::BX_BID:{
+        double leg1BuyPrice = DBL_MAX;
+        double leg1SellPrice =DBL_MAX;
+        double leg2BuyPrice = DBL_MAX;
+        double leg2SellPrice = DBL_MAX;
+        double leg3BuyPrice = DBL_MAX;
+        double leg3SellPrice = DBL_MAX;
+        double leg4BuyPrice = DBL_MAX;
+        double leg4SellPrice =DBL_MAX;
+        QString key1 = QString::number(portfolio.PortfolioNumber)+"_"+QString::number(portfolio.Leg1TokenNo);
+        if(averagePriceList.contains(key1)){
+            PortfolioAvgPrice leg1 = averagePriceList[key1];
+            leg1SellPrice = leg1.AvgPrice;
+        }
+        key1 = QString::number(portfolio.PortfolioNumber + 1500000)+"_"+QString::number(portfolio.Leg1TokenNo);
+        if(averagePriceList.contains(key1)){
+            PortfolioAvgPrice leg1 = averagePriceList[key1];
+            leg1BuyPrice = leg1.AvgPrice;
+        }
+
+        QString key2 = QString::number(portfolio.PortfolioNumber)+"_"+QString::number(portfolio.Leg2TokenNo);
+        if(averagePriceList.contains(key2)){
+            PortfolioAvgPrice leg2 = averagePriceList[key2];
+            leg2BuyPrice = leg2.AvgPrice;
+        }
+        key2 = QString::number(portfolio.PortfolioNumber + 1500000)+"_"+QString::number(portfolio.Leg2TokenNo);
+        if(averagePriceList.contains(key2)){
+            PortfolioAvgPrice leg2 = averagePriceList[key2];
+            leg2SellPrice = leg2.AvgPrice;
+        }
+        QString key3 = QString::number(portfolio.PortfolioNumber)+"_"+QString::number(portfolio.Leg3TokenNo);
+        if(averagePriceList.contains(key3)){
+            PortfolioAvgPrice leg3 = averagePriceList[key3];
+            leg3BuyPrice = leg3.AvgPrice;
+        }
+        key3 = QString::number(portfolio.PortfolioNumber + 1500000)+"_"+QString::number(portfolio.Leg3TokenNo);
+        if(averagePriceList.contains(key3)){
+            PortfolioAvgPrice leg3 = averagePriceList[key3];
+            leg3SellPrice = leg3.AvgPrice;
+        }
+        QString key4 = QString::number(portfolio.PortfolioNumber)+"_"+QString::number(portfolio.Leg4TokenNo);
+        if(averagePriceList.contains(key4)){
+            PortfolioAvgPrice leg4 = averagePriceList[key4];
+            leg4SellPrice = leg4.AvgPrice;
+        }
+        key4 = QString::number(portfolio.PortfolioNumber + 1500000)+"_"+QString::number(portfolio.Leg4TokenNo);
+        if(averagePriceList.contains(key4)){
+            PortfolioAvgPrice leg4 = averagePriceList[key4];
+            leg4BuyPrice = leg4.AvgPrice;
+        }
+
+        QHash<QString, contract_table> Contract =  ContractDetail::getInstance().GetContracts();
+        int l1StrikePrice = 0;
+        int l3StrikePrice = 0;
+        if(Contract.contains(QString::number(portfolio.Leg1TokenNo)))
+            l1StrikePrice = Contract[QString::number(portfolio.Leg1TokenNo)].StrikePrice;
+        if(Contract.contains(QString::number(portfolio.Leg3TokenNo)))
+            l3StrikePrice = Contract[QString::number(portfolio.Leg3TokenNo)].StrikePrice;
+
+        double strikeDiff = (1.0 * (l3StrikePrice - l1StrikePrice)) / devicer;
+        bool ret = false;
+        if (leg1BuyPrice == DBL_MAX || leg4BuyPrice == DBL_MAX  || leg2SellPrice == DBL_MAX || leg3SellPrice == DBL_MAX)
+        {
+            portfolio.BuyAveragePrice = "-";
+        }
+        else
+        {
+            double diff = strikeDiff - ((leg1SellPrice + leg4SellPrice) - (leg2BuyPrice + leg3BuyPrice));
+
+            QString d = QString::number(diff, 'f', decimal_precision);
+            if (portfolio.BuyAveragePrice != d)
+            {
+                portfolio.AverageUpdateTime =QDateTime::currentDateTime();
+                portfolio.BuyAveragePrice = d;
+            }
+        }
+        if (leg1SellPrice == DBL_MAX || leg4SellPrice == DBL_MAX || leg2BuyPrice == DBL_MAX || leg3BuyPrice == DBL_MAX)
+        {
+            portfolio.SellAveragePrice = "-";
+        }
+        else
+        {
+            double diff =  strikeDiff - ((leg1SellPrice + leg4SellPrice) - (leg2BuyPrice + leg3BuyPrice));
             QString d = QString::number(diff, 'f', decimal_precision);
 
             if (portfolio.SellAveragePrice != d)

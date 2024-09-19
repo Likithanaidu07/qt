@@ -60,6 +60,37 @@ MainWindow::MainWindow(QWidget *parent)
     connect(this,SIGNAL(showMessageSignal(QString)),this,SLOT(showMessageSlot(QString)));
     connect(this, SIGNAL(requestDeleteConfirmation(QStringList)), this, SLOT(onRequestDeleteConfirmation(QStringList)));
 
+
+    /*************Initialize settings window*********/
+    sett_win = new Settings_Window(this);
+    connect(sett_win,SIGNAL(updateHotKeysSignal(QStringList)),this,SLOT(updateHotKeysSlot(QStringList)));
+
+
+    /*************************************************/
+
+    /***********************Main Menu Section**********************************/
+    QMenu *mainMenu = new QMenu("Tool", this);
+    ui->menu->setMenu(mainMenu);
+    ui->menu->setPopupMode(QToolButton::InstantPopup);
+
+    // Create reset password actions
+    QAction *changepasswordAction = new QAction("ChangePassword", this);
+    mainMenu->addAction(changepasswordAction);// Add actions to the Card menu
+    connect(changepasswordAction, &QAction::triggered, this, &MainWindow::onChangepasswordActionTriggered);// Create a ToolButton to act as the menu title on ui->card
+
+
+    // Create setting window actions
+    QAction *openSettWinAction = new QAction("Settings", this);
+    mainMenu->addAction(openSettWinAction);// Add actions to the Card menu
+    connect(openSettWinAction, &QAction::triggered, this, &MainWindow::openSettingsWindow);// Create a ToolButton to act as the menu title on ui->card
+
+
+
+
+    /********************************************************************************/
+
+
+
     //    // Create the Card menu
     QMenu *cardMenu = new QMenu("Card", this);
 
@@ -91,20 +122,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    ui->label_2->setFont(font);
 //    ui->label_2->setText("User Message :");
 
-    QMenu *resetMenu = new QMenu("Tool", this);
 
-    // Create actions
-    QAction *changepasswordAction = new QAction("ChangePassword", this);
-
-
-    // Add actions to the Card menu
-    resetMenu->addAction(changepasswordAction);
-
-
-    // Create a ToolButton to act as the menu title on ui->card
-    ui->menu->setMenu(resetMenu);
-    ui->menu->setPopupMode(QToolButton::InstantPopup);
-    connect(changepasswordAction, &QAction::triggered, this, &MainWindow::onChangepasswordActionTriggered);
 
 
     // Connect the actions to their respective slots (if needed)
@@ -1011,14 +1029,18 @@ MainWindow::MainWindow(QWidget *parent)
 
 //    this->restoreState(settings.value("DOCK_LOCATIONS").toByteArray(),1);
 
-    new QShortcut(QKeySequence(Qt::Key_Delete), this,  SLOT(Delete_clicked_slot()));
-    new QShortcut(QKeySequence(Qt::Key_F1), this,  SLOT(F1_clicked_slot()));
-    new QShortcut(QKeySequence(Qt::Key_F2), this,  SLOT(F2_clicked_slot()));
+   // new QShortcut(QKeySequence(Qt::Key_Delete), this,  SLOT(Delete_clicked_slot()));
+   // new QShortcut(QKeySequence(Qt::Key_F1), this,  SLOT(F1_clicked_slot()));
+   // new QShortcut(QKeySequence(Qt::Key_F2), this,  SLOT(F2_clicked_slot()));
 
     // db_conn =new mysql_conn(this,"main_db_conn");
     // connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
    //loadContract();
     //initWatchWindow();
+
+    /***********Initlaize Hotkey here*************/
+    initializeGlobalHotKeys();
+    /*********************************************/
 
 }
 
@@ -3168,5 +3190,270 @@ void MainWindow::onLogActionTriggered(){
 
     LC->show();
 }
+
+
+
+/*********Setting Window Section***************/
+void MainWindow::openSettingsWindow(){
+
+    sett_win->loadHotkeyFromIniFileAndPopulateTreeView();
+    sett_win->show();
+}
+
+/*********Setting Window Section***************/
+
+
+void MainWindow::initializeGlobalHotKeys(){
+
+    for (const QString &action : sett_win->HotKeysHash.keys()) {
+       const HotKeyDetails &hotKey = sett_win->HotKeysHash.value(action);
+       // If QShortcut already exists, update it
+       if (HotKeyShortcutObjects.contains(action)) {
+           QShortcut *shortcut = HotKeyShortcutObjects[action];
+           shortcut->setKey(QKeySequence(hotKey.shortcut)); // Update shortcut key
+           shortcut->setEnabled(hotKey.enabled); // Enable or disable based on the flag
+       }
+       else {
+           /*************General Hotkey init****************************/
+           // Create a new QShortcut if it doesn't exist
+           QShortcut *shortcut;
+
+           // Connect the shortcut's activated signal to the corresponding action
+           if (action == "OPEN_ALGO") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), this);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                       on_Algorithms_Button_clicked(); // Call the non-static member function
+               });
+           }
+           else if (action == "OPEN_TRADES") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), this);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                    on_OrderBook_Button_clicked();
+               });
+           }
+           else if (action == "OPEN_POSITION") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), this);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                    on_Positions_Button_clicked();
+               });
+           }
+           else if (action == "OPEN_LINERS") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), this);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                    on_Liners_Button_clicked();
+               });
+           }
+           else if (action == "OPEN_HISTORICAL_POSITION") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), this);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                    on_HP_Button_clicked();
+               });
+           }
+           else if (action == "OPEN_MISSED_TRADES") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), this);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                    on_MissedTrade_Button_clicked();
+               });
+           }
+           else if (action == "OPEN_TEMPLATES") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), this);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                    on_Templates_Button_clicked();
+               });
+           }
+           else if (action == "OPEN_SUMMARY") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), this);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                    onSummaryActionTriggered();
+               });
+           }
+           else if (action == "OPEN_WATCH") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), this);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                    onWatchActionTriggered();
+               });
+           }
+           else if (action == "OPEN_LOGS") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), this);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                    onLogActionTriggered();
+               });
+           }
+           else if (action == "OPEN_SETTINGS") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), this);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                    openSettingsWindow();
+               });
+           }
+           else if (action == "OPEN_F1_WIN") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), this);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                    F1_clicked_slot();
+               });
+           }
+           else if (action == "OPEN_F2_WIN") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), this);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                    F2_clicked_slot();
+               });
+           }
+           /*************Algo Hotkey init****************************/
+           else if (action == "OPEN_BUILD_ALOG") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), T_Portfolio_DockWin);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                    ConvertAlgo_button_clicked();
+               });
+           }
+           else if (action == "ENABLE_DISABLE_SELECTED_ALGO") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), T_Portfolio_DockWin);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                     QModelIndexList selection = T_Portfolio_Table->selectionModel()->selectedRows();
+                     if(selection.count()>0)
+                     {
+                         PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(selection.first().row());
+                         if (!P) {
+                             qDebug()<<"ENABLE_DISABLE_SELECTED_ALGO----- portfolio null, need to debug this code.";
+                             return;
+                         }
+                         QString PortfolioNumber = QString::number(P->PortfolioNumber);
+                         if(P->Status==true){
+                             QString Query = "UPDATE Portfolios SET Status='DisabledByUser' WHERE PortfolioNumber="+PortfolioNumber;
+                             QString msg;
+                             bool success =  db_conn->updateDB_Table(Query,msg);
+                             if(success){
+                                 db_conn->logToDB(QString("Disabled  Algo PortfolioNumber"));
+                             }
+                         }
+                         else{
+                             QString Query = "UPDATE Portfolios SET Status='Active'  WHERE PortfolioNumber="+PortfolioNumber;
+                             QString msg;
+                             bool success =  db_conn->updateDB_Table(Query,msg);
+                             if(success){
+                                 db_conn->logToDB(QString("Disabled  Algo PortfolioNumber"));
+                             }
+                         }
+
+                     }
+
+               });
+           }
+           else if (action == "OPEN_ALGO_INFO_WIN") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), T_Portfolio_DockWin);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                   QModelIndexList selection = T_Portfolio_Table->selectionModel()->selectedIndexes();
+                   if (selection.isEmpty()) {
+                       QMessageBox msgBox;
+                       msgBox.setText("Please select a Portfolio from Portfolio Table.");
+                       msgBox.setIcon(QMessageBox::Warning);
+                       msgBox.exec();
+                       return;
+                   } else {
+                       // Get the first selected cell (QModelIndex)
+                       QModelIndex firstSelectedCell = selection.at(PortfolioData_Idx::_AlgoName);
+
+                       // Pass the first selected cell to the double-click handler
+                       T_Portfolio_Table_cellDoubleClicked(firstSelectedCell);
+                   }
+               });
+           }
+           else if (action == "IMPORT_ALGOS") {
+               QShortcut *shortcut = new QShortcut(QKeySequence(hotKey.shortcut), T_Portfolio_DockWin);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+               });
+           }
+           else if (action == "EXPORT_ALGOS") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), T_Portfolio_DockWin);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+               });
+           }
+           else if (action == "OPEN_ALGO_SORT_WIN") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), T_Portfolio_DockWin);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                   sorting_Button_clicked();
+               });
+           }
+           else if (action == "ENABLE_ALL_ALGO") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), T_Portfolio_DockWin);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                   startall_Button_clicked();
+               });
+           }
+           else if (action == "DISABLE_ALL_ALGO") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), T_Portfolio_DockWin);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                   stopall_Button_clicked();
+               });
+           }
+           /*******************************************************/
+           /*************Trade Win Hotkey init****************************/
+           else if (action == "OPEN_TRADE_DETAILS_WIN") {
+               shortcut = new QShortcut(QKeySequence(hotKey.shortcut), dock_win_trade);
+               shortcut->setEnabled(hotKey.enabled);
+               QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
+                   QModelIndexList selection = trade_table->selectionModel()->selectedIndexes();
+                   if (selection.isEmpty()) {
+                       QMessageBox msgBox;
+                       msgBox.setText("Please select a Portfolio from Trade Table.");
+                       msgBox.setIcon(QMessageBox::Warning);
+                       msgBox.exec();
+                       return;
+                   } else {
+                       // Get the first selected cell (QModelIndex)
+                       QModelIndex firstSelectedCell = selection.at(OrderBook_Idx::AlgoName_OB);
+                       // Pass the first selected cell to the double-click handler
+                       trade_table_cellDoubleClicked(firstSelectedCell);
+                   }
+               });
+           }
+           /*******************************************************/
+
+
+
+
+         // Store the QShortcut object in the hash for future updates
+         HotKeyShortcutObjects.insert(action, shortcut);
+       }
+
+    }
+
+
+}
+
+void MainWindow::updateHotKeysSlot(QStringList actions){
+
+    for(int i=0;i<actions.length();i++){
+        HotKeyDetails hotKey = sett_win->HotKeysHash[actions[i]];
+
+        // If QShortcut already exists, update it
+        if (HotKeyShortcutObjects.contains(actions[i])) {
+            QShortcut *shortcut = HotKeyShortcutObjects[actions[i]];
+            shortcut->setKey(QKeySequence(hotKey.shortcut)); // Update shortcut key
+            shortcut->setEnabled(hotKey.enabled); // Enable or disable based on the flag
+        }
+    }
+
+}
+
 
 

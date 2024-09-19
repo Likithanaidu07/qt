@@ -352,6 +352,33 @@ struct Indices_Data_Struct{
     int display_widget_idx;
 };
 
+
+struct HotKeyDetails{
+    QString action;
+    QString description;
+    QString shortcut;
+    bool enabled;
+    // Define the '==' operator for comparison
+    bool operator==(const HotKeyDetails &other) const {
+        return (action == other.action &&
+                description == other.description &&
+                shortcut == other.shortcut &&
+                enabled == other.enabled);
+    }
+
+    // Define the '!=' operator for comparison
+    bool operator!=(const HotKeyDetails &other) const {
+        return !(*this == other);
+    }
+};
+
+struct HotKeysData_Grouped{
+    QString category;
+    QString title;
+    QList<HotKeyDetails>  HotKeyList;
+
+};
+
 enum BID_TYPE{
     INDEX_ALGO_BFLY_BID=0,
     INDEX_ALGO_F2F,
@@ -377,5 +404,8 @@ enum NOTIFICATION_TYPE
 enum ConvertAlog_Model_Roles {
     CustomSortingDataRole = Qt::UserRole + 2, // This should be 2, 1 is already used.
 };
+
+
+
 
 #endif // DEFINES_H
