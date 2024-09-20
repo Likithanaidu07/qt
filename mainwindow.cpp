@@ -444,9 +444,9 @@ MainWindow::MainWindow(QWidget *parent)
 
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::resizePortFolioTableColWidth, this, &MainWindow::resizePortFolioTableColWidthSlot);
    // QObject::connect(T_Portfolio_Table, &table_portfolios_custom::clicked, T_Portfolio_Model, &Table_Portfolios_Model::onItemChanged);
-    QObject::connect(T_Portfolio_Table, &table_portfolios_custom::selectionChangedSignal, T_Portfolio_Model, &Table_Portfolios_Model::selectionChangedSlot);
+    QObject::connect(T_Portfolio_Table, &table_portfolios_custom::selectionChangedSignal, T_Portfolio_Model, &Table_Portfolios_Model::selectionChangedSlot,Qt::QueuedConnection);
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::updateDBOnDataChanged, this, &MainWindow::updatePortFolioStatus, Qt::QueuedConnection);
-    QObject::connect(db_conn, &mysql_conn::updateModelDataListSignal, T_Portfolio_Model, &Table_Portfolios_Model::updateModelDataList, Qt::QueuedConnection);
+    QObject::connect(db_conn, &mysql_conn::updateModelDataListSignal, T_Portfolio_Model, &Table_Portfolios_Model::updateModelDataList, Qt::QueuedConnection); //QueuedConnection for avoid deadlock when mutex used inside model class,
 
 
 
@@ -1709,6 +1709,7 @@ void MainWindow::stop_slowdata_indices_worker(){
 }
 
 void MainWindow::loadDataAndUpdateTable(int table){
+
     switch (table) {
     case T_Table::PORTFOLIO:{
         QStringList TradedPortFolioList =  trade_model->getTradedPortFolioList();
@@ -1719,7 +1720,8 @@ void MainWindow::loadDataAndUpdateTable(int table){
 
 
         QStringList PortFoliosToDelete;
-        db_conn->getPortfoliosTableData(reloadSortSettFlg,AlgoCount,combined_tracker_model,averagePriceList,QString::number(userData.UserId),TradedPortFolioList,PortFoliosToDelete);
+        PortFolioHashLessHash = db_conn->getPortfoliosTableData(reloadSortSettFlg,AlgoCount,combined_tracker_model,averagePriceList,QString::number(userData.UserId),TradedPortFolioList,PortFoliosToDelete);
+
         if(PortFoliosToDelete.size()){
          // QString msg = "Token not exist in contract table for  Portfolios ('" + PortFoliosToDelete.join("','") + "')!. Deleting it.";
           if(showMessagOnceFlg){
@@ -1751,8 +1753,8 @@ void MainWindow::loadDataAndUpdateTable(int table){
 
     case T_Table::TRADE:{
 //        OutputDebugStringA("Test1 \n");
-        QHash<QString, PortFolioData_Less> PortFolioHash = T_Portfolio_Model->getPortFolioDataLess();
-        db_conn->getTradeTableData(TraderCount,trade_model,liners_model,QString::number(userData.UserId),PortFolioHash);
+        //QHash<QString, PortFolioData_Less> PortFolioHash = T_Portfolio_Model->getPortFolioDataLess();
+        db_conn->getTradeTableData(TraderCount,trade_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash);
         emit data_loded_signal(T_Table::TRADE);
         updateSummaryLabels();
         break;
@@ -1766,8 +1768,8 @@ void MainWindow::loadDataAndUpdateTable(int table){
     }*/
 
     case T_Table::NET_POS:{
-        QHash<QString,int> PortFoliosLotSizeHash = T_Portfolio_Model->getPortFoliosLotSize();
-        db_conn->getNetPosTableData(BuyValue,SellValue,Profit,BuyQty_summary,SellQty_summary,NetQty,net_pos_model,QString::number(userData.UserId),PortFoliosLotSizeHash);
+      //  QHash<QString,int> PortFoliosLotSizeHash = T_Portfolio_Model->getPortFoliosLotSize();
+        db_conn->getNetPosTableData(BuyValue,SellValue,Profit,BuyQty_summary,SellQty_summary,NetQty,net_pos_model,QString::number(userData.UserId));
         emit data_loded_signal(T_Table::NET_POS);
         updateSummaryLabels();
         break;
@@ -2280,6 +2282,11 @@ void MainWindow::startall_Button_clicked()
         bool success =  db_conn->updateDB_Table(Query,msg);
         if(success){
             db_conn->logToDB(QString("Enabled Algos [" + joinedPortfolioNumbers + "]"));
+            quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+            const unsigned char dataBytes[] = { 0x01};
+            QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
+            QByteArray msg = backend_comm->createPacket(command, data);
+            backend_comm->insertData(msg);
         }
 
 
@@ -2307,6 +2314,11 @@ void MainWindow::stopall_Button_clicked()
         bool success =  db_conn->updateDB_Table(Query,msg);
         if(success){
             db_conn->logToDB(QString("Disabled  Algos ["+joinedPortfolioNumbers+"]"));
+            quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+            const unsigned char dataBytes[] = { 0x01};
+            QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
+            QByteArray msg = backend_comm->createPacket(command, data);
+            backend_comm->insertData(msg);
         }
 }
 
@@ -2384,12 +2396,10 @@ void MainWindow::ConvertAlgo_button_clicked(){
 
     if(!convertalgo){
         convertalgo=new ConvertAlgo_Win(this);
-        Qt::WindowFlags flags = convertalgo->windowFlags();
-        convertalgo->setWindowFlags(flags | Qt::Tool);
         qDebug()<<"Creating convertalgo....";
     }
 
-    convertalgo->update_contract_tableData(QString::number(userData.UserId),userData.MaxPortfolioCount);
+   convertalgo->update_contract_tableData(QString::number(userData.UserId),userData.MaxPortfolioCount);
     if(!convertalgo->isVisible())
     convertalgo->show();
 }
@@ -3337,7 +3347,7 @@ void MainWindow::initializeGlobalHotKeys(){
                              QString msg;
                              bool success =  db_conn->updateDB_Table(Query,msg);
                              if(success){
-                                 db_conn->logToDB(QString("Disabled  Algo PortfolioNumber"));
+                                 db_conn->logToDB(QString("Disabled  Algo PortfolioNumber=")+PortfolioNumber);
                              }
                          }
                          else{
@@ -3345,7 +3355,7 @@ void MainWindow::initializeGlobalHotKeys(){
                              QString msg;
                              bool success =  db_conn->updateDB_Table(Query,msg);
                              if(success){
-                                 db_conn->logToDB(QString("Disabled  Algo PortfolioNumber"));
+                                 db_conn->logToDB(QString("Disabled  Algo PortfolioNumber=")+PortfolioNumber);
                              }
                          }
 

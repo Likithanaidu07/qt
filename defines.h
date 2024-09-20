@@ -265,6 +265,7 @@ struct algo_data_to_insert{
 struct PortFolioData_Less{
     QString PortfolioType;
     QString Expiry;
+    int lotSize;
 };
 
 struct PortfolioAvgPrice{

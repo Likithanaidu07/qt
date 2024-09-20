@@ -128,8 +128,7 @@ private:
     int UsedMargin;
     double BuyQty_summary;
     double SellQty_summary;
-
-
+    QHash<QString,PortFolioData_Less> PortFolioHashLessHash;
     ads::CDockManager* DockManagerMainPanel;
  //  ads::CDockManager *DockManagerSidePanel;
 

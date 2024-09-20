@@ -150,9 +150,6 @@ void convert_to_algo_box_bid::createEndStrikeModelAndPopulateListView(){
             item->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
             model_end_strike->appendRow(item);
 
-
-
-
         }
     }
 

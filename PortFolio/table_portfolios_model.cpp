@@ -137,6 +137,7 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         return QVariant();
 
     PortfolioObject *portfolio = portfolio_data_list.at(index.row());
+
     switch (role) {
 
     case Qt::CheckStateRole :
@@ -387,10 +388,11 @@ case Qt::EditRole:{
 
     //editing row swithced, make previous row flg not editing
    if(current_editingRow!=index.row()){
-      if(current_editingRow!=-1)
+      if(current_editingRow!=-1){
           portfolio_data_list[current_editingRow]->edting.storeRelaxed(0);
+      }
     }
-    PortfolioObject *portfolio = portfolio_data_list.at(index.row());
+   // PortfolioObject *portfolio = portfolio_data_list.at(index.row());
     portfolio->edting.storeRelaxed(1);
    // qDebug()<<"editStarted";
     if(c==PortfolioData_Idx::_SellPriceDifference){
@@ -442,6 +444,7 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
     qDebug()<<"Entering---setData";
 #endif
     QMutexLocker locker(&mutex); // Lock the mutex automatically
+
 #ifdef MUTEX_DEBUG_LOG
     qDebug()<<"Setting Mutex---setData";
 #endif
@@ -450,8 +453,9 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
 
     //editing row swithced, make previous row flg not editing
     if(current_editingRow!=index.row()){
-        if(current_editingRow!=-1)
+        if(current_editingRow!=-1){
             portfolio_data_list[current_editingRow]->edting.storeRelaxed(0);
+        }
         editingDataHash.clear();
     }
 
@@ -849,7 +853,8 @@ void Table_Portfolios_Model::updateModelDataList(QList <PortfolioObject*> portfo
     ///  and selectionChangedSlot() functions.
     ///  The blockSignals(true) call disables all signals from the model during the row removal process.
     ///  This prevents the selectionChangedSlot from being triggered during the row removal.
-    bool signalsBlocked = this->blockSignals(true);
+  //  bool signalsBlocked = this->blockSignals(true);
+
   //remove rows
     for(int i = 0;i<portfolio_ids_ToRemove.length();i++){
         beginRemoveRows(QModelIndex(), portfolio_ids_ToRemove[i]-i, portfolio_ids_ToRemove[i]-i); //substract i means each time one item removed the index need to be decrement by 1
@@ -859,7 +864,7 @@ void Table_Portfolios_Model::updateModelDataList(QList <PortfolioObject*> portfo
         endRemoveRows();
     }
 
-    this->blockSignals(signalsBlocked);
+   // this->blockSignals(signalsBlocked);
 
     portfolio_ids_ToRemove.clear();
     for (PortfolioObject* portfolioDel : portfolio_data_list_new)
@@ -925,12 +930,12 @@ QVariant Table_Portfolios_Model::headerData(int section, Qt::Orientation orienta
         return QString::number(section);
 
 }
-
+/*
 QHash<QString,PortFolioData_Less> Table_Portfolios_Model::getPortFolioDataLess(){
 #ifdef MUTEX_DEBUG_LOG
     qDebug()<<"Entering---getPortFolioDataLess";
 #endif
-    QMutexLocker locker(&mutex); // Lock the mutex automatically
+   // QMutexLocker locker(&mutex); // Lock the mutex automatically
 #ifdef MUTEX_DEBUG_LOG
     qDebug()<<"Setting Mutex---getPortFolioDataLess";
 #endif
@@ -946,13 +951,13 @@ QHash<QString,PortFolioData_Less> Table_Portfolios_Model::getPortFolioDataLess()
     qDebug()<<"Exiting---getPortFolioDataLess";
 #endif
     return PortFolioDataHash;
-}
-
+}*/
+/*
 QHash<QString,int> Table_Portfolios_Model::getPortFoliosLotSize(){
 #ifdef MUTEX_DEBUG_LOG
     qDebug()<<"Entering---getPortFoliosLotSize";
 #endif
-    QMutexLocker locker(&mutex); // Lock the mutex automatically
+    //QMutexLocker locker(&mutex); // Lock the mutex automatically
 #ifdef MUTEX_DEBUG_LOG
     qDebug()<<"Setting Mutex---getPortFoliosLotSize";
 #endif
@@ -967,7 +972,7 @@ QHash<QString,int> Table_Portfolios_Model::getPortFoliosLotSize(){
     qDebug()<<"Exiting---getPortFoliosLotSize";
 #endif
     return PortFolioLotSizeHash;
-}
+}*/
 
 void Table_Portfolios_Model::refreshTable(){
     emit layoutChanged();
@@ -1032,7 +1037,6 @@ void Table_Portfolios_Model::updateMarketRate(const QHash<QString, MBP_Data_Stru
 
                  }
              }
-
             // Reset the timer
             slowDataPriceUpdateTimer.restart();
         }
@@ -1055,9 +1059,8 @@ PortfolioObject* Table_Portfolios_Model::getPortFolioAt(int idx) const {
             return nullptr; // Return a null pointer if idx is out of range
         }
 
-        // Get the portfolio at the specified index
+          // Get the portfolio at the specified index
            PortfolioObject* originalPortfolio = portfolio_data_list.at(idx);
-
            // Create a deep copy of the portfolio object
            PortfolioObject* copiedPortfolio = new PortfolioObject(*originalPortfolio);
 #ifdef MUTEX_DEBUG_LOG

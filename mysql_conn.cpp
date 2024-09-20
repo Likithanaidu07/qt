@@ -328,7 +328,7 @@ void  mysql_conn::getSummaryTableData(int &OrderCount,QString user_id)
 
 
 
-void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount, Combined_Tracker_Table_Model *comb_tracker_model, QHash<QString, PortfolioAvgPrice> &averagePriceList, QString user_id, QStringList TradedPortFolioList,QStringList &PortFoliosToDelete )
+QHash<QString,PortFolioData_Less> mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount, Combined_Tracker_Table_Model *comb_tracker_model, QHash<QString, PortfolioAvgPrice> &averagePriceList, QString user_id, QStringList TradedPortFolioList,QStringList &PortFoliosToDelete )
 {
     QMutexLocker lock(&mutex);
     // int editing_state = portfolio_table_editing.loadRelaxed();
@@ -340,6 +340,10 @@ void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoC
     QString msg;
     SlowData slowData;
     QHash<QString, MBP_Data_Struct>  MBP_Data_Hash = slowData.getMBP_Data_Hash();
+
+    QHash<QString,PortFolioData_Less>  PortFolioDataHash;
+
+
 
     bool ok = checkDBOpened(msg);
     if(ok){
@@ -405,6 +409,14 @@ void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoC
                 if(TradedPortFolioList.contains(QString::number(o->PortfolioNumber)))
                     o->TradedHighlight = true;
                 PortfolioObjectList.append(o);
+
+                PortFolioData_Less P;
+                P.PortfolioType = o->PortfolioType;
+                P.Expiry =  o->Expiry;
+                P.lotSize = o->GetLotSize();
+
+                PortFolioDataHash.insert(QString::number(o->PortfolioNumber),P);
+
 
                 QString sort_string = QString::number(o->Status)+"-"+o->AlgoNameForSorting;
                 algoNameList.append(sort_string);
@@ -473,6 +485,7 @@ void mysql_conn::getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoC
         }
     }
     // qDebug()<<"getPortfoliosTableData ----------------mutex unlocked";
+    return PortFolioDataHash;
 }
 
 
@@ -655,7 +668,7 @@ bool mysql_conn::resetPassword(const QString &new_password, QString user_id,QStr
 bool mysql_conn::modifytype(QString value,QString user_id,QString &msg)
 {
     // QString reset_querystr;
-    // QString reset_querystr = "UPDATE rt_usertable SET OldPassword03 = OldPassword02,OldPassword02 = OldPassword01,OldPassword01 = Password, Password = '"+new_password+"' WHERE UserId = '"+user_id+"'";
+    // QString reset_querystr = "UPDATE rt_usertable SET OldPassword03 = OldPassword02,OldPassword02 = OldPassword01,OldPassword01 = Password, Password = '"+new_password+"' WHERE UserId = '"+user_id+"'";
     QString modify_querystr = "UPDATE Portfolios SET ModifyType = '" + value + "' WHERE TraderID = '" +user_id + "';";
 
     // QSqlQuery query(reset_querystr, db);
@@ -1045,7 +1058,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
     QList <QStringList> trade_data_listTmp;
 
     // QList <QStringList> algo_pos_data_listTmp;
-QList <QStringList> liners_listTmp;
+    QList <QStringList> liners_listTmp;
     QHash<QString, Liners_Data> Liners_Data_Hash;
     QString msg;
     TraderCount = 0;
@@ -1641,7 +1654,7 @@ void mysql_conn::getLinersTableData(Liners_Model *model,QString user_id,QHash<QS
     }
 }
 
-void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash)
+void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id)
 {
     QMutexLocker lock(&mutex);
     BuyValue_summary=0;

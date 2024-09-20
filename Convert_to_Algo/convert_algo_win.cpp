@@ -50,7 +50,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     setTabOrder(ui->pushButton_Cancel, ui->comboBox_AlgoType);
     ui->comboBox_AlgoType->setStyleSheet("QComboBox { text-align: center; }");
 
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+    setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::Tool);
 
     QPixmap pixmapclose(":/close_window_icon.png");
     ui->Close->setIcon(pixmapclose);

@@ -23,8 +23,8 @@ public:
     QVariant headerData(int section, Qt::Orientation , int role)const override;
     QList <PortfolioObject*> portfolio_data_list;
     QList<int>  portfolio_tokens; //leg1,leg2,leg3,leg4,leg5,leg6
-    QHash<QString,PortFolioData_Less> getPortFolioDataLess();
-    QHash<QString,int> getPortFoliosLotSize();
+   // QHash<QString,PortFolioData_Less> getPortFolioDataLess();
+   // QHash<QString,int> getPortFoliosLotSize();
     QHash<int,QString> editingDataHash; //data to store editing cell
     //void clearTable();
     void setEditingFlg(int row,int val);
