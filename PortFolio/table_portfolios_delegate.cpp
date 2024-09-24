@@ -341,7 +341,7 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                                     incValue = roundedNumber;
                                 }
                             }
-                            if(currentIndex.column() == PortfolioData_Idx::_BuyTotalQuantity || currentIndex.column() == PortfolioData_Idx::_SellTotalQuantity){
+                            if(currentIndex.column() == PortfolioData_Idx::_BuyTotalQuantity || currentIndex.column() == PortfolioData_Idx::_SellTotalQuantity ||currentIndex.column() == PortfolioData_Idx::_MaxLoss){
                                 if(incValue < 0)
                                     incValue = 0;
                             }

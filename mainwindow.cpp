@@ -458,21 +458,22 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(T_Portfolio_Table, &QTableView::doubleClicked, this, &MainWindow::T_Portfolio_Table_cellDoubleClicked);
 
-    QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
-    proxyModel->setSourceModel(T_Portfolio_Model);
-    proxyModel->setFilterKeyColumn(-1);  // Search across all columns
+    //QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
+    Portfolio_SearchFilterProxyModel *T_Portfolio_ProxyModel = new Portfolio_SearchFilterProxyModel(this);
+    T_Portfolio_ProxyModel->setSourceModel(T_Portfolio_Model);
+    T_Portfolio_ProxyModel->setFilterKeyColumn(-1);  // Search across all columns
 
     connect(ui->lineEditSearch, &QLineEdit::textChanged, this, [=](const QString &text) {
         // Check if the relevant window or widget is open/visible
         if (T_Portfolio_Table->isVisible()) { // Replace 'this' with the specific window or widget if needed
-            proxyModel->setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
+            T_Portfolio_ProxyModel->setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
             T_Portfolio_Delegate->setHighlightText(text);
             T_Portfolio_Table->viewport()->update();  // Redraw the view to apply the highlight
         }
     });
 
 
-    T_Portfolio_Table->setModel(proxyModel);
+    T_Portfolio_Table->setModel(T_Portfolio_ProxyModel);
 
     connect(T_Portfolio_Table->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
             this, SLOT(T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&)));
@@ -1304,7 +1305,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 }
             }
         }
-        else if(index.column() == PortfolioData_Idx::_Alias) {
+        /*else if(index.column() == PortfolioData_Idx::_Alias) {
             // Skip checking for duplicate alias names
 
             QString Query = "UPDATE Portfolios SET Alias='" + valStr + "' WHERE PortfolioNumber=" + PortfolioNumber;
@@ -1342,7 +1343,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 msgBox.setText(msg);
                 msgBox.exec();
             }
-        }
+        }*/
 
         //Get edited cell data from portfolio table and update DB
         else{
@@ -1537,6 +1538,22 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                         logMsg = logMsg+"SellPriceDifference ["+SellPriceDifference+"], ";
                     }
                     break;
+
+                    case PortfolioData_Idx::_Alias:{
+                        updateQueryList.append("Alias='"+valStr+"'");
+                        logMsg = logMsg+"Alias ["+valStr+"], ";
+                    }
+                    break;
+
+                    case PortfolioData_Idx::_MaxLoss:{
+                        double val = valStr.toDouble();
+                        int valInt = val*devicer;
+                        updateQueryList.append("MaxLoss="+QString::number(valInt));
+                        logMsg = logMsg+"Alias ["+valStr+"], ";
+                    }
+                    break;
+
+
 
                     default:{
 
