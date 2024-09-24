@@ -1832,13 +1832,13 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
 
 
                 int Quantity = query.value(rec.indexOf("Quantity")).toInt();
-                Quantity = ContractDetail::getInstance().GetLotSize(token_number,0);
+                 int lotsize = ContractDetail::getInstance().GetLotSize(token_number,0);
                 int Portfolio = query.value(rec.indexOf("Portfolio")).toInt();
                 double Price = query.value(rec.indexOf("Price")).toDouble();
                 Price = Price/devicer;
 
                 QString PriceStr = fixDecimal(Price,decimal_precision);
-                QString QuantityStr = QString::number(Quantity);
+                QString QuantityStr = QString::number(Quantity/lotsize);
                 QString PortfolioStr = QString::number(Portfolio);
 
 

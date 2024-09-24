@@ -12,12 +12,13 @@ Summary_cards::Summary_cards(QWidget *parent) :
     ui->widget_14->setVisible(false);
 }
 QString Summary_cards::fixDecimal(double num, int decimal_precision) {
-    QString str = QString::number(num, 'f', decimal_precision + 1);
+    QString str = QString::number(num, 'f', decimal_precision);  // Removed +1 for correct precision
     return str;
 }
 
+
 void Summary_cards::updateSummaryData(const QStringList &data) {
-    if (data.size() >= 9) {
+    if (data.size() >= 8) {
         ui->label_3->setText(data[0]);
         ui->label_3->setAlignment(Qt::AlignCenter);
 
@@ -27,19 +28,14 @@ void Summary_cards::updateSummaryData(const QStringList &data) {
         ui->label_30->setText(data[2]);
         ui->label_30->setAlignment(Qt::AlignCenter);
 
-        int decimal_precision = 1;
-        double value = data[3].toDouble();
-        ui->label_23->setText(fixDecimal(value, decimal_precision));
+
+        ui->label_23->setText(data[3]);
         ui->label_23->setAlignment(Qt::AlignCenter);
 
-       // ui->label_26->setText(data[4]);
-        double value1 = data[4].toDouble();
-        ui->label_26->setText(fixDecimal(value1, decimal_precision));
+        ui->label_26->setText(data[4]);
         ui->label_26->setAlignment(Qt::AlignCenter);
 
-      //  ui->label_31->setText(data[5]);
-        double value2 = data[5].toDouble();
-        ui->label_31->setText(fixDecimal(value2, decimal_precision));
+        ui->label_31->setText(data[5]);
         ui->label_31->setAlignment(Qt::AlignCenter);
 
         ui->label_24->setText(data[6]);

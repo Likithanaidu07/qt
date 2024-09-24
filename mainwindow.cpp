@@ -1785,8 +1785,8 @@ void MainWindow::loadDataAndUpdateTable(int table){
     }*/
 
     case T_Table::NET_POS:{
-      //  QHash<QString,int> PortFoliosLotSizeHash = T_Portfolio_Model->getPortFoliosLotSize();
-        db_conn->getNetPosTableData(BuyValue,SellValue,Profit,BuyQty_summary,SellQty_summary,NetQty,net_pos_model,QString::number(userData.UserId));
+        //QHash<QString,int> PortFoliosLotSizeHash = T_Portfolio_Model->getPortFoliosLotSize();
+        db_conn->getNetPosTableData(BuyValue_summary,SellValue,Profit,BuyQty_summary,SellQty_summary,NetQty,net_pos_model,QString::number(userData.UserId));
         emit data_loded_signal(T_Table::NET_POS);
         updateSummaryLabels();
         break;
@@ -1834,14 +1834,15 @@ void MainWindow::updateSummaryLabels()
     summarydatList.append(QString::number(AlgoCount));
     summarydatList.append(QString::number(OrderCount));
     summarydatList.append(QString::number(TraderCount));
-    summarydatList.append(QString::number(BuyValue));
-    summarydatList.append(QString::number(SellValue));
-    summarydatList.append(QString::number(Profit));
+    summarydatList.append(QString::number(BuyValue_summary, 'f', 2));
+    summarydatList.append(QString::number(SellValue, 'f', 2));
+    summarydatList.append(QString::number(Profit, 'f', 2));
     summarydatList.append(QString::number(BuyQty_summary));
     summarydatList.append(QString::number(SellQty_summary));
     summarydatList.append(QString::number(NetQty));
 
-    data_summary_update_signal(summarydatList); // Call the method directly
+
+    emit data_summary_update_signal(summarydatList);
 
 
 
@@ -2416,6 +2417,7 @@ void MainWindow::ConvertAlgo_button_clicked(){
         qDebug()<<"Creating convertalgo....";
     }
 
+
    convertalgo->update_contract_tableData(QString::number(userData.UserId),userData.MaxPortfolioCount);
     if(!convertalgo->isVisible())
     convertalgo->show();
@@ -2423,7 +2425,8 @@ void MainWindow::ConvertAlgo_button_clicked(){
 void MainWindow::Delete_clicked_slot()
 {
     QMessageBox::StandardButton reply;
-    reply = QMessageBox::question(this, "Delete Portfolio From Database?", "Click Yes to Continue.",  QMessageBox::Yes|QMessageBox::No);
+
+    reply = QMessageBox::question(this, "Delete Portfolio From Database?", "Delete the portfolio?",  QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes)
     {
         QModelIndexList selection = T_Portfolio_Table->selectionModel()->selectedRows();
@@ -3458,7 +3461,6 @@ void MainWindow::initializeGlobalHotKeys(){
 
 
 
-
          // Store the QShortcut object in the hash for future updates
          HotKeyShortcutObjects.insert(action, shortcut);
        }
@@ -3480,8 +3482,13 @@ void MainWindow::updateHotKeysSlot(QStringList actions){
             shortcut->setEnabled(hotKey.enabled); // Enable or disable based on the flag
         }
     }
-
 }
-
+void MainWindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+    {
+        ui->lineEditSearch->clear();
+    }
+}
 
 

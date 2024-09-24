@@ -605,7 +605,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         QStyleOptionViewItem op(option);
 
 
-        if(c==PortfolioData_Idx::_BuyMarketRate){            
+        if(c==PortfolioData_Idx::_BuyMarketRate){
             painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
         }
         if(portfolio->StatusVal.toInt()==portfolio_status::Active){
@@ -639,7 +639,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
     else if(c==PortfolioData_Idx::_SellMarketRate || c==PortfolioData_Idx::_SellAveragePrice || c==PortfolioData_Idx::_SellPriceDifference || c==PortfolioData_Idx::_SellTotalQuantity || c==PortfolioData_Idx::_SellTradedQuantity || c==PortfolioData_Idx::_SellRemainingQuantity){
         QStyleOptionViewItem op(option);
 
-        if(c==PortfolioData_Idx::_SellMarketRate){           
+        if(c==PortfolioData_Idx::_SellMarketRate){
             painter->drawLine(option.rect.topLeft(), option.rect.bottomLeft());
         }
 
