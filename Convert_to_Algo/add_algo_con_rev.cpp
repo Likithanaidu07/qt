@@ -359,10 +359,13 @@ void add_algo_con_rev::generateAlgo(){
 //                    Algo_Name_list.append(Algo_Name);
 
 
-                    QString Algo_Name ="CR- "+Instr_Name+" "+dt1.toString("yyyy MMM").toUpper()+" "+
-                                        QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)
-                                        +" "+optionType+" - "+QString::number(((endStrike-startStrike)/sharedData->strike_price_devider),'f',sharedData->decimal_precision)+" - "
-                                        +" "+Instr_Name+" "+dt3.toString("yyyy MMM").toUpper();
+                    QString Algo_Name = "CR- " + Instr_Name + " " + dt1.toString("dd MMM").toUpper() + "-" +
+                                        QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice / sharedData->strike_price_devider, 'f', sharedData->decimal_precision); /*+
+                                        " " + optionType + " - " +
+                                        QString::number((endStrike - startStrike) / sharedData->strike_price_devider, 'f', sharedData->decimal_precision);*/
+
+//                                        +" "+Instr_Name+" "+dt3.toString("yyyy MMM").toUpper()*/;
+
                     Algo_Name_list.append(Algo_Name);
 
 

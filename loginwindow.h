@@ -30,6 +30,7 @@ private slots:
     void on_minimize_clicked();
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
+    void keyPressEvent(QKeyEvent *event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
     void on_lineEditUsername_textEdited(const QString &arg1);
     void on_lineEdit_Password_textEdited(const QString &arg1);

@@ -212,6 +212,14 @@ void loginwindow::mouseMoveEvent(QMouseEvent *event) {
     }
     }
 }
+void loginwindow::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+    {
+    ui->lineEditUsername->clear();
+    ui->lineEdit_Password->clear();
+    }
+}
 
 void loginwindow::mouseReleaseEvent(QMouseEvent *event) {
     QLabel *child = static_cast<QLabel*>(childAt(event->pos()));

@@ -117,7 +117,7 @@ private:
     int AlgoCount;
     int OrderCount;
     int TraderCount;
-    double BuyValue;
+    double BuyValue_summary;
     double SellValue;
     double Profit;
     double BuyQty;
@@ -305,7 +305,7 @@ private slots:
    // void on_Templates_Close_clicked();
     void on_maximize_clicked();
 
-
+    void keyPressEvent(QKeyEvent *event) override;
     void mousePressEvent(QMouseEvent *event) override;
     void mouseMoveEvent(QMouseEvent* event) override;
     void mouseReleaseEvent(QMouseEvent* event) override;
