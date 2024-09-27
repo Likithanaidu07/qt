@@ -184,7 +184,13 @@ void add_algo_f2f::instrumentEditFinishedAction(){
             unsigned int unix_time= tmp.Expiry;
             QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
             dt = dt.addYears(10);
+            int targetYear = dt.date().year();
+            bool isLeapYear = QDate::isLeapYear(targetYear);
 
+            // If it is a leap year, and the date is after Feb 29, subtract one day
+            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+                dt = dt.addDays(-1);
+            }
             QString Expiry=dt.toString("MMM dd yyyy").toUpper();
             QStandardItem *itemF2FL2 = new QStandardItem;
             itemF2FL2->setText(Instr_Name+" "+Expiry);
@@ -502,7 +508,6 @@ void add_algo_f2f::itemSelectedStartStrike(QModelIndex index)
     else
     {
         qInfo() << "Not a start strike vaild index";
-
     }
 }
 

@@ -186,6 +186,13 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
         unix_time= contract.Expiry;
         dt = QDateTime::fromSecsSinceEpoch(unix_time);
         dt = dt.addYears(10);
+        int targetYear = dt.date().year();
+        bool isLeapYear = QDate::isLeapYear(targetYear);
+
+        // If it is a leap year, and the date is after Feb 29, subtract one day
+        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+            dt = dt.addDays(-1);
+        }
         Expiry=dt.toString("MMM dd yyyy").toUpper();
         QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract)+" "+contract.OptionType;
         QStandardItem *itemBFLY = new QStandardItem;
@@ -246,6 +253,13 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
         unix_time= contract.Expiry;
         dt = QDateTime::fromSecsSinceEpoch(unix_time);
         dt = dt.addYears(10);
+        int targetYear = dt.date().year();
+        bool isLeapYear = QDate::isLeapYear(targetYear);
+
+        // If it is a leap year, and the date is after Feb 29, subtract one day
+        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+            dt = dt.addDays(-1);
+        }
         Expiry=dt.toString("MMM dd yyyy").toUpper();
         QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract)+" "+contract.OptionType;
         QStandardItem *itemBFLY = new QStandardItem;
@@ -273,6 +287,13 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
         unsigned int unix_time= contract.Expiry;
         QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
         dt = dt.addYears(10);
+        int targetYear = dt.date().year();
+        bool isLeapYear = QDate::isLeapYear(targetYear);
+
+        // If it is a leap year, and the date is after Feb 29, subtract one day
+        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+            dt = dt.addDays(-1);
+        }
         QString Expiry=dt.toString("MMM dd yyyy").toUpper();
         QString instrument_name = contract.InstrumentName;
 
@@ -292,6 +313,13 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
         unix_time= contract.Expiry;
         dt = QDateTime::fromSecsSinceEpoch(unix_time);
         dt = dt.addYears(10);
+        int targetYear_cr = dt.date().year();
+        bool isLeapYear_cr = QDate::isLeapYear(targetYear);
+
+        // If it is a leap year, and the date is after Feb 29, subtract one day
+        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+            dt = dt.addDays(-1);
+        }
         Expiry=dt.toString("MMM dd yyyy").toUpper();
 
         QStandardItem *itemFut = new QStandardItem;
@@ -317,6 +345,13 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
         unsigned int unix_time= contract.Expiry;
         QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
         dt = dt.addYears(10);
+        int targetYear = dt.date().year();
+        bool isLeapYear = QDate::isLeapYear(targetYear);
+
+        // If it is a leap year, and the date is after Feb 29, subtract one day
+        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+            dt = dt.addDays(-1);
+        }
         QString Expiry=dt.toString("MMM dd yyyy").toUpper();
         QString instrument_name = contract.InstrumentName;
 
@@ -354,7 +389,17 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
         unsigned int unix_time= contract.Expiry;
         QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
         dt = dt.addYears(10);
-        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
+        // Check if the target year is a leap year
+        int targetYear = dt.date().year();
+        bool isLeapYear = QDate::isLeapYear(targetYear);
+
+        // If it is a leap year, and the date is after Feb 29, subtract one day
+        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+            dt = dt.addDays(-1);
+        }
+
+        QString Expiry = dt.toString("MMM dd yyyy").toUpper();
+
         QString instrument_name = contract.InstrumentName;
 
         QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract);

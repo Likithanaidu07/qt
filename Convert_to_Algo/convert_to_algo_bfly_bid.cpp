@@ -137,6 +137,13 @@ void add_algo_btfly_bid::startStrikeEditFinishedAction(){
             unsigned int unix_time= tmp.Expiry;
             QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
             dt = dt.addYears(10);
+            int targetYear = dt.date().year();
+            bool isLeapYear = QDate::isLeapYear(targetYear);
+
+            // If it is a leap year, and the date is after Feb 29, subtract one day
+            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+                dt = dt.addDays(-1);
+            }
             QString ExpiryTmp=dt.toString("MMM dd yyyy").toUpper();
             QString strik_price = QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
             QString algo_combination =
@@ -297,8 +304,8 @@ void add_algo_btfly_bid::generateAlgo()
         //check for if item  is already added or upload in table and will not be in sharedData->algo_data_list
         for (int row = 0; row < tableWidget->rowCount(); ++row) {
             QString Instr_Name_Tmp="";
-            QString Option_Type_tmp = "";
-            QString ExpiryTime_tmp = "";
+//            QString Option_Type_tmp = "";
+//            QString ExpiryTime_tmp = "";
             QString Leg1_Strike_tmp= "";
             QString Leg2_Strike_tmp= "";
             QString Leg3_Strike_tmp= "";
@@ -307,32 +314,32 @@ void add_algo_btfly_bid::generateAlgo()
             if (item0) {
                 Instr_Name_Tmp = item0->text();
             }
+//            QTableWidgetItem *item1 = tableWidget->item(row, 1);
+//            if (item1) {
+//                Option_Type_tmp = item1->text();
+//            }
+//            QTableWidgetItem *item2 = tableWidget->item(row, 2);
+//            if (item2) {
+//                ExpiryTime_tmp = item2->text();
+//            }
             QTableWidgetItem *item1 = tableWidget->item(row, 1);
             if (item1) {
-                Option_Type_tmp = item1->text();
+                Leg1_Strike_tmp = item1->text();
             }
             QTableWidgetItem *item2 = tableWidget->item(row, 2);
             if (item2) {
-                ExpiryTime_tmp = item2->text();
+                Leg2_Strike_tmp = item2->text();
             }
             QTableWidgetItem *item3 = tableWidget->item(row, 3);
             if (item3) {
-                Leg1_Strike_tmp = item3->text();
-            }
-            QTableWidgetItem *item4 = tableWidget->item(row, 4);
-            if (item4) {
-                Leg2_Strike_tmp = item4->text();
-            }
-            QTableWidgetItem *item5 = tableWidget->item(row, 5);
-            if (item5) {
-                Leg3_Strike_tmp = item5->text();
+                Leg3_Strike_tmp = item3->text();
             }
 
 
 
             if(Algo_Name_list[i]==Instr_Name_Tmp&&
-                Option_Type_tmp==Option_Type&&
-                ExpiryTime_tmp==ExpiryTime&&
+               // Option_Type_tmp==Option_Type&&
+               // ExpiryTime_tmp==ExpiryTime&&
                 Leg1_Strike_tmp==Leg1_Strike&&
                 Leg2_Strike_tmp==Leg2_Strike&&
                 Leg3_Strike_tmp==Leg3_Strike
@@ -358,38 +365,38 @@ void add_algo_btfly_bid::generateAlgo()
         tableWidget->setItem(tableWidget->rowCount()-1, 0, c0);
 
 
-        QTableWidgetItem *c1 = new QTableWidgetItem(Option_Type);
+//        QTableWidgetItem *c1 = new QTableWidgetItem(Option_Type);
+//        c1->setFlags(c1->flags() ^ Qt::ItemIsEditable);
+//        tableWidget->setItem(tableWidget->rowCount()-1, 1, c1);
+
+//        QTableWidgetItem *c2 = new QTableWidgetItem(ExpiryTime);
+//        c2->setFlags(c2->flags() ^ Qt::ItemIsEditable);
+//        tableWidget->setItem(tableWidget->rowCount()-1, 2, c2);
+
+        QTableWidgetItem *c1 = new QTableWidgetItem(Leg1_Strike);
         c1->setFlags(c1->flags() ^ Qt::ItemIsEditable);
         tableWidget->setItem(tableWidget->rowCount()-1, 1, c1);
 
-        QTableWidgetItem *c2 = new QTableWidgetItem(ExpiryTime);
+        QTableWidgetItem *c2 = new QTableWidgetItem(Leg2_Strike);
         c2->setFlags(c2->flags() ^ Qt::ItemIsEditable);
         tableWidget->setItem(tableWidget->rowCount()-1, 2, c2);
 
-        QTableWidgetItem *c3 = new QTableWidgetItem(Leg1_Strike);
+        QTableWidgetItem *c3 = new QTableWidgetItem(Leg3_Strike);
         c3->setFlags(c3->flags() ^ Qt::ItemIsEditable);
         tableWidget->setItem(tableWidget->rowCount()-1, 3, c3);
 
-        QTableWidgetItem *c4 = new QTableWidgetItem(Leg2_Strike);
+//        QTableWidgetItem *c6 = new QTableWidgetItem("NA");
+//        c6->setFlags(c6->flags() ^ Qt::ItemIsEditable);
+//        tableWidget->setItem(tableWidget->rowCount()-1, 6, c6);
+
+//        QTableWidgetItem *c7 = new QTableWidgetItem("NA");
+//        c7->setFlags(c7->flags() ^ Qt::ItemIsEditable);
+//        tableWidget->setItem(tableWidget->rowCount()-1, 7, c7);
+
+
+        QTableWidgetItem *c4 = new QTableWidgetItem("To be Uploaded");
         c4->setFlags(c4->flags() ^ Qt::ItemIsEditable);
         tableWidget->setItem(tableWidget->rowCount()-1, 4, c4);
-
-        QTableWidgetItem *c5 = new QTableWidgetItem(Leg3_Strike);
-        c5->setFlags(c5->flags() ^ Qt::ItemIsEditable);
-        tableWidget->setItem(tableWidget->rowCount()-1, 5, c5);
-
-        QTableWidgetItem *c6 = new QTableWidgetItem("NA");
-        c6->setFlags(c6->flags() ^ Qt::ItemIsEditable);
-        tableWidget->setItem(tableWidget->rowCount()-1, 6, c6);
-
-        QTableWidgetItem *c7 = new QTableWidgetItem("NA");
-        c7->setFlags(c7->flags() ^ Qt::ItemIsEditable);
-        tableWidget->setItem(tableWidget->rowCount()-1, 7, c7);
-
-
-        QTableWidgetItem *c8 = new QTableWidgetItem("To be Uploaded");
-        c8->setFlags(c8->flags() ^ Qt::ItemIsEditable);
-        tableWidget->setItem(tableWidget->rowCount()-1, 8, c8);
 
         algo_data_to_insert data;
         data.Algo_Status = "DisabledByUser";

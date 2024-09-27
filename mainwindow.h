@@ -244,8 +244,6 @@ private:
       void saveLinersTableViewColumnState(QTableView *tableView);
       void initializeGlobalHotKeys();
       QHash<QString, QShortcut*> HotKeyShortcutObjects;
-
-
 public slots:
     void openSettingsWindow();
     void profolioTableEditFinshedSlot(QString val,QModelIndex);
