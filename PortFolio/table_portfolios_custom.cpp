@@ -30,6 +30,8 @@ void table_portfolios_custom::keyPressEvent(QKeyEvent *event)
     int nextRow = currentRow;
     int nextColumn = currentColumn;
 
+
+
     if (event->key() == Qt::Key_Tab || event->key() == Qt::Key_Backtab)
     {
         nav_direction direction = nav_direction::nav_forward;

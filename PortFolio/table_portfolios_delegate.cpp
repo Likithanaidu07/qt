@@ -13,7 +13,7 @@
 #include <QStandardPaths>
 #include <QCheckBox>
 #include "qsortfilterproxymodel.h"
-
+#include "portfolio_searchfilterproxymodel.h"
 
 Table_Portfolios_Delegate::Table_Portfolios_Delegate(QObject *parent)  : QStyledItemDelegate{parent}
 {
@@ -65,7 +65,7 @@ bool Table_Portfolios_Delegate::editorEvent(QEvent *event, QAbstractItemModel *m
            // qDebug() << "Model type:" << index.model()->metaObject()->className();
           //  qDebug() << "Column:" << index.column() << "Row:" << index.row();
             //model->setData(index, index.data(Qt::ItemIsUserCheckable).value<Qt::CheckState>(), Qt::ItemIsUserCheckable);
-            const QSortFilterProxyModel *proxyModel = qobject_cast<const QSortFilterProxyModel*>(index.model());
+            const Portfolio_SearchFilterProxyModel *proxyModel = qobject_cast<const Portfolio_SearchFilterProxyModel*>(index.model());
 
             if (proxyModel) {
                 if (!index.isValid()) {
@@ -81,7 +81,8 @@ bool Table_Portfolios_Delegate::editorEvent(QEvent *event, QAbstractItemModel *m
                 }
 
                 proxyModel->sourceModel()->setData(sourceIndex, sourceIndex.data(Qt::CheckStateRole).value<Qt::CheckState>(), Qt::CheckStateRole);
-            } else {
+            }
+            else {
                 if (!index.isValid()) {
                     qDebug() << "Invalid index passed to non-proxy model!";
                     return true;
@@ -243,7 +244,7 @@ void Table_Portfolios_Delegate::setModelData(QWidget *editor, QAbstractItemModel
 }*/
 void Table_Portfolios_Delegate::setModelData(QWidget *editor, QAbstractItemModel *model, const QModelIndex &index) const
 {
-    const QSortFilterProxyModel *proxyModel = qobject_cast<const QSortFilterProxyModel *>(model);
+    const Portfolio_SearchFilterProxyModel *proxyModel = qobject_cast<const Portfolio_SearchFilterProxyModel *>(model);
     QModelIndex sourceIndex = index;
 
     // If the model is a proxy model, map to the source index
@@ -371,7 +372,9 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                         double newvalue = multiplied / 20.0;
                       //  mutableModel = const_cast<QAbstractItemModel *>(currentIndex.model());
                       //  mutableModel->setData(currentIndex, newvalue, Qt::EditRole);
-                        const QSortFilterProxyModel *proxyModel = qobject_cast<const QSortFilterProxyModel *>(currentIndex.model());
+                        const Portfolio_SearchFilterProxyModel *proxyModel = qobject_cast<const Portfolio_SearchFilterProxyModel *>(currentIndex.model());
+                        proxyModel->disableSortingWhileEditing();  //this required or elase tab key event will trigger when search text in cell and edit the same cell and press enter. And cause hang state due to mutex
+
                         QModelIndex sourceIndex = currentIndex;
                         if (proxyModel) {
                             sourceIndex = proxyModel->mapToSource(currentIndex);
@@ -387,7 +390,9 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                         emit commitData(lineEdit);
                         emit closeEditor(lineEdit);
                         mutableModel = nullptr;
-                        emit editFinished(QString::number(currentValue), currentIndex);
+                        emit editFinished(QString::number(currentValue), sourceIndex);
+                        proxyModel->enableSortingAfterEditing();
+
                         return true;
                     }
                 }
@@ -411,7 +416,9 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                     {
                         QString  currentValue = lineEdit->text();
 
-                        const QSortFilterProxyModel *proxyModel = qobject_cast<const QSortFilterProxyModel *>(currentIndex.model());
+                        const Portfolio_SearchFilterProxyModel *proxyModel = qobject_cast<const Portfolio_SearchFilterProxyModel *>(currentIndex.model());
+                        proxyModel->disableSortingWhileEditing(); //this required or elase tab key event will trigger when search text in cell and edit the same cell and press enter. And cause hang state due to mutex
+
                         QModelIndex sourceIndex = currentIndex;
                         if (proxyModel) {
                             sourceIndex = proxyModel->mapToSource(currentIndex);
@@ -425,7 +432,9 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                         emit commitData(lineEdit);
                         emit closeEditor(lineEdit);
                         mutableModel = nullptr;
-                        emit editFinished(currentValue, currentIndex);
+                        emit editFinished(currentValue, sourceIndex);
+                        proxyModel->enableSortingAfterEditing();
+
                         return true;
                     }
                 }
@@ -469,7 +478,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
     auto c= index.column();
     QStyleOptionViewItem op(option);
 
-    const QSortFilterProxyModel *proxyModel = qobject_cast<const QSortFilterProxyModel*>(index.model());
+    const Portfolio_SearchFilterProxyModel *proxyModel = qobject_cast<const Portfolio_SearchFilterProxyModel*>(index.model());
     QModelIndex sourceIndex = proxyModel->mapToSource(index);
     const Table_Portfolios_Model *portfolioModel = qobject_cast<const Table_Portfolios_Model*>(proxyModel->sourceModel());
     PortfolioObject *portfolio = portfolioModel->getPortFolioAt(sourceIndex.row());

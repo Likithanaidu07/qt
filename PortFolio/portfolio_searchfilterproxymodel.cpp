@@ -19,3 +19,15 @@ bool Portfolio_SearchFilterProxyModel::filterAcceptsRow(int source_row, const QM
     }
     return false;
 }
+
+
+void Portfolio_SearchFilterProxyModel::disableSortingWhileEditing() const {
+    // Disable sorting by turning off dynamic sorting
+    const_cast<Portfolio_SearchFilterProxyModel *>(this)->setDynamicSortFilter(false); // Disable dynamic sorting
+}
+
+void Portfolio_SearchFilterProxyModel::enableSortingAfterEditing() const {
+    // Re-enable sorting after editing
+    const_cast<Portfolio_SearchFilterProxyModel *>(this)->setDynamicSortFilter(true);  // Enable dynamic sorting
+    const_cast<Portfolio_SearchFilterProxyModel *>(this)->invalidate(); // Force sorting and filtering to reapply
+}

@@ -326,7 +326,7 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
             return portfolio->Alias;
         }
         else if (index.column() == PortfolioData_Idx::_MaxLoss) {
-                return portfolio->MaxLoss;
+                return double_to_Human_Readable(portfolio->MaxLoss,decimal_precision);
         }
         else if (index.column() == PortfolioData_Idx::_ExpiryDateTime) {
             QString ExpiryDateTimeStr = "-";
@@ -422,7 +422,8 @@ case Qt::EditRole:{
     }
     else if(c==PortfolioData_Idx::_MaxLoss){
         emit edit_Started(r,c);
-        return portfolio->MaxLoss;
+        return double_to_Human_Readable(portfolio->MaxLoss,decimal_precision);
+
     }
     else
         return QVariant();
@@ -443,10 +444,8 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
 #ifdef MUTEX_DEBUG_LOG
     qDebug()<<"Entering---setData";
 #endif
-    //QMutexLocker locker(&mutex); // Lock the mutex automatically
-    mutex.lock();
+    QMutexLocker locker(&mutex); // Lock the mutex automatically
     PortfolioObject* P_Obj = portfolio_data_list.at(index.row());
-    mutex.unlock();
 
 
 #ifdef MUTEX_DEBUG_LOG
@@ -458,9 +457,7 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
     //editing row swithced, make previous row flg not editing
     if(current_editingRow!=index.row()){
         if(current_editingRow!=-1){
-            mutex.lock();
             portfolio_data_list[current_editingRow]->edting.storeRelaxed(0);
-            mutex.unlock();
         }
         editingDataHash.clear();
     }
@@ -493,9 +490,7 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
             //store data to editing hash if it not equal to previous value
             if(P_Obj->SellPriceDifference != value.toDouble())
                 editingDataHash[c] = value.toString();
-            mutex.lock();
             portfolio_data_list[index.row()]->SellPriceDifference = value.toDouble();
-            mutex.unlock();
             emit dataChanged(index, index);
 #ifdef MUTEX_DEBUG_LOG
         qDebug()<<"Exiting---setData";
@@ -508,9 +503,7 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
             if(P_Obj->BuyPriceDifference != value.toDouble())
                 editingDataHash[c] = value.toString();
 
-            mutex.lock();
             portfolio_data_list[index.row()]->BuyPriceDifference = value.toDouble();
-            mutex.unlock();
             emit dataChanged(index, index);
 #ifdef MUTEX_DEBUG_LOG
         qDebug()<<"Exiting---setData";
@@ -524,9 +517,7 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
             //store data to editing hash if it not equal to previous value
             if(P_Obj->SellTotalQuantity != value.toDouble())
                 editingDataHash[c] = value.toString();
-            mutex.lock();
             portfolio_data_list[index.row()]->SellTotalQuantity = value.toDouble();
-            mutex.unlock();
             emit dataChanged(index, index);
 #ifdef MUTEX_DEBUG_LOG
         qDebug()<<"Exiting---setData";
@@ -541,9 +532,7 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
             if(P_Obj->BuyTotalQuantity != value.toDouble())
                 editingDataHash[c] = value.toString();
 
-            mutex.lock();
             portfolio_data_list[index.row()]->BuyTotalQuantity = value.toDouble();
-            mutex.unlock();
             emit dataChanged(index, index);
 #ifdef MUTEX_DEBUG_LOG
         qDebug()<<"Exiting---setData";
@@ -558,9 +547,7 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
             if(P_Obj->OrderQuantity != value.toDouble())
                 editingDataHash[c] = value.toString();
 
-            mutex.lock();
             portfolio_data_list[index.row()]->OrderQuantity = value.toDouble();
-            mutex.unlock();
             emit dataChanged(index, index);
 #ifdef MUTEX_DEBUG_LOG
         qDebug()<<"Exiting---setData";
@@ -573,9 +560,7 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
             //store data to editing hash if it not equal to previous value
             if(P_Obj->Alias != value.toString())
                 editingDataHash[c] = value.toString();
-            mutex.lock();
             portfolio_data_list[index.row()]->Alias = value.toString();
-            mutex.unlock();
             emit dataChanged(index, index);
 #ifdef MUTEX_DEBUG_LOG
         qDebug()<<"Exiting---setData";
@@ -590,9 +575,7 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
             if(P_Obj->MaxLoss != value.toDouble())
                 editingDataHash[c] = value.toString();
 
-            mutex.lock();
             portfolio_data_list[index.row()]->MaxLoss = value.toDouble();
-            mutex.unlock();
             emit dataChanged(index, index);
 #ifdef MUTEX_DEBUG_LOG
         qDebug()<<"Exiting---setData";
@@ -939,6 +922,8 @@ QVariant Table_Portfolios_Model::headerData(int section, Qt::Orientation orienta
 {
     if (role != Qt::DisplayRole ){
         return QVariant();
+
+
     }
     if (orientation == Qt::Horizontal)
         return header.at(section);

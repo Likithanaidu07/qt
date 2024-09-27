@@ -1945,7 +1945,7 @@ QString MainWindow::base64_decode(QString str){
 }
 
 
-void MainWindow::updatePortFolioStatus(){
+void MainWindow::updatePortFolioStatus(QModelIndex index){
 
     if(portfolio_table_updating_db.loadRelaxed()==1){
         qDebug()<<"portfolio_table_updating_db----- in progress.";
@@ -1955,15 +1955,15 @@ void MainWindow::updatePortFolioStatus(){
 
     portfolio_table_updating_db.storeRelaxed(1);
 
-    QModelIndexList selection = T_Portfolio_Table->selectionModel()->selectedRows();
-    for(int i=0; i< selection.count(); i++)
-    {
-            QModelIndex index = selection.at(i);
+   // QModelIndexList selection = T_Portfolio_Table->selectionModel()->selectedRows();
+  //  for(int i=0; i< selection.count(); i++)
+  //  {
+           // QModelIndex index = selection.at(i);
 
             PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());
             if (!P) {
                 qDebug()<<"updatePortFolioStatus----- portfolio null, need to debug this code.";
-                continue;
+                return;
             }
             QString PortfolioNumber = QString::number(P->PortfolioNumber);//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
             T_Portfolio_Model->setEditingFlg(index.row(),1);//T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(1);
@@ -2017,7 +2017,7 @@ void MainWindow::updatePortFolioStatus(){
         T_Portfolio_Model->setEditingFlg(index.row(),0);//T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0);
         delete P;
 
-    }
+   // }
     portfolio_table_updating_db.storeRelaxed(0);
 }
 
@@ -2422,6 +2422,22 @@ void MainWindow::ConvertAlgo_button_clicked(){
     if(!convertalgo->isVisible())
     convertalgo->show();
 }
+
+
+QModelIndexList  MainWindow::getSelectedPortFolioIndexs(){
+    QModelIndexList selection = T_Portfolio_Table->selectionModel()->selectedRows();
+
+    // Get the proxy model
+    const Portfolio_SearchFilterProxyModel *proxyModel = qobject_cast<const Portfolio_SearchFilterProxyModel*>(T_Portfolio_Table->model());
+
+    // Iterate over the selected rows and map them to the source model
+    QModelIndexList sourceSelection;
+    for (const QModelIndex &index : selection) {
+        QModelIndex sourceIndex = proxyModel->mapToSource(index);
+        sourceSelection.append(sourceIndex);
+    }
+   return sourceSelection;
+}
 void MainWindow::Delete_clicked_slot()
 {
     QMessageBox::StandardButton reply;
@@ -2429,8 +2445,9 @@ void MainWindow::Delete_clicked_slot()
     reply = QMessageBox::question(this, "Delete Portfolio From Database?", "Delete the portfolio?",  QMessageBox::Yes|QMessageBox::No);
     if (reply == QMessageBox::Yes)
     {
-        QModelIndexList selection = T_Portfolio_Table->selectionModel()->selectedRows();
-        if(selection.count()==0)
+        QModelIndexList selected = getSelectedPortFolioIndexs();
+
+        if(selected.count()==0)
         {
             QMessageBox msgBox;
             msgBox.setText("Please select a Portfolio from Portfolio Table.");
@@ -2443,9 +2460,9 @@ void MainWindow::Delete_clicked_slot()
         QString logs;
         QStringList activeAlgoList;
         deletingPortFolioFlg.storeRelaxed(1);
-        for(int i=0; i< selection.count(); i++)
+        for(int i=0; i< selected.count(); i++)
         {
-            QModelIndex index = selection.at(i);
+            QModelIndex index = selected.at(i);
            //QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
             PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());
             if (!P) {
@@ -3353,7 +3370,8 @@ void MainWindow::initializeGlobalHotKeys(){
                shortcut = new QShortcut(QKeySequence(hotKey.shortcut), T_Portfolio_DockWin);
                shortcut->setEnabled(hotKey.enabled);
                QObject::connect(shortcut, &QShortcut::activated, this, [this]() {
-                     QModelIndexList selection = T_Portfolio_Table->selectionModel()->selectedRows();
+                     QModelIndexList selection = getSelectedPortFolioIndexs();
+
                      if(selection.count()>0)
                      {
                          PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(selection.first().row());

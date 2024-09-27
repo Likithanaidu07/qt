@@ -9,6 +9,10 @@ class Portfolio_SearchFilterProxyModel : public QSortFilterProxyModel {
 
 public:
     explicit Portfolio_SearchFilterProxyModel(QObject *parent = nullptr);
+    void disableSortingWhileEditing() const;
+    void enableSortingAfterEditing() const;
+
+
 
 protected:
     bool filterAcceptsRow(int source_row, const QModelIndex &source_parent) const override;

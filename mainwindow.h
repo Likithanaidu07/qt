@@ -244,6 +244,7 @@ private:
       void saveLinersTableViewColumnState(QTableView *tableView);
       void initializeGlobalHotKeys();
       QHash<QString, QShortcut*> HotKeyShortcutObjects;
+      QModelIndexList  getSelectedPortFolioIndexs();
 
 
 public slots:
@@ -264,7 +265,7 @@ public slots:
     void slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct>& data);
     void backend_comm_Data_Slot(QString msg,SocketDataType msgType);
 //    void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
-    void updatePortFolioStatus();
+    void updatePortFolioStatus(QModelIndex index);
     void resizePortFolioTableColWidthSlot(int width);
     void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
     void T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index);
