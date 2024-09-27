@@ -661,6 +661,13 @@ background: #46454d;
         </widget>
        </item>
        <item>
+        <widget class="QToolButton" name="toolButtonCards">
+         <property name="text">
+          <string>Cards</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QWidget" name="Templates_Widget" native="true">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
@@ -720,16 +727,6 @@ background: #46454d;
         </widget>
        </item>
        <item>
-        <widget class="QToolButton" name="toolButtonCards">
-         <property name="text">
-          <string>Cards</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="lineEditSearch"/>
-       </item>
-       <item>
         <spacer name="horizontalSpacer_4">
          <property name="orientation">
           <enum>Qt::Horizontal</enum>
@@ -741,6 +738,9 @@ background: #46454d;
           </size>
          </property>
         </spacer>
+       </item>
+       <item>
+        <widget class="QLineEdit" name="lineEditSearch"/>
        </item>
       </layout>
      </widget>

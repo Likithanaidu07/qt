@@ -534,7 +534,7 @@ void ConvertAlgo_Win::resetTableWidget(){
         headers = {"Algo Name","Strike/Expiry1","Strike/Expiry2","Market/Skip Leg","Market-Skip/Leg-Ratio","Buy Diff","Sell Diff","Status"};
     }
     else if(algoType==BFLY_BID_TYPE){
-        headers = {"Algo Name","Option Type ","Expiry","Leg1 Strike","Leg2 Strike","Leg3 Strike","Reserved","Reserved","Status"};
+        headers = {"Algo Name"/*,"Option Type ","Expiry"*/,"Strike1","Strike2","Strike3","Status"};
     }
     else if(algoType=="CRJELLY-BID"){
         headers = {"Algo Name","Strike/Expiry1","Strike/Expiry2","Strike/Expiry3","Buy Diff","Sell Diff","Status"};

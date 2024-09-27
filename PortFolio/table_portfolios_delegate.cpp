@@ -307,71 +307,82 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
             PortfolioData_Idx::_MaxLoss
         }; // these are the editable table cell indexes in the algo table
 
-        if (editableIDx.contains(currentColIdx))
-        {
+        if (editableIDx.contains(currentColIdx)) {
             double incStep = quantity_incrementer;
             if (currentColIdx == PortfolioData_Idx::_SellPriceDifference ||
                 currentColIdx == PortfolioData_Idx::_BuyPriceDifference ||
-                currentColIdx == PortfolioData_Idx::_MaxLoss){
+                currentColIdx == PortfolioData_Idx::_MaxLoss) {
                 incStep = price_diff_incrementer;
             }
+
             QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
             if (keyEvent->key() == Qt::Key_Left || keyEvent->key() == Qt::Key_Right) {
                 if (currentIndex.isValid()) {
-                    if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(obj)){
+                    if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(obj)) {
                         QString value = lineEdit->text();
                         bool ok;
                         double incValue = value.toDouble(&ok);
+
                         if (ok) {
                             int divisor = 5;
                             int result = std::round(incValue * 100);
-                            if (keyEvent->key() == Qt::Key_Right){
-                                if(std::fmod(result, divisor) == 0.0)
-                                    incValue = incValue + incStep;
-                                else{
-                                    double roundedNumber = std::ceil(incValue / 0.05) * 0.05;
-                                    incValue = roundedNumber;
+
+                            if (keyEvent->key() == Qt::Key_Right) {
+                                if (std::fmod(result, divisor) == 0.0) {
+                                    incValue += incStep;
+                                } else {
+                                    // Skip rounding for BuyPriceDifference and SellPriceDifference
+                                    if (currentColIdx != PortfolioData_Idx::_SellPriceDifference &&
+                                        currentColIdx != PortfolioData_Idx::_BuyPriceDifference) {
+                                        double roundedNumber = std::ceil(incValue / 0.05) * 0.05;
+                                        incValue = roundedNumber;
+                                    }
+                                }
+                            } else if (keyEvent->key() == Qt::Key_Left) {
+                                if (std::fmod(result, divisor) == 0.0) {
+                                    incValue -= incStep;
+                                } else {
+                                    // Skip rounding for BuyPriceDifference and SellPriceDifference
+                                    if (currentColIdx != PortfolioData_Idx::_SellPriceDifference &&
+                                        currentColIdx != PortfolioData_Idx::_BuyPriceDifference) {
+                                        double roundedNumber = std::floor(incValue / 0.05) * 0.05;
+                                        incValue = roundedNumber;
+                                    }
                                 }
                             }
-                            else if (keyEvent->key() == Qt::Key_Left){
-                                if(std::fmod(result, divisor) == 0.0){
-                                    incValue = incValue - incStep;
-                                }
-                                else{
-                                    double roundedNumber = std::floor(incValue / 0.05) * 0.05;
-                                    incValue = roundedNumber;
-                                }
+
+                            if (currentColIdx == PortfolioData_Idx::_BuyTotalQuantity ||
+                                currentColIdx == PortfolioData_Idx::_SellTotalQuantity ||
+                                currentColIdx == PortfolioData_Idx::_MaxLoss) {
+                                if (incValue < 0) incValue = 0;
                             }
-                            if(currentIndex.column() == PortfolioData_Idx::_BuyTotalQuantity || currentIndex.column() == PortfolioData_Idx::_SellTotalQuantity ||currentIndex.column() == PortfolioData_Idx::_MaxLoss){
-                                if(incValue < 0)
-                                    incValue = 0;
+                            if (currentColIdx == PortfolioData_Idx::_OrderQuantity) {
+                                if (incValue < 1) incValue = 1;
                             }
-                            if(currentIndex.column() == PortfolioData_Idx::_OrderQuantity){
-                                if(incValue < 1)
-                                    incValue = 1;
-                            }
+
                             value = QString::number(incValue);
                             lineEdit->setText(value);
-                            //cursor
-                            if ( keyEvent->key() == Qt::Key_Left) {
-                                lineEdit->setCursorPosition(-1); // Set cursor position outside visible range
-                            }
                             lineEdit->setAlignment(Qt::AlignCenter);
+
+                            if (keyEvent->key() == Qt::Key_Left) {
+                                lineEdit->setCursorPosition(-1);  // Set cursor position outside visible range
+                            }
                         }
                     }
                 }
-            }
-            else if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return)
-            {
-                if (currentIndex.isValid())
-                {
-                    if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(obj))
-                    {
+            } else if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
+                if (currentIndex.isValid()) {
+                    if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(obj)) {
                         double currentValue = lineEdit->text().toDouble();
-                        double multiplied = round(currentValue * 20.0);
-                        double newvalue = multiplied / 20.0;
-                      //  mutableModel = const_cast<QAbstractItemModel *>(currentIndex.model());
-                      //  mutableModel->setData(currentIndex, newvalue, Qt::EditRole);
+
+                        // Skip rounding for BuyPriceDifference and SellPriceDifference
+                        double newValue = currentValue;
+                        if (currentColIdx != PortfolioData_Idx::_SellPriceDifference &&
+                            currentColIdx != PortfolioData_Idx::_BuyPriceDifference) {
+                            double multiplied = std::round(currentValue * 20.0);
+                            newValue = multiplied / 20.0;
+                        }
+
                         const Portfolio_SearchFilterProxyModel *proxyModel = qobject_cast<const Portfolio_SearchFilterProxyModel *>(currentIndex.model());
                         proxyModel->disableSortingWhileEditing();  //this required or elase tab key event will trigger when search text in cell and edit the same cell and press enter. And cause hang state due to mutex
 
@@ -382,11 +393,13 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                         } else {
                             mutableModel = const_cast<QAbstractItemModel *>(currentIndex.model());
                         }
-                        mutableModel->setData(sourceIndex, newvalue, Qt::EditRole);
 
+                        if (mutableModel) {
+                            mutableModel->setData(sourceIndex, newValue, Qt::EditRole);
+                        } else {
+                            qDebug() << "Mutable model is null!";
+                        }
 
-
-                        // Close the editor and commit the data
                         emit commitData(lineEdit);
                         emit closeEditor(lineEdit);
                         mutableModel = nullptr;
@@ -396,26 +409,18 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                         return true;
                     }
                 }
-            }
-            else if (keyEvent->key() == Qt::Key_Backtab) {
-                // Tab key and Shift key are pressed simultaneously, do something here
+            } else if (keyEvent->key() == Qt::Key_Backtab) {
                 emit tabKeyPressed(nav_direction::nav_backward);
-            }
-            else if (keyEvent->key() == Qt::Key_Tab){
+            } else if (keyEvent->key() == Qt::Key_Tab) {
                 emit tabKeyPressed(nav_direction::nav_forward);
             }
         }
-        else if(PortfolioData_Idx::_Alias){
+        else if (currentColIdx == PortfolioData_Idx::_Alias) {
             QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
-
-            if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return)
-            {
-                if (currentIndex.isValid())
-                {
-                    if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(obj))
-                    {
-                        QString  currentValue = lineEdit->text();
-
+            if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
+                if (currentIndex.isValid()) {
+                    if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(obj)) {
+                        QString currentValue = lineEdit->text();
                         const Portfolio_SearchFilterProxyModel *proxyModel = qobject_cast<const Portfolio_SearchFilterProxyModel *>(currentIndex.model());
                         proxyModel->disableSortingWhileEditing(); //this required or elase tab key event will trigger when search text in cell and edit the same cell and press enter. And cause hang state due to mutex
 
@@ -426,9 +431,13 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                         } else {
                             mutableModel = const_cast<QAbstractItemModel *>(currentIndex.model());
                         }
-                        mutableModel->setData(sourceIndex, currentValue, Qt::EditRole);
 
-                        // Close the editor and commit the data
+                        if (mutableModel) {
+                            mutableModel->setData(sourceIndex, currentValue, Qt::EditRole);
+                        } else {
+                            qDebug() << "Mutable model is null!";
+                        }
+
                         emit commitData(lineEdit);
                         emit closeEditor(lineEdit);
                         mutableModel = nullptr;
@@ -438,19 +447,16 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                         return true;
                     }
                 }
-            }
-            else if (keyEvent->key() == Qt::Key_Backtab) {
-                // Tab key and Shift key are pressed simultaneously, do something here
+            } else if (keyEvent->key() == Qt::Key_Backtab) {
                 emit tabKeyPressed(nav_direction::nav_backward);
-            }
-            else if (keyEvent->key() == Qt::Key_Tab){
+            } else if (keyEvent->key() == Qt::Key_Tab) {
                 emit tabKeyPressed(nav_direction::nav_forward);
             }
-
         }
     }
     return QStyledItemDelegate::eventFilter(obj, event);
 }
+
 
 
 
@@ -837,7 +843,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             QRect highlightRect(highlightStartX, opt.rect.top(), matchWidth, opt.rect.height());
 
             // Fill the background with yellow for the highlighted part
-         painter->fillRect(highlightRect, QColor(163, 163, 161));
+         painter->fillRect(highlightRect, QColor(229, 229, 227));
 
 
 

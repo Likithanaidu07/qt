@@ -96,7 +96,8 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
        obj.OrderQuantity = 0;
         totalQty = query.value("SellTotalQuantity").toInt() / lotSize;
 
-        obj.SellPriceDifference =query.value("SellPriceDifference").toDouble()/devicer_;//convert->ToRupees(query.value("SellPriceDifference").toDouble());
+       obj.SellPriceDifference = query.value("SellPriceDifference").toDouble() / static_cast<double>(devicer_);
+
         obj.SellTradedQuantity = query.value("SellTradedQuantity").toInt() / lotSize;
         obj.SellTotalQuantity = totalQty;
         obj.SellRemainingQuantity = totalQty - obj.SellTradedQuantity;

@@ -30,7 +30,6 @@
 #include "PortFolio/portfolio_searchfilterproxymodel.h"
 #include "TradePosition/tradetable_searchfilterproxymodel.h"
 
-
 //#define ENABLE_BACKEND_DEBUG_MSG
 
 static const char stylesheetvis[]= "background: #596167;" "border-radius: 10px;";
@@ -146,6 +145,24 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lineEditSearch->addAction(search_action, QLineEdit::LeadingPosition);
     ui->lineEditSearch->setStyleSheet(lineedit_dock_SS);
 
+
+    ui->Templates_Widget->setToolTip("Coming Soon");
+    // Apply stylesheet for hover effect with sparkles
+    ui->Templates_Widget->setStyleSheet(
+        "QWidget#Templates_Widget {"
+      //  "    background-color: rgb(77, 77, 115);"  // Normal background
+        "    color: white;"
+        "    font-family: 'Work Sans';"
+        "    font-weight: bold;"
+        "}"
+        "QWidget#Templates_Widget:hover {"
+        "    background-color: rgb(100, 100, 150);"  // Change background on hover
+        "    color: white;"
+        "    border: 1px solid yellow;"  // Example effect
+     //   "    qproperty-toolTip: 'Coming Soon';"
+        "    /* Sparkle Effect: Add sparkles as a background image or custom animation */"
+        "}"
+        );
 
 
     ui->HP_Widget->setVisible(false);
@@ -423,8 +440,8 @@ MainWindow::MainWindow(QWidget *parent)
                 internalLayout->addWidget(button3);
                 internalLayout->addWidget(button6);
                 internalLayout->addWidget(button4);
+               //  internalLayout->addSpacerItem(spc);
                 //internalLayout->addWidget(button5);
-              //  internalLayout->addSpacerItem(spc);
                 //internalLayout->addWidget(line_edit_trade_search);
                 lay->addWidget(test, 0, 0);
 
@@ -1549,7 +1566,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                         double val = valStr.toDouble();
                         int valInt = val*devicer;
                         updateQueryList.append("MaxLoss="+QString::number(valInt));
-                        logMsg = logMsg+"Alias ["+valStr+"], ";
+                        logMsg = logMsg+"MaxLoss ["+valStr+"], ";
                     }
                     break;
 
@@ -3508,5 +3525,3 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         ui->lineEditSearch->clear();
     }
 }
-
-

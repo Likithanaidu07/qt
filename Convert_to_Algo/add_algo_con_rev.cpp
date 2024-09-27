@@ -140,6 +140,7 @@ void add_algo_con_rev::create_AutoFillModel_StartStrike(){
 
     QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[key].Expiry);
     dt1 = dt1.addYears(10);
+
     QString ExpirySlected=dt1.toString("MMM dd yyyy").toUpper();
 
     model_start_strike_CR->clear();
@@ -213,6 +214,13 @@ void add_algo_con_rev::startStrikeEditFinishedAction(){
             unsigned int unix_time= tmp.Expiry;
             QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
             dt = dt.addYears(10);
+            int targetYear = dt.date().year();
+            bool isLeapYear = QDate::isLeapYear(targetYear);
+
+            // If it is a leap year, and the date is after Feb 29, subtract one day
+            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+                dt = dt.addDays(-1);
+            }
             QString ExpiryTmp=dt.toString("MMM dd yyyy").toUpper();
             QString algo_combination = tmp.InstrumentName+" "+ExpiryTmp+" "+QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);//+" "+tmp.OptionType;
             QStandardItem *item = new QStandardItem;

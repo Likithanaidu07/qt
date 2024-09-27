@@ -1431,6 +1431,24 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
                 QString Remaining_Lot = QString::number(static_cast<double>(query.value(rec.indexOf("RemainingQty")).toDouble()) / lotSize);
                 long long Trade_Time = query.value(rec.indexOf("Leg2_TimeOrderEnteredHost")).toLongLong();
                 QDateTime dt = QDateTime::fromSecsSinceEpoch(Trade_Time);
+                if (portfolio_type == PortfolioType::BX_BID) {
+                    std::vector<int> legOrderStates = {Leg1_OrderState, Leg2_OrderState, Leg3_OrderState, Leg4_OrderState};
+                    std::vector<QString> legTimeFields = {
+                        "Leg1_TimeOrderEnteredHost",
+                        "Leg2_TimeOrderEnteredHost",
+                        "Leg3_TimeOrderEnteredHost",
+                        "Leg4_TimeOrderEnteredHost"
+                    };
+
+                    // Loop through each leg
+                    for (int i = 0; i < 4; ++i) {
+                        if (legOrderStates[i] == 7) {
+                            long long tradeTime = query.value(rec.indexOf(legTimeFields[i])).toLongLong();
+                            QDateTime dt = QDateTime::fromSecsSinceEpoch(tradeTime);
+                            qDebug() << "Trade time for Leg" << i+1 << ":" << dt.toString();
+                        }
+                    }
+                }
 
                 dt = dt.toUTC();
 
