@@ -119,7 +119,7 @@ void ContractDetail::ReloadContractDetails(userInfo uData)
     }
 #endif
 
-   // create_inputFiledAutoFillModel_For_AddAlgoWindow();
+   create_inputFiledAutoFillModel_For_AddAlgoWindow();
     //std::sort(m_ContractDetails.begin(), m_ContractDetails.end(), [](const ContractDetail& a, const ContractDetail& b) { return a.InstrumentName < b.InstrumentName; });
 }
 

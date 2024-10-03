@@ -744,12 +744,12 @@ void PortfolioParser::CalculateAveragePrice(PortfolioObject &portfolio,    QHash
             PortfolioAvgPrice leg2 = averagePriceList[key2];
             leg2BuyPrice = leg2.AvgPrice;
         }
-        key1 = QString::number(portfolio.PortfolioNumber)+"_"+QString::number(portfolio.Leg1TokenNo+ 1500000);
+        key1 = QString::number(portfolio.PortfolioNumber+ 1500000)+"_"+QString::number(portfolio.Leg1TokenNo);
         if(averagePriceList.contains(key1)){
             PortfolioAvgPrice leg1 = averagePriceList[key1];
             leg1BuyPrice = leg1.AvgPrice;
         }
-        key2 = QString::number(portfolio.PortfolioNumber)+"_"+QString::number(portfolio.Leg2TokenNo+ 1500000);
+        key2 = QString::number(portfolio.PortfolioNumber+ 1500000)+"_"+QString::number(portfolio.Leg2TokenNo);
         if(averagePriceList.contains(key2)){
             PortfolioAvgPrice leg2 = averagePriceList[key2];
             leg2SellPrice = leg2.AvgPrice;
