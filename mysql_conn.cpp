@@ -1010,7 +1010,8 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
     bool ok = checkDBOpened(msg);
     if(ok)
     {
-        QString query_str = "SELECT StockName,LocalOrderNumber,PortfolioNumber,BuySellIndicator,TradedPrice,TotalVolume,TimeOrderEnteredHost FROM Trades WHERE TraderId='"+user_id+"' and LocalOrderNumber="+localOrderID;
+        //QString query_str = "SELECT StockName,LocalOrderNumber,PortfolioNumber,BuySellIndicator,TradedPrice,TotalVolume,TimeOrderEnteredHost FROM Trades WHERE TraderId='"+user_id+"' and LocalOrderNumber="+localOrderID ;
+        QString query_str = "SELECT StockName, LocalOrderNumber, PortfolioNumber, BuySellIndicator, TradedPrice, TotalVolume, TimeOrderEnteredHost, TradeNumber FROM Trades WHERE TraderId = '" + user_id + "' AND LocalOrderNumber = " + localOrderID + " ORDER BY TradeNumber ASC;";
 
         QSqlQuery query(query_str,db);
         if( !query.exec() )
@@ -1201,6 +1202,9 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
                 else if(Leg1_OrderState==9){
                     Leg1_OrderStateStr = "Open";
                 }
+                else if(Leg1_OrderState==3){
+                    Leg1_OrderStateStr = "Open";
+                }
                 else if(Leg1_OrderState==10){
                     Leg1_OrderStateStr = "ModifyPending";
                 }
@@ -1233,6 +1237,9 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
                 else if(Leg3_OrderState==9){
                     Leg3_OrderStateStr = "Open";
                 }
+                else if(Leg3_OrderState==3){
+                    Leg3_OrderStateStr = "Open";
+                }
                 else if(Leg3_OrderState==11){
                     Leg3_OrderStateStr = "Modified";
                 }
@@ -1256,14 +1263,19 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
                 }
                 else if(Leg2_OrderState==5){
                     Leg2_OrderStateStr = "Cancelled";
+                    leg2Price=0;
                 }
                 else if(Leg2_OrderState==6){
                     Leg2_OrderStateStr = "Rejected";
+                     leg2Price=0;
                 }
                 else if(Leg2_OrderState==7){
                     Leg2_OrderStateStr = "Traded";
                 }
                 else if(Leg2_OrderState==9){
+                    Leg2_OrderStateStr = "Open";
+                }
+                else if(Leg2_OrderState==3){
                     Leg2_OrderStateStr = "Open";
                 }
                 else if(Leg2_OrderState==10){
@@ -1277,6 +1289,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
                 }
                 else if(Leg2_OrderState==13){
                     Leg2_OrderStateStr = "Cancelled";
+                     leg2Price=0;
                 }
                 else{
                     Leg2_OrderStateStr="-";
@@ -1301,6 +1314,9 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
                         Leg4_OrderStateStr = "PartialTrade";
                     }
                     else if (Leg4_OrderState == 9) {
+                        Leg4_OrderStateStr = "Open";
+                    }
+                    else if (Leg4_OrderState == 3) {
                         Leg4_OrderStateStr = "Open";
                     }
                     else if (Leg4_OrderState == 10) {
@@ -2267,7 +2283,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
         if(ok){
             QSqlQuery query(db);
             int PortfoliosCount = -1;
-            query.prepare("SELECT * FROM Portfolios");
+            query.prepare("SELECT * FROM Portfolios WHERE TraderID=" + (data.user_id));
 
             if( !query.exec() )
             {

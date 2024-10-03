@@ -128,7 +128,7 @@ signals:
 private:
 
     QString m_highlightText;
-    double price_diff_incrementer = 0.05;
+    double price_diff_incrementer = 0.01;
     double quantity_incrementer = 1.0;
     QString market_type;
     QPen pen;

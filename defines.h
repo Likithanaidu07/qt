@@ -18,7 +18,7 @@ extern QString userNameLogged;
 
 #define FO_DEVICER 100.0
 #define FO_DECIMAL_PRECISION 2
-#define FO_PRICE_DIFF_INCREMENTER 0.05
+#define FO_PRICE_DIFF_INCREMENTER 0.01
 
 
 enum nav_direction{
