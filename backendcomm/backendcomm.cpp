@@ -239,6 +239,7 @@ void BackendComm::processQueue()
 
 void BackendComm::quitDataFetchThread(){
     runThread = false;
+
 }
 
 

@@ -96,7 +96,7 @@ private:
 signals:
     void update_ui_signal(int);
     void display_log_text_signal(QString);
-
+    void portFolioAdded_Signal();
 private slots:
 
 

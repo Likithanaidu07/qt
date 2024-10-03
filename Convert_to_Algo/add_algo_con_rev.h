@@ -58,8 +58,8 @@ private:
     EventFilter *eventFilterStart;
     EventFilter *eventFilterEnd;
     EventFilter *eventFilterFUT;
- //   bool compareStrikePrice(const QString &key1, const QString &key2, const QHash<QString, contract_table> &contractTableHash);
- //   void sortFilteredKeys(QStringList &filteredKeys, const QHash<QString, contract_table> &contractTableHash);
+    bool compareStrikePrice(const QString &key1, const QString &key2, const QHash<QString, contract_table> &contractTableHash);
+    void sortFilteredKeys(QStringList &filteredKeys, const QHash<QString, contract_table> &contractTableHash);
 
 public slots:
     void itemSelectedStartStrike(QModelIndex);

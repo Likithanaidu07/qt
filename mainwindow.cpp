@@ -476,7 +476,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(T_Portfolio_Table, &QTableView::doubleClicked, this, &MainWindow::T_Portfolio_Table_cellDoubleClicked);
 
     //QSortFilterProxyModel *proxyModel = new QSortFilterProxyModel(this);
-    Portfolio_SearchFilterProxyModel *T_Portfolio_ProxyModel = new Portfolio_SearchFilterProxyModel(this);
+    T_Portfolio_ProxyModel = new Portfolio_SearchFilterProxyModel(this);
     T_Portfolio_ProxyModel->setSourceModel(T_Portfolio_Model);
     T_Portfolio_ProxyModel->setFilterKeyColumn(-1);  // Search across all columns
 
@@ -1836,6 +1836,14 @@ void MainWindow::onRequestDeleteConfirmation(const QStringList &PortFoliosToDele
         if (!ret) {
             QMessageBox::warning(this, "Error", "Failed to delete the portfolios: " + msg);
         }
+        else{
+            //send notifcation to backend server
+            quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+            const unsigned char dataBytes[] = { 0xFF, 0xFF };
+            QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
+            QByteArray msg = backend_comm->createPacket(command, data);
+            backend_comm->insertData(msg);
+        }
     } else {
         this->on_close_clicked();
     }
@@ -1941,12 +1949,27 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
     // ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(94, 255, 107);border-radius:6px;color:#000;");
 }
 void MainWindow::stop_backend_comm_socket_worker(){
-    backend_comm->quitDataFetchThread();
+//    backend_comm->quitDataFetchThread();
 
-    // Quit the thread's event loop and wait for it to finish
-    backend_comm_thread->quit();
-    backend_comm_thread->wait();
-    backend_comm_thread->deleteLater();
+//    // Quit the thread's event loop and wait for it to finish
+//    backend_comm_thread->quit();
+//    backend_comm_thread->wait();
+//    backend_comm_thread->deleteLater();
+
+    if (backend_comm) {
+            // Close the backend communicationd thread properly
+            backend_comm->quitDataFetchThread();  // Ensure socket is closed
+
+            // Quit the thread's event loop and wait for it to finish
+            backend_comm_thread->quit();
+
+            // Add a small timeout to ensure the thread does not block too long
+            if (!backend_comm_thread->wait(500)) {  // Wait for 1 second
+                backend_comm_thread->terminate();  // Force termination if necessary
+            }
+
+            backend_comm_thread->deleteLater();
+        }
 }
 
 QString MainWindow::base64_encode(QString str){
@@ -2087,14 +2110,42 @@ void MainWindow::loggedInSucessful(userInfo userData)
     loadContract();
 
 }
-
+/*
 void MainWindow::stopBG_Threads(){
     stop_dataLoadingThread();
     stop_slowdata_worker();
     stop_slowdata_indices_worker();
     stop_backend_comm_socket_worker();
 }
+*/
+void MainWindow::stopBG_Threads(){
+    QElapsedTimer timer;
 
+    // Measure stop_dataLoadingThread
+    timer.start();
+    stop_dataLoadingThread();
+    qint64 time1 = timer.elapsed();
+    qDebug() << "Time taken for stop_dataLoadingThread: " << time1 << "ms";
+
+    // Measure stop_slowdata_worker
+    timer.start();
+    stop_slowdata_worker();
+    qint64 time2 = timer.elapsed();
+    qDebug() << "Time taken for stop_slowdata_worker: " << time2 << "ms";
+
+    // Measure stop_slowdata_indices_worker
+    timer.start();
+    stop_slowdata_indices_worker();
+    qint64 time3 = timer.elapsed();
+    qDebug() << "Time taken for stop_slowdata_indices_worker: " << time3 << "ms";
+
+    // Measure stop_backend_comm_socket_worker
+    timer.start();
+    stop_backend_comm_socket_worker();
+    qint64 time4 = timer.elapsed();
+    qDebug() << "Time taken for stop_backend_comm_socket_worker: " << time4 << "ms";
+
+}
 
 void MainWindow::loggedOut(){
 
@@ -2222,6 +2273,8 @@ void MainWindow::on_Templates_Button_clicked()
 void MainWindow::on_close_clicked()
 {
     db_conn->logToDB("Logged Out");
+
+
     //loggedOut();
     //portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser;
     stopBG_Threads();
@@ -2501,6 +2554,13 @@ void MainWindow::Delete_clicked_slot()
             {
                 logs = "PortfolioNumber '"+PortfolioNumber+"' deleted successfully.";
                 db_conn->logToDB(logs);
+
+                //send notifcation to backend server
+                quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+                const unsigned char dataBytes[] = { 0xFF, 0xFF };
+                QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
+                QByteArray msg = backend_comm->createPacket(command, data);
+                backend_comm->insertData(msg);
             }
             else
             {
@@ -2525,13 +2585,15 @@ void MainWindow::Delete_clicked_slot()
 }
 
 void MainWindow::T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index){
-    //int row = index.row();
-    int col = index.column();
+
+    QModelIndex mappedIdx = T_Portfolio_ProxyModel->mapToSource(index);
+
+    int col = mappedIdx.column();
     if(col==PortfolioData_Idx::_AlgoName){
         if(orderPopUpWin->isHidden())
             orderPopUpWin->show();
         // QString Expiry = T_Portfolio_Model->portfolio_data_list[index.row()]->Expiry;
-        PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());
+        PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(mappedIdx.row());
         if (!P) {
             qDebug()<<"updatePortFolioStatus----- portfolio null, need to debug this code.";
 
@@ -3391,7 +3453,8 @@ void MainWindow::initializeGlobalHotKeys(){
 
                      if(selection.count()>0)
                      {
-                         PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(selection.first().row());
+                         updatePortFolioStatus(selection.first());
+                         /*PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(selection.first().row());
                          if (!P) {
                              qDebug()<<"ENABLE_DISABLE_SELECTED_ALGO----- portfolio null, need to debug this code.";
                              return;
@@ -3412,7 +3475,7 @@ void MainWindow::initializeGlobalHotKeys(){
                              if(success){
                                  db_conn->logToDB(QString("Disabled  Algo PortfolioNumber=")+PortfolioNumber);
                              }
-                         }
+                         }*/
 
                      }
 
@@ -3431,10 +3494,22 @@ void MainWindow::initializeGlobalHotKeys(){
                        return;
                    } else {
                        // Get the first selected cell (QModelIndex)
-                       QModelIndex firstSelectedCell = selection.at(PortfolioData_Idx::_AlgoName);
 
-                       // Pass the first selected cell to the double-click handler
-                       T_Portfolio_Table_cellDoubleClicked(firstSelectedCell);
+                       // Pass the first selected row to the double-click handler
+                       QModelIndex firstSelectedIndex = selection.first();
+
+                       // Get the row from the first selected index
+                       int row = firstSelectedIndex.row();
+
+                       // Specify the column you want to target (e.g., PortfolioData_Idx::_AlgoName)
+                       int col = PortfolioData_Idx::_AlgoName;
+
+                       // Create a new index for the same row but specific column
+                       QModelIndex targetIndex = T_Portfolio_Table->model()->index(row, col);
+
+                       // Call the double-click function with the new index
+                       T_Portfolio_Table_cellDoubleClicked(targetIndex);
+
                    }
                });
            }

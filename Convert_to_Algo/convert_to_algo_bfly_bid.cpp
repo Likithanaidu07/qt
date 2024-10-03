@@ -106,8 +106,6 @@ void add_algo_btfly_bid::startStrikeEditFinishedAction(){
     model_end_strike->clear();
     lineEdit_EndStrike->clear();
     foo_token_number_end_strike = "";
-    strike_priceList.clear();
-    token_numebrList.clear();
     expiry_dateList.clear();
     QString key = foo_token_number_start_strike;
     QString Instr_Name = sharedData->contract_table_hash[key].InstrumentName;
@@ -126,10 +124,7 @@ void add_algo_btfly_bid::startStrikeEditFinishedAction(){
 
         if(tmp.InstrumentName==Instr_Name&&tmp.OptionType==Option_Type&&Expiry==tmp.Expiry){
 
-            if(!strike_priceList.contains(QString::number(tmp.StrikePrice))){
-                strike_priceList.append(QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)); // store in Rs
-                token_numebrList.append(QString::number(tmp.TokenNumber));
-            }
+
             // this will prevent adding same algo_combination  in end strike list view as in start strik list view
             if(start_strike==end_strike)
                 continue;
@@ -180,7 +175,9 @@ void add_algo_btfly_bid::generateAlgo()
 
     QString keyStart = foo_token_number_start_strike;
     QString keyEnd = foo_token_number_end_strike;
-    QString Option_Type = sharedData->contract_table_hash[keyStart].OptionType;
+    QString Start_Strike_Option_Type = sharedData->contract_table_hash[keyStart].OptionType;
+    QString Start_Strike_InstrumentName = sharedData->contract_table_hash[keyStart].InstrumentName;
+
     if(lineEdit_StrikeDifference->text()==""){
         QMessageBox msgBox;
         msgBox.setText("Please fill Strike Difference.");
@@ -188,7 +185,7 @@ void add_algo_btfly_bid::generateAlgo()
         msgBox.exec();
         return;
     }
-    float StrikeDifference = lineEdit_StrikeDifference->text().toFloat(); /// will be in Rs
+    float StrikeDifference = lineEdit_StrikeDifference->text().toFloat()*sharedData->strike_price_devider; /// will be in Rs
     if(StrikeDifference<=0){
         QMessageBox msgBox;
         msgBox.setText("Please Enter Valid  Strike Difference.");
@@ -197,86 +194,65 @@ void add_algo_btfly_bid::generateAlgo()
         return;
     }
 
-    float startStrike =  sharedData->contract_table_hash[keyStart].StrikePrice/sharedData->strike_price_devider; // will be in paise so converted to Rs
-    float endStrike = sharedData->contract_table_hash[keyEnd].StrikePrice/sharedData->strike_price_devider;// will be in paise so converted to Rs
-    unsigned int unix_time= sharedData->contract_table_hash[keyStart].Expiry;
-    QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+    float startStrike =  sharedData->contract_table_hash[keyStart].StrikePrice; // will be in paise so converted to Rs
+    float endStrike = sharedData->contract_table_hash[keyEnd].StrikePrice;// will be in paise so converted to Rs
+    long long Start_Strike_Expiry= sharedData->contract_table_hash[keyStart].Expiry;
+    QDateTime dt = QDateTime::fromSecsSinceEpoch(Start_Strike_Expiry);
     dt = dt.addYears(10);
     QString ExpiryTime=dt.toString("MMM dd yyyy").toUpper();
 
 
+    QHash<QString, QString> strikePrice_TokenFiltered;
+    QList<int> strikePriceListFiltered;
+    for(int i=0;i<sorted_keys_BFLY_BID.length();i++){
+        contract_table c = sharedData->contract_table_hash[sorted_keys_BFLY_BID[i]];
+        if(c.StrikePrice<startStrike||c.StrikePrice>endStrike+StrikeDifference+StrikeDifference)
+            continue;
 
-    QList<float> leg1_list;
-    QList<float> leg2_list;
-    QList<float> leg3_list;
+        if(c.InstrumentName==Start_Strike_InstrumentName&&c.OptionType==Start_Strike_Option_Type&&c.Expiry==Start_Strike_Expiry){
+            QString key = QString::number(c.StrikePrice);
+            strikePrice_TokenFiltered.insert(key,QString::number(c.TokenNumber));
+            strikePriceListFiltered.append(c.StrikePrice);
+        }
+    }
+    std::sort(strikePriceListFiltered.begin(), strikePriceListFiltered.end());
 
     QList<QString> Leg1_token_number_list;
     QList<QString> Leg2_token_number_list;
     QList<QString> Leg3_token_number_list;
     QList<QString> Algo_Name_list;
 
-    float currentStrick = startStrike;
-    while(1){
-        if(StrikeDifference>0){
-            if(((endStrike-startStrike)/StrikeDifference)>1000000000){
+    for(int i=0;i<strikePriceListFiltered.length();i++){
+
+        int leg1Strike = strikePriceListFiltered[i];
+        int leg2Strike = strikePriceListFiltered[i]+StrikeDifference;
+        int leg3Strike = strikePriceListFiltered[i]+StrikeDifference+StrikeDifference;
+
+        QString key1 = QString::number(leg1Strike);
+        QString key2 = QString::number(leg2Strike);
+        QString key3 = QString::number(leg3Strike);
+
+        if(strikePrice_TokenFiltered.contains(key1)&&strikePrice_TokenFiltered.contains(key2)&&strikePrice_TokenFiltered.contains(key3)){
+            Leg1_token_number_list.append(strikePrice_TokenFiltered[key1]);
+            Leg2_token_number_list.append(strikePrice_TokenFiltered[key2]);
+            Leg3_token_number_list.append(strikePrice_TokenFiltered[key3]);
+            QString Algo_Name = "Bfly-" + Start_Strike_InstrumentName+"-"+dt.toString("ddMMM").toUpper()+"-"+QString::number(leg2Strike/sharedData->strike_price_devider,'f', sharedData->decimal_precision)+"-"+QString::number(StrikeDifference/sharedData->strike_price_devider,'f', sharedData->decimal_precision)+"-"+Start_Strike_Option_Type;
+            Algo_Name_list.append(Algo_Name);
+            if(Algo_Name_list.size()==sharedData->ROW_LIMIT){
                 QMessageBox msgBox;
-                msgBox.setText("Strike diffrence is too small, please chose higher value.");
-                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.setText("Maximum allowed entry at a time is "+QString::number(sharedData->ROW_LIMIT));
+                msgBox.setIcon(QMessageBox::Information);
                 msgBox.exec();
                 break;
             }
         }
-        float leg1 =  currentStrick;
-        float leg2 = leg1+StrikeDifference;
-        float leg3 = leg2+StrikeDifference;
 
-        QString Leg1_token_number="";
-        QString Leg2_token_number="";
-        QString Leg3_token_number="";
-        //check generated stricke price is in the DB and get the token numeber, if not remove it
-        for(int i=0;i<strike_priceList.length();i++){
-            if(strike_priceList[i].toFloat()==leg1){
-                Leg1_token_number = token_numebrList[i];
-            }
-            else if(strike_priceList[i].toFloat()==leg2){
-                Leg2_token_number = token_numebrList[i];
-            }
-            else if(strike_priceList[i].toFloat()==leg3){
-                Leg3_token_number = token_numebrList[i];
-            }
-        }
 
-        if(Leg1_token_number!=""&&Leg2_token_number!=""&&Leg3_token_number!=""){
-            leg1_list.append(leg1);
-            leg2_list.append(leg2);
-            leg3_list.append(leg3);
-            Leg1_token_number_list.append(Leg1_token_number);
-            Leg2_token_number_list.append(Leg2_token_number);
-            Leg3_token_number_list.append(Leg3_token_number);
-            //(Instrument name, expiry year and month, middle strike and strike difference     eg.  Bfly - EURUSD 24 JUN 1.005 CE - 0.005
-
-//            Algo_Name = "Bfly-";
-//            double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number).toDouble());
-//            Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM")+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number) +"-"+QString::number(diff)+ContractDetail::getInstance().GetOptionType(leg1_token_number);
-
-            QString Instr_Name = "Bfly-" + sharedData->contract_table_hash[keyStart].InstrumentName+"-"+dt.toString("ddMMM").toUpper()+"-"+QString::number(leg2)+"-"+QString::number(StrikeDifference)+"-"+Option_Type;
-            Algo_Name_list.append(Instr_Name);
-
-        }
-
-        currentStrick = currentStrick+StrikeDifference;
-        if(currentStrick>endStrike)
-            break;
-        if(leg1_list.size()>50){
-            QMessageBox msgBox;
-            msgBox.setText("Cannot create more than 50 algos, showing the first 50 algos.");
-            msgBox.setIcon(QMessageBox::Warning);
-            msgBox.exec();
-            break;
-        }
     }
 
-    if(leg1_list.size()==0){
+
+
+    if(Leg1_token_number_list.size()==0){
         QMessageBox msgBox;
         msgBox.setText("Not able to generate algos for given input, please select different strike price.");
         msgBox.setIcon(QMessageBox::Warning);
@@ -285,11 +261,10 @@ void add_algo_btfly_bid::generateAlgo()
     }
 
     QStringList duplicateList;
-    for(int i=0;i<leg1_list.size();i++){
-        QString Leg1_Strike=QString::number(leg1_list[i],'f', sharedData->decimal_precision);
-        QString Leg2_Strike=QString::number(leg2_list[i],'f', sharedData->decimal_precision);
-        QString Leg3_Strike=QString::number(leg3_list[i],'f', sharedData->decimal_precision);
-
+    for(int i=0;i<Leg1_token_number_list.size();i++){
+        QString Leg1_Strike=QString::number(sharedData->contract_table_hash[Leg1_token_number_list[i]].StrikePrice/sharedData->strike_price_devider,'f', sharedData->decimal_precision);
+        QString Leg2_Strike=QString::number(sharedData->contract_table_hash[Leg2_token_number_list[i]].StrikePrice/sharedData->strike_price_devider,'f', sharedData->decimal_precision);
+        QString Leg3_Strike=QString::number(sharedData->contract_table_hash[Leg3_token_number_list[i]].StrikePrice/sharedData->strike_price_devider,'f', sharedData->decimal_precision);
 
 
         bool exist=false;
@@ -412,17 +387,17 @@ void add_algo_btfly_bid::generateAlgo()
         data.Leg1_Strike = Leg1_Strike;
         data.Leg2_Strike = Leg2_Strike;
         data.Leg3_Strike = Leg3_Strike;
-        data.option_type = Option_Type;
+        data.option_type = Start_Strike_Option_Type;
         data.uploaded=false; // this flag is used to id
 
         sharedData->algo_data_list.append(data);
-        if(tableWidget->rowCount()>=sharedData->ROW_LIMIT){
+        /*if(tableWidget->rowCount()>=sharedData->ROW_LIMIT){
             QMessageBox msgBox;
             msgBox.setText("Maximum allowed entry at a time is "+QString::number(sharedData->ROW_LIMIT));
             msgBox.setIcon(QMessageBox::Warning);
             msgBox.exec();
             break;
-        }
+        }*/
     }
 
     if(duplicateList.size()>0){
@@ -434,7 +409,6 @@ void add_algo_btfly_bid::generateAlgo()
     }
 
     tableWidget->resizeColumnsToContents();
-
 }
 
 void add_algo_btfly_bid::slotStartHide(QString)

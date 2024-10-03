@@ -256,11 +256,12 @@ void convert_to_algo_box_bid::generateAlgo()
 
             Algo_Name_list.append(Algo_Name);
 
-            if(Algo_Name_list.size()==50){
+            if(Algo_Name_list.size()==sharedData->ROW_LIMIT){
                 QMessageBox msgBox;
                 msgBox.setText("Maximum allowed entry at a time is "+QString::number(sharedData->ROW_LIMIT));
                 msgBox.setIcon(QMessageBox::Information);
                 msgBox.exec();
+                break;
             }
         }
 
@@ -413,13 +414,13 @@ void convert_to_algo_box_bid::generateAlgo()
         data.uploaded=false; // this flag is used to id
 
         sharedData->algo_data_list.append(data);
-        if(tableWidget->rowCount()>=sharedData->ROW_LIMIT){
+        /*if(tableWidget->rowCount()>=sharedData->ROW_LIMIT){
             QMessageBox msgBox;
             msgBox.setText("Maximum allowed entry at a time is "+QString::number(sharedData->ROW_LIMIT));
             msgBox.setIcon(QMessageBox::Warning);
             msgBox.exec();
             break;
-        }
+        }*/
     }
 
     if(duplicateList.size()>0){

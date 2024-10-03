@@ -1068,14 +1068,14 @@ void PortfolioParser::CalculateAveragePrice(PortfolioObject &portfolio,    QHash
         break;
     }
     case PortfolioType::BOX:{
-        double leg1BuyPrice = DBL_MAX;
-        double leg1SellPrice =DBL_MAX;
-        double leg2BuyPrice = DBL_MAX;
-        double leg2SellPrice = DBL_MAX;
-        double leg3BuyPrice = DBL_MAX;
-        double leg3SellPrice = DBL_MAX;
-        double leg4BuyPrice = DBL_MAX;
-        double leg4SellPrice =DBL_MAX;
+        double leg1BuyPrice = 0;//DBL_MAX;
+        double leg1SellPrice = 0;//DBL_MAX;
+        double leg2BuyPrice = 0;// DBL_MAX;
+        double leg2SellPrice =  0;//DBL_MAX;
+        double leg3BuyPrice =  0;//DBL_MAX;
+        double leg3SellPrice =  0;//DBL_MAX;
+        double leg4BuyPrice =  0;//DBL_MAX;
+        double leg4SellPrice =  0;//DBL_MAX;
         QString key1 = QString::number(portfolio.PortfolioNumber)+"_"+QString::number(portfolio.Leg1TokenNo);
         if(averagePriceList.contains(key1)){
             PortfolioAvgPrice leg1 = averagePriceList[key1];
@@ -1166,12 +1166,12 @@ void PortfolioParser::CalculateAveragePrice(PortfolioObject &portfolio,    QHash
     case PortfolioType::BX_BID:{
         double leg1BuyPrice = DBL_MAX;
         double leg1SellPrice =DBL_MAX;
-        double leg2BuyPrice = DBL_MAX;
-        double leg2SellPrice = DBL_MAX;
-        double leg3BuyPrice = DBL_MAX;
-        double leg3SellPrice = DBL_MAX;
-        double leg4BuyPrice = DBL_MAX;
-        double leg4SellPrice =DBL_MAX;
+        double leg2BuyPrice =  DBL_MAX;
+        double leg2SellPrice =  DBL_MAX;
+        double leg3BuyPrice =  DBL_MAX;
+        double leg3SellPrice =  DBL_MAX;
+        double leg4BuyPrice =  DBL_MAX;
+        double leg4SellPrice = DBL_MAX;
         QString key1 = QString::number(portfolio.PortfolioNumber)+"_"+QString::number(portfolio.Leg1TokenNo);
         if(averagePriceList.contains(key1)){
             PortfolioAvgPrice leg1 = averagePriceList[key1];
@@ -1230,7 +1230,8 @@ void PortfolioParser::CalculateAveragePrice(PortfolioObject &portfolio,    QHash
         }
         else
         {
-            double diff = strikeDiff - ((leg1SellPrice + leg4SellPrice) - (leg2BuyPrice + leg3BuyPrice));
+           // double diff = strikeDiff - ((leg1SellPrice + leg4SellPrice) - (leg2BuyPrice + leg3BuyPrice));
+            double diff = ((leg1BuyPrice + leg4BuyPrice) - (leg2SellPrice + leg3SellPrice)) - strikeDiff;
 
             QString d = QString::number(diff, 'f', decimal_precision);
             if (portfolio.BuyAveragePrice != d)
@@ -1246,6 +1247,7 @@ void PortfolioParser::CalculateAveragePrice(PortfolioObject &portfolio,    QHash
         else
         {
             double diff =  strikeDiff - ((leg1SellPrice + leg4SellPrice) - (leg2BuyPrice + leg3BuyPrice));
+
             QString d = QString::number(diff, 'f', decimal_precision);
 
             if (portfolio.SellAveragePrice != d)

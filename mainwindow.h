@@ -167,6 +167,7 @@ private:
     void stopBG_Threads();
 
     Table_Portfolios_Model  *T_Portfolio_Model;
+    Portfolio_SearchFilterProxyModel *T_Portfolio_ProxyModel;
     table_portfolios_custom *T_Portfolio_Table;
     Table_Portfolios_Delegate *T_Portfolio_Delegate;
 

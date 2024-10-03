@@ -253,7 +253,7 @@ void add_algo_con_rev::startStrikeEditFinishedAction(){
 }
 
 // Comparator function to sort based on StrikePrice
-/*bool add_algo_con_rev::compareStrikePrice(const QString &key1, const QString &key2, const QHash<QString, contract_table> &contractTableHash) {
+bool add_algo_con_rev::compareStrikePrice(const QString &key1, const QString &key2, const QHash<QString, contract_table> &contractTableHash) {
     return contractTableHash[key1].StrikePrice < contractTableHash[key2].StrikePrice;
 }
 
@@ -262,7 +262,7 @@ void add_algo_con_rev::sortFilteredKeys(QStringList &filteredKeys, const QHash<Q
               [&](const QString &key1, const QString &key2) {
                   return compareStrikePrice(key1, key2, contractTableHash);
               });
-}*/
+}
 
 void add_algo_con_rev::generateAlgo(){
 
@@ -325,7 +325,7 @@ void add_algo_con_rev::generateAlgo(){
             filteredKeys.append(sorted_keys_CON_REV[i]);
     }
 
- //   sortFilteredKeys(filteredKeys, sharedData->contract_table_hash);
+    sortFilteredKeys(filteredKeys, sharedData->contract_table_hash);
 
     //qDebug()<<filteredKeys.length();
     // get all data to diplay-----note: BFLY sorted based on strike price.

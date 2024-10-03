@@ -52,9 +52,7 @@ private:
     QListView *endStrikeListView;
 
     QStringList expiry_dateList;
-    QStringList token_numebrList;
     AddAlgoSharedVar *sharedData;
-    QStringList strike_priceList;
 
     EventFilter *eventFilterStart;
     EventFilter *eventFilterEnd;

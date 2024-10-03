@@ -348,7 +348,25 @@ QHash<QString,PortFolioData_Less> mysql_conn::getPortfoliosTableData(QAtomicInt 
     bool ok = checkDBOpened(msg);
     if(ok){
        QString sqlquery = "SELECT PortfolioNumber, (sum(TradedPrice*TotalVolume) * 1.0 / sum(TotalVolume))/"+QString::number(devicer)+" as AvgPrice, TokenNo, BuySellIndicator from Trades WHERE TraderID='"+user_id+"' group by PortfolioNumber, TokenNo, BuySellIndicator ";
-        QSqlQuery queryAvgPrice(sqlquery, db);
+
+
+       /*QString sqlquery = "SELECT "
+               "t.PortfolioNumber, "
+               "(SUM(t.TradedPrice * (t.TotalVolume / c.LotSize)) * 1.0 / SUM(t.TotalVolume / c.LotSize)) / "+QString::number(devicer)+" AS AvgPrice, "
+               "t.TokenNo, "
+               "t.BuySellIndicator "
+           "FROM "
+              " Trades t "
+           "JOIN "
+              " Contract c ON t.TokenNo = c.Token "
+           " WHERE "
+             "  t.TraderID = '"+user_id+"' "
+          " GROUP BY "
+              " t.PortfolioNumber, "
+               "t.TokenNo, "
+               "t.BuySellIndicator; ";*/
+
+       QSqlQuery queryAvgPrice(sqlquery, db);
         if(!queryAvgPrice.exec())
         {
             // Error Handling, check query.lastError(), probably return
@@ -1445,7 +1463,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
                         if (legOrderStates[i] == 7) {
                             long long tradeTime = query.value(rec.indexOf(legTimeFields[i])).toLongLong();
                             QDateTime dt = QDateTime::fromSecsSinceEpoch(tradeTime);
-                            qDebug() << "Trade time for Leg" << i+1 << ":" << dt.toString();
+                           // qDebug() << "Trade time for Leg" << i+1 << ":" << dt.toString();
                         }
                     }
                 }
