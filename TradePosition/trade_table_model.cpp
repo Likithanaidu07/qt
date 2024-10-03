@@ -297,9 +297,13 @@ void Trade_Table_Model::setColumnWidths(QTableView *tableView) const {
 
         // Add some padding
         maxWidth += 30;
-        // Set the column width directly in the view
-        tableView->setColumnWidth(col, maxWidth);
-        tableView->setColumnWidth(AlgoName_OB,300);
-        //  tableView->horizontalHeader()->setSectionResizeMode(_Status, QHeaderView::Fixed);
+        // Set the column width for AlgoName_OB to 300 (or any preferred width)
+        tableView->setColumnWidth(AlgoName_OB, 300);
+        tableView->resizeColumnsToContents();             // Adjust columns to content
+        tableView->resizeRowsToContents();                // Adjust rows to content
+        tableView->horizontalHeader()->setStretchLastSection(true);  // Stretch the last column
+        tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);  // Optional for dynamic resizing
+
+
     }
 }

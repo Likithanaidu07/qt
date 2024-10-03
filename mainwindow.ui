@@ -740,7 +740,14 @@ background: #46454d;
         </spacer>
        </item>
        <item>
-        <widget class="QLineEdit" name="lineEditSearch"/>
+        <widget class="QLineEdit" name="lineEditSearch">
+         <property name="minimumSize">
+          <size>
+           <width>15</width>
+           <height>0</height>
+          </size>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

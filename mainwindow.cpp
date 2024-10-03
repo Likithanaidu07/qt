@@ -164,7 +164,11 @@ MainWindow::MainWindow(QWidget *parent)
         "}"
         );
 
-
+    ui->lineEditSearch->setStyleSheet(
+        "QLineEdit {"
+        "    padding-right: 50px;"  // Add 20 pixels of space on the right
+        "}"
+        );
     ui->HP_Widget->setVisible(false);
     //ui->widget_3->setVisible(false);
       ui->widget_5->setVisible(true);
@@ -434,7 +438,6 @@ MainWindow::MainWindow(QWidget *parent)
             //    internalLayout->addWidget(switchBox);
                 internalLayout->addSpacerItem(spc);
                 //internalLayout->addWidget(line_edit_trade_search);
-                internalLayout->addSpacerItem(spc);
                 internalLayout->addWidget(button1);
                 internalLayout->addWidget(button2);
                 internalLayout->addWidget(button3);
@@ -524,6 +527,7 @@ MainWindow::MainWindow(QWidget *parent)
     lay->addWidget(T_Portfolio_Table,1,0);
     T_Portfolio_Table->show();
     restoreTableViewColumnState(T_Portfolio_Table);
+
     /***********Init portfolio table Window**************************/
 
 
@@ -843,8 +847,8 @@ MainWindow::MainWindow(QWidget *parent)
     //dock_win_combined_tracker->setAllowedAreas(Qt::AllDockWidgetAreas );
     dock_win_combined_tracker->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
     dock_win_combined_tracker->setMinimumSize(200,150);
-    const auto autoHideContainer_tracker = DockManagerMainPanel->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_combined_tracker);
-    autoHideContainer_tracker->setSize(480);
+//    const auto autoHideContainer_tracker = DockManagerMainPanel->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_combined_tracker);
+//    autoHideContainer_tracker->setSize(480);
 
     //create a titlebar
     QWidget *hp_titlebar=new QWidget;

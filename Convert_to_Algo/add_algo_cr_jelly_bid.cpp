@@ -163,13 +163,13 @@ void add_algo_cr_jelly_bid::create_AutoFillModel_StartStrike(){
         unsigned int unix_time= tmp.Expiry;
         QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
         dt = dt.addYears(10);
-        int targetYear = dt1.date().year();
-        bool isLeapYear = QDate::isLeapYear(targetYear);
+//        int targetYear = dt1.date().year();
+//        bool isLeapYear = QDate::isLeapYear(targetYear);
 
-        // If it is a leap year, and the date is after Feb 29, subtract one day
-        if (isLeapYear && dt1.date() > QDate(targetYear, 2, 29)) {
-            dt1 = dt1.addDays(-1);
-        }
+//        // If it is a leap year, and the date is after Feb 29, subtract one day
+//        if (isLeapYear && dt1.date() > QDate(targetYear, 2, 29)) {
+//            dt1 = dt1.addDays(-1);
+//        }
         QString ExpiryTmp=dt.toString("MMM dd yyyy").toUpper();
 
 
@@ -235,13 +235,13 @@ void add_algo_cr_jelly_bid::startStrikeEditFinishedAction(){
             unsigned int unix_time= tmp.Expiry;
             QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
             dt = dt.addYears(10);
-            int targetYear = dt.date().year();
-            bool isLeapYear = QDate::isLeapYear(targetYear);
+//            int targetYear = dt.date().year();
+//            bool isLeapYear = QDate::isLeapYear(targetYear);
 
-            // If it is a leap year, and the date is after Feb 29, subtract one day
-            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-                dt = dt.addDays(-1);
-            }
+//            // If it is a leap year, and the date is after Feb 29, subtract one day
+//            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//                dt = dt.addDays(-1);
+//            }
             QString ExpiryTmp=dt.toString("MMM dd yyyy").toUpper();
             QString algo_combination = tmp.InstrumentName+" "+ExpiryTmp+" "+QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);//+" "+tmp.OptionType;
             QStandardItem *item = new QStandardItem;
