@@ -22,17 +22,17 @@ void Table_OrderBook_Delegate::setHighlightText(const QString &text) {
 }
 
 void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
-    auto c = index.column();
-    auto r = index.row();
+
     QStyleOptionViewItem op(option);
     op.palette.setColor(QPalette::All, QPalette::Window, Qt::red);
     op.palette.setColor(QPalette::All, QPalette::WindowText, Qt::red);
 
     const QSortFilterProxyModel *proxyModel = qobject_cast<const QSortFilterProxyModel*>(index.model());
-    QModelIndex sourceIndex = proxyModel->mapToSource(index);
+    QModelIndex mappedIndex = proxyModel->mapToSource(index);
     const Trade_Table_Model *model = qobject_cast<const Trade_Table_Model*>(proxyModel->sourceModel());
-
-    QStringList order_list = model->trade_data_list.at(index.row());
+    auto c = mappedIndex.column();
+    auto r = mappedIndex.row();
+    QStringList order_list = model->trade_data_list.at(mappedIndex.row());
     QList<QString> fifthColumnValues;
 
 
@@ -42,7 +42,7 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
         c == OrderBook_Idx::TradedLot_OB ||
         c == OrderBook_Idx::RemainingLot_OB) {
 
-        QStringList order_list = model->trade_data_list.at(index.row());
+        QStringList order_list = model->trade_data_list.at(mappedIndex.row());
         QString buy_sell = order_list[OrderBook_Idx::BuyorSell_OB];
 
         QColor color("#42A5F5");
@@ -103,10 +103,10 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
 
         // Set the text color and draw the text
         painter->setPen(textColor);
-        painter->drawText(option.rect, index.data().toString(), QTextOption(Qt::AlignCenter));
+        painter->drawText(option.rect, mappedIndex.data().toString(), QTextOption(Qt::AlignCenter));
 
         // Optionally call the base class method for default painting
-        QStyledItemDelegate::paint(painter, option, index);
+        QStyledItemDelegate::paint(painter, option, mappedIndex);
 
 
         QPen pen(textColor);
@@ -155,10 +155,10 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
     painter->drawLine(p1, p2);
     painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
 
-    QString text = index.data(Qt::DisplayRole).toString();
+    QString text = mappedIndex.data(Qt::DisplayRole).toString();
     int startIndex = text.indexOf(m_highlightText, 0, Qt::CaseInsensitive);
     QStyleOptionViewItem opt = option;
-    initStyleOption(&opt, index);
+    initStyleOption(&opt, mappedIndex);
 
     painter->save();  // Save the painter state
     painter->setClipRect(opt.rect);
@@ -188,7 +188,7 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
     }
 
     painter->restore();
-    int orderState = index.model()->data(index, Qt::UserRole).toInt();
+    int orderState = mappedIndex.model()->data(index, Qt::UserRole).toInt();
 
     // Determine the text color based on the order state
     QColor textColor;
@@ -215,7 +215,7 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
     opt.palette.setColor(QPalette::Text, textColor);
 
     // Call the base class paint method to handle the rest
-    QStyledItemDelegate::paint(painter, opt, index);
+    QStyledItemDelegate::paint(painter, opt, mappedIndex);
 
 
 

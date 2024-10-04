@@ -2734,6 +2734,7 @@ void MainWindow::slotHideProgressBar()
 
 void MainWindow::indicesDataRecv_Slot(Indices_Data_Struct data){
     emit indicesDataRecv_Signal_watch_card(data);
+    updateWatchDataCard(data);
 
     //remove below code
 //    bool newIndicesData = false;
@@ -3614,7 +3615,6 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
 
 void MainWindow::instilizeWatchUIOnTopBar(){
 
-    QStringList savedWatchItems;
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
     QStringList groups = settings.childGroups();
@@ -3642,22 +3642,35 @@ void MainWindow::instilizeWatchUIOnTopBar(){
     in >> indicesDataList;
     file.close();
 
+    ui->horizontalLayout_Watch->setSpacing(5);
+    watchCardWidgetList.clear();
+
     for(int i=0;i<savedWatchItems.length();i++){
         if(indicesDataList.contains(savedWatchItems[i])){
-            auto widget1 = new watch_Data_List_Item();
+            auto widget1 = new watch_data_card();
             Indices_Data_Struct data = indicesDataList[savedWatchItems[i]];
             widget1->setData(data);
+            watchCardWidgetList.append(widget1);
             // Set background color using QPalette
-            QPalette pal = widget1->palette();
+          /*  QPalette pal = widget1->palette();
             pal.setColor(QPalette::Window, Qt::lightGray);  // Use QPalette::Window in Qt 6
             widget1->setAutoFillBackground(true);  // Ensures that the background is painted
-            widget1->setPalette(pal);
+            widget1->setPalette(pal);*/
 
             // Add the widget to the horizontal layout
             ui->horizontalLayout_Watch->addWidget(widget1);
         }
     }
 
+
+}
+
+void MainWindow::updateWatchDataCard(Indices_Data_Struct data){
+   for(int i=0;i<watchCardWidgetList.size();i++){
+       if(watchCardWidgetList.at(i)->data.indexName ==data.indexName){
+           watchCardWidgetList[i]->setData(data);
+       }
+   }
 
 }
 

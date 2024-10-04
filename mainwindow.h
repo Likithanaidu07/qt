@@ -55,6 +55,9 @@
 #include "Cards/watch_cards.h"
 #include "PortFolio/portfolio_searchfilterproxymodel.h"
 #include "TradePosition/tradetable_searchfilterproxymodel.h"
+#include "watch_data_card.h"
+
+
 using namespace ads;
 
 class mysql_conn;
@@ -109,6 +112,8 @@ private:
     Ui::MainWindow *ui;
     QStringList logsdata;
     Settings_Window *sett_win= nullptr;
+    QStringList savedWatchItems;
+    QList<watch_data_card*> watchCardWidgetList;
 
     loadingdatawindow *loadingDataWinodw;
     SortSettingPopUp *sortWin; // Add this line
@@ -248,6 +253,7 @@ private:
       QHash<QString, QShortcut*> HotKeyShortcutObjects;
       QModelIndexList  getSelectedPortFolioIndexs();
       void instilizeWatchUIOnTopBar();
+      void updateWatchDataCard(Indices_Data_Struct data);
 
 public slots:
     void openSettingsWindow();

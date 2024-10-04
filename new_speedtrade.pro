@@ -76,6 +76,7 @@ SOURCES += \
     sortsettingpopup.cpp \
     trade_details_popup.cpp \
     uidockwidget.cpp \
+    watch_data_card.cpp \
     watch_data_list_item.cpp
 
 HEADERS += \
@@ -144,6 +145,7 @@ HEADERS += \
     style_sheet.h \
     trade_details_popup.h \
     uidockwidget.h \
+    watch_data_card.h \
     watch_data_list_item.h
 
 FORMS += \
@@ -159,6 +161,7 @@ FORMS += \
     settings_window.ui \
     sortsettingpopup.ui \
     trade_details_popup.ui \
+    watch_data_card.ui \
     watch_data_list_item.ui
 
 

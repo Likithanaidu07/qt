@@ -48,48 +48,52 @@ public:
     }
 };
 
-
-// Double  Validator, only allow value beteween bottom and top and last digit should be 0 or 5
 class DiffValidator : public QDoubleValidator
 {
 private:
     bool is_cds;
 
 public:
-    DiffValidator(double bottom, double top, int decimals,bool is_cds, QObject * parent) :
+    DiffValidator(double bottom, double top, int decimals, bool is_cds, QObject *parent) :
         QDoubleValidator(bottom, top, decimals, parent),
         is_cds(is_cds)
     {
     }
 
-    QValidator::State validate(QString &s, int &i) const
+    QValidator::State validate(QString &s, int &i) const override
     {
         if (s.isEmpty() || s == "-") {
             return QValidator::Intermediate;
         }
 
-        QChar decimalPoint = locale().decimalPoint().at(0); // or locale().decimalPoint().first();
+        QChar decimalPoint = locale().decimalPoint().at(0);
 
-        if(s.indexOf(decimalPoint) != -1) {
-            int charsAfterPoint = s.length() - s.indexOf(decimalPoint) - 1;
+        // Handle the case where the string starts with a decimal point
+        QString modifiedStr = s;
+        if (s.startsWith(decimalPoint)) {
+            modifiedStr.prepend("0");
+        }
+
+        // Check for decimals and precision
+        if (modifiedStr.indexOf(decimalPoint) != -1) {
+            int charsAfterPoint = modifiedStr.length() - modifiedStr.indexOf(decimalPoint) - 1;
 
             if (charsAfterPoint > decimals()) {
                 return QValidator::Invalid;
             }
 
-            // check last digi it 0 or 5 for cds only
-            if (is_cds) {
-                if(charsAfterPoint==decimals()){
-                    QString lastDigit = s.at(s.length() - 1); // Using at()
-                    if(lastDigit!="0"&&lastDigit!="5"){
-                        return QValidator::Invalid;
-                    }
+            // Check last digit (0 or 5) for cds only
+            if (is_cds && charsAfterPoint == decimals()) {
+                QString lastDigit = modifiedStr.at(modifiedStr.length() - 1);
+                if (lastDigit != "0" && lastDigit != "5") {
+                    return QValidator::Invalid;
                 }
             }
         }
 
+        // Validate the number range
         bool ok;
-        double d = locale().toDouble(s, &ok);
+        double d = locale().toDouble(modifiedStr, &ok);
 
         if (ok && d >= bottom() && d <= top()) {
             return QValidator::Acceptable;
@@ -98,6 +102,7 @@ public:
         }
     }
 };
+
 
 
 class Table_Portfolios_Delegate : public QStyledItemDelegate

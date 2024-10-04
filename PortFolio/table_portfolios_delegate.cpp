@@ -467,14 +467,14 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 {
 
 
-    auto c= index.column();
     QStyleOptionViewItem op(option);
 
     const Portfolio_SearchFilterProxyModel *proxyModel = qobject_cast<const Portfolio_SearchFilterProxyModel*>(index.model());
-    QModelIndex sourceIndex = proxyModel->mapToSource(index);
+    QModelIndex mappedIndex = proxyModel->mapToSource(index);
     const Table_Portfolios_Model *portfolioModel = qobject_cast<const Table_Portfolios_Model*>(proxyModel->sourceModel());
-    PortfolioObject *portfolio = portfolioModel->getPortFolioAt(sourceIndex.row());
+    PortfolioObject *portfolio = portfolioModel->getPortFolioAt(mappedIndex.row());
 
+    auto c= mappedIndex.column();
 
     if (!portfolio) {
         return;
@@ -493,7 +493,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         QPixmap checkboxPixmap(10,10);
         checkboxPixmap.fill(Qt::transparent); // Fill with transparent background
         QStyleOptionButton checkboxOption;
-        checkboxOption.state |= (index.data(Qt::CheckStateRole).toInt() == Qt::Checked) ? QStyle::State_On : QStyle::State_Off;
+        checkboxOption.state |= (mappedIndex.data(Qt::CheckStateRole).toInt() == Qt::Checked) ? QStyle::State_On : QStyle::State_Off;
 
         checkboxOption.rect = checkboxPixmap.rect(); // Adjust rect for drawing on the pixmap
 
@@ -785,10 +785,10 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
     //draw  text section
     if(c!=PortfolioData_Idx::_Status){
 
-        QString text = index.data(Qt::DisplayRole).toString();
+        QString text = mappedIndex.data(Qt::DisplayRole).toString();
         int startIndex = text.indexOf(m_highlightText, 0, Qt::CaseInsensitive);
         QStyleOptionViewItem opt = option;
-        initStyleOption(&opt, index);
+        initStyleOption(&opt, mappedIndex);
 
 
         // Set a clipping region to ensure drawing only happens within the cell bounds
