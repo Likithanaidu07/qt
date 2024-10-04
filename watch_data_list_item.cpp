@@ -7,7 +7,6 @@ watch_Data_List_Item::watch_Data_List_Item(QWidget *parent) :
 {
     ui->setupUi(this);
 
-
     ui->name->setStyleSheet("font-family: 'Work Sans';"
                         "font-size: 14px;"
                         "font-weight: 500;"

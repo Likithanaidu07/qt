@@ -627,7 +627,7 @@ MainWindow::MainWindow(QWidget *parent)
     //T_order_Delegate =  new trade_table_delegate();
     //trade_table->setItemDelegate(T_order_Delegate);
 
-    QSortFilterProxyModel *tradetableproxyModel = new QSortFilterProxyModel(this);
+    tradetableproxyModel = new QSortFilterProxyModel(this);
     tradetableproxyModel->setSourceModel(trade_model);
     tradetableproxyModel->setFilterKeyColumn(-1);  // Search across all columns
 
@@ -1064,6 +1064,8 @@ MainWindow::MainWindow(QWidget *parent)
     /***********Initlaize Hotkey here*************/
     initializeGlobalHotKeys();
     /*********************************************/
+
+    instilizeWatchUIOnTopBar();
 
 }
 
@@ -2616,12 +2618,14 @@ void MainWindow::T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index){
 
 void MainWindow::trade_table_cellDoubleClicked(const QModelIndex &index){
     //int row = index.row();
+    QModelIndex mappedIdx = tradetableproxyModel->mapToSource(index);
+
     int col = index.column();
     if(col==OrderBook_Idx::AlgoName_OB){
         if(tradePopUpWin->isHidden())
             tradePopUpWin->show();
        // QString Expiry = T_Portfolio_Model->portfolio_data_list[index.row()]->Expiry;
-        QStringList data = trade_model->getTradedDataForIdx(index.row());
+        QStringList data = trade_model->getTradedDataForIdx(mappedIdx.row());
         QString localOrderID = data[OrderBook_Idx::TraderData_OB];
         int LotSize = data[OrderBook_Idx::LotSize_OB].toInt();
 
@@ -3604,3 +3608,56 @@ void MainWindow::keyPressEvent(QKeyEvent *event)
         ui->lineEditSearch->clear();
     }
 }
+
+
+
+
+void MainWindow::instilizeWatchUIOnTopBar(){
+
+    QStringList savedWatchItems;
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
+    QStringList groups = settings.childGroups();
+    QString market_type = "fo";
+    if(groups.contains("GeneralSettings")){
+        settings.beginGroup("GeneralSettings");
+        if(settings.contains("Watch_InstrumentNames")){
+            QString watch=  settings.value("Watch_InstrumentNames").toString();
+            if(watch=="")
+                savedWatchItems.clear();
+            else
+                savedWatchItems = watch.split(";");
+        }
+        settings.endGroup();
+    }
+
+    QHash<QString, Indices_Data_Struct> indicesDataList;
+    QString fileName = appDataPath+"/Data/watch_cache.bin";
+    QFile file(fileName);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qWarning("Could not open file for reading--> watch_cache.bin");
+        return;
+    }
+    QDataStream in(&file);
+    in >> indicesDataList;
+    file.close();
+
+    for(int i=0;i<savedWatchItems.length();i++){
+        if(indicesDataList.contains(savedWatchItems[i])){
+            auto widget1 = new watch_Data_List_Item();
+            Indices_Data_Struct data = indicesDataList[savedWatchItems[i]];
+            widget1->setData(data);
+            // Set background color using QPalette
+            QPalette pal = widget1->palette();
+            pal.setColor(QPalette::Window, Qt::lightGray);  // Use QPalette::Window in Qt 6
+            widget1->setAutoFillBackground(true);  // Ensures that the background is painted
+            widget1->setPalette(pal);
+
+            // Add the widget to the horizontal layout
+            ui->horizontalLayout_Watch->addWidget(widget1);
+        }
+    }
+
+
+}
+

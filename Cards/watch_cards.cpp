@@ -18,20 +18,20 @@ Watch_cards::~Watch_cards()
 {
     delete ui;
 }
-QDataStream &operator<<(QDataStream &out, const Indices_Data_Struct &data) {
-    out << data.indexName << data.indexValue << data.change << data.percentagechange
-        << data.netChangeIndicator << data.openingIdx << data.closingIdx
-        << data.highIndexValue << data.lowIndexValue << data.marketCapitialisation
-        << data.display_widget_idx;
-    return out;
-}
-
 QDataStream &operator>>(QDataStream &in, Indices_Data_Struct &data) {
     in >> data.indexName >> data.indexValue >> data.change >> data.percentagechange
         >> data.netChangeIndicator >> data.openingIdx >> data.closingIdx
         >> data.highIndexValue >> data.lowIndexValue >> data.marketCapitialisation
         >> data.display_widget_idx;
     return in;
+}
+
+QDataStream &operator<<(QDataStream &out, const Indices_Data_Struct &data) {
+    out << data.indexName << data.indexValue << data.change << data.percentagechange
+        << data.netChangeIndicator << data.openingIdx << data.closingIdx
+        << data.highIndexValue << data.lowIndexValue << data.marketCapitialisation
+        << data.display_widget_idx;
+    return out;
 }
 void Watch_cards::initWatchWindow(){
     loadWatch_InstrumentNames();

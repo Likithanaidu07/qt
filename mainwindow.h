@@ -187,6 +187,7 @@ private:
     QTableView *trade_table;
     Trade_Table_Model *trade_model;
     CDockWidget *dock_win_trade;
+     QSortFilterProxyModel *tradetableproxyModel;
 
 
     QTableView *missed_trade_table;
@@ -246,7 +247,7 @@ private:
       void initializeGlobalHotKeys();
       QHash<QString, QShortcut*> HotKeyShortcutObjects;
       QModelIndexList  getSelectedPortFolioIndexs();
-
+      void instilizeWatchUIOnTopBar();
 
 public slots:
     void openSettingsWindow();

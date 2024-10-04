@@ -356,6 +356,9 @@ struct Indices_Data_Struct{
     int display_widget_idx;
 };
 
+QDataStream &operator>>(QDataStream &in, Indices_Data_Struct &data);
+QDataStream &operator<<(QDataStream &out, const Indices_Data_Struct &data);
+
 
 struct HotKeyDetails{
     QString action;
