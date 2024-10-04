@@ -71,7 +71,12 @@
       </size>
      </property>
      <property name="styleSheet">
-      <string notr="true"/>
+      <string notr="true">#ConvertAlgo_TitleBar {
+    border: 1px solid white;  
+    border-radius: 5px;     
+    background: transparent;  
+}
+</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
       <property name="topMargin">
@@ -87,8 +92,8 @@
        <widget class="QToolButton" name="Close">
         <property name="minimumSize">
          <size>
-          <width>14</width>
-          <height>14</height>
+          <width>16</width>
+          <height>16</height>
          </size>
         </property>
         <property name="maximumSize">
@@ -101,8 +106,8 @@
          <enum>Qt::NoFocus</enum>
         </property>
         <property name="styleSheet">
-         <string notr="true">#Close{
-background: transparent;
+         <string notr="true">#Close {
+background:transparent;
 }</string>
         </property>
         <property name="text">

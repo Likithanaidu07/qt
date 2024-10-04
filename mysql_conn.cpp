@@ -290,7 +290,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
         }
         else{
             userLoginInfo.dbError = true;
-            userLoginInfo.loginResponse= "Cannot connect Database"+db.lastError().text();
+            userLoginInfo.loginResponse= "Unable to connect the Server "/*+db.lastError().text()*/;
             userLoginInfo.errorCode = T_LoginErroCode::DB_ERROR;
 
         }
@@ -669,7 +669,7 @@ bool mysql_conn::resetPassword(const QString &new_password, QString user_id,QStr
         if( !query.exec() )
         {
 
-            msg = reset_querystr+" failed, "+ query.lastError().text();
+            msg = /*reset_querystr+*/" Unable to connect the Server "/*+ query.lastError().text()*/;
             ret = false;
         }
         else{
@@ -704,7 +704,7 @@ bool mysql_conn::modifytype(QString value,QString user_id,QString &msg)
         if( !query.exec() )
         {
 
-            msg = modify_querystr+" failed, "+ query.lastError().text();
+            msg = /*modify_querystr+*/" Unable to connect the Server "/*+ query.lastError().text()*/;
             ret = false;
         }
         else{
@@ -732,7 +732,7 @@ bool mysql_conn::updateDB_Table(QString query_str, QString &msg)
         if( !query.exec() )
         {
 
-            msg = query_str+" failed, "+ query.lastError().text();
+            msg =/* query_str+*/" Unable to connect the Server "/*+ query.lastError().text()*/;
             ret = false;
         }
         else{

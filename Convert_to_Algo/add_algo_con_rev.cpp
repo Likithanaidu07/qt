@@ -295,6 +295,13 @@ void add_algo_con_rev::generateAlgo(){
     unsigned int unix_time= sharedData->contract_table_hash[keyFut].Expiry;
     QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
     dt = dt.addYears(10);
+    int targetYear = dt.date().year();
+    bool isLeapYear = QDate::isLeapYear(targetYear);
+
+    // If it is a leap year, and the date is after Feb 29, subtract one day
+    if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+        dt = dt.addDays(-1);
+    }
     QString Leg1_val=dt.toString("MMM dd yyyy").toUpper();
 
 

@@ -1405,9 +1405,9 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                             qty = BuyTotalQuantity;
 
                         else if(BuyTotalQuantity>SellTotalQuantity)
-                            qty = SellTotalQuantity;
-                        else
                             qty = BuyTotalQuantity;
+                        else
+                            qty = SellTotalQuantity;
                         //check the condtion
                         if(val1 >qty){
                             QMessageBox msgBox;
