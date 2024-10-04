@@ -366,8 +366,72 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                     }
                 }
             } else if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
-                // Enter key logic, already implemented
-                // ...
+                if (currentIndex.isValid()) {
+                    if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(obj)) {
+                        double currentValue = lineEdit->text().toDouble();
+                        // Skip rounding for BuyPriceDifference and SellPriceDifference
+                        double newValue = currentValue;
+                        if (currentColIdx != PortfolioData_Idx::_SellPriceDifference &&
+                            currentColIdx != PortfolioData_Idx::_BuyPriceDifference) {
+                            double multiplied = std::round(currentValue * 20.0);
+                            newValue = multiplied / 20.0;
+                        }
+                        const Portfolio_SearchFilterProxyModel *proxyModel = qobject_cast<const Portfolio_SearchFilterProxyModel *>(currentIndex.model());
+                        proxyModel->disableSortingWhileEditing();  //this required or elase tab key event will trigger when search text in cell and edit the same cell and press enter. And cause hang state due to mutex
+                        QModelIndex sourceIndex = currentIndex;
+                        if (proxyModel) {
+                            sourceIndex = proxyModel->mapToSource(currentIndex);
+                            mutableModel = const_cast<QAbstractItemModel *>(proxyModel->sourceModel());
+                        } else {
+                            mutableModel = const_cast<QAbstractItemModel *>(currentIndex.model());
+                        }
+                        if (mutableModel) {
+                            mutableModel->setData(sourceIndex, newValue, Qt::EditRole);
+                        } else {
+                            qDebug() << "Mutable model is null!";
+                        }
+                        emit commitData(lineEdit);
+                        emit closeEditor(lineEdit);
+                        mutableModel = nullptr;
+                        emit editFinished(QString::number(currentValue), sourceIndex);
+                        proxyModel->enableSortingAfterEditing();
+                        return true;
+                    }
+                }
+            } else if (keyEvent->key() == Qt::Key_Backtab) {
+                emit tabKeyPressed(nav_direction::nav_backward);
+            } else if (keyEvent->key() == Qt::Key_Tab) {
+                emit tabKeyPressed(nav_direction::nav_forward);
+            }
+        }
+        else if (currentColIdx == PortfolioData_Idx::_Alias) {
+            QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+            if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
+                if (currentIndex.isValid()) {
+                    if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(obj)) {
+                        QString currentValue = lineEdit->text();
+                        const Portfolio_SearchFilterProxyModel *proxyModel = qobject_cast<const Portfolio_SearchFilterProxyModel *>(currentIndex.model());
+                        proxyModel->disableSortingWhileEditing(); //this required or elase tab key event will trigger when search text in cell and edit the same cell and press enter. And cause hang state due to mutex
+                        QModelIndex sourceIndex = currentIndex;
+                        if (proxyModel) {
+                            sourceIndex = proxyModel->mapToSource(currentIndex);
+                            mutableModel = const_cast<QAbstractItemModel *>(proxyModel->sourceModel());
+                        } else {
+                            mutableModel = const_cast<QAbstractItemModel *>(currentIndex.model());
+                        }
+                        if (mutableModel) {
+                            mutableModel->setData(sourceIndex, currentValue, Qt::EditRole);
+                        } else {
+                            qDebug() << "Mutable model is null!";
+                        }
+                        emit commitData(lineEdit);
+                        emit closeEditor(lineEdit);
+                        mutableModel = nullptr;
+                        emit editFinished(currentValue, sourceIndex);
+                        proxyModel->enableSortingAfterEditing();
+                        return true;
+                    }
+                }
             } else if (keyEvent->key() == Qt::Key_Backtab) {
                 emit tabKeyPressed(nav_direction::nav_backward);
             } else if (keyEvent->key() == Qt::Key_Tab) {

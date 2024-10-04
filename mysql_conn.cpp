@@ -1132,15 +1132,15 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
                 int Leg2_OrderState = query.value(rec.indexOf("Leg2_OrderState")).toInt();
                 int Leg4_OrderState = query.value(rec.indexOf("Leg4_OrderState")).toInt();
 
-                bool skipRecord = true;
+//                bool skipRecord = true;
 
-                if((portfolio_type==PortfolioType::BX_BID)&&(Leg1_OrderState==7||Leg2_OrderState==7||Leg3_OrderState==7||Leg4_OrderState==7))
-                        skipRecord = false;
-                if(portfolio_type!=PortfolioType::BX_BID&&Leg2_OrderState==7)
-                        skipRecord = false;
+//                if((portfolio_type==PortfolioType::BX_BID)&&(Leg1_OrderState==7||Leg2_OrderState==7||Leg3_OrderState==7||Leg4_OrderState==7))
+//                        skipRecord = false;
+//                if(portfolio_type!=PortfolioType::BX_BID&&Leg2_OrderState==7)
+//                        skipRecord = false;
 
-                if(skipRecord==true)
-                  continue;
+//                if(skipRecord==true)
+//                  continue;
 
 
 
