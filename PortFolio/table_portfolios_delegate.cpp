@@ -325,14 +325,14 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                         double incValue = value.toDouble(&ok);
 
                         if (ok) {
-                            double incrementedValue = incValue;
+                            //double incrementedValue = incValue;
 
                             if (keyEvent->key() == Qt::Key_Right) {
                                 // Increase value by incStep
-                                incrementedValue += incStep;
+                                incValue += incStep;
                             } else if (keyEvent->key() == Qt::Key_Left) {
                                 // Decrease value by incStep
-                                incrementedValue -= incStep;
+                                incValue -= incStep;
                             }
 
                             // Skip rounding for price differences and MaxLoss
@@ -340,39 +340,40 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                                 currentColIdx != PortfolioData_Idx::_BuyPriceDifference &&
                                 currentColIdx != PortfolioData_Idx::_MaxLoss) {
                                 // Round to nearest 0.05 (or appropriate precision)
-                                incrementedValue = std::round(incrementedValue * 20.0) / 20.0;
+                                incValue = std::round(incValue * 20.0) / 20.0;
                             }
 
                             // Ensure certain values do not go below their respective thresholds
                             if (currentColIdx == PortfolioData_Idx::_BuyTotalQuantity ||
                                 currentColIdx == PortfolioData_Idx::_SellTotalQuantity ||
                                 currentColIdx == PortfolioData_Idx::_MaxLoss) {
-                                if (incrementedValue < 0) incrementedValue = 0;
-                            }
-                            if (currentColIdx == PortfolioData_Idx::_OrderQuantity) {
-                                if (incrementedValue < 1) incrementedValue = 1;
+                                if (incValue < 0) incValue = 0;
                             }
 
-                            // Update the line edit with the new value
-                            value = QString::number(incrementedValue, 'f', 2); // Ensure 2 decimal precision
+                            if(currentIndex.column() == PortfolioData_Idx::_OrderQuantity){
+                                if(incValue < 1)
+                                    incValue = 1;
+                            }
+                            value = QString::number(incValue);
                             lineEdit->setText(value);
-                            lineEdit->setAlignment(Qt::AlignCenter);
-
-                            // Handle cursor position for left key press
-                            if (keyEvent->key() == Qt::Key_Left) {
-                                lineEdit->setCursorPosition(-1);  // Set cursor position outside visible range
+                            //cursor
+                            if ( keyEvent->key() == Qt::Key_Left) {
+                                lineEdit->setCursorPosition(-1); // Set cursor position outside visible range
                             }
+                            lineEdit->setAlignment(Qt::AlignCenter);
                         }
                     }
                 }
-            } else if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
+            }
+             else if (keyEvent->key() == Qt::Key_Enter || keyEvent->key() == Qt::Key_Return) {
                 if (currentIndex.isValid()) {
                     if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(obj)) {
                         double currentValue = lineEdit->text().toDouble();
                         // Skip rounding for BuyPriceDifference and SellPriceDifference
                         double newValue = currentValue;
                         if (currentColIdx != PortfolioData_Idx::_SellPriceDifference &&
-                            currentColIdx != PortfolioData_Idx::_BuyPriceDifference) {
+                            currentColIdx != PortfolioData_Idx::_BuyPriceDifference &&
+                            currentColIdx != PortfolioData_Idx::_MaxLoss) {
                             double multiplied = std::round(currentValue * 20.0);
                             newValue = multiplied / 20.0;
                         }

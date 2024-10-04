@@ -223,6 +223,13 @@ void convert_to_algo_bs1221::generateAlgo()
     QString Instr_Name = sharedData->contract_table_hash[startStrikeToken].InstrumentName;// both start and end instrument will be same, so chose an of it
     QDateTime dt = QDateTime::fromSecsSinceEpoch(Expiry);
     dt = dt.addYears(10);
+    int targetYear = dt.date().year();
+    bool isLeapYear = QDate::isLeapYear(targetYear);
+
+    // If it is a leap year, and the date is after Feb 29, subtract one day
+    if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+        dt = dt.addDays(-1);
+    }
     QString ExpiryTimeStr=dt.toString("ddMMM").toUpper();
 
     //QString Instr_Name2 = sharedData->contract_table_hash[endStrikeToken].InstrumentName;
