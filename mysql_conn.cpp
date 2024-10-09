@@ -1434,10 +1434,11 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
 
                     int strikePriceLeg1 = ContractDetail::getInstance().GetStrikePrice(leg1_token_number, portfolio_type).toInt()* devicer;
 
+                    int strikeDiff = strikePriceLeg3 - strikePriceLeg1;
                     if (Leg1BuySellIndicator == 1) {
-                        Exch_Price_val = static_cast<double>(leg1Price + leg4Price - leg2Price - leg3Price - strikePriceLeg3  + strikePriceLeg1) / devicer;
+                        Exch_Price_val = static_cast<double>(leg3Price + leg2Price - leg4Price - leg1Price + strikeDiff) / devicer;
                     } else {
-                        Exch_Price_val = static_cast<double>(strikePriceLeg3  - strikePriceLeg1 - leg1Price - leg4Price + leg2Price + leg3Price) / devicer;
+                        Exch_Price_val = static_cast<double>(-strikeDiff  - leg3Price - leg2Price + leg4Price + leg1Price) / devicer;
 
                     }
 
@@ -2195,11 +2196,11 @@ bool mysql_conn::deleteAlgo(QString PortfolioNumber,QString &msg)
 
                 if(query.size()>0){
                     ret = false;  // PortfolioNumber exist in Trades so return
-                    msg = "Delete skipped, Record exist in Trades table.";
-                    QMessageBox msgBox;
+                    msg = "Executed Trades cannot be deleted.!";//"Delete skipped, Record exist in Trades table.";
+                    /*QMessageBox msgBox;
                     msgBox.setText("Executed Trades cannot be deleted ");
                     msgBox.setIcon(QMessageBox::Warning);
-                    msgBox.exec();
+                    msgBox.exec();*/
                 }
                 else {
                     str = "DELETE FROM Portfolios WHERE PortfolioNumber='"+PortfolioNumber+"'" +  " AND SellTradedQuantity = 0 AND BuyTradedQuantity = 0";

@@ -559,7 +559,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
        op.palette.setColor(QPalette::Highlight , HighlightColor);
 
         if(portfolio->StatusVal.toInt()==portfolio_status::Active){
-            if (option.state & QStyle::State_Selected)
+            if (option.state & QStyle::State_Selected && option.state & QStyle::State_Active)
                 painter->fillRect(option.rect, HighlightColor);
             else
                 painter->fillRect(option.rect, QColor("#E0F1FF"));
@@ -572,7 +572,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         else if(portfolio->StatusVal.toInt()==portfolio_status::Filled)
         {
             QColor color("#E0F1FF");
-            if (option.state & QStyle::State_Selected)
+            if (option.state & QStyle::State_Selected && option.state & QStyle::State_Active)
                 painter->fillRect(option.rect, HighlightColor);
             else
                 painter->fillRect(option.rect, color);
@@ -580,7 +580,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         }
         else if(portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser){
             QColor color("#FFF");
-            if (option.state & QStyle::State_Selected)
+            if (option.state & QStyle::State_Selected && option.state & QStyle::State_Active)
                 painter->fillRect(option.rect, HighlightColor);
             else
                 painter->fillRect(option.rect, color);
@@ -590,7 +590,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
         if(portfolio->TradedHighlight== true ){
             QColor color("#cfc0ce");
-            if (option.state & QStyle::State_Selected)
+            if (option.state & QStyle::State_Selected && option.state & QStyle::State_Active)
                 painter->fillRect(option.rect, HighlightColor);
             else
                 painter->fillRect(option.rect, color);
@@ -730,7 +730,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
 
 
-        if (option.state & QStyle::State_Selected && (c==PortfolioData_Idx::_AlgoName ||
+        if (option.state & QStyle::State_Selected && option.state & QStyle::State_Active &&  (c==PortfolioData_Idx::_AlgoName ||
                                                       c==PortfolioData_Idx::_MaxLoss||
                                                       c==PortfolioData_Idx::_ExpiryDateTime ||
                                                       c==PortfolioData_Idx::_Cost||
@@ -795,11 +795,13 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
         // Set a clipping region to ensure drawing only happens within the cell bounds
         painter->save();  // Save the painter state
         painter->setClipRect(opt.rect);  // Set the clipping area to the cell's rectangle
-        if (option.state & QStyle::State_Selected && (c==PortfolioData_Idx::_AlgoName ||
+        if (option.state & QStyle::State_Selected && option.state & QStyle::State_Active && (c==PortfolioData_Idx::_AlgoName ||
+                                                      c==PortfolioData_Idx::_PortfolioNumber ||
                                                       c==PortfolioData_Idx::_ExpiryDateTime ||
                                                       c==PortfolioData_Idx::_Cost||
                                                       c==PortfolioData_Idx::_QuantityRatio||
                                                       c==PortfolioData_Idx::_BidLeg||
+                                                      c==PortfolioData_Idx::_MaxLoss||
                                                       c==PortfolioData_Idx::_FuturePrice)){
             painter->setPen(opt.palette.color(QPalette::Light));  // Set the text color
         }

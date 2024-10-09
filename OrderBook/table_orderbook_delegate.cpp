@@ -21,11 +21,28 @@ void Table_OrderBook_Delegate::setHighlightText(const QString &text) {
     m_highlightText = text;
 }
 
+QColor Table_OrderBook_Delegate::getOrderStateColor(int orderState) const{
+    switch (orderState) {
+        case 5:
+        case 13:
+            return QColor(203, 5, 5);    // Red
+        case 6:
+            return QColor(250, 42, 85);  // Pinkish
+        case 8:
+            return QColor(0, 128, 0);    // Green
+        case 10:
+            return QColor(0, 0, 139);    // Dark Blue
+        default:
+            return QColor(0, 0, 0);      // Black
+    }
+}
+
+
 void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
 
     QStyleOptionViewItem op(option);
-    op.palette.setColor(QPalette::All, QPalette::Window, Qt::red);
-    op.palette.setColor(QPalette::All, QPalette::WindowText, Qt::red);
+   // op.palette.setColor(QPalette::All, QPalette::Window, Qt::red);
+  //  op.palette.setColor(QPalette::All, QPalette::WindowText, Qt::red);
 
     const QSortFilterProxyModel *proxyModel = qobject_cast<const QSortFilterProxyModel*>(index.model());
     QModelIndex mappedIndex = proxyModel->mapToSource(index);
@@ -35,6 +52,24 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
     QStringList order_list = model->trade_data_list.at(mappedIndex.row());
     QList<QString> fifthColumnValues;
 
+    QColor textColor = QColor(0, 0, 0);
+    int orderState = -1;
+
+    if (c == OrderBook_Idx::Leg1State_OB) {
+        orderState = order_list[OrderBook_Idx::Leg1StateVal_OB].toInt();
+    } else if (c == OrderBook_Idx::Leg3State_OB) {
+        orderState = order_list[OrderBook_Idx::Leg3StateVal_OB].toInt();
+    } else if (c == OrderBook_Idx::Leg4State_OB) {
+        orderState = order_list[OrderBook_Idx::Leg4StateVal_OB].toInt();
+    } else if (c == OrderBook_Idx::BidLegState_OB) {
+        orderState = order_list[OrderBook_Idx::BidLegStateVal_OB].toInt();
+    }
+
+    if (orderState != -1) {
+        textColor = getOrderStateColor(orderState);
+    }
+
+
 
     if (c == OrderBook_Idx::ExchPrice_OB ||
         c == OrderBook_Idx::UserPrice_OB ||
@@ -42,7 +77,6 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
         c == OrderBook_Idx::TradedLot_OB ||
         c == OrderBook_Idx::RemainingLot_OB) {
 
-        QStringList order_list = model->trade_data_list.at(mappedIndex.row());
         QString buy_sell = order_list[OrderBook_Idx::BuyorSell_OB];
 
         QColor color("#42A5F5");
@@ -64,7 +98,8 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
             p1.setX(p1.x() - 5);
             p2.setX(p2.x() + 5);
             painter->drawLine(p1, p2);
-        } else if (buy_sell == "Buy") {
+        }
+        else if (buy_sell == "Buy") {
             QColor color("#D6FCF0");
             op.palette.setColor(QPalette::Highlight, Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText, Qt::black);
@@ -87,7 +122,8 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
                c == OrderBook_Idx::BidLegState_OB ||
                c == OrderBook_Idx::TradeTime_OB) {
 
-        QColor textColor(108, 117, 125);
+
+        //QColor textColor(108, 117, 125);
         QColor bgColor("#E0F1FF");
         QString Leg1_OrderState = order_list[OrderBook_Idx::Leg1StateVal_OB];
         QString Leg3_OrderState = order_list[OrderBook_Idx::Leg3StateVal_OB];
@@ -116,10 +152,14 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
 
 
 
-        if (option.state & QStyle::State_Selected)
-            painter->fillRect(option.rect, HighlightColor);
+
+        if (option.state & QStyle::State_Selected && option.state & QStyle::State_Active) {
+            textColor = QColor(255, 255, 255);               // Apply white text color
+            painter->fillRect(option.rect, HighlightColor);  // Apply the same highlight color
+        }
         else
             painter->fillRect(option.rect, bgColor);
+
 
         QPoint p1 = option.rect.bottomLeft();
         QPoint p2 = option.rect.bottomRight();
@@ -179,16 +219,20 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
         painter->fillRect(highlightRect, QColor(163, 163, 161));
 
         // Ensure text is always drawn in black
-        painter->setPen(Qt::black);
+
+
+        painter->setPen(textColor);
         painter->drawText(opt.rect, Qt::AlignCenter, before + match + after);
     } else {
         // Ensure text is always drawn in black
-        painter->setPen(Qt::black);
+        painter->setPen(textColor);
         painter->drawText(option.rect, Qt::AlignCenter, text);
     }
 
     painter->restore();
-    int orderState = mappedIndex.model()->data(index, Qt::UserRole).toInt();
+
+
+   /* int orderState = mappedIndex.model()->data(index, Qt::UserRole).toInt();
 
     // Determine the text color based on the order state
     QColor textColor;
@@ -211,12 +255,15 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
         break;
     }
 
+
+
     // Set the text color in the palette
-    opt.palette.setColor(QPalette::Text, textColor);
+    opt.palette.setColor(QPalette::Text, textColor);*/
+   // opt.palette.setColor(QPalette::Highlight, Qt::transparent);
+
 
     // Call the base class paint method to handle the rest
-    QStyledItemDelegate::paint(painter, opt, mappedIndex);
-
+   // QStyledItemDelegate::paint(painter, opt, mappedIndex);
 
 
 }

@@ -78,6 +78,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(changepasswordAction, &QAction::triggered, this, &MainWindow::onChangepasswordActionTriggered);// Create a ToolButton to act as the menu title on ui->card
 
 
+    // Create reset password actions
+    QAction *exportAction = new QAction("Export To CSV", this);
+    mainMenu->addAction(exportAction);// Add actions to the Card menu
+    connect(exportAction, &QAction::triggered, this, &MainWindow::exportTableViewToCSV);// Create a ToolButton to act as the menu title on ui->card
+
+
     // Create setting window actions
     QAction *openSettWinAction = new QAction("Settings", this);
     mainMenu->addAction(openSettWinAction);// Add actions to the Card menu
@@ -452,6 +458,34 @@ MainWindow::MainWindow(QWidget *parent)
     T_Portfolio_Table->setObjectName("algo_table");
     T_Portfolio_Table->setStyleSheet(scroll_bar_SS);
     // T_Portfolio_Table->viewport()->setFocusPolicy(Qt::NoFocus);
+
+    PortfolioHeaderView* headerView = new PortfolioHeaderView(Qt::Horizontal, T_Portfolio_Table);
+    headerView->setFixedHeight(32);
+    headerView->setFont(headerfont);
+    headerView->setStyleSheet(
+        "   background: #495867;"
+        "   border: none;"
+        "   color: #FFF; "
+        "   text-align: center; "
+        "   font-size: 12px; "
+        "   font-style: normal; "
+        "   font-weight: 600; "
+        "   line-height: normal;"
+        );
+    connect(headerView, &QHeaderView::sectionMoved, this, &MainWindow::onPortFolioTableHeader_Rearranged,Qt::UniqueConnection);
+
+    T_Portfolio_Table->setHorizontalHeader(headerView);
+    T_Portfolio_Table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    //T_Portfolio_Table->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
+    T_Portfolio_Table->horizontalHeader()->setStretchLastSection(true);
+    T_Portfolio_Table->setShowGrid(false);
+    T_Portfolio_Table->verticalHeader()->setVisible(false);
+    T_Portfolio_Table->setAlternatingRowColors(true);
+    T_Portfolio_Table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    T_Portfolio_Table->setSelectionMode(QAbstractItemView::ExtendedSelection);
+
+
+
     T_Portfolio_Model = new Table_Portfolios_Model();
     T_Portfolio_Delegate =  new Table_Portfolios_Delegate();
     //connect(T_Portfolio_Model,SIGNAL(edit_Started(int,int)),this,SLOT(edit_Started_PortFolio_Table(int,int)));
@@ -462,7 +496,7 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(T_Portfolio_Table, &table_portfolios_custom::portFolioDeleteKeyPressed, this, &MainWindow::Delete_clicked_slot);
 
 
-    QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::resizePortFolioTableColWidth, this, &MainWindow::resizePortFolioTableColWidthSlot);
+    //QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::resizePortFolioTableColWidth, this, &MainWindow::resizePortFolioTableColWidthSlot);
    // QObject::connect(T_Portfolio_Table, &table_portfolios_custom::clicked, T_Portfolio_Model, &Table_Portfolios_Model::onItemChanged);
     QObject::connect(T_Portfolio_Table, &table_portfolios_custom::selectionChangedSignal, T_Portfolio_Model, &Table_Portfolios_Model::selectionChangedSlot,Qt::QueuedConnection);
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::updateDBOnDataChanged, this, &MainWindow::updatePortFolioStatus, Qt::QueuedConnection);
@@ -498,31 +532,7 @@ MainWindow::MainWindow(QWidget *parent)
     connect(T_Portfolio_Table->selectionModel(), SIGNAL(selectionChanged(const QItemSelection&, const QItemSelection&)),
             this, SLOT(T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&)));
 
-    PortfolioHeaderView* headerView = new PortfolioHeaderView(Qt::Horizontal, T_Portfolio_Table);
-    headerView->setFixedHeight(32);
-    headerView->setFont(headerfont);
-    headerView->setStyleSheet(
-        "   background: #495867;"
-        "   border: none;"
-        "   color: #FFF; "
-        "   text-align: center; "
-        "   font-size: 12px; "
-        "   font-style: normal; "
-        "   font-weight: 600; "
-        "   line-height: normal;"
-        );
-    connect(headerView, &QHeaderView::sectionMoved, this, &MainWindow::onPortFolioTableHeader_Rearranged);
 
-    T_Portfolio_Table->setHorizontalHeader(headerView);
-    T_Portfolio_Table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-    T_Portfolio_Table->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
-    T_Portfolio_Table->horizontalHeader()->setStretchLastSection(true);
-    T_Portfolio_Table->setShowGrid(false);
-    T_Portfolio_Table->verticalHeader()->setVisible(false);
-    T_Portfolio_Table->setAlternatingRowColors(true);
-    T_Portfolio_Table->verticalHeader()->setVisible(false);
-    T_Portfolio_Table->setSelectionBehavior(QAbstractItemView::SelectRows);
-    T_Portfolio_Table->setSelectionMode(QAbstractItemView::ExtendedSelection);
 
     lay->addWidget(T_Portfolio_Table,1,0);
     T_Portfolio_Table->show();
@@ -613,9 +623,12 @@ MainWindow::MainWindow(QWidget *parent)
         );
 //    headerViews->setSectionsMovable(true);
 //    headerViews->setHighlightSections(true);
-     connect(headerViews, &QHeaderView::sectionMoved, this, &MainWindow::onTradeTableHeader_Rearranged);
+     connect(headerViews, &QHeaderView::sectionMoved, this, &MainWindow::onTradeTableHeader_Rearranged,Qt::UniqueConnection);
+
     //trade_table->setHorizontalHeader(headerViews);
     trade_table->setHorizontalHeader(headerViews);
+    // Connect the horizontal header's sectionResized signal using a lambda function
+
 
     lay_Trade_Window->addWidget(trade_table, 1, 0, 1, 3);
 
@@ -640,7 +653,7 @@ MainWindow::MainWindow(QWidget *parent)
     trade_table->setModel(tradetableproxyModel);
     // Configure column resizing
     //trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
-    trade_table->setColumnWidth(1,300);
+   // trade_table->setColumnWidth(1,300);
 
     trade_table->horizontalHeader()->setStretchLastSection(true);
     trade_table->verticalHeader()->setVisible(false);
@@ -655,7 +668,11 @@ MainWindow::MainWindow(QWidget *parent)
                                             "QHeaderView { background-color: #C0AAE5;color:#3D3D3D;} QHeaderView::section { background-color:#C0AAE5;color:#3D3D3D;font-weight: 400; }");*/
 
     trade_table->show();
-    restoreTradeTableViewColumnState(trade_table);
+    restoreTableViewColumnState(trade_table);
+
+    //connect this signal only after every table init completed, or else it will overwrite table state with defult setting before restore previous state
+   // connect(headerViews, &QHeaderView::sectionResized, this, &MainWindow::onTradeTableHeader_Rearranged,Qt::UniqueConnection);
+
     /***********Init Order Book Window**************************/
 
     /************Positions Window********************************/
@@ -728,7 +745,7 @@ MainWindow::MainWindow(QWidget *parent)
     net_pos_table->setObjectName("netpos_table");
     net_pos_table->setModel(net_pos_model);
     net_pos_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
-    net_pos_table->setColumnWidth(1,250);
+    //net_pos_table->setColumnWidth(1,250);
 
     net_pos_table->horizontalHeader()->setStretchLastSection(true);
     net_pos_table->verticalHeader()->setVisible(false);
@@ -745,8 +762,9 @@ MainWindow::MainWindow(QWidget *parent)
    net_pos_table->horizontalHeader()->setStretchLastSection(true);
     dock_win_net_pos->setWidget(net_pos_table);
     net_pos_table->show();
-    restoreNetposTableViewColumnState(net_pos_table);
+    restoreTableViewColumnState(net_pos_table);
     /************Net Position Window********************************/
+
 
     /************Liners Window********************************/
     QPixmap pixmapdock_Liners_close(":/dock_close.png");
@@ -817,7 +835,7 @@ MainWindow::MainWindow(QWidget *parent)
     liners_table->setItemDelegate(liner_delegate);
 
     liners_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
-    liners_table->setColumnWidth(1,300);
+    //liners_table->setColumnWidth(1,300);
     liners_table->horizontalHeader()->setStretchLastSection(true);
     liners_table->verticalHeader()->setVisible(false);
     /*  net_pos_table->setStyleSheet("QTableView {selection-background-color: #EFB37F;"
@@ -831,7 +849,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     dock_win_liners->setWidget(liners_table);
     liners_table->show();
-     restoreLinersTableViewColumnState(liners_table);
+    restoreTableViewColumnState(liners_table);
     /************Liners Window********************************/
 
 
@@ -842,7 +860,7 @@ MainWindow::MainWindow(QWidget *parent)
     QPixmap pixmapdock_hp_close(":/dock_close.png");
 
     dock_win_combined_tracker =  new CDockWidget(tr("Historical Positions"));
-    dock_win_combined_tracker->setToolTip("Coming Soon");
+
     connect(dock_win_combined_tracker, SIGNAL(visibilityChanged(bool)), this, SLOT(OnHPDockWidgetVisiblityChanged(bool)));
     //dock_win_combined_tracker->setAllowedAreas(Qt::AllDockWidgetAreas );
     dock_win_combined_tracker->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
@@ -880,6 +898,8 @@ MainWindow::MainWindow(QWidget *parent)
     //subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_combined_tracker);
 
     combined_tracker_table = new QTableView(dock_win_combined_tracker);
+    combined_tracker_table->setObjectName("combined_tracker_table");
+
     combined_tracker_table->setStyleSheet(tableview_SS);
     combined_tracker_table->horizontalHeader()->setFixedHeight(32);
     combined_tracker_table->horizontalHeader()->setFont(headerfont);
@@ -892,9 +912,11 @@ MainWindow::MainWindow(QWidget *parent)
     combined_tracker_table->verticalHeader()->setVisible(false);
     combined_tracker_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     combined_tracker_table->setSelectionMode(QAbstractItemView::SingleSelection);
-
+    connect(combined_tracker_table->horizontalHeader(), &QHeaderView::sectionMoved, this, &MainWindow::onCombined_tracker_tableHeader_Rearranged,Qt::UniqueConnection);
     dock_win_combined_tracker->setWidget(combined_tracker_table);
     combined_tracker_table->show();
+    restoreTableViewColumnState(combined_tracker_table);
+
     /************Historical Positions********************************/
 
 
@@ -939,6 +961,8 @@ MainWindow::MainWindow(QWidget *parent)
     //subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_missed_trades);
 
     missed_trade_table = new QTableView(dock_win_missed_trades);
+    missed_trade_table->setObjectName("missed_trade_table");
+
     missed_trade_table->setStyleSheet(tableview_SS);
     missed_trade_table->horizontalHeader()->setFixedHeight(32);
     missed_trade_table->horizontalHeader()->setFont(headerfont);
@@ -951,9 +975,11 @@ MainWindow::MainWindow(QWidget *parent)
     missed_trade_table->verticalHeader()->setVisible(false);
     missed_trade_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     missed_trade_table->setSelectionMode(QAbstractItemView::SingleSelection);
-
+    connect(missed_trade_table->horizontalHeader(), &QHeaderView::sectionMoved, this, &MainWindow::onMissed_trade_tableHeader_Rearranged,Qt::UniqueConnection);
     dock_win_missed_trades->setWidget(missed_trade_table);
     missed_trade_table->show();
+    restoreTableViewColumnState(missed_trade_table);
+
     /************Missed Trades ********************************/
 
 
@@ -1389,7 +1415,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     if(val > vfq){
                         QMessageBox msgBox;
                         msgBox.setText("Cannot update OrderQuantity");
-                        msgBox.setText("OrderQuantity cannot be greater than VolumeFreezeQty "+QString::number(vfq));
+                        msgBox.setText("OrderQuantity cannot be greater than VolumeFreezeQty "+QString::number(vfq/lotSize));
                         msgBox.setIcon(QMessageBox::Warning);
                         msgBox.exec();
                     }
@@ -2067,10 +2093,10 @@ void MainWindow::updatePortFolioStatus(QModelIndex index){
     portfolio_table_updating_db.storeRelaxed(0);
 }
 
-void MainWindow::resizePortFolioTableColWidthSlot(int width)
-{
-    T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_AlgoName,width);
-}
+//void MainWindow::resizePortFolioTableColWidthSlot(int width)
+//{
+//    T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_AlgoName,width);
+//}
 
 //void MainWindow::tradeTableSerachNext(){
 //    currentIDxSearch++;
@@ -2283,6 +2309,14 @@ void MainWindow::on_close_clicked()
 
     //loggedOut();
     //portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser;
+    saveTableViewColumnState(T_Portfolio_Table);
+    saveTableViewColumnState(trade_table);
+    saveTableViewColumnState(net_pos_table);
+    saveTableViewColumnState(liners_table);
+    saveTableViewColumnState(combined_tracker_table);
+    saveTableViewColumnState(missed_trade_table);
+
+
     stopBG_Threads();
     close();
 }
@@ -2535,6 +2569,9 @@ void MainWindow::Delete_clicked_slot()
         // Multiple rows can be selected
         QString logs;
         QStringList activeAlgoList;
+        QStringList notDeletedList;
+        QString notDeletedMSg;
+
         deletingPortFolioFlg.storeRelaxed(1);
         for(int i=0; i< selected.count(); i++)
         {
@@ -2570,6 +2607,8 @@ void MainWindow::Delete_clicked_slot()
             }
             else
             {
+                notDeletedList.append(PortfolioNumber);
+                notDeletedMSg= msg;
                 logs = "PortfolioNumber '"+PortfolioNumber+"' not Deleted, "+msg;
                 db_conn->logToDB(logs);
                 qDebug()<<"PortfolioNumber: "<<PortfolioNumber<<" not Deleted, Info:"<<msg;
@@ -2587,6 +2626,14 @@ void MainWindow::Delete_clicked_slot()
             msgBox.setIcon(QMessageBox::Information);
             msgBox.exec();
         }
+        if(!notDeletedList.empty())
+        {
+            QMessageBox msgBox;
+            msgBox.setText(notDeletedMSg +" ["+ notDeletedList.join(",") +"]\n");
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.exec();
+        }
+
     }
 }
 
@@ -3053,7 +3100,6 @@ void MainWindow::saveDockManagerState()
         file1.close();
     }
 
-
 }
 
 
@@ -3080,6 +3126,27 @@ void MainWindow::onPortFolioTableHeader_Rearranged(int logicalIndex, int oldVisu
      saveTableViewColumnState(T_Portfolio_Table);
 }
 
+
+void MainWindow::onTradeTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
+     saveTableViewColumnState(trade_table);
+}
+
+void MainWindow::onNetposTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
+     saveTableViewColumnState(net_pos_table);
+}
+
+void MainWindow::onLinersTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
+     saveTableViewColumnState(liners_table);
+}
+
+void MainWindow::onCombined_tracker_tableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
+     saveTableViewColumnState(combined_tracker_table);
+}
+void MainWindow::onMissed_trade_tableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
+     saveTableViewColumnState(missed_trade_table);
+}
+
+
 void MainWindow::saveTableViewColumnState(QTableView *tableView){
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
     QSettings settings(appDataPath+"/table_view_sett.dat", QSettings::IniFormat);
@@ -3087,7 +3154,7 @@ void MainWindow::saveTableViewColumnState(QTableView *tableView){
 
     // Save the state of the table view headers
    settings.setValue(key,tableView->horizontalHeader()->saveState());
-
+   qDebug()<<"Saving table state  for "<<tableView->objectName();
 }
 
 void MainWindow::restoreTableViewColumnState(QTableView *tableView){
@@ -3099,81 +3166,11 @@ void MainWindow::restoreTableViewColumnState(QTableView *tableView){
      if (settings.contains(key))
      {
        tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
+       qDebug()<<"Restoring table state  for "<<tableView->objectName();
+
      }
 }
 
-void MainWindow::onTradeTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
-     saveTradeTableViewColumnState(trade_table);
-
-}
-
-void MainWindow::saveTradeTableViewColumnState(QTableView *tableView) {
-     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
-     QString key = tableView->objectName() + "_HeaderState";
-
-     // Save the state of the trade table headers
-     settings.setValue(key, tableView->horizontalHeader()->saveState());
-}
-
-void MainWindow::restoreTradeTableViewColumnState(QTableView *tableView) {
-     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
-
-     // Restore the state of the trade table headers if available
-     QString key = tableView->objectName() + "_HeaderState";
-     if (settings.contains(key)) {
-       tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
-     }
-}
-void MainWindow::onNetposTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
-     saveNetposTableViewColumnState(net_pos_table);
-
-}
-
-void MainWindow::saveNetposTableViewColumnState(QTableView *tableView) {
-     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
-     QString key = tableView->objectName() + "_HeaderState";
-
-     // Save the state of the trade table headers
-     settings.setValue(key, tableView->horizontalHeader()->saveState());
-}
-
-void MainWindow::restoreNetposTableViewColumnState(QTableView *tableView) {
-     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
-
-     // Restore the state of the trade table headers if available
-     QString key = tableView->objectName() + "_HeaderState";
-     if (settings.contains(key)) {
-       tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
-     }
-}
-void MainWindow::onLinersTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
-     saveLinersTableViewColumnState(liners_table);
-
-}
-
-void MainWindow::saveLinersTableViewColumnState(QTableView *tableView) {
-     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
-     QString key = tableView->objectName() + "_HeaderState";
-
-     // Save the state of the trade table headers
-     settings.setValue(key, tableView->horizontalHeader()->saveState());
-}
-
-void MainWindow::restoreLinersTableViewColumnState(QTableView *tableView) {
-     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-     QSettings settings(appDataPath + "/table_view_sett.dat", QSettings::IniFormat);
-
-     // Restore the state of the trade table headers if available
-     QString key = tableView->objectName() + "_HeaderState";
-     if (settings.contains(key)) {
-       tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
-     }
-}
 
 void MainWindow::sorting_Button_clicked(){
       if (!sortWin) {
@@ -3674,3 +3671,66 @@ void MainWindow::updateWatchDataCard(Indices_Data_Struct data){
 
 }
 
+
+void MainWindow::exportTableViewToCSV(){
+    QString folderPath = QFileDialog::getExistingDirectory(nullptr, "Select Folder to Save CSV");
+
+    // If the user cancels, folderPath will be empty
+    if (folderPath.isEmpty()) {
+        return;
+    }
+
+    QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd_HH-mm-ss");
+
+    QList<QAbstractItemModel*> modelsToExport;
+    QStringList outfileNames;
+
+    modelsToExport.append(trade_table->model());
+    modelsToExport.append(net_pos_table->model());
+
+    outfileNames.append(trade_table->objectName()+"_"+timestamp+ ".csv");
+    outfileNames.append(net_pos_table->objectName()+"_"+timestamp+ ".csv");
+    bool allFilesExported = true; // Flag to track export success
+
+    for(int i=0;i<modelsToExport.length();i++){
+        QString filePath = QDir(folderPath).filePath(outfileNames.at(i));
+
+        QFile file(filePath);
+
+            if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+                QTextStream out(&file);
+
+                // Export headers
+                QStringList headers;
+                for (int col = 0; col < modelsToExport[i]->columnCount(); ++col) {
+                    headers << modelsToExport[i]->headerData(col, Qt::Horizontal).toString();
+                }
+                out << headers.join(",") << "\n";
+
+                // Export data
+                for (int row = 0; row < modelsToExport[i]->rowCount(); ++row) {
+                    QStringList rowValues;
+                    for (int col = 0; col < modelsToExport[i]->columnCount(); ++col) {
+                        rowValues << modelsToExport[i]->data(modelsToExport[i]->index(row, col)).toString();
+                    }
+                    out << rowValues.join(",") << "\n";
+                }
+
+                file.close();
+                qDebug() << "File Exported  successfully!:" << filePath;
+            } else {
+                qDebug() << "Export Failed !, Could not open file for writing:" << file.errorString();
+                allFilesExported = false; // Mark flag as false if any export fails
+
+            }
+    }
+    // Show success message if all files were exported successfully
+       if (allFilesExported) {
+           QMessageBox::information(this, "Export Successful", "Table data have been exported successfully!");
+       } else {
+           QMessageBox::warning(this, "Export Failed", "Some Table could not be exported. Please check the logs.");
+       }
+
+
+
+}

@@ -56,7 +56,10 @@
 #include "PortFolio/portfolio_searchfilterproxymodel.h"
 #include "TradePosition/tradetable_searchfilterproxymodel.h"
 #include "watch_data_card.h"
-
+#include <QFileDialog>
+#include <QFile>
+#include <QTextStream>
+#include <QDir>
 
 using namespace ads;
 
@@ -242,13 +245,7 @@ private:
     void saveDockManagerState();
      void restoreDockManagerState();
      void restoreTableViewColumnState(QTableView *tableView);
-    void restoreTradeTableViewColumnState(QTableView *tableView);
-      void restoreNetposTableViewColumnState(QTableView *tableView);
-     void restoreLinersTableViewColumnState(QTableView *tableView);
      void saveTableViewColumnState(QTableView *tableView);
-      void saveTradeTableViewColumnState(QTableView *tableView);
-     void saveNetposTableViewColumnState(QTableView *tableView);
-      void saveLinersTableViewColumnState(QTableView *tableView);
       void initializeGlobalHotKeys();
       QHash<QString, QShortcut*> HotKeyShortcutObjects;
       QModelIndexList  getSelectedPortFolioIndexs();
@@ -274,7 +271,7 @@ public slots:
     void backend_comm_Data_Slot(QString msg,SocketDataType msgType);
 //    void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
     void updatePortFolioStatus(QModelIndex index);
-    void resizePortFolioTableColWidthSlot(int width);
+   // void resizePortFolioTableColWidthSlot(int width);
     void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
     void T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index);
     void trade_table_cellDoubleClicked(const QModelIndex &index);
@@ -290,11 +287,16 @@ public slots:
     void onTradeTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
     void onNetposTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
     void onLinersTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
+    void onCombined_tracker_tableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
+    void onMissed_trade_tableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
+
     void onSummaryActionTriggered();
     void onChangepasswordActionTriggered();
     void onWatchActionTriggered();
     void onLogActionTriggered();
     void updateHotKeysSlot(QStringList actions);
+
+    void exportTableViewToCSV();
 
 private slots:
     void on_close_clicked();

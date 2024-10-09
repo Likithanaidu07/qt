@@ -37,7 +37,7 @@ public:
     void refreshTable();
     int switchstatetest() const;
 
-    void setColumnWidths(QTableView *tableView) const;
+   // void setColumnWidths(QTableView *tableView) const;
     QStringList getTradedHighlight_ExcludeList();
     QStringList  TradedHighlight_ExcludeList;
     void updateMarketRate(const QHash<QString, MBP_Data_Struct>& data);
@@ -74,7 +74,7 @@ public slots:
 signals:
     void editCompleted(QString text, QModelIndex idx) const;
     void  edit_Started(int row,int col) const;
-    void resizePortFolioTableColWidth(int colWidth);
+   // void resizePortFolioTableColWidth(int colWidth);
     void updateDBOnDataChanged(QModelIndex index);
 };
 

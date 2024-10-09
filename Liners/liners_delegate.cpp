@@ -58,10 +58,19 @@ void liners_delegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
         //       // painter->fillRect(option.rect, color);
         //        op.palette.setColor(QPalette::Highlight , Qt::transparent);
         //        op.palette.setColor(QPalette::HighlightedText , Qt::black);
-        painter->fillRect(option.rect, color);
-    }
+        QColor HighlightColor("#42A5F5");
+        if(option.state & QStyle::State_Active)
+            op.palette.setColor(QPalette::Highlight, HighlightColor);
+        else
+            op.palette.setColor(QPalette::Highlight, color);
 
+        if (option.state & QStyle::State_Selected)
+            painter->fillRect(option.rect, HighlightColor);
+        else
+           painter->fillRect(option.rect, color);
+    }
     QStyledItemDelegate::paint(painter, op, index);
+
     double borderWidth = 0.5;
     QColor myColor(108, 117, 125);
     QPen pen(myColor);
@@ -77,6 +86,5 @@ void liners_delegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
 
     painter->setPen(pen);
     painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
-    QStyledItemDelegate::paint(painter, op, index);
 }
 

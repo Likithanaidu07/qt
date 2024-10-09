@@ -89,7 +89,7 @@ QVariant Trade_Table_Model::
         //            else
         //                return QVariant::fromValue(QColor(0,0,0));
         //        }
-        if(c==OrderBook_Idx::Leg1State_OB){
+       /* if(c==OrderBook_Idx::Leg1State_OB){
             int Leg1_OrderState = trade_data_list[r][OrderBook_Idx::Leg1StateVal_OB].toInt();
             //            QString Leg2_OrderState =  trade_data_list[r][c];
             //            QString Leg3_OrderState =  trade_data_list[r][c];
@@ -146,7 +146,7 @@ QVariant Trade_Table_Model::
                 return QVariant::fromValue(QColor(0,0,0));
         }
 
-        else
+        else*/
             return QVariant();
 
     case Qt::DisplayRole:

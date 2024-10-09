@@ -34,12 +34,14 @@ protected:
     bool eventFilter(QObject *object, QEvent *event) override;
 private:
 
-  QString m_highlightText;
+    QString m_highlightText;
     double price_diff_incrementer = 0.05;
     double quantity_incrementer = 1.0;
     QString market_type;
     QPen pen;
     QTableView* view;
+    QColor getOrderStateColor(int orderState) const;
+
 };
 
 #endif // TABLE_ORDERBOOK_DELEGATE_H

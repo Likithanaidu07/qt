@@ -15,14 +15,14 @@ public:
     explicit table_portfolios_custom(QWidget *parent = Q_NULLPTR);
 
 
-    void resizeEvent(QResizeEvent *event) override
+    /*void resizeEvent(QResizeEvent *event) override
     {
         QTableView::resizeEvent(event);
         if (model())
         {
             static_cast<Table_Portfolios_Model*>(model())->setColumnWidths(this);
         }
-    }
+    }*/
 
 
 private:

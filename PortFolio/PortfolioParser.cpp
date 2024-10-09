@@ -74,7 +74,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
             SlowDataReader::GetInstance().RegisterContract(static_cast<uint>(obj.Leg4TokenNo));
             SlowDataReader::GetInstance().RegisterContract(static_cast<uint>(obj.Leg5TokenNo));
             SlowDataReader::GetInstance().RegisterContract(static_cast<uint>(obj.Leg6TokenNo));*/
-        obj.VolumeFreezeQty = ContractDetail::getInstance().GetVolumeFreezeQty(obj.Leg1TokenNo,type);
+        obj.VolumeFreezeQty = ContractDetail::getInstance().GetVolumeFreezeQty(obj.Leg1TokenNo,type)-1;
         obj.Leg1LotSizeOrg = ContractDetail::getInstance().GetLotSize(obj.Leg1TokenNo,type);
         obj.Leg2LotSize = ContractDetail::getInstance().GetLotSize(obj.Leg2TokenNo,type);
         obj.Leg3LotSize = ContractDetail::getInstance().GetLotSize(obj.Leg3TokenNo,type);
@@ -1231,7 +1231,7 @@ void PortfolioParser::CalculateAveragePrice(PortfolioObject &portfolio,    QHash
         else
         {
            // double diff = strikeDiff - ((leg1SellPrice + leg4SellPrice) - (leg2BuyPrice + leg3BuyPrice));
-            double diff = ((leg1BuyPrice + leg4BuyPrice) - (leg2SellPrice + leg3SellPrice)) - strikeDiff;
+            double diff = leg3BuyPrice + leg2BuyPrice - leg4SellPrice - leg1SellPrice + strikeDiff;
 
             QString d = QString::number(diff, 'f', decimal_precision);
             if (portfolio.BuyAveragePrice != d)
@@ -1246,7 +1246,7 @@ void PortfolioParser::CalculateAveragePrice(PortfolioObject &portfolio,    QHash
         }
         else
         {
-            double diff =  strikeDiff - ((leg1SellPrice + leg4SellPrice) - (leg2BuyPrice + leg3BuyPrice));
+            double diff =  -strikeDiff  - leg3SellPrice - leg2SellPrice + leg4BuyPrice + leg1BuyPrice;
 
             QString d = QString::number(diff, 'f', decimal_precision);
 
@@ -1820,7 +1820,8 @@ void PortfolioParser::CalculateBoxPriceDifference(PortfolioObject &portfolio, QH
                                        (leg3.lastTradedPrice.toDouble() * 2 * 0.0009) +
                                        (leg4.lastTradedPrice.toDouble() * 2 * 0.0009)) / devicer), 'f', decimal_precision);
 
-    double diff = leg1BuyPrice + leg4BuyPrice - leg2SellPrice - leg3SellPrice - strikePriceLeg3 +  strikePriceLeg1;
+    double strikeDiff =  strikePriceLeg3 -  strikePriceLeg1;
+    double diff = leg3BuyPrice + leg2BuyPrice - leg4SellPrice - leg1SellPrice + strikeDiff;
     diff = diff / devicer;
 
 
@@ -1829,7 +1830,7 @@ void PortfolioParser::CalculateBoxPriceDifference(PortfolioObject &portfolio, QH
         portfolio.BuyMarketRate = diff;
     }
 
-    diff = strikePriceLeg3 - strikePriceLeg1 - leg1SellPrice - leg4SellPrice + leg2BuyPrice + leg3BuyPrice;
+    diff = -strikeDiff  - leg3SellPrice - leg2SellPrice + leg4BuyPrice + leg1BuyPrice;
     diff = diff / devicer;
 
     if (portfolio.SellMarketRate != diff)

@@ -981,7 +981,7 @@ void Table_Portfolios_Model::refreshTable(){
 }
 
 
-
+/*
 void Table_Portfolios_Model::setColumnWidths(QTableView *tableView) const {
     for (int col = 0; col < columnCount(); ++col) {
         int maxWidth = 0;
@@ -1028,7 +1028,7 @@ void Table_Portfolios_Model::setColumnWidths(QTableView *tableView) const {
 
 
     }
-}
+}*/
 
 // This function will be called when slow data receved
 void Table_Portfolios_Model::updateMarketRate(const QHash<QString, MBP_Data_Struct>& MBP_Data_Hash){
