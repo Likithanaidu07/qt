@@ -1,6 +1,7 @@
 #include "f1_f2_buysell.h"
 #include "ui_f1_f2_buysell.h"
 #include "ContractDetail.h"
+#include <QKeyEvent>
 
 F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_precision) :
     QDialog(parent),
@@ -251,4 +252,12 @@ void F1_F2_BuySell::setBuyMode(bool buy_mode_){
         ui->comboBoxBuySell->setCurrentText("Sell");
     }
 }
-
+void F1_F2_BuySell::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+    {
+        ui->lineEdit_Stockname->clear();
+        ui->spinBoxLot->clear();
+        ui->doubleSpinBox_price->clear();
+    }
+}

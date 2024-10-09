@@ -1012,19 +1012,19 @@ void Table_Portfolios_Model::setColumnWidths(QTableView *tableView) const {
         tableView->setColumnWidth(_AlgoName,300);
         tableView->horizontalHeader()->setSectionResizeMode(_Status, QHeaderView::Fixed);
 
-        // For all other columns, allow them to resize to fit content
-        for (int col = 0; col < tableView->model()->columnCount(); ++col) {
-            if (col != _Status) {
-                tableView->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);  // Resize to fit content
-                tableView->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Interactive);       // Allow manual stretching
-            }
-        }
+//        // For all other columns, allow them to resize to fit content
+//        for (int col = 0; col < tableView->model()->columnCount(); ++col) {
+//            if (col != _Status) {
+//                tableView->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);  // Resize to fit content
+//                tableView->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Interactive);       // Allow manual stretching
+//            }
+//        }
 
-        // Stretch the last column to fill remaining space, if needed
-        tableView->horizontalHeader()->setStretchLastSection(true);
+//        // Stretch the last column to fill remaining space, if needed
+//        tableView->horizontalHeader()->setStretchLastSection(true);
 
-        // Adjust row height to fit content
-        tableView->resizeRowsToContents();
+//        // Adjust row height to fit content
+//        tableView->resizeRowsToContents();
 
 
     }

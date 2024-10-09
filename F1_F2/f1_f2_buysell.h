@@ -30,6 +30,7 @@ protected:
 private slots:
     void on_pushButtonSubmit_clicked();
     void on_comboBoxBuySell_currentTextChanged(const QString &arg1);
+     void keyPressEvent(QKeyEvent *event) override;
 
 public slots:
     void slotstockNameListViewHide(QString);

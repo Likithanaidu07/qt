@@ -2516,39 +2516,45 @@ QModelIndexList  MainWindow::getSelectedPortFolioIndexs(){
 }
 void MainWindow::Delete_clicked_slot()
 {
-    QMessageBox::StandardButton reply;
+   // Get the selected portfolios first
+   QModelIndexList selected = getSelectedPortFolioIndexs();
 
-    reply = QMessageBox::question(this, "Delete Portfolio From Database?", "Delete the portfolio?",  QMessageBox::Yes|QMessageBox::No);
-    if (reply == QMessageBox::Yes)
-    {
-        QModelIndexList selected = getSelectedPortFolioIndexs();
+   // If no rows are selected, show the "Please select a portfolio" message and return
+   if (selected.count() == 0)
+   {
+//        QMessageBox msgBox;
+//        msgBox.setText("Please select a Algo.");
+//        msgBox.setIcon(QMessageBox::Warning);
+//        msgBox.exec();
+        return;
+   }
 
-        if(selected.count()==0)
-        {
-            QMessageBox msgBox;
-            msgBox.setText("Please select a Portfolio from Portfolio Table.");
-            msgBox.setIcon(QMessageBox::Warning);
-            msgBox.exec();
-            return;
-        }
+   // Now that we know rows are selected, ask for delete confirmation
+   QMessageBox::StandardButton reply;
+   reply = QMessageBox::question(this, "Delete Portfolio From Database?", "Delete the portfolio?",  QMessageBox::Yes|QMessageBox::No);
 
+   if (reply == QMessageBox::Yes)
+   {
         // Multiple rows can be selected
         QString logs;
         QStringList activeAlgoList;
         deletingPortFolioFlg.storeRelaxed(1);
-        for(int i=0; i< selected.count(); i++)
+
+        for (int i = 0; i < selected.count(); i++)
         {
             QModelIndex index = selected.at(i);
-           //QString PortfolioNumber = T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
             PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());
+
             if (!P) {
-                qDebug()<<"updatePortFolioStatus----- portfolio null, need to debug this code.";
+                qDebug() << "updatePortFolioStatus----- portfolio null, need to debug this code.";
                 continue;
             }
+
             QString PortfolioNumber = QString::number(P->PortfolioNumber);
-            if( P->Status == true)
+
+            if (P->Status == true)
             {
-                logs = "PortfolioNumber '"+PortfolioNumber+"' is Active, cannot delete.";
+                logs = "PortfolioNumber '" + PortfolioNumber + "' is Active, cannot delete.";
                 activeAlgoList.append(PortfolioNumber);
                 db_conn->logToDB(logs);
                 continue;
@@ -2556,12 +2562,13 @@ void MainWindow::Delete_clicked_slot()
 
             QString msg;
             bool ret = db_conn->deleteAlgo(PortfolioNumber, msg);
-            if(ret==true)
+
+            if (ret == true)
             {
-                logs = "PortfolioNumber '"+PortfolioNumber+"' deleted successfully.";
+                logs = "PortfolioNumber '" + PortfolioNumber + "' deleted successfully.";
                 db_conn->logToDB(logs);
 
-                //send notifcation to backend server
+                // Send notification to backend server
                 quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
                 const unsigned char dataBytes[] = { 0xFF, 0xFF };
                 QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
@@ -2570,25 +2577,25 @@ void MainWindow::Delete_clicked_slot()
             }
             else
             {
-                logs = "PortfolioNumber '"+PortfolioNumber+"' not Deleted, "+msg;
+                logs = "PortfolioNumber '" + PortfolioNumber + "' not Deleted, " + msg;
                 db_conn->logToDB(logs);
-                qDebug()<<"PortfolioNumber: "<<PortfolioNumber<<" not Deleted, Info:"<<msg;
+                qDebug() << "PortfolioNumber: " << PortfolioNumber << " not Deleted, Info: " << msg;
             }
             delete P;
-
         }
+
         deletingPortFolioFlg.storeRelaxed(0);
 
-
-        if(!activeAlgoList.empty())
+        if (!activeAlgoList.empty())
         {
             QMessageBox msgBox;
-            msgBox.setText("Active algo cannot be deleted,\n disable the algo No. " + activeAlgoList.join(",") +" and then try again.\n");
+            msgBox.setText("Active algo cannot be deleted,\n disable the algo No. " + activeAlgoList.join(",") + " and then try again.\n");
             msgBox.setIcon(QMessageBox::Information);
             msgBox.exec();
         }
-    }
+   }
 }
+
 
 void MainWindow::T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index){
 

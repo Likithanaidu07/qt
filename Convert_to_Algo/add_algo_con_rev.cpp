@@ -140,6 +140,13 @@ void add_algo_con_rev::create_AutoFillModel_StartStrike(){
 
     QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[key].Expiry);
     dt1 = dt1.addYears(10);
+    int targetYear = dt1.date().year();
+    bool isLeapYear = QDate::isLeapYear(targetYear);
+
+    // If it is a leap year, and the date is after Feb 29, subtract one day
+    if (isLeapYear && dt1.date() > QDate(targetYear, 2, 29)) {
+        dt1 = dt1.addDays(-1);
+    }
 
     QString ExpirySlected=dt1.toString("MMM dd yyyy").toUpper();
 
@@ -150,6 +157,14 @@ void add_algo_con_rev::create_AutoFillModel_StartStrike(){
         unsigned int unix_time= tmp.Expiry;
         QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
         dt = dt.addYears(10);
+        int targetYear = dt.date().year();
+        bool isLeapYear = QDate::isLeapYear(targetYear);
+
+        // If it is a leap year, and the date is after Feb 29, subtract one day
+        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+            dt = dt.addDays(-1);
+        }
+
         QString ExpiryTmp=dt.toString("MMM dd yyyy").toUpper();
 
         if(tmp.InstrumentName==Instr_Name&&tmp.OptionType=="CE"&&ExpirySlected==ExpiryTmp){
@@ -345,11 +360,25 @@ void add_algo_con_rev::generateAlgo(){
                 if(leg2==sharedData->contract_table_hash[filteredKeys[j]].StrikePrice&&sharedData->contract_table_hash[filteredKeys[j]].OptionType=="PE"){
                     QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
                     dt1 = dt1.addYears(10);
+                    int target_Year = dt1.date().year();
+                    bool isLeap_Year = QDate::isLeapYear(targetYear);
+
+                    // If it is a leap year, and the date is after Feb 29, subtract one day
+                    if (isLeapYear && dt1.date() > QDate(targetYear, 2, 29)) {
+                        dt1 = dt1.addDays(-1);
+                    }
                     QString Leg2_date=dt1.toString("MMM dd yyyy").toUpper();
                     QString leg2=Leg2_date+" "+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" CE";
 
                     QDateTime dt3 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
                     dt3 = dt3.addYears(10);
+                    int targetYear = dt3.date().year();
+                    bool isLeapYear = QDate::isLeapYear(targetYear);
+
+                    // If it is a leap year, and the date is after Feb 29, subtract one day
+                    if (isLeapYear && dt3.date() > QDate(targetYear, 2, 29)) {
+                        dt3 = dt3.addDays(-1);
+                    }
                     QString Leg3_date=dt3.toString("MMM dd yyyy").toUpper();
                     QString leg3=Leg3_date+" "+QString::number(sharedData->contract_table_hash[filteredKeys[j]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" PE";
 
@@ -395,13 +424,26 @@ void add_algo_con_rev::generateAlgo(){
                 if(leg3==sharedData->contract_table_hash[filteredKeys[j]].StrikePrice&&sharedData->contract_table_hash[filteredKeys[j]].OptionType=="CE"){
                     QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
                     dt1 = dt1.addYears(10);
+                    int target_Year = dt1.date().year();
+                    bool isLeap_Year = QDate::isLeapYear(targetYear);
 
+                    // If it is a leap year, and the date is after Feb 29, subtract one day
+                    if (isLeapYear && dt1.date() > QDate(targetYear, 2, 29)) {
+                        dt1 = dt1.addDays(-1);
+                    }
 
                     QString Leg2_date=dt1.toString("MMM dd yyyy").toUpper();
                     QString leg2=Leg2_date+" "+QString::number(sharedData->contract_table_hash[filteredKeys[j]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" CE";
 
                     QDateTime dt3 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
                     dt3 = dt3.addYears(10);
+                    int targetYear = dt3.date().year();
+                    bool isLeapYear = QDate::isLeapYear(targetYear);
+
+                    // If it is a leap year, and the date is after Feb 29, subtract one day
+                    if (isLeapYear && dt3.date() > QDate(targetYear, 2, 29)) {
+                        dt3 = dt3.addDays(-1);
+                    }
                     QString Leg3_date=dt3.toString("MMM dd yyyy").toUpper();
                     QString leg3=Leg3_date+" "+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" PE";
 
@@ -488,33 +530,38 @@ void add_algo_con_rev::generateAlgo(){
         c0->setData(Qt::UserRole + 1,sharedData->unique_id);
         c0->setData(Qt::DisplayRole,Algo_Name_list[i]);
         c0->setFlags(c0->flags() ^ Qt::ItemIsEditable);
+        c0->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 0, c0);
 
 
         QTableWidgetItem *c1 = new QTableWidgetItem(Leg1_val);
         c1->setFlags(c1->flags() ^ Qt::ItemIsEditable);
+        c1->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 1, c1);
 
         QTableWidgetItem *c2 = new QTableWidgetItem(Leg2_list[i]);
         c2->setFlags(c2->flags() ^ Qt::ItemIsEditable);
+        c2->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 2, c2);
 
         QTableWidgetItem *c3 = new QTableWidgetItem(Leg3_list[i]);
         c3->setFlags(c3->flags() ^ Qt::ItemIsEditable);
+        c3->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 3, c3);
 
-        QTableWidgetItem *c4 = new QTableWidgetItem("NA");
+//        QTableWidgetItem *c4 = new QTableWidgetItem("NA");
+//        c4->setFlags(c4->flags() ^ Qt::ItemIsEditable);
+//        tableWidget->setItem(tableWidget->rowCount()-1, 4, c4);
+
+//        QTableWidgetItem *c5 = new QTableWidgetItem("NA");
+//        c5->setFlags(c5->flags() ^ Qt::ItemIsEditable);
+//        tableWidget->setItem(tableWidget->rowCount()-1, 5, c5);
+
+
+        QTableWidgetItem *c4 = new QTableWidgetItem("To be Uploaded");
         c4->setFlags(c4->flags() ^ Qt::ItemIsEditable);
+        c4->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 4, c4);
-
-        QTableWidgetItem *c5 = new QTableWidgetItem("NA");
-        c5->setFlags(c5->flags() ^ Qt::ItemIsEditable);
-        tableWidget->setItem(tableWidget->rowCount()-1, 5, c5);
-
-
-        QTableWidgetItem *c6 = new QTableWidgetItem("To be Uploaded");
-        c6->setFlags(c6->flags() ^ Qt::ItemIsEditable);
-        tableWidget->setItem(tableWidget->rowCount()-1, 6, c6);
 
         algo_data_to_insert data;
         data.Algo_Status = "DisabledByUser";

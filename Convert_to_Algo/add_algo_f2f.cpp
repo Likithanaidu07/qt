@@ -320,11 +320,24 @@ void add_algo_f2f::generateAlgo(){
     unsigned int unix_timestart= sharedData->contract_table_hash[foo_token_number_start_strike].Expiry;
     QDateTime dtstart = QDateTime::fromSecsSinceEpoch(unix_timestart);
     dtstart = dtstart.addYears(10);
-    QString ExpiryTmpStart=dtstart.toString("MMM dd yyyy").toUpper();
+    int targetYear = dtstart.date().year();
+    bool isLeapYear = QDate::isLeapYear(targetYear);
 
+    // If it is a leap year, and the date is after Feb 29, subtract one day
+    if (isLeapYear && dtstart.date() > QDate(targetYear, 2, 29)) {
+        dtstart = dtstart.addDays(-1);
+    }
+    QString ExpiryTmpStart=dtstart.toString("MMM dd yyyy").toUpper();
     unsigned int unix_timeend= sharedData->contract_table_hash[foo_token_number_end_strike].Expiry;
     QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_timeend);
     dt = dt.addYears(10);
+    int target_Year = dt.date().year();
+    bool isLeap_Year = QDate::isLeapYear(targetYear);
+
+    // If it is a leap year, and the date is after Feb 29, subtract one day
+    if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+        dt = dt.addDays(-1);
+    }
     QString ExpiryTmpEnd=dt.toString("MMM dd yyyy").toUpper();
     Leg1_list.append(ExpiryTmpStart);
     Leg2_list.append(ExpiryTmpEnd);
@@ -410,32 +423,37 @@ void add_algo_f2f::generateAlgo(){
         c0->setData(Qt::UserRole + 1,sharedData->unique_id);
         c0->setData(Qt::DisplayRole,Instr_Name);
         c0->setFlags(c0->flags() ^ Qt::ItemIsEditable);
+        c0->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 0, c0);
 
         QTableWidgetItem *c1 = new QTableWidgetItem(Leg1_list[i]);
         c1->setFlags(c1->flags() ^ Qt::ItemIsEditable);
+        c1->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1,1, c1);
 
         QTableWidgetItem *c2 = new QTableWidgetItem(Leg2_list[i]);
         c2->setFlags(c2->flags() ^ Qt::ItemIsEditable);
+        c2->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 2, c2);
 
 
-        QTableWidgetItem *c3 = new QTableWidgetItem("-");
+//        QTableWidgetItem *c3 = new QTableWidgetItem("-");
+//        c3->setFlags(c3->flags() ^ Qt::ItemIsEditable);
+//        c3->setTextAlignment(Qt::AlignCenter);
+//        tableWidget->setItem(tableWidget->rowCount()-1, 3, c3);
+
+//        QTableWidgetItem *c4 = new QTableWidgetItem("NA");
+//        c4->setFlags(c4->flags() ^ Qt::ItemIsEditable);
+//        tableWidget->setItem(tableWidget->rowCount()-1, 4, c4);
+
+//        QTableWidgetItem *c5 = new QTableWidgetItem("NA");
+//        c5->setFlags(c5->flags() ^ Qt::ItemIsEditable);
+//        tableWidget->setItem(tableWidget->rowCount()-1, 5, c5);
+
+        QTableWidgetItem *c3 = new QTableWidgetItem("To be Uploaded");
         c3->setFlags(c3->flags() ^ Qt::ItemIsEditable);
+        c3->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 3, c3);
-
-        QTableWidgetItem *c4 = new QTableWidgetItem("NA");
-        c4->setFlags(c4->flags() ^ Qt::ItemIsEditable);
-        tableWidget->setItem(tableWidget->rowCount()-1, 4, c4);
-
-        QTableWidgetItem *c5 = new QTableWidgetItem("NA");
-        c5->setFlags(c5->flags() ^ Qt::ItemIsEditable);
-        tableWidget->setItem(tableWidget->rowCount()-1, 5, c5);
-
-        QTableWidgetItem *c6 = new QTableWidgetItem("To be Uploaded");
-        c6->setFlags(c6->flags() ^ Qt::ItemIsEditable);
-        tableWidget->setItem(tableWidget->rowCount()-1, 6, c6);
 
 
 
