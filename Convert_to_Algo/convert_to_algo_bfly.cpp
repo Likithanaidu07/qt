@@ -398,40 +398,49 @@ void add_algo_btfly::generateAlgo()
         c0->setData(Qt::UserRole + 1,sharedData->unique_id);
         c0->setData(Qt::DisplayRole,Algo_Name_list[i]);
         c0->setFlags(c0->flags() ^ Qt::ItemIsEditable);
+        c0->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 0, c0);
 
 
         QTableWidgetItem *c1 = new QTableWidgetItem(Option_Type);
         c1->setFlags(c1->flags() ^ Qt::ItemIsEditable);
+        c1->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 1, c1);
 
         QTableWidgetItem *c2 = new QTableWidgetItem(ExpiryTime);
         c2->setFlags(c2->flags() ^ Qt::ItemIsEditable);
+        c2->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 2, c2);
 
         QTableWidgetItem *c3 = new QTableWidgetItem(Leg1_Strike);
         c3->setFlags(c3->flags() ^ Qt::ItemIsEditable);
+        c3->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 3, c3);
 
         QTableWidgetItem *c4 = new QTableWidgetItem(Leg2_Strike);
         c4->setFlags(c4->flags() ^ Qt::ItemIsEditable);
+        c4->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 4, c4);
 
         QTableWidgetItem *c5 = new QTableWidgetItem(Leg3_Strike);
         c5->setFlags(c5->flags() ^ Qt::ItemIsEditable);
+        c5->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 5, c5);
 
         QTableWidgetItem *c6 = new QTableWidgetItem("NA");
         c6->setFlags(c6->flags() ^ Qt::ItemIsEditable);
+        c6->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 6, c6);
 
         QTableWidgetItem *c7 = new QTableWidgetItem("NA");
         c7->setFlags(c7->flags() ^ Qt::ItemIsEditable);
+        c7->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 7, c7);
 
 
         QTableWidgetItem *c8 = new QTableWidgetItem("To be Uploaded");
         c8->setFlags(c8->flags() ^ Qt::ItemIsEditable);
+        c8->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 8, c8);
 
         algo_data_to_insert data;

@@ -50,6 +50,7 @@ struct Liners_Data{
     QList<double> NetQty;
     QList<double> profit;
     QString Traded_Lot;
+
 };
 
 //class chlildofMainWindow: public MainWindow{

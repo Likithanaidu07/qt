@@ -21,11 +21,11 @@ public:
     void setDataList(QList <QStringList> alog_data_list);
     QVariant headerData(int section, Qt::Orientation ,   int role) const override;
     QList <QStringList> net_pos_data_list;
-     void setColumnWidths(QTableView *tableView) const;
+    // void setColumnWidths(QTableView *tableView) const;
 
 private:
     int col_count;
-    QStringList header={"SNo","Stock Name","BLot","SLot","Buy Value","Sell Value","BAvg","SAvg","Net Qty","Profit","MTM"};
+    QStringList header={"Stock Name","BLot","SLot","Buy Value","Sell Value","BAvg","SAvg","Net Qty","Profit","MTM"};
 
 
 signals:

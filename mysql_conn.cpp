@@ -1334,7 +1334,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
 //                 if (portfolio_type == PortfolioType::F2F||portfolio_type == PortfolioType::BFLY_BID||portfolio_type == PortfolioType::CR||portfolio_type == PortfolioType::CR_JELLY){
 //                       Leg4_OrderStateStr = "-";
 //                }
-
+                QString Stockname = ContractDetail::getInstance().GetInstrumentName(leg1_token_number,portfolio_type);
                 int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
 
 //                Leg1_OrderStateStr = ContractDetail::getInstance().GetStockName(leg1_token_number,portfolio_type)+" "+"["+(QString::number(Leg1_Total_Volume/lotSize))+"]";
@@ -1498,13 +1498,13 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
                 rowList.append(Remaining_Lot);
                 //  rowList.append(Buy_Sell);
                 rowList.append(dt.toString("hh:mm:ss"));
-                rowList.append(Leg2_OrderStateStr);
                 rowList.append(Leg1_OrderStateStr);
+                rowList.append(Leg2_OrderStateStr);
                 rowList.append(Leg3_OrderStateStr);
                 rowList.append(Leg4_OrderStateStr);
                 rowList.append(Algo_ID);
-                rowList.append(QString::number(Leg2_OrderState));
                 rowList.append(QString::number(Leg1_OrderState));
+                rowList.append(QString::number(Leg2_OrderState));
                 rowList.append(QString::number(Leg3_OrderState));
                 rowList.append(QString::number(Leg4_OrderState));
                 rowList.append(Expiry);
@@ -1564,34 +1564,34 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
             for (const QString &key : Liners_Data_Hash.keys()) {
                 Liners_Data linersData = Liners_Data_Hash.value(key);
 
+                double BuyAvgPrice = calculateAverage(linersData.BuyAvgPrice);
+                int BuyQtyLots = calculateSum(linersData.BuyQtyLots);
 
-                double  BuyAvgPrice = calculateAverage(linersData.BuyAvgPrice);
-                int  BuyQtyLots = calculateSum(linersData.BuyQtyLots);
-
-
-                double  SellAvgPrice = calculateAverage(linersData.SellAvgPrice);
-                int   SellQtyLots = calculateSum(linersData.SellQtyLots);
+                double SellAvgPrice = calculateAverage(linersData.SellAvgPrice);
+                int SellQtyLots = calculateSum(linersData.SellQtyLots);
 
                 double profit = SellAvgPrice - BuyAvgPrice;
                 double NetQty = BuyQtyLots - SellQtyLots;
-                //                int portfolio_type = -1;
-                //                 int leg1_token_number = query.value(rec.indexOf("Leg1_Tok_No")).toInt();
-                //                 int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
+
                 QStringList rowList;
                 rowList.append(linersData.algoID);
                 rowList.append(linersData.algoName);
-                rowList.append(fixDecimal(BuyAvgPrice,decimal_precision));
+                rowList.append(fixDecimal(BuyAvgPrice, decimal_precision));
                 rowList.append(QString::number(BuyQtyLots));
-                rowList.append(fixDecimal(SellAvgPrice,decimal_precision));
+                rowList.append(fixDecimal(SellAvgPrice, decimal_precision));
                 rowList.append(QString::number(SellQtyLots));
                 rowList.append(QString::number(NetQty));
-                rowList.append(fixDecimal(profit,decimal_precision));
+                rowList.append(fixDecimal(profit, decimal_precision));
+               // rowList.append(linersData.StockName);
+
                 liners_listTmp.append(rowList);
-
             }
+//            std::sort(liners_listTmp.begin(), liners_listTmp.end(), [](const QStringList &a, const QStringList &b) {
+//                return a[8] < b[8]; // Compare by algoName, which is the second element (index 1)
+//            });
 
+            liners_model->setDataList(liners_listTmp);
 
-        liners_model->setDataList(liners_listTmp);
 
 
 
@@ -1707,36 +1707,32 @@ void mysql_conn::getLinersTableData(Liners_Model *model,QString user_id,QHash<QS
     }
 }
 
-void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id)
+void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue, double &Profit_summary,
+                                    double &BuyQty_summary, double &SellQty_summary, double &NetQty_summary,
+                                    Net_Position_Table_Model *model, QString user_id)
 {
     QMutexLocker lock(&mutex);
-    BuyValue_summary=0;
+    BuyValue_summary = 0;
     SellValue = 0;
-    Profit_summary = 0 ;
+    Profit_summary = 0;
     BuyQty_summary = 0;
     SellQty_summary = 0;
     NetQty_summary = 0;
 
-
-    //Qury: SELECT TokenNo, (sum(TradedPrice * TotalVolume) / sum(TotalVolume)) /10000000  as AvgPrice, sum(TotalVolume) as Qty, BuySellIndicator FROM Trades where TraderId = 1 group by TokenNo, BuySellIndicator;
     QString msg;
-    QList <QStringList> netPos_data_listTmp;
+    QList<QStringList> netPos_data_listTmp;
     QHash<QString, net_pos_data_> net_pos_dataList;
 
     bool ok = checkDBOpened(msg);
-    if(ok){
-        //QString query_str ="SELECT TokenNo,StockName,PortfolioNumber, (sum(TradedPrice * TotalVolume) / sum(TotalVolume)) /"+QString::number(devicer)+"  as AvgPrice, sum(TotalVolume) as Qty, BuySellIndicator FROM Trades where TraderId = '"+user_id+"'group by TokenNo, BuySellIndicator,StockName,PortfolioNumber";
-
-       // QString query_str ="SELECT Trades.TokenNo,Contract.StockName, Trades.BuySellIndicator, Contract.LotSize,FORMAT((SUM(Trades.TradedPrice * Trades.TotalVolume)/ SUM(Trades.TotalVolume)/"+QString::number(devicer)+"),2) AS AvgPrice, sum(TotalVolume) as Qty FROM Trades JOIN Contract ON Contract.Token = Trades.TokenNo  WHERE Trades.TraderId='"+user_id+"' GROUP BY Trades.TokenNo,Trades.BuySellIndicator,Contract.StockName";
-        QString query_str ="SELECT Trades.TokenNo,Contract.StockName, Trades.BuySellIndicator, Contract.LotSize,ROUND((SUM(Trades.TradedPrice * Trades.TotalVolume)/ SUM(Trades.TotalVolume)/"+QString::number(devicer)+"),2) AS AvgPrice, sum(TotalVolume) as Qty, ROUND((SUM(Trades.TradedPrice * Trades.TotalVolume)/"+QString::number(devicer)+"),2) AS buysellvalue FROM Trades JOIN Contract ON Contract.Token = Trades.TokenNo  WHERE Trades.TraderId='"+user_id+"' GROUP BY Trades.TokenNo,Trades.BuySellIndicator,Contract.StockName";
-        //QString query_str="SELECT StockName, (sum(TradedPrice * TotalVolume) / sum(TotalVolume)) /"+QString::number(devicer)+"  as AvgPrice, sum(TotalVolume) as Qty, BuySellIndicator FROM Trades where TraderId = '"+user_id+"' group by  StockName,BuySellIndicator";
-        QSqlQuery query(query_str,db);
-        if( !query.exec() )
-        {
-            // Error Handling, check query.lastError(), probably return
-            qDebug()<<query.lastError().text();
-        }
-        else{
+    if (ok) {
+        // Define the SQL query to retrieve the desired data
+        QString query_str = "SELECT Trades.TokenNo, Contract.StockName, Trades.BuySellIndicator, Contract.LotSize, ROUND((SUM(Trades.TradedPrice * Trades.TotalVolume) / SUM(Trades.TotalVolume) / " + QString::number(devicer) + "), 2) AS AvgPrice, SUM(TotalVolume) AS Qty, ROUND((SUM(Trades.TradedPrice * Trades.TotalVolume) / " + QString::number(devicer) + "), 2) AS buysellvalue FROM Trades JOIN Contract ON Contract.Token = Trades.TokenNo WHERE Trades.TraderId = '" + user_id + "' GROUP BY Trades.TokenNo, Trades.BuySellIndicator, Contract.StockName ORDER BY Contract.StockName ASC";
+        QSqlQuery query(query_str, db);
+        if (!query.exec()) {
+            // Error Handling, check query.lastError()
+            qDebug() << "Query execution failed:" << query.lastError().text();
+            return;  // Exit if the query fails
+        } else {
             QSqlRecord rec = query.record();
             while (query.next()) {
              QString buy_sell = query.value(rec.indexOf("BuySellIndicator")).toString();
@@ -1748,92 +1744,69 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary,double &SellValue,d
              double buysellvalue = query.value(rec.indexOf("buysellvalue")).toDouble();
 
              QString key = QString::number(TokenNo);
-             if(net_pos_dataList.contains(key)){
-                    if(buy_sell=="1"){
-                        net_pos_dataList[key].Buy_Avg_Price = net_pos_dataList[key].Buy_Avg_Price+AvgPrice;
-                        net_pos_dataList[key].Buy_Total_Lot = net_pos_dataList[key].Buy_Total_Lot + Qty;
-                        net_pos_dataList[key].Buy_Price = net_pos_dataList[key].Buy_Price + buysellvalue;
-                        // BuyQty_summary = BuyQty_summary + net_pos_dataList[key].Buy_Total_Lot;
+             if (net_pos_dataList.contains(key)) {
+                    if (buy_sell == "1") {
+                        net_pos_dataList[key].Buy_Avg_Price += AvgPrice;
+                        net_pos_dataList[key].Buy_Total_Lot += Qty;
+                        net_pos_dataList[key].Buy_Price += buysellvalue;
+                    } else {
+                        net_pos_dataList[key].Sell_Avg_Price += AvgPrice;
+                        net_pos_dataList[key].Sell_Total_Lot += Qty;
+                        net_pos_dataList[key].Sell_Price += buysellvalue;
                     }
-                    else{
-                        net_pos_dataList[key].Sell_Avg_Price = net_pos_dataList[key].Sell_Avg_Price+ AvgPrice;
-                        net_pos_dataList[key].Sell_Total_Lot = net_pos_dataList[key].Sell_Total_Lot + Qty;
-                        net_pos_dataList[key].Sell_Price = net_pos_dataList[key].Sell_Price + buysellvalue;
-                        // SellQty_summary = SellQty_summary +  net_pos_dataList[key].Sell_Total_Lot;
-                    }
-             }
-             else{
+             } else {
                     net_pos_data_ net_pos;
                     net_pos.Stock_Name = StockName;
                     net_pos.lotSize = lotSize;
-                    net_pos.Buy_Avg_Price = 0;
-                    net_pos.Buy_Total_Lot = 0;
-                    net_pos.Buy_Price = 0;
-                    net_pos.Sell_Avg_Price = 0;
-                    net_pos.Sell_Price = 0;
-                    net_pos.Sell_Total_Lot = 0;
+                    net_pos.Buy_Avg_Price = (buy_sell == "1") ? AvgPrice : 0;
+                    net_pos.Buy_Total_Lot = (buy_sell == "1") ? Qty : 0;
+                    net_pos.Buy_Price = (buy_sell == "1") ? buysellvalue : 0;
+                    net_pos.Sell_Avg_Price = (buy_sell == "2") ? AvgPrice : 0;
+                    net_pos.Sell_Total_Lot = (buy_sell == "2") ? Qty : 0;
+                    net_pos.Sell_Price = (buy_sell == "2") ? buysellvalue : 0;
 
-                    if(buy_sell=="1"){
-                        net_pos.Buy_Avg_Price = (AvgPrice);
-                        net_pos.Buy_Total_Lot = (Qty);
-                        net_pos.Buy_Price = (buysellvalue);
-                    }
-                    else{
-                        net_pos.Sell_Avg_Price = (AvgPrice);
-                        net_pos.Sell_Total_Lot = (Qty);
-                        net_pos.Sell_Price = (buysellvalue);
-                    }
-                    net_pos_dataList.insert(key,net_pos);
+                    net_pos_dataList.insert(key, net_pos);
              }
             }
 
+            // Calculate the net quantities and summarize the data
             QHashIterator<QString, net_pos_data_> iter(net_pos_dataList);
-            int c=1;
-
-            while(iter.hasNext())
-            {
+            while (iter.hasNext()) {
              iter.next();
-             QString TokenNo =  iter.key();
+             QString TokenNo = iter.key();
+             net_pos_dataList[TokenNo].Net_Qty = net_pos_dataList[TokenNo].Buy_Total_Lot - net_pos_dataList[TokenNo].Sell_Total_Lot;
 
-             // QString stock_name=ContractDetail::getInstance().GetStockName(TokenNo.toInt(),portfolio_type);
-             net_pos_dataList[TokenNo].Net_Qty = (net_pos_dataList[TokenNo].Buy_Total_Lot)-(net_pos_dataList[TokenNo].Sell_Total_Lot);
-           //  net_pos_dataList[TokenNo].Buy_Price =(net_pos_dataList[TokenNo].Buy_Avg_Price)*(net_pos_dataList[TokenNo].Buy_Total_Lot);
-           //  net_pos_dataList[TokenNo].Sell_Price = (net_pos_dataList[TokenNo].Sell_Total_Lot)*(net_pos_dataList[TokenNo].Sell_Avg_Price);
+             BuyValue_summary += net_pos_dataList[TokenNo].Buy_Price;
+             SellValue += net_pos_dataList[TokenNo].Sell_Price;
+             NetQty_summary += (net_pos_dataList[TokenNo].Net_Qty) / net_pos_dataList[TokenNo].lotSize;
+             BuyQty_summary += (net_pos_dataList[TokenNo].Buy_Total_Lot) / net_pos_dataList[TokenNo].lotSize;
+             SellQty_summary += (net_pos_dataList[TokenNo].Sell_Total_Lot) / net_pos_dataList[TokenNo].lotSize;
 
+             double Profit = net_pos_dataList[TokenNo].Sell_Price - net_pos_dataList[TokenNo].Buy_Price;
+             Profit_summary += Profit;
 
-             BuyValue_summary = BuyValue_summary + net_pos_dataList[TokenNo].Buy_Price ;
-
-
-
-             SellValue = SellValue +  net_pos_dataList[TokenNo].Sell_Price ;
-
-             NetQty_summary = NetQty_summary + (net_pos_dataList[TokenNo].Net_Qty )/ net_pos_dataList[TokenNo].lotSize;
-
-             BuyQty_summary = BuyQty_summary + (net_pos_dataList[TokenNo].Buy_Total_Lot)/ net_pos_dataList[TokenNo].lotSize;
-             SellQty_summary = SellQty_summary + (net_pos_dataList[TokenNo].Sell_Total_Lot)/ net_pos_dataList[TokenNo].lotSize;
-
-
-             double Profit = net_pos_dataList[TokenNo].Sell_Price-net_pos_dataList[TokenNo].Buy_Price;
-             Profit_summary = Profit_summary + Profit ;
              QStringList rowList;
-             rowList.append(QString::number(c));
              rowList.append(net_pos_dataList[TokenNo].Stock_Name);
-             rowList.append(QString::number((net_pos_dataList[TokenNo].Buy_Total_Lot)/ net_pos_dataList[TokenNo].lotSize));
-             rowList.append(QString::number((net_pos_dataList[TokenNo].Sell_Total_Lot)/ net_pos_dataList[TokenNo].lotSize));
-             rowList.append(fixDecimal(net_pos_dataList[TokenNo].Buy_Price,decimal_precision));
-             rowList.append(fixDecimal(net_pos_dataList[TokenNo].Sell_Price,decimal_precision));
-             rowList.append(fixDecimal((net_pos_dataList[TokenNo].Buy_Avg_Price),decimal_precision));
-             rowList.append(fixDecimal((net_pos_dataList[TokenNo].Sell_Avg_Price),decimal_precision));
-             rowList.append(QString::number(net_pos_dataList[TokenNo].Net_Qty/ net_pos_dataList[TokenNo].lotSize));
-             rowList.append(fixDecimal(Profit,decimal_precision));
+             rowList.append(QString::number((net_pos_dataList[TokenNo].Buy_Total_Lot) / net_pos_dataList[TokenNo].lotSize));
+             rowList.append(QString::number((net_pos_dataList[TokenNo].Sell_Total_Lot) / net_pos_dataList[TokenNo].lotSize));
+             rowList.append(fixDecimal(net_pos_dataList[TokenNo].Buy_Price, decimal_precision));
+             rowList.append(fixDecimal(net_pos_dataList[TokenNo].Sell_Price, decimal_precision));
+             rowList.append(fixDecimal((net_pos_dataList[TokenNo].Buy_Avg_Price), decimal_precision));
+             rowList.append(fixDecimal((net_pos_dataList[TokenNo].Sell_Avg_Price), decimal_precision));
+             rowList.append(QString::number(net_pos_dataList[TokenNo].Net_Qty / net_pos_dataList[TokenNo].lotSize));
+             rowList.append(fixDecimal(Profit, decimal_precision));
              rowList.append("-");
-             rowList.append(TokenNo); // this should be the last one
-             netPos_data_listTmp.append(rowList);
-             c++;
+             rowList.append(TokenNo); // TokenNo should be the last one
 
+             netPos_data_listTmp.append(rowList);
             }
 
+            // Sort the data based on StockName (first column in rowList)
+            std::sort(netPos_data_listTmp.begin(), netPos_data_listTmp.end(), [](const QStringList &a, const QStringList &b) {
+                return a[0] < b[0]; // Sort by StockName
+            });
 
+            // Set sorted data to the model
             model->setDataList(netPos_data_listTmp);
         }
     }

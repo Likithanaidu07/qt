@@ -13,7 +13,14 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     MainWindowObj = (MainWindow*) parent;
     //setWindowModality(Qt::ApplicationModal);
 
+    ui->pushButtonSelectAll->setText("Select All");
+    ui->pushButtonSelectAll->setStyleSheet("font-size: 10px;");
 
+    ui->pushButtonDelete->setText("Delete");
+    ui->pushButtonDelete->setStyleSheet("font-size: 10px;");
+
+    ui->pushButton_Reset->setText("Reset");
+    ui->pushButton_Reset->setStyleSheet("font-size: 10px;");
   //  ui->tableWidget->setFocusPolicy(Qt::NoFocus);
 
     setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Start_strike_Btfy);
@@ -219,8 +226,8 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
         ui->comboBox_AlgoType->addItem("CRJELLY-BID");
         ui->comboBox_AlgoType->addItem("BX-BID");
-        ui->comboBox_AlgoType->addItem("F2F");
-        ui->comboBox_AlgoType->addItem("BX1221");
+        ui->comboBox_AlgoType->addItem("F2F-BID");
+      //  ui->comboBox_AlgoType->addItem("BX1221");
         ui->comboBox_AlgoType->setStyleSheet(
             "QComboBox {"
             "    font-weight: bold;"
@@ -506,68 +513,50 @@ void ConvertAlgo_Win::mouseReleaseEvent(QMouseEvent *event) {
     pressed = false;
 }
 
-void ConvertAlgo_Win::resetTableWidget(){
+void ConvertAlgo_Win::resetTableWidget() {
     QStringList headers = {};
     sharedData->unique_id = 0;
 
-
     QString algoType = ui->comboBox_AlgoType->currentText();
-    if(algoType=="F2F"){
-        headers = {"Algo Name","Strike/Expiry1","Strike/Expiry2","Market/Skip Leg","Buy Diff","Sell Diff","Status"};
-    }
-    else if(algoType=="BFLY"){
-        headers = {"Algo Name","Option Type ","Expiry","Leg1 Strike","Leg2 Strike","Leg3 Strike","Reserved","Reserved","Status"};
-    }
-    else if(algoType=="CR-BID"){
-        headers = {"Algo Name","Strike/Expiry1","Strike/Expiry2","Strike/Expiry3","Buy Diff","Sell Diff","Status"};
-    }
-    else if(algoType=="2L Straddle"){
-        headers = {"Algo Name","Leg1 Strike","Leg2 Strike","Reserved","Reserved","Status"};
-    }
-    else if(algoType=="BOX"){
-        headers = {"Algo Name","Strike/Expiry1","Strike/Expiry2","Market/Skip Leg","Buy Diff","Sell Diff","Status"};
-    }
-    else if(algoType=="Open-BFLY"){
-        headers = {"Algo Name","Market-Skip/Leg-Ratio","Buy Diff","Sell Diff","Status"};
-    }
-    else if(algoType=="Open-BOX"){
-        headers = {"Algo Name","Strike/Expiry1","Strike/Expiry2","Market/Skip Leg","Market-Skip/Leg-Ratio","Buy Diff","Sell Diff","Status"};
-    }
-    else if(algoType==BFLY_BID_TYPE){
-        headers = {"Algo Name"/*,"Option Type ","Expiry"*/,"Strike1","Strike2","Strike3","Status"};
-    }
-    else if(algoType=="CRJELLY-BID"){
-        headers = {"Algo Name","Strike/Expiry1","Strike/Expiry2","Strike/Expiry3","Buy Diff","Sell Diff","Status"};
-    }
-
-    else if(algoType=="BX-BID"){
-        headers = {"Algo Name","Expiry","Strike1","Strike2","Strike3","Strike4","Reserved","Reserved","Status"};
-    }
-
-    else if(algoType=="BX1221"){
-        headers = {"Algo Name","Expiry","Strike1","Strike2","Strike3","Strike4","Reserved","Reserved","Status"};
+    if (algoType == "F2F-BID") {
+        headers = {"Algo Name", "Strike/Expiry1", "Strike/Expiry2", "Status"};
+    } else if (algoType == "BFLY") {
+        headers = {"Algo Name", "Option Type ", "Expiry", "Leg1 Strike", "Leg2 Strike", "Leg3 Strike", "Reserved", "Reserved", "Status"};
+    } else if (algoType == "CR-BID") {
+        headers = {"Algo Name", "Strike/Expiry1", "Strike/Expiry2", "Strike/Expiry3", "Status"};
+    } else if (algoType == "2L Straddle") {
+        headers = {"Algo Name", "Leg1 Strike", "Leg2 Strike", "Reserved", "Reserved", "Status"};
+    } else if (algoType == "BOX") {
+        headers = {"Algo Name", "Strike/Expiry1", "Strike/Expiry2", "Market/Skip Leg", "Buy Diff", "Sell Diff", "Status"};
+    } else if (algoType == "Open-BFLY") {
+        headers = {"Algo Name", "Market-Skip/Leg-Ratio", "Buy Diff", "Sell Diff", "Status"};
+    } else if (algoType == "Open-BOX") {
+        headers = {"Algo Name", "Strike/Expiry1", "Strike/Expiry2", "Market/Skip Leg", "Market-Skip/Leg-Ratio", "Buy Diff", "Sell Diff", "Status"};
+    } else if (algoType == BFLY_BID_TYPE) {
+        headers = {"Algo Name", "Strike1", "Strike2", "Strike3", "Status"};
+    } else if (algoType == "CRJELLY-BID") {
+        headers = {"Algo Name", "Strike/Expiry1", "Strike/Expiry2", "Strike/Expiry3", "Status"};
+    } else if (algoType == "BX-BID") {
+        headers = {"Algo Name", "Expiry", "Strike1", "Strike2", "Strike3", "Strike4", "Status"};
+    } else if (algoType == "BX1221") {
+        headers = {"Algo Name", "Expiry", "Strike1", "Strike2", "Strike3", "Strike4", "Reserved", "Reserved", "Status"};
     }
 
     ui->tableWidget->clear();
     ui->tableWidget->setRowCount(0);
     ui->tableWidget->setColumnCount(headers.size());
     ui->tableWidget->setHorizontalHeaderLabels(headers);
-    /*for(int i=0;i<headers.size()-1;i++){
-            ui->tableWidget->setColumnWidth(i, ui->tableWidget->width()/headers.size());
-        }*/
-    /* ui->tableWidget->setColumnWidth(0, 100);
-        ui->tableWidget->setColumnWidth(1, 100);
-        ui->tableWidget->setColumnWidth(2, 100);
-        ui->tableWidget->setColumnWidth(3, 100);
-        ui->tableWidget->setColumnWidth(4, 60);
-        ui->tableWidget->setColumnWidth(5, 60);*/
+
+    QHeaderView *header = ui->tableWidget->horizontalHeader();
+    header->setStyleSheet("QHeaderView::section {"
+                          "border: 1px solid lightgrey;"  // Simple border style
+                          "background-color: white;" // Optional: background color
+                          "}");
 
     ui->tableWidget->resizeColumnsToContents();
-
-
     ui->comboBox_AlgoType->setFocus();
-
 }
+
 
 void ConvertAlgo_Win::enable_disable_UIElement(bool enable)
 {
@@ -611,7 +600,7 @@ void ConvertAlgo_Win::display_log_text_slot(QString msg)
 void ConvertAlgo_Win::on_pushButtonAdd_clicked()
 {
     QString algo_type  = ui->comboBox_AlgoType->currentText();
-    if(algo_type=="F2F"){
+    if(algo_type=="F2F-BID"){
         algoF2F->generateAlgo();
     }
 
@@ -667,7 +656,7 @@ void ConvertAlgo_Win::on_comboBox_AlgoType_currentTextChanged(const QString algo
     resetTableWidget();
     sharedData->algo_data_list.clear();
 
-    if(algoType=="F2F"){
+    if(algoType=="F2F-BID"){
 
         ui->stackedWidget->setCurrentWidget(ui->page_f2f);
         algoF2F->selectedAction();
@@ -792,12 +781,13 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
             algo_data_insert_status status = db_conn->insertToAlgoTable(sharedData->algo_data_list[i],sharedData->MaxPortfolioCount,msg);
             //emit insert_algo_data_signal(algo_data_list);
             if(status==algo_data_insert_status::INSERTED){
-                db_conn->logToDB(QString("Portfolio Added"));
+                //  QString Algo_Name = algo_type+"-"+sharedData->algo_data_list[i].Algo_Name;
+                //db_conn->logToDB(QString("Portfolio Added "));
                 sharedData->algo_data_list[i].uploaded=true;
                 ui->tableWidget->item(tableRowIDx, ui->tableWidget->columnCount()-1)->setForeground(QBrush(QColor(0, 200, 0)));
                 QString algo_type  = sharedData->algo_data_list[i].algo_type;
                 if(algo_type==QString::number(PortfolioType::F2F))
-                    algo_type="F2F";
+                    algo_type="F2F-BID";
                 else if(algo_type==QString::number(PortfolioType::BY))
                     algo_type="BFLY";
                 else if(algo_type==QString::number(PortfolioType::CR))
@@ -809,7 +799,7 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                 else if(algo_type==QString::number(PortfolioType::OPEN_BOX))
                     algo_type="Open-BOX";
                 else if(algo_type==QString::number(PortfolioType::BFLY_BID))
-                    algo_type="BFLY_BID_TYPE";
+                    algo_type="BFLY_BID";
                 else if(algo_type==QString::number(PortfolioType::CR_JELLY))
                     algo_type="CRJELLY";
                 else if(algo_type==QString::number(PortfolioType::BX_BID))
@@ -826,6 +816,7 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                                       " Inserted New Algo: "+ Algo_Name +"</span> </p>";
 
                 emit display_log_text_signal(htmlContent);
+                 db_conn->logToDB(QString("Portfolio Added "+Algo_Name));
             }
             else if(status==algo_data_insert_status::FAILED){
                 ui->tableWidget->item(tableRowIDx, ui->tableWidget->columnCount()-1)->setForeground(QBrush(QColor(200, 0, 0)));

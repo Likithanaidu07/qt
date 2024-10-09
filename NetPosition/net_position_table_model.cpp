@@ -148,34 +148,34 @@ QVariant Net_Position_Table_Model::headerData(int section, Qt::Orientation orien
         return QString::number(section);
 
 }
-void Net_Position_Table_Model::setColumnWidths(QTableView *tableView) const {
-    for (int col = 0; col < columnCount(); ++col) {
-        int maxWidth = 0;
+//void Net_Position_Table_Model::setColumnWidths(QTableView *tableView) const {
+//    for (int col = 0; col < columnCount(); ++col) {
+//        int maxWidth = 0;
 
-        // Consider header text width
-        QVariant headerText = this->headerData(col, Qt::Horizontal, Qt::DisplayRole);
-        int headerWidth = tableView->fontMetrics().horizontalAdvance(headerText.toString());
-        maxWidth = qMax(maxWidth, headerWidth);
+//        // Consider header text width
+//        QVariant headerText = this->headerData(col, Qt::Horizontal, Qt::DisplayRole);
+//        int headerWidth = tableView->fontMetrics().horizontalAdvance(headerText.toString());
+//        maxWidth = qMax(maxWidth, headerWidth);
 
-        for (int row = 0; row < rowCount(); ++row) {
-            QModelIndex index = this->index(row, col);
+//        for (int row = 0; row < rowCount(); ++row) {
+//            QModelIndex index = this->index(row, col);
 
-            // Use the font metrics of the QTableView
-            QString text = data(index, Qt::DisplayRole).toString();
-            int textWidth = tableView->fontMetrics().horizontalAdvance(text);
+//            // Use the font metrics of the QTableView
+//            QString text = data(index, Qt::DisplayRole).toString();
+//            int textWidth = tableView->fontMetrics().horizontalAdvance(text);
 
-            // Adjust the maximum width if necessary
-            maxWidth = qMax(maxWidth, textWidth);
-        }
+//            // Adjust the maximum width if necessary
+//            maxWidth = qMax(maxWidth, textWidth);
+//        }
 
-        // Add some padding
-        maxWidth += 30;
-        // Set the column width for AlgoName_OB to 300 (or any preferred width)
-        tableView->resizeColumnsToContents();             // Adjust columns to content
-        tableView->resizeRowsToContents();                // Adjust rows to content
-       // tableView->horizontalHeader()->setStretchLastSection(true);  // Stretch the last column
-        tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);  // Optional for dynamic resizing
+//        // Add some padding
+//        maxWidth += 30;
+////          tableView->setColumnWidth(StockName_NP, 300);
+////        tableView->resizeColumnsToContents();             // Adjust columns to content
+////        tableView->resizeRowsToContents();                // Adjust rows to content
+////       // tableView->horizontalHeader()->setStretchLastSection(true);  // Stretch the last column
+////        tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);  // Optional for dynamic resizing
 
 
-    }
-}
+//    }
+//}

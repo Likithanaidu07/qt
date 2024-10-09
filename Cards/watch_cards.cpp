@@ -2,6 +2,7 @@
 #include "ui_watch_cards.h"
 #include "QListWidgetItem"
 #include "watch_data_list_item.h"
+#include <QKeyEvent>
 
 Watch_cards::Watch_cards(QWidget *parent) :
     QDialog(parent),
@@ -373,5 +374,12 @@ void Watch_cards::on_listWidgetWatch_itemSelectionChanged()
 {
     if(ui->listWidgetWatch->selectedItems().count()==0){
         ui->watchListSelectedDetails_Parent->setVisible(false);
+    }
+}
+void Watch_cards::keyPressEvent(QKeyEvent *event)
+{
+    if (event->key() == Qt::Key_Escape)
+    {
+        ui->lineEditWatchSearch->clear();
     }
 }

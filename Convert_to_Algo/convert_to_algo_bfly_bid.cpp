@@ -344,6 +344,7 @@ void add_algo_btfly_bid::generateAlgo()
         c0->setData(Qt::UserRole + 1,sharedData->unique_id);
         c0->setData(Qt::DisplayRole,Algo_Name_list[i]);
         c0->setFlags(c0->flags() ^ Qt::ItemIsEditable);
+        c0->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 0, c0);
 
 
@@ -357,14 +358,17 @@ void add_algo_btfly_bid::generateAlgo()
 
         QTableWidgetItem *c1 = new QTableWidgetItem(Leg1_Strike);
         c1->setFlags(c1->flags() ^ Qt::ItemIsEditable);
+        c1->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 1, c1);
 
         QTableWidgetItem *c2 = new QTableWidgetItem(Leg2_Strike);
         c2->setFlags(c2->flags() ^ Qt::ItemIsEditable);
+        c2->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 2, c2);
 
         QTableWidgetItem *c3 = new QTableWidgetItem(Leg3_Strike);
         c3->setFlags(c3->flags() ^ Qt::ItemIsEditable);
+        c3->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 3, c3);
 
 //        QTableWidgetItem *c6 = new QTableWidgetItem("NA");
@@ -378,6 +382,7 @@ void add_algo_btfly_bid::generateAlgo()
 
         QTableWidgetItem *c4 = new QTableWidgetItem("To be Uploaded");
         c4->setFlags(c4->flags() ^ Qt::ItemIsEditable);
+        c4->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 4, c4);
 
         algo_data_to_insert data;

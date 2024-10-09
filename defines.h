@@ -113,13 +113,13 @@ enum OrderBook_Idx{
     TradedLot_OB,
     RemainingLot_OB,
     TradeTime_OB,
-    BidLegState_OB,
     Leg1State_OB,
+    BidLegState_OB,
     Leg3State_OB,
     Leg4State_OB,
     AlgoNo_OB,
-    BidLegStateVal_OB,
     Leg1StateVal_OB,
+    BidLegStateVal_OB,
     Leg3StateVal_OB,
     Leg4StateVal_OB,
     Expiry_OB,
@@ -137,12 +137,12 @@ enum Liners_Idx{
     SellQtyinLots,
     NetQty,
     Profit,
+
 };
 
 enum NET_POS
 {
-    SNo_NP = 0,
-    StockName_NP,
+    StockName_NP=0,
     BuyTotalLot_NP,
     SellTotalLot_NP,
     BuyValue_NP,

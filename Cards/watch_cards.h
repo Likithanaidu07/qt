@@ -30,6 +30,7 @@ private slots:
 
     void on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item);
     void on_listWidgetWatch_itemSelectionChanged();
+    void keyPressEvent(QKeyEvent *event) override;
 
 private:
     Ui::Watch_cards *ui;

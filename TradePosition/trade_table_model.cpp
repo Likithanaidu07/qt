@@ -276,34 +276,33 @@ QVariant Trade_Table_Model::headerData(int section, Qt::Orientation orientation,
 
 }
 void Trade_Table_Model::setColumnWidths(QTableView *tableView) const {
-    for (int col = 0; col < columnCount(); ++col) {
-        int maxWidth = 0;
+    int maxWidth = 0;
 
+    // Calculate the maximum width across all columns and rows
+    for (int col = 0; col < columnCount(); ++col) {
         // Consider header text width
         QVariant headerText = this->headerData(col, Qt::Horizontal, Qt::DisplayRole);
         int headerWidth = tableView->fontMetrics().horizontalAdvance(headerText.toString());
         maxWidth = qMax(maxWidth, headerWidth);
 
+        // Check the width of each row's text for the current column
         for (int row = 0; row < rowCount(); ++row) {
             QModelIndex index = this->index(row, col);
-
-            // Use the font metrics of the QTableView
             QString text = data(index, Qt::DisplayRole).toString();
             int textWidth = tableView->fontMetrics().horizontalAdvance(text);
 
-            // Adjust the maximum width if necessary
+            // Update the maximum width if necessary
             maxWidth = qMax(maxWidth, textWidth);
         }
 
-        // Add some padding
-        maxWidth += 30;
-        // Set the column width for AlgoName_OB to 300 (or any preferred width)
-        tableView->setColumnWidth(AlgoName_OB, 300);
-        tableView->resizeColumnsToContents();             // Adjust columns to content
-        tableView->resizeRowsToContents();                // Adjust rows to content
-        tableView->horizontalHeader()->setStretchLastSection(true);  // Stretch the last column
-        tableView->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);  // Optional for dynamic resizing
 
+//    // Add some padding
+//    maxWidth += 30;
 
-    }
+    tableView->setColumnWidth(col, maxWidth);
+
+    tableView->setColumnWidth(OrderId_OB,45);
+    tableView->setColumnWidth(AlgoName_OB,300);
+   // tableView->horizontalHeader()->setSectionResizeMode(_Status, QHeaderView::Fixed);
+}
 }
