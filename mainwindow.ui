@@ -220,6 +220,9 @@ background: #46454d;
                  <height>8</height>
                 </size>
                </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
                <property name="text">
                 <string>...</string>
                </property>
@@ -285,6 +288,9 @@ background: #46454d;
                  <height>8</height>
                 </size>
                </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
                <property name="text">
                 <string>...</string>
                </property>
@@ -337,6 +343,9 @@ background: #46454d;
                  <width>8</width>
                  <height>8</height>
                 </size>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
                </property>
                <property name="text">
                 <string>...</string>
@@ -409,6 +418,9 @@ background: #46454d;
                  <height>8</height>
                 </size>
                </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
+               </property>
                <property name="text">
                 <string>...</string>
                </property>
@@ -467,6 +479,9 @@ background: #46454d;
                  <width>15</width>
                  <height>15</height>
                 </size>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
                </property>
                <property name="text">
                 <string>...</string>
@@ -545,6 +560,9 @@ background: #46454d;
                  <width>8</width>
                  <height>8</height>
                 </size>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
                </property>
                <property name="text">
                 <string>...</string>
@@ -630,6 +648,9 @@ background: #46454d;
                  <width>8</width>
                  <height>8</height>
                 </size>
+               </property>
+               <property name="focusPolicy">
+                <enum>Qt::NoFocus</enum>
                </property>
                <property name="text">
                 <string>...</string>
@@ -740,6 +761,9 @@ background: #27262b;
            <height>14</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
          <property name="styleSheet">
           <string notr="true">#menu{
 background: transparent;
@@ -774,6 +798,9 @@ background: transparent;
            <height>14</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
          <property name="styleSheet">
           <string notr="true">#minimize{
 background: transparent;
@@ -792,6 +819,9 @@ background: transparent;
            <height>14</height>
           </size>
          </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
+         </property>
          <property name="styleSheet">
           <string notr="true">#maximize{
 background: transparent;
@@ -809,6 +839,9 @@ background: transparent;
            <width>14</width>
            <height>14</height>
           </size>
+         </property>
+         <property name="focusPolicy">
+          <enum>Qt::NoFocus</enum>
          </property>
          <property name="styleSheet">
           <string notr="true">#close{
@@ -860,6 +893,19 @@ background: transperent;
    </property>
   </widget>
  </widget>
+ <tabstops>
+  <tabstop>Algorithms_Button</tabstop>
+  <tabstop>Liners_Button</tabstop>
+  <tabstop>OrderBook_Button</tabstop>
+  <tabstop>Positions_Button</tabstop>
+  <tabstop>MissedTrade_Button</tabstop>
+  <tabstop>Templates_Button</tabstop>
+  <tabstop>toolButtonCards</tabstop>
+  <tabstop>lineEditSearch</tabstop>
+  <tabstop>maximize</tabstop>
+  <tabstop>HP_Button</tabstop>
+  <tabstop>OrderBook_Close</tabstop>
+ </tabstops>
  <resources/>
  <connections/>
 </ui>

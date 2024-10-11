@@ -538,3 +538,6 @@ Qt-Advanced-Docking-System/lib/qtadvanceddocking.dll
 /Qt-Advanced-Docking-System/.qtc_clangd
 /Qt-Advanced-Docking-System/src/Makefile.Release
 /Qt-Advanced-Docking-System/src/Makefile.Debug
+ui_settings_window.h
+ui_settings_window.h
+ui_watch_data_card.h

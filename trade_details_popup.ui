@@ -3,7 +3,7 @@
  <class>TradeDetailsPopup</class>
  <widget class="QDialog" name="TradeDetailsPopup">
   <property name="windowModality">
-   <enum>Qt::ApplicationModal</enum>
+   <enum>Qt::NonModal</enum>
   </property>
   <property name="geometry">
    <rect>
@@ -17,7 +17,8 @@
    <string>Trade Details</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="applications-graphics"/>
+   <iconset theme="applications-graphics">
+    <normaloff>.</normaloff>.</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="0">

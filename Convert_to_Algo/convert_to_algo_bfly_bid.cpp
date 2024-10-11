@@ -158,11 +158,8 @@ void add_algo_btfly_bid::startStrikeEditFinishedAction(){
 
         }
     }
-
-
-
-
 }
+
 void add_algo_btfly_bid::generateAlgo()
 {
     if(foo_token_number_start_strike=="" || foo_token_number_end_strike==""){

@@ -181,6 +181,15 @@ MainWindow::MainWindow(QWidget *parent)
     //ui->widget_4->setVisible(false);
     //ui->toggle_Button_1->setVisible(false);
   //  connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
+//      setTabOrder(ui->Algorithms_Button,ui->Liners_Button);
+//    setTabOrder(ui->Liners_Button,ui->OrderBook_Button);
+//    setTabOrder(ui->OrderBook_Button,ui->Positions_Button);
+//    setTabOrder(ui->Positions_Button,ui->MissedTrade_Button);
+//    setTabOrder(ui->MissedTrade_Button,ui->Templates_Button);
+//    setTabOrder(ui->Templates_Button,ui->toolButtonCards);
+//    setTabOrder(ui->toolButtonCards,ui->lineEditSearch);
+//    setTabOrder(ui->lineEditSearch,ui->Algorithms_Button);
+
 
     connect(this,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
     loadingDataWinodw = new loadingdatawindow(this);
@@ -1462,7 +1471,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                         if (TQ > userData.IDXOpenLimit+bTTQ) {
                             QMessageBox msgBox;
-                            msgBox.setText("TQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
+                            msgBox.setText("BTQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
                             msgBox.setIcon(QMessageBox::Warning);
                             msgBox.exec();
                             break;
@@ -1472,7 +1481,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                         if (TQ > userData.STKOpenLimit+bTTQ) {
                             QMessageBox msgBox;
-                            msgBox.setText("TQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
+                            msgBox.setText("BTQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
                             msgBox.setIcon(QMessageBox::Warning);
                             msgBox.exec();
                             break;
@@ -1483,7 +1492,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                     if (TQ < TTQ) {
                             QMessageBox msgBox;
-                            msgBox.setText("Total Quantity cannot be less than Traded Quantity is " + QString::number(TTQ));
+                            msgBox.setText("BTQ cannot be less than Traded Quantity is " + QString::number(TTQ));
                             msgBox.setIcon(QMessageBox::Warning);
                             msgBox.exec();
 
@@ -1494,7 +1503,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                             if(TQ<OrderQty){
                                // show the error mesg here
                                 QMessageBox msgBox;
-                                msgBox.setText("TQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
+                                msgBox.setText("BTQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
                                 msgBox.setIcon(QMessageBox::Warning);
                                 msgBox.exec();
                             }
@@ -1525,7 +1534,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                             if (TQ > userData.IDXOpenLimit + sTTQ) {
                                 QMessageBox msgBox;
-                                msgBox.setText("TQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
+                                msgBox.setText("STQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
                                 msgBox.setIcon(QMessageBox::Warning);
                                 msgBox.exec();
                                 break;
@@ -1535,7 +1544,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                             if (TQ > userData.STKOpenLimit + sTTQ) {
                                 QMessageBox msgBox;
-                                msgBox.setText("TQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
+                                msgBox.setText("STQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
                                 msgBox.setIcon(QMessageBox::Warning);
                                 msgBox.exec();
                                 break;
@@ -1545,7 +1554,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                         if (TQ < TTQ) {
                             QMessageBox msgBox;
-                            msgBox.setText("Total Quantity cannot be less than Traded Quantity is " + QString::number(TTQ));
+                            msgBox.setText("STQ cannot be less than Traded Quantity is " + QString::number(TTQ));
                             msgBox.setIcon(QMessageBox::Warning);
                             msgBox.exec();
                         }
@@ -1554,7 +1563,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                             if(TQ<OrderQty){
                                 // show the error mesg here
                                 QMessageBox msgBox;
-                                msgBox.setText("TQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
+                                msgBox.setText("STQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
                                 msgBox.setIcon(QMessageBox::Warning);
                                 msgBox.exec();
                             }

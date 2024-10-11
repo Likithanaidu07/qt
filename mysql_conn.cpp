@@ -1488,6 +1488,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
                 dt = dt.toUTC();
 
                 QStringList rowList;
+                rowList.append(Algo_ID);
                 rowList.append(order_id);
                 //                rowList.append(Volant_No);
                 rowList.append(Algo_Name);
@@ -1502,7 +1503,6 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
                 rowList.append(Leg2_OrderStateStr);
                 rowList.append(Leg3_OrderStateStr);
                 rowList.append(Leg4_OrderStateStr);
-                rowList.append(Algo_ID);
                 rowList.append(QString::number(Leg1_OrderState));
                 rowList.append(QString::number(Leg2_OrderState));
                 rowList.append(QString::number(Leg3_OrderState));
@@ -1782,7 +1782,7 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
              BuyQty_summary += (net_pos_dataList[TokenNo].Buy_Total_Lot) / net_pos_dataList[TokenNo].lotSize;
              SellQty_summary += (net_pos_dataList[TokenNo].Sell_Total_Lot) / net_pos_dataList[TokenNo].lotSize;
 
-             double Profit = net_pos_dataList[TokenNo].Sell_Price - net_pos_dataList[TokenNo].Buy_Price;
+             double Profit = net_pos_dataList[TokenNo].Buy_Price - net_pos_dataList[TokenNo].Sell_Price;
              Profit_summary += Profit;
 
              QStringList rowList;
@@ -2006,7 +2006,7 @@ void mysql_conn::getNetPosTableData_BackUp(double &BuyValue_summary,double &Sell
                 SellQty_summary = SellQty_summary + (net_pos_dataList[TokenNo].Sell_Total_Lot)/ lotSize;
 
 
-                double Profit = net_pos_dataList[TokenNo].Sell_Price-net_pos_dataList[TokenNo].Buy_Price;
+                double Profit = net_pos_dataList[TokenNo].Buy_Price-net_pos_dataList[TokenNo].Sell_Price;
                 Profit_summary = Profit_summary + Profit ;
                 QStringList rowList;
                 rowList.append(QString::number(c)+"-"+TokenNo);
