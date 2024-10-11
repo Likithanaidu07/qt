@@ -474,8 +474,13 @@ MainWindow::MainWindow(QWidget *parent)
         );
     connect(headerView, &QHeaderView::sectionMoved, this, &MainWindow::onPortFolioTableHeader_Rearranged,Qt::UniqueConnection);
 
+    // Set the width of the fixed column (adjust the width as needed)
+
+
+
     T_Portfolio_Table->setHorizontalHeader(headerView);
     T_Portfolio_Table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+
     //T_Portfolio_Table->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
     T_Portfolio_Table->horizontalHeader()->setStretchLastSection(true);
     T_Portfolio_Table->setShowGrid(false);
@@ -537,6 +542,10 @@ MainWindow::MainWindow(QWidget *parent)
     lay->addWidget(T_Portfolio_Table,1,0);
     T_Portfolio_Table->show();
     restoreTableViewColumnState(T_Portfolio_Table);
+
+    //This will make first column fixed size
+    T_Portfolio_Table->horizontalHeader()->setSectionResizeMode(PortfolioData_Idx::_Status, QHeaderView::Fixed);
+    T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_Status, 60); // Set width to fixed pixels
 
     /***********Init portfolio table Window**************************/
 

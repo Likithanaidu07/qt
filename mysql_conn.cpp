@@ -1023,9 +1023,6 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
             QSqlRecord rec = query.record();
             while (query.next()) {
 
-
-
-
                 QString Buy_Sell = query.value(rec.indexOf("BuySellIndicator")).toString();
                 if(Buy_Sell=="1")
                     Buy_Sell = "Buy";
