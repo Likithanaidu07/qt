@@ -18,7 +18,6 @@ QStandardItemModel* ContractDetail::model_searchInstrument_F2F_Leg1 = nullptr;
 QStandardItemModel* ContractDetail::model_FUT_CON_REV = nullptr;
 QStandardItemModel* ContractDetail::model_start_strike_BFLY_BID = nullptr;
 QStandardItemModel* ContractDetail::model_start_strike_BOX_BID = nullptr;
-
 QStandardItemModel* ContractDetail::model_F1_F2 = nullptr;
 
 double ContractDetail::devicer_contract;
@@ -26,6 +25,28 @@ double ContractDetail::decimal_precision_contract;
 bool ContractDetail::settingLoaded = false;
 
 
+
+double estimateModelMemoryUsageMB(QStandardItemModel* model) {
+    int rowCount = model->rowCount();
+    int columnCount = model->columnCount();
+    double totalSizeBytes = 0.0;
+
+    for (int row = 0; row < rowCount; ++row) {
+        for (int col = 0; col < columnCount; ++col) {
+            QStandardItem* item = model->item(row, col);
+            if (item) {
+                // Estimate the size of the data stored in each item
+                QVariant data = item->data();
+                QByteArray byteArray = data.toString().toUtf8(); // For strings or general data
+                totalSizeBytes += static_cast<double>(byteArray.size());
+            }
+        }
+    }
+
+    // Convert bytes to megabytes (MB)
+    double totalSizeMB = totalSizeBytes / (1024.0 * 1024.0);
+    return totalSizeMB;
+}
 ContractDetail::ContractDetail() noexcept
 {
     //        model_searchInstrument_BOX_Leg1 = new QStandardItemModel;
@@ -415,6 +436,19 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
         model_start_strike_BOX_BID->appendRow(itemBOX_BID);
    }
     /********************************************************************/
+
+
+
+      /* qDebug() << "model_searchInstrument_F2F_Leg1: " << estimateModelMemoryUsageMB(model_start_strike_BFLY) << " MB";
+       qDebug() << "model_searchInstrument_F2F_Leg1: " << estimateModelMemoryUsageMB(model_searchInstrument_F2F_Leg1) << " MB";
+       qDebug() << "model_FUT_CON_REV: " << estimateModelMemoryUsageMB(model_FUT_CON_REV) << " MB";
+       qDebug() << "model_start_strike_BFLY_BID: " << estimateModelMemoryUsageMB(model_start_strike_BFLY_BID) << " MB";
+       qDebug() << "model_start_strike_BOX_BID: " << estimateModelMemoryUsageMB(model_start_strike_BOX_BID) << " MB";
+       qDebug() << "model_F1_F2: " << estimateModelMemoryUsageMB(model_F1_F2) << " MB";*/
+
+
+
+
 
 
 
