@@ -439,20 +439,12 @@ void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
 
 
 
-      /* qDebug() << "model_searchInstrument_F2F_Leg1: " << estimateModelMemoryUsageMB(model_start_strike_BFLY) << " MB";
+       qDebug() << "model_searchInstrument_F2F_Leg1: " << estimateModelMemoryUsageMB(model_start_strike_BFLY) << " MB";
        qDebug() << "model_searchInstrument_F2F_Leg1: " << estimateModelMemoryUsageMB(model_searchInstrument_F2F_Leg1) << " MB";
        qDebug() << "model_FUT_CON_REV: " << estimateModelMemoryUsageMB(model_FUT_CON_REV) << " MB";
        qDebug() << "model_start_strike_BFLY_BID: " << estimateModelMemoryUsageMB(model_start_strike_BFLY_BID) << " MB";
        qDebug() << "model_start_strike_BOX_BID: " << estimateModelMemoryUsageMB(model_start_strike_BOX_BID) << " MB";
-       qDebug() << "model_F1_F2: " << estimateModelMemoryUsageMB(model_F1_F2) << " MB";*/
-
-
-
-
-
-
-
-
+       qDebug() << "model_F1_F2: " << estimateModelMemoryUsageMB(model_F1_F2) << " MB";
 
 }
 
