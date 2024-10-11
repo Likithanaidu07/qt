@@ -181,6 +181,15 @@ MainWindow::MainWindow(QWidget *parent)
     //ui->widget_4->setVisible(false);
     //ui->toggle_Button_1->setVisible(false);
   //  connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
+//      setTabOrder(ui->Algorithms_Button,ui->Liners_Button);
+//    setTabOrder(ui->Liners_Button,ui->OrderBook_Button);
+//    setTabOrder(ui->OrderBook_Button,ui->Positions_Button);
+//    setTabOrder(ui->Positions_Button,ui->MissedTrade_Button);
+//    setTabOrder(ui->MissedTrade_Button,ui->Templates_Button);
+//    setTabOrder(ui->Templates_Button,ui->toolButtonCards);
+//    setTabOrder(ui->toolButtonCards,ui->lineEditSearch);
+//    setTabOrder(ui->lineEditSearch,ui->Algorithms_Button);
+
 
     connect(this,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
     loadingDataWinodw = new loadingdatawindow(this);
@@ -1322,47 +1331,56 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             qDebug()<<"profolioTableEditFinshedSlot----- portfolio null, need to debug this code.";
             return;
         }
+
+
+
+
         QString PortfolioNumber = QString::number(P->PortfolioNumber);//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
         T_Portfolio_Model->setEditingFlg(index.row(),0);//portfolio_data_list[index.row()]->edting.storeRelaxed(0);
 
         //Update status data to DB
-        if(index.column()==PortfolioData_Idx::_Status){
-            if(valStr == "0"){
-                QString Query = "UPDATE Portfolios SET Status='DisabledByUser' where PortfolioNumber="+PortfolioNumber;
-                QString msg;
-                bool success = db_conn->updateDB_Table(Query,msg);
-                if(success){
-                    db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));
-                    //refresh sorting
-                    reloadSortSettFlg.storeRelaxed(1);
-                }
-                else{
-                    QMessageBox msgBox;
-                    msgBox.setWindowTitle("Update Status Failed");
-                    msgBox.setIcon(QMessageBox::Warning);
-                    msgBox.setText(msg);
-                    msgBox.exec();
-                }
+        if (index.column() == PortfolioData_Idx::_Status) {
+            if (valStr == "0") {
+            QString Query = "UPDATE Portfolios SET Status='DisabledByUser' WHERE PortfolioNumber=" + PortfolioNumber;
+            QString msg;
+            bool success = db_conn->updateDB_Table(Query, msg);
+            if (success) {
+                db_conn->logToDB(QString("Disabled portfolio [" + PortfolioNumber + "]"));
+                // refresh sorting
+                reloadSortSettFlg.storeRelaxed(1);
+            } else {
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("Update Status Failed");
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.setText(msg);
+                msgBox.exec();
             }
-            else{
-                QString msg;
-                QString Query = "UPDATE Portfolios SET Status='Active' where PortfolioNumber="+PortfolioNumber;
-                bool success =  db_conn->updateDB_Table(Query,msg);
+            } else {
+            if (P->OrderQuantity == 0) {
+                QMessageBox msgBox;
+                msgBox.setText("Portfolio can't be enabled if OrderQuantity is 0.");
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.exec();
+                return;  // Prevent enabling the portfolio
+            }
 
-                if(success){
-                    db_conn->logToDB(QString("Activated  portfolio ["+PortfolioNumber+"]"));
-                    //refresh sorting
-                    reloadSortSettFlg.storeRelaxed(1);
-                }
-                else{
-                    QMessageBox msgBox;
-                    msgBox.setWindowTitle("Update Status Failed");
-                    msgBox.setIcon(QMessageBox::Warning);
-                    msgBox.setText(msg);
-                    msgBox.exec();
-                }
+            QString Query = "UPDATE Portfolios SET Status='Active' WHERE PortfolioNumber=" + PortfolioNumber;
+            QString msg;
+            bool success = db_conn->updateDB_Table(Query, msg);
+            if (success) {
+                db_conn->logToDB(QString("Activated portfolio [" + PortfolioNumber + "]"));
+                // refresh sorting
+                reloadSortSettFlg.storeRelaxed(1);
+            } else {
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("Update Status Failed");
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.setText(msg);
+                msgBox.exec();
+            }
             }
         }
+
         /*else if(index.column() == PortfolioData_Idx::_Alias) {
             // Skip checking for duplicate alias names
 
@@ -1471,7 +1489,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                         if (TQ > userData.IDXOpenLimit+bTTQ) {
                             QMessageBox msgBox;
-                            msgBox.setText("TQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
+                            msgBox.setText("BTQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
                             msgBox.setIcon(QMessageBox::Warning);
                             msgBox.exec();
                             break;
@@ -1481,7 +1499,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                         if (TQ > userData.STKOpenLimit+bTTQ) {
                             QMessageBox msgBox;
-                            msgBox.setText("TQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
+                            msgBox.setText("BTQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
                             msgBox.setIcon(QMessageBox::Warning);
                             msgBox.exec();
                             break;
@@ -1492,7 +1510,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                     if (TQ < TTQ) {
                             QMessageBox msgBox;
-                            msgBox.setText("Total Quantity cannot be less than Traded Quantity is " + QString::number(TTQ));
+                            msgBox.setText("BTQ cannot be less than Traded Quantity is " + QString::number(TTQ));
                             msgBox.setIcon(QMessageBox::Warning);
                             msgBox.exec();
 
@@ -1503,7 +1521,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                             if(TQ<OrderQty){
                                // show the error mesg here
                                 QMessageBox msgBox;
-                                msgBox.setText("TQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
+                                msgBox.setText("BTQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
                                 msgBox.setIcon(QMessageBox::Warning);
                                 msgBox.exec();
                             }
@@ -1534,7 +1552,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                             if (TQ > userData.IDXOpenLimit + sTTQ) {
                                 QMessageBox msgBox;
-                                msgBox.setText("TQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
+                                msgBox.setText("STQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
                                 msgBox.setIcon(QMessageBox::Warning);
                                 msgBox.exec();
                                 break;
@@ -1544,7 +1562,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                             if (TQ > userData.STKOpenLimit + sTTQ) {
                                 QMessageBox msgBox;
-                                msgBox.setText("TQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
+                                msgBox.setText("STQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
                                 msgBox.setIcon(QMessageBox::Warning);
                                 msgBox.exec();
                                 break;
@@ -1554,7 +1572,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
                         if (TQ < TTQ) {
                             QMessageBox msgBox;
-                            msgBox.setText("Total Quantity cannot be less than Traded Quantity is " + QString::number(TTQ));
+                            msgBox.setText("STQ cannot be less than Traded Quantity is " + QString::number(TTQ));
                             msgBox.setIcon(QMessageBox::Warning);
                             msgBox.exec();
                         }
@@ -1563,7 +1581,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                             if(TQ<OrderQty){
                                 // show the error mesg here
                                 QMessageBox msgBox;
-                                msgBox.setText("TQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
+                                msgBox.setText("STQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
                                 msgBox.setIcon(QMessageBox::Warning);
                                 msgBox.exec();
                             }

@@ -105,7 +105,8 @@ enum CombinedTrackerData_Idx{
 };
 
 enum OrderBook_Idx{
-    OrderId_OB=0,
+    AlgoNo_OB=0,
+    OrderId_OB,
     AlgoName_OB,
     UserPrice_OB,
     ExchPrice_OB,
@@ -117,7 +118,6 @@ enum OrderBook_Idx{
     BidLegState_OB,
     Leg3State_OB,
     Leg4State_OB,
-    AlgoNo_OB,
     Leg1StateVal_OB,
     BidLegStateVal_OB,
     Leg3StateVal_OB,

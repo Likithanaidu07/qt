@@ -13,14 +13,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     MainWindowObj = (MainWindow*) parent;
     //setWindowModality(Qt::ApplicationModal);
 
-    ui->pushButtonSelectAll->setText("Select All");
-    ui->pushButtonSelectAll->setStyleSheet("font-size: 10px;");
 
-    ui->pushButtonDelete->setText("Delete");
-    ui->pushButtonDelete->setStyleSheet("font-size: 10px;");
-
-    ui->pushButton_Reset->setText("Reset");
-    ui->pushButton_Reset->setStyleSheet("font-size: 10px;");
   //  ui->tableWidget->setFocusPolicy(Qt::NoFocus);
 
     setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Start_strike_Btfy);
@@ -59,7 +52,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
 
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::Tool);
 
-    QPixmap pixmapclose(":/close_window_icon.png");
+    QPixmap pixmapclose(":/dock_close.png");
     ui->Close->setIcon(pixmapclose);
 
     const char LineEdit_SS[]="border-radius: 6px;""border: 0.5px solid #343A40;""background: #FFF;""color: #6C757D;""font-size: 12px;""font-style: normal;""font-weight: 400;""line-height: normal;" "padding: 4px 10px 4px 10px;";
@@ -104,7 +97,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
                                "background: #FFF; "
                                "color: #465460; "
                                "text-align: center; "
-                               "font-size: 8px; "
+                               "font-size: 10px; "
                                "font-style: normal; "
                                "font-weight: 500; "
                                "line-height: normal;";
