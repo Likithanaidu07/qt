@@ -1331,47 +1331,56 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             qDebug()<<"profolioTableEditFinshedSlot----- portfolio null, need to debug this code.";
             return;
         }
+
+
+
+
         QString PortfolioNumber = QString::number(P->PortfolioNumber);//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
         T_Portfolio_Model->setEditingFlg(index.row(),0);//portfolio_data_list[index.row()]->edting.storeRelaxed(0);
 
         //Update status data to DB
-        if(index.column()==PortfolioData_Idx::_Status){
-            if(valStr == "0"){
-                QString Query = "UPDATE Portfolios SET Status='DisabledByUser' where PortfolioNumber="+PortfolioNumber;
-                QString msg;
-                bool success = db_conn->updateDB_Table(Query,msg);
-                if(success){
-                    db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));
-                    //refresh sorting
-                    reloadSortSettFlg.storeRelaxed(1);
-                }
-                else{
-                    QMessageBox msgBox;
-                    msgBox.setWindowTitle("Update Status Failed");
-                    msgBox.setIcon(QMessageBox::Warning);
-                    msgBox.setText(msg);
-                    msgBox.exec();
-                }
+        if (index.column() == PortfolioData_Idx::_Status) {
+            if (valStr == "0") {
+            QString Query = "UPDATE Portfolios SET Status='DisabledByUser' WHERE PortfolioNumber=" + PortfolioNumber;
+            QString msg;
+            bool success = db_conn->updateDB_Table(Query, msg);
+            if (success) {
+                db_conn->logToDB(QString("Disabled portfolio [" + PortfolioNumber + "]"));
+                // refresh sorting
+                reloadSortSettFlg.storeRelaxed(1);
+            } else {
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("Update Status Failed");
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.setText(msg);
+                msgBox.exec();
             }
-            else{
-                QString msg;
-                QString Query = "UPDATE Portfolios SET Status='Active' where PortfolioNumber="+PortfolioNumber;
-                bool success =  db_conn->updateDB_Table(Query,msg);
+            } else {
+            if (P->OrderQuantity == 0) {
+                QMessageBox msgBox;
+                msgBox.setText("Portfolio can't be enabled if OrderQuantity is 0.");
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.exec();
+                return;  // Prevent enabling the portfolio
+            }
 
-                if(success){
-                    db_conn->logToDB(QString("Activated  portfolio ["+PortfolioNumber+"]"));
-                    //refresh sorting
-                    reloadSortSettFlg.storeRelaxed(1);
-                }
-                else{
-                    QMessageBox msgBox;
-                    msgBox.setWindowTitle("Update Status Failed");
-                    msgBox.setIcon(QMessageBox::Warning);
-                    msgBox.setText(msg);
-                    msgBox.exec();
-                }
+            QString Query = "UPDATE Portfolios SET Status='Active' WHERE PortfolioNumber=" + PortfolioNumber;
+            QString msg;
+            bool success = db_conn->updateDB_Table(Query, msg);
+            if (success) {
+                db_conn->logToDB(QString("Activated portfolio [" + PortfolioNumber + "]"));
+                // refresh sorting
+                reloadSortSettFlg.storeRelaxed(1);
+            } else {
+                QMessageBox msgBox;
+                msgBox.setWindowTitle("Update Status Failed");
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.setText(msg);
+                msgBox.exec();
+            }
             }
         }
+
         /*else if(index.column() == PortfolioData_Idx::_Alias) {
             // Skip checking for duplicate alias names
 
