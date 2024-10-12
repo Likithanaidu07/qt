@@ -25,8 +25,7 @@ class add_algo_cr_jelly_bid : public QObject
 public:
     explicit add_algo_cr_jelly_bid(QObject *parent = nullptr);
     void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_);
-    QStringList sorted_keys_CON_REV_JELLY_BID; // sorted keys for contract_table hash table     // this used for start strike and endstrike
-    QStringList sorted_keys_F2F; // sorted keys for contract_table hash table  // this used to full fut instrument
+    QStringList CR_JELLY_BID_Tokens; // sorted keys for contract_table hash table     // this used for start strike and endstrike
     void create_AutoFillModel_StartStrike();
 
     void selectedAction();
@@ -39,8 +38,10 @@ public:
     QStandardItemModel *model_start_strike_CR_JELLY_BID;
     QStandardItemModel *model_end_strike_CR_JELLY_BID;
     QStandardItemModel *model_Fut_CR_JELLY_BID;
-
+    void clearAllModel();
 signals:
+  void progressSignal(bool, QString);
+
 private:
     QLineEdit *lineEdit_Start_strike;
     QLineEdit *lineEdit_EndStrike;

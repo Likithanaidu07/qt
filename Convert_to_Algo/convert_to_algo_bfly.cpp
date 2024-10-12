@@ -3,6 +3,9 @@
 
 #include "QElapsedTimer"
 #include "contractdetail.h"
+#include <QFuture>
+#include <QtConcurrent/QtConcurrent>
+#include <QProgressDialog>
 
 add_algo_btfly::add_algo_btfly(QObject *parent)
     : QObject{parent}
@@ -10,7 +13,14 @@ add_algo_btfly::add_algo_btfly(QObject *parent)
     //  model_start_strike_BFLY = new QStandardItemModel;
     sharedData = &AddAlgoSharedVar::getInstance();
     model_end_strike = new QStandardItemModel;
+    model_start_strike_BFLY = new QStandardItemModel;
+    BFLY_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::BY);
 
+
+}
+void add_algo_btfly::clearAllModel(){
+    model_end_strike->clear();
+    model_start_strike_BFLY->clear();
 }
 
 void add_algo_btfly::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_)
@@ -55,7 +65,7 @@ void add_algo_btfly::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidg
     endStrikeListView->installEventFilter(eventFilterEnd);
 
 
-    model_start_strike_BFLY = ContractDetail::getInstance().Get_model_start_strike_BFLY();
+    //model_start_strike_BFLY = ContractDetail::getInstance().Get_model_start_strike_BFLY();
     CustomSearchWidget *start_strikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_BFLY);
     connect(lineEdit_Start_strike, SIGNAL(textEdited(QString)),start_strikeCustomWidget, SLOT(filterItems(QString)));
     connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),this, SLOT(slotStartHide(QString)));
@@ -103,6 +113,51 @@ void add_algo_btfly::selectedAction(){
 
     startStrikeListView->hide();
     endStrikeListView->hide();
+    model_start_strike_BFLY->clear();
+
+    // Create a lambda function for processing in the background
+        QFuture<void> future = QtConcurrent::run([=]() {
+        QElapsedTimer timer1;
+        timer1.start();
+        emit progressSignal(true,"Data Model is Loading, Please wait!");
+        for(int i=0;i<BFLY_Tokens.length();i++){
+                const auto& contract = sharedData->contract_table_hash[BFLY_Tokens[i]];
+
+                /**********Create model for BFLY *************************/
+                unsigned int unix_time= contract.Expiry;
+                QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+                dt = dt.addYears(10);
+                int targetYear = dt.date().year();
+                bool isLeapYear = QDate::isLeapYear(targetYear);
+                QString instrument_name = contract.InstrumentName;
+
+                // If it is a leap year, and the date is after Feb 29, subtract one day
+                if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+                    dt = dt.addDays(-1);
+                }
+                QString Expiry=dt.toString("MMM dd yyyy").toUpper();
+                QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" "+contract.OptionType;
+                QStandardItem *itemBFLY = new QStandardItem;
+                itemBFLY->setText(algo_combination);
+                itemBFLY->setData(contract.TokenNumber, Qt::UserRole + 1);
+                QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd") + "-" + QString::number(contract.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
+                // Set the composite key as data for sorting
+                itemBFLY->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+
+                QMetaObject::invokeMethod(this, [=]() {
+                                   model_start_strike_BFLY->appendRow(itemBFLY);
+                }, Qt::QueuedConnection);
+
+                /********************************************************************/
+
+            }
+        emit progressSignal(false,"");
+
+
+        qDebug() << "model_start_strike_BFLY  Time:" << timer1.elapsed() << "milliseconds";
+
+        // Close the progress dialog once done
+    });
 
 
     // Get the global position of lineEdit_Start_strike
@@ -147,8 +202,8 @@ void add_algo_btfly::startStrikeEditFinishedAction()
 
     model_end_strike->clear();
 
-    for(int i=0;i<sorted_keys_BFLY.length();i++) {
-        contract_table tmp = sharedData->contract_table_hash[sorted_keys_BFLY[i]];
+    for(int i=0;i<BFLY_Tokens.length();i++) {
+        contract_table tmp = sharedData->contract_table_hash[BFLY_Tokens[i]];
 
         float end_strike = tmp.StrikePrice;
         if(start_strike>end_strike)

@@ -125,21 +125,29 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     /*******Class to generate F2F algos************/
    algoF2F = new add_algo_f2f();
    algoF2F->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_f2f,ui->lineEdit_EndStrike_f2f);
+   connect(algoF2F,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
+
     // /*******Class to generate F2F algos************/
 
     /*******Class to generate BtFly algos************/
     algoBtFly= new add_algo_btfly();
     algoBtFly->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_Btfy,ui->lineEdit_EndStrike_Btfy,ui->lineEdit_StrikeDifference_Btfy);
+    connect(algoBtFly,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
+
     /*******Class to generate BtFly algos************/
 
     /*******Class to generate con_rev algos************/
     algoConRev= new add_algo_con_rev();
     algoConRev->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_ConvRev,ui->lineEdit_EndStrike_ConvRev,ui->lineEdit_Fut_ConvRev);
+    connect(algoConRev,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
+
     /*******Class to generate con_rev algos************/
 
     /*******Class to generate BtFly-bid algos************/
     algoBtFlyBid= new add_algo_btfly_bid();
     algoBtFlyBid->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_BtfyBid,ui->lineEdit_EndStrike_BtfyBid,ui->lineEdit_StrikeDifference_BtfyBid);
+    connect(algoBtFlyBid,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
+
     /*******Class to generate BtFly-bid algos************/
 
 
@@ -147,11 +155,15 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     /*******Class to generate algoCRJellyBid algos************/
     algoCRJellyBid= new add_algo_cr_jelly_bid();
     algoCRJellyBid->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_CRJellyBid,ui->lineEdit_EndStrike_CRJellyBid,ui->lineEdit_Fut_CRJellyBid);
+    connect(algoCRJellyBid,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
+
     /*******Class to generate algoCRJellyBid algos************/
 
     /*******Class to generate BtFly-bid algos************/
     algoBoxBid= new convert_to_algo_box_bid();
     algoBoxBid->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_BoxBid,ui->lineEdit_EndStrike_BoxBid,ui->lineEdit_StrikeDifference_BoxBid);
+    connect(algoBoxBid,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
+
     /*******Class to generate BtFly-bid algos************/
 
 
@@ -159,6 +171,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     /*******Class to generate bs1221 algos************/
     algoBx1221= new convert_to_algo_bs1221();
     algoBx1221->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_Bs1221,ui->lineEdit_EndStrike_Bs1221,ui->lineEdit_StrikeDifference_Bs1221);
+    connect(algoBx1221,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
     /*******Class to generate BtFly-bid algos************/
 
 
@@ -305,12 +318,26 @@ void ConvertAlgo_Win::hideAnyListViewVisible(){
     algoBoxBid->slotStartHide("");
     algoBoxBid->slotEndHide("");
 
+    algoBx1221->slotStartHide("");
+    algoBx1221->slotStartHide("");
 
 }
 
 
 void ConvertAlgo_Win::on_Close_clicked()
 {
+
+
+    algoBx1221->clearAllModel();
+    algoBoxBid->clearAllModel();
+    algoCRJellyBid->clearAllModel();
+    algoBtFlyBid->clearAllModel();
+    algoConRev->clearAllModel();
+    algoBtFly->clearAllModel();
+    algoF2F->clearAllModel();
+
+
+
     hideAnyListViewVisible();
     close();
 }
@@ -372,34 +399,35 @@ void ConvertAlgo_Win::update_contract_tableData(QString foo_user_id_,int MaxPort
     sharedData->foo_user_id = foo_user_id_;
     sharedData->MaxPortfolioCount = MaxPortfolioCount_;
 
-    sharedData->FO_F2F_data_list_Sorted_Key = ContractDetail::getInstance().Get_F2F_data_list_Sorted_Key();
-    sharedData->FO_BFLY_data_list_Sorted_Key = ContractDetail::getInstance().Get_BFLY_data_list_Sorted_Key();
-    sharedData->FO_BFLY_BID_data_list_Sorted_Key = ContractDetail::getInstance().Get_BFLY_BID_data_list_Sorted_Key();
+
+   // sharedData->FO_F2F_data_list_Sorted_Key = ContractDetail::getInstance().Get_F2F_data_list_Sorted_Key();
+   // sharedData->FO_BFLY_data_list_Sorted_Key = ContractDetail::getInstance().Get_BFLY_data_list_Sorted_Key();
+   // sharedData->FO_BFLY_BID_data_list_Sorted_Key = ContractDetail::getInstance().Get_BFLY_BID_data_list_Sorted_Key();
 
     // default oprion will be FO so use the contract table fo and it's sorted key
-    algoF2F->sorted_keys_F2F = sharedData->FO_F2F_data_list_Sorted_Key;
-    algoF2F->model_searchInstrument_F2F_Leg1 =  ContractDetail::getInstance().Get_model_searchInstrument_F2F_Leg1(); //get the model generated from contract class for leg1
+    //algoF2F->sorted_keys_F2F = sharedData->FO_F2F_data_list_Sorted_Key;
+   // algoF2F->model_searchInstrument_F2F_Leg1 =  ContractDetail::getInstance().Get_model_searchInstrument_F2F_Leg1(); //get the model generated from contract class for leg1
 
-    algoBtFly->sorted_keys_BFLY = sharedData->FO_BFLY_data_list_Sorted_Key;
-    algoBtFly->model_start_strike_BFLY = ContractDetail::getInstance().Get_model_start_strike_BFLY();  //get the model generated from contract class for start strike
+   // algoBtFly->sorted_keys_BFLY = sharedData->FO_BFLY_data_list_Sorted_Key;
+   // algoBtFly->model_start_strike_BFLY = ContractDetail::getInstance().Get_model_start_strike_BFLY();  //get the model generated from contract class for start strike
 
-    algoBtFlyBid->sorted_keys_BFLY_BID = sharedData->FO_BFLY_BID_data_list_Sorted_Key;
-    algoBtFlyBid->model_start_strike_BFLY_BID = ContractDetail::getInstance().Get_model_start_strike_BFLY_BID();  //get the model generated from contract class for start strike
+    //algoBtFlyBid->sorted_keys_BFLY_BID = sharedData->FO_BFLY_BID_data_list_Sorted_Key;
+   // algoBtFlyBid->model_start_strike_BFLY_BID = ContractDetail::getInstance().Get_model_start_strike_BFLY_BID();  //get the model generated from contract class for start strike
 
-    algoBoxBid->filtered_tokens_BX_BID = ContractDetail::getInstance().Get_BOX_BID_data_list_Sorted_Key();//sharedData->FO_BFLY_BID_data_list_Sorted_Key;
-    algoBoxBid->model_start_strike_BOX_BID = ContractDetail::getInstance().Get_model_start_strike_BOX_BID();  //get the model generated from contract class for start strike
+ //   algoBoxBid->filtered_tokens_BX_BID = ContractDetail::getInstance().Get_BOX_BID_data_list_Sorted_Key();//sharedData->FO_BFLY_BID_data_list_Sorted_Key;
+  //  algoBoxBid->model_start_strike_BOX_BID = ContractDetail::getInstance().Get_model_start_strike_BOX_BID();  //get the model generated from contract class for start strike
 
-    algoBx1221->filtered_tokens_BX1221 = ContractDetail::getInstance().Get_BOX_BID_data_list_Sorted_Key();//sharedData->FO_BFLY_BID_data_list_Sorted_Key;
-    algoBx1221->model_start_strike_BX1221 = ContractDetail::getInstance().Get_model_start_strike_BOX_BID();  //get the model generated from contract class for start strike
+   // algoBx1221->filtered_tokens_BX1221 = ContractDetail::getInstance().Get_BOX_BID_data_list_Sorted_Key();//sharedData->FO_BFLY_BID_data_list_Sorted_Key;
+  //  algoBx1221->model_start_strike_BX1221 = ContractDetail::getInstance().Get_model_start_strike_BOX_BID();  //get the model generated from contract class for start strike
 
-    algoConRev->sorted_keys_CON_REV = sharedData->FO_BFLY_data_list_Sorted_Key;
-    algoConRev->sorted_keys_F2F = sharedData->FO_F2F_data_list_Sorted_Key;
-    algoConRev->model_Fut_CR = ContractDetail::getInstance().Get_model_FUT_CON_REV();  //get the model generated from contract class
+   // algoConRev->sorted_keys_CON_REV = sharedData->FO_BFLY_data_list_Sorted_Key;
+   // algoConRev->sorted_keys_F2F = sharedData->FO_F2F_data_list_Sorted_Key;
+   // algoConRev->model_Fut_CR = ContractDetail::getInstance().Get_model_FUT_CON_REV();  //get the model generated from contract class
 
 
-    algoCRJellyBid->sorted_keys_CON_REV_JELLY_BID = sharedData->FO_BFLY_data_list_Sorted_Key;
-    algoCRJellyBid->sorted_keys_F2F = sharedData->FO_F2F_data_list_Sorted_Key;
-    algoCRJellyBid->model_Fut_CR_JELLY_BID = ContractDetail::getInstance().Get_model_FUT_CON_REV();  //get the model generated from contract class
+    //algoCRJellyBid->sorted_keys_CON_REV_JELLY_BID = sharedData->FO_BFLY_data_list_Sorted_Key;
+   // algoCRJellyBid->sorted_keys_F2F = sharedData->FO_F2F_data_list_Sorted_Key;
+   // algoCRJellyBid->model_Fut_CR_JELLY_BID = ContractDetail::getInstance().Get_model_FUT_CON_REV();  //get the model generated from contract class
 
     /*algoBOX->sorted_keys_BOX = sharedData->FO_BFLY_data_list_Sorted_Key;
     algoBOX->model_searchInstrument_BOX_Leg1 = ContractDetail::getInstance().Get_model_searchInstrument_BOX_Leg1(); //get the model generated from contract class for leg1
@@ -910,6 +938,18 @@ void ConvertAlgo_Win::on_pushButtonDelete_clicked()
 
     //algo_data_list.removeAt(row);
 }
+
+void ConvertAlgo_Win::progressSlot(bool show, QString msg){
+
+     ui->progressBar->setVisible(show);
+     ui->label_ProgressText->setVisible(show);
+     ui->label_ProgressText->setText(msg);
+
+   //  ui->progressBar->setRange(0, 0);         // Indeterminate state (busy mode)
+    // ui->progressBar->setTextVisible(true);   // Ensure text is visible
+    // ui->progressBar->setFormat(msg);
+}
+
 
 
 

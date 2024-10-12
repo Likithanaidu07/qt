@@ -1,6 +1,8 @@
 #include "add_algo_con_rev.h"
 #include "contractdetail.h"
-
+#include <QFuture>
+#include <QtConcurrent/QtConcurrent>
+#include <QProgressDialog>
 
 add_algo_con_rev::add_algo_con_rev(QObject *parent)
     : QObject{parent}
@@ -8,10 +10,18 @@ add_algo_con_rev::add_algo_con_rev(QObject *parent)
 
     // model_FUT_CON_REV = new QStandardItemModel;
     sharedData = &AddAlgoSharedVar::getInstance();
+    model_Fut_CR = new QStandardItemModel;
     model_start_strike_CR = new QStandardItemModel;
     model_end_strike_CR = new QStandardItemModel;
+    CON_REV_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::CR);
 
 
+}
+
+void add_algo_con_rev::clearAllModel(){
+    model_Fut_CR->clear();
+    model_start_strike_CR->clear();
+    model_end_strike_CR->clear();
 }
 void add_algo_con_rev::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_){
     lineEdit_Start_strike = lineEdit_Start_strike_;
@@ -74,7 +84,7 @@ void add_algo_con_rev::copyUIElement(QDialog *parentWidget,QTableWidget *tableWi
 
 
 
-      model_Fut_CR =   ContractDetail::getInstance().Get_model_FUT_CON_REV();
+     // model_Fut_CR =   ContractDetail::getInstance().Get_model_FUT_CON_REV();
       CustomSearchWidget *futCustomWidget = new CustomSearchWidget(futListView,model_Fut_CR);
       connect(lineEdit_Fut, SIGNAL(textEdited(QString)),futCustomWidget, SLOT(filterItems(QString)));
 
@@ -108,6 +118,59 @@ void add_algo_con_rev::selectedAction(){
     futListView->hide();
     startStrikeListView->hide();
     endStrikeListView->hide();
+
+    model_Fut_CR->clear();
+
+    // Create a lambda function for processing in the background
+               QFuture<void> future = QtConcurrent::run([=]() {
+               QElapsedTimer timer1;
+               timer1.start();
+               emit progressSignal(true,"Data Model is Loading, Please wait!");
+               for(int i=0;i<CON_REV_Tokens.length();i++){
+
+                       /**********Create model for model_Fut_CR*************************/
+                       const auto& contract = sharedData->contract_table_hash[CON_REV_Tokens[i]];
+
+                       unsigned int unix_time= contract.Expiry;
+                       QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+                       dt = dt.addYears(10);
+                       int targetYear = dt.date().year();
+                       bool isLeapYear = QDate::isLeapYear(targetYear);
+
+                       // If it is a leap year, and the date is after Feb 29, subtract one day
+                       if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+                           dt = dt.addDays(-1);
+                       }
+                       QString Expiry=dt.toString("MMM dd yyyy").toUpper();
+
+                       QStandardItem *itemFut = new QStandardItem;
+                       itemFut->setText(contract.InstrumentName+" "+Expiry);
+                       itemFut->setData(contract.TokenNumber, Qt::UserRole + 1);
+                       QString compositeKey = contract.InstrumentName + "-" + dt.toString("yyyyMMdd");
+                       // Set the composite key as data for sorting
+                       itemFut->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+
+                       QMetaObject::invokeMethod(this, [=]() {
+                            model_Fut_CR->appendRow(itemFut);
+                       }, Qt::QueuedConnection);
+
+                       /********************************************************************/
+
+                   }
+               emit progressSignal(false,"");
+
+
+               qDebug() << "model_Fut_CR  Time:" << timer1.elapsed() << "milliseconds";
+
+               // Close the progress dialog once done
+           });
+
+
+
+
+
+
+
 
     // Get the global position of lineEdit_Start_strike
     QPoint globalPos = lineEdit_Fut->mapToGlobal(lineEdit_Fut->geometry().bottomLeft());
@@ -152,8 +215,8 @@ void add_algo_con_rev::create_AutoFillModel_StartStrike(){
 
     model_start_strike_CR->clear();
     //create list based on the Fut input and populate start strike model the data is of same as butterfly
-    for(int i=0;i<sorted_keys_CON_REV.length();i++) {
-        contract_table tmp = sharedData->contract_table_hash[sorted_keys_CON_REV[i]];
+    for(int i=0;i<CON_REV_Tokens.length();i++) {
+        contract_table tmp = sharedData->contract_table_hash[CON_REV_Tokens[i]];
         unsigned int unix_time= tmp.Expiry;
         QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
         dt = dt.addYears(10);
@@ -219,8 +282,8 @@ void add_algo_con_rev::startStrikeEditFinishedAction(){
 
     // float expiry_date_start = contract_table_hash[key].expiry_date.toFloat();
     model_end_strike_CR->clear();
-    for(int i=0;i<sorted_keys_CON_REV.length();i++) {
-        contract_table tmp = sharedData->contract_table_hash[sorted_keys_CON_REV[i]];
+    for(int i=0;i<CON_REV_Tokens.length();i++) {
+        contract_table tmp = sharedData->contract_table_hash[CON_REV_Tokens[i]];
         float end_strike = tmp.StrikePrice;
         //qDebug()<<tmp.instrument_name<<"=="<<Instr_Name<<"   "<<tmp.option_type<<"=="<<Option_Type<<"   "<<Expiry<<"=="<<tmp.expiry_date;
         if(start_strike>=end_strike)
@@ -332,19 +395,19 @@ void add_algo_con_rev::generateAlgo(){
     long long expiryDateStartStrike = sharedData->contract_table_hash[keyStart].Expiry;
     //filter based on  selected combination
     QStringList filteredKeys;
-    for(int i=0;i<sorted_keys_CON_REV.length();i++) {
-        if(Instr_Name!= sharedData->contract_table_hash[sorted_keys_CON_REV[i]].InstrumentName||sharedData->contract_table_hash[sorted_keys_CON_REV[i]].Expiry!=expiryDateStartStrike)
+    for(int i=0;i<CON_REV_Tokens.length();i++) {
+        if(Instr_Name!= sharedData->contract_table_hash[CON_REV_Tokens[i]].InstrumentName||sharedData->contract_table_hash[CON_REV_Tokens[i]].Expiry!=expiryDateStartStrike)
             continue;
-        QString optionType = sharedData->contract_table_hash[sorted_keys_CON_REV[i]].OptionType;
+        QString optionType = sharedData->contract_table_hash[CON_REV_Tokens[i]].OptionType;
 
 
 
-        int tmpStrike =  sharedData->contract_table_hash[sorted_keys_CON_REV[i]].StrikePrice; // will be in paise so converted to Rs
+        int tmpStrike =  sharedData->contract_table_hash[CON_REV_Tokens[i]].StrikePrice; // will be in paise so converted to Rs
         if(tmpStrike>endStrike||tmpStrike<startStrike)
             continue;
 
         if(optionType=="CE"||optionType=="PE")
-            filteredKeys.append(sorted_keys_CON_REV[i]);
+            filteredKeys.append(CON_REV_Tokens[i]);
     }
 
     sortFilteredKeys(filteredKeys, sharedData->contract_table_hash);

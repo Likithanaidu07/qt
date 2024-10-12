@@ -18,7 +18,7 @@
     public:
         explicit convert_to_algo_bs1221(QObject *parent = nullptr);
         void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_);
-        QStringList filtered_tokens_BX1221; // filtered token for BOX_BID
+        QStringList BX1221_Tokens; // filtered token for BOX_BID
         void selectedAction();
         QString foo_token_number_start_strike;// this for start strike input of btfly
         QString foo_token_number_end_strike;// this for start strike input of btfly
@@ -29,10 +29,11 @@
         void generateAlgo();
         void endStrikeEditFinishedAction();
         void initializeUI() ;
+        void clearAllModel();
 
 
-
-    private slots:
+    signals:
+      void progressSignal(bool, QString);
 
     public slots:
         void itemSelectedStartStrike(QModelIndex);

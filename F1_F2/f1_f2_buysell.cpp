@@ -2,6 +2,9 @@
 #include "ui_f1_f2_buysell.h"
 #include "ContractDetail.h"
 #include <QKeyEvent>
+#include <QFuture>
+#include <QtConcurrent/QtConcurrent>
+#include <QProgressDialog>
 
 F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_precision) :
     QDialog(parent),
@@ -49,9 +52,9 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
     ui->spinBoxLot->setFont(font2);
 
 
+    model_stock_name = new QStandardItemModel;
 
-
-    model_stock_name =  ContractDetail::getInstance().Get_model_F1_F2();
+    //model_stock_name =  ContractDetail::getInstance().Get_model_F1_F2();
 
     QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     // to make floating window
@@ -83,6 +86,60 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
 
 
    // stockNameListView->move(x+100, y+65);
+
+
+    ui->comboBoxBuySell->setEnabled(false);
+    ui->lineEdit_Stockname->setEnabled(false);
+    ui->doubleSpinBox_price->setEnabled(false);
+    ui->spinBoxLot->setEnabled(false);
+    ui->pushButtonSubmit->setEnabled(false);
+
+    QFuture<void> future = QtConcurrent::run([=]() {
+    //QElapsedTimer timer1;
+    //timer1.start();
+    QStringList CR_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::CR);
+        for(int i=0;i<CR_Tokens.length();i++){
+
+            /**********Create model for F1_F2*************************/
+            contract_table contract = ContractDetail::getInstance().GetDetail(CR_Tokens[i].toInt(),PortfolioType::F1_F2);
+
+            unsigned int unix_time= contract.Expiry;
+            QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+            dt = dt.addYears(10);
+            int targetYear = dt.date().year();
+            bool isLeapYear = QDate::isLeapYear(targetYear);
+
+            // If it is a leap year, and the date is after Feb 29, subtract one day
+            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+                dt = dt.addDays(-1);
+            }
+            QString Expiry=dt.toString("MMM dd yyyy").toUpper();
+            QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer,'f',decimal_precision)+" "+contract.OptionType;
+            QStandardItem *itemF1_F2 = new QStandardItem;
+            itemF1_F2->setText(algo_combination);
+            itemF1_F2->setData(contract.TokenNumber, Qt::UserRole + 1);
+            // Set the composite key as data for sorting
+             QString compositeKey = contract.InstrumentName + "-" + dt.toString("yyyyMMdd");
+            itemF1_F2->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+            model_stock_name->appendRow(itemF1_F2);
+
+
+
+            /********************************************************************/
+        }
+
+        QMetaObject::invokeMethod(ui->progressBar, "setVisible", Qt::QueuedConnection, Q_ARG(bool, false));
+        // Ensure each UI element update happens on the UI thread
+        QMetaObject::invokeMethod(ui->comboBoxBuySell, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, true));
+        QMetaObject::invokeMethod(ui->lineEdit_Stockname, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, true));
+        QMetaObject::invokeMethod(ui->doubleSpinBox_price, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, true));
+        QMetaObject::invokeMethod(ui->spinBoxLot, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, true));
+        QMetaObject::invokeMethod(ui->pushButtonSubmit, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, true));
+
+        //qDebug() << "itemF1_F2  Time:" << timer1.elapsed() << "milliseconds";
+
+        // Close the progress dialog once done
+    });
 
 
 }
@@ -137,6 +194,8 @@ void F1_F2_BuySell::itemSelectedStockName(QModelIndex index)
 
 F1_F2_BuySell::~F1_F2_BuySell()
 {
+    model_stock_name->clear();
+    delete model_stock_name;
     delete ui;
 }
 

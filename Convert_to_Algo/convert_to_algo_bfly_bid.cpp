@@ -2,6 +2,10 @@
 #include "custom_q_completer.h"
 #include "contractdetail.h"
 #include "QElapsedTimer"
+#include <QFuture>
+#include <QtConcurrent/QtConcurrent>
+#include <QProgressDialog>
+
 
 add_algo_btfly_bid::add_algo_btfly_bid(QObject *parent)
     : QObject{parent}
@@ -9,19 +13,26 @@ add_algo_btfly_bid::add_algo_btfly_bid(QObject *parent)
     //  model_start_strike_BFLY = new QStandardItemModel;
     sharedData = &AddAlgoSharedVar::getInstance();
     model_end_strike = new QStandardItemModel;
+    model_start_strike_BFLY_BID = new QStandardItemModel;
+    BFLY_BID_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::BFLY_BID);
+
 
 }
 
-void add_algo_btfly_bid::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_){
+void add_algo_btfly_bid::clearAllModel(){
+    model_end_strike->clear();
+    model_start_strike_BFLY_BID->clear();
+}
+
+void add_algo_btfly_bid::copyUIElement(QDialog *parentWidget_,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_){
 
     lineEdit_Start_strike = lineEdit_Start_strike_;
     lineEdit_EndStrike = lineEdit_EndStrike_;
     lineEdit_StrikeDifference = lineEdit_StrikeDifference_;
     tableWidget = tableWidget_;
-
     QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     // to make floating window
-    startStrikeListView = new QListView(parentWidget);
+    startStrikeListView = new QListView(parentWidget_);
     connect(startStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedStartStrike(QModelIndex)));
     startStrikeListView->setSizePolicy(sizePolicy);
     startStrikeListView->setFixedSize(230, 200);
@@ -30,7 +41,7 @@ void add_algo_btfly_bid::copyUIElement(QDialog *parentWidget,QTableWidget *table
 
 
 
-     endStrikeListView = new QListView(parentWidget);
+     endStrikeListView = new QListView(parentWidget_);
      connect(endStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
      endStrikeListView->setSizePolicy(sizePolicy);
      endStrikeListView->setFixedSize(230, 200);
@@ -53,17 +64,13 @@ void add_algo_btfly_bid::copyUIElement(QDialog *parentWidget,QTableWidget *table
     endStrikeListView->installEventFilter(eventFilterEnd);
 
 
-    model_start_strike_BFLY_BID = ContractDetail::getInstance().Get_model_start_strike_BFLY_BID();
+    //model_start_strike_BFLY_BID = ContractDetail::getInstance().Get_model_start_strike_BFLY_BID();
     //create qcompleter and fill with abovie model
     CustomSearchWidget *startstrikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_BFLY_BID);
     startstrikeCustomWidget->name = "startStrike";
     connect(lineEdit_Start_strike, SIGNAL(textEdited(QString)),startstrikeCustomWidget, SLOT(filterItems(QString)));
     connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),this, SLOT(slotStartHide(QString)));
     connect(lineEdit_EndStrike, SIGNAL(textChanged(QString)),this, SLOT(slotEndHide(QString)));
-
-
-
-
 
     // create qcompleter and fill with above model
     CustomSearchWidget *endstrikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike);
@@ -74,6 +81,97 @@ void add_algo_btfly_bid::copyUIElement(QDialog *parentWidget,QTableWidget *table
 
 
 void add_algo_btfly_bid::selectedAction(){
+
+    model_start_strike_BFLY_BID->clear();
+    model_end_strike->clear();
+
+
+//    for(int i=0;i<BFLY_BID_Tokens.length();i++){
+
+//        /**********Create model for BFLY BID*************************/
+//        const auto& contract = sharedData->contract_table_hash[BFLY_BID_Tokens[i]];
+//        unsigned int  unix_time= contract.Expiry;
+//        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//        dt = dt.addYears(10);
+//        int targetYear = dt.date().year();
+//        bool isLeapYear = QDate::isLeapYear(targetYear);
+
+//        // If it is a leap year, and the date is after Feb 29, subtract one day
+//        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//            dt = dt.addDays(-1);
+//        }
+//        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
+//        QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" "+contract.OptionType;
+//        QStandardItem *itemBFLY = new QStandardItem;
+//        itemBFLY->setText(algo_combination);
+//        itemBFLY->setData(contract.TokenNumber, Qt::UserRole + 1);
+//        QString strik_price = QString::number(contract.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
+
+//        // Create custom data for sorting
+//        QString compositeKey = contract.InstrumentName + "-" + dt.toString("yyyyMMdd") + "-" + strik_price;
+//        // Set the composite key as data for sorting
+//        itemBFLY->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+//        model_start_strike_BFLY_BID->appendRow(itemBFLY);
+
+//        /********************************************************************/
+
+//    }
+
+    // Create a progress dialog to show the progress
+
+
+
+
+        // Create a lambda function for processing in the background
+            QFuture<void> future = QtConcurrent::run([=]() {
+            QElapsedTimer timer1;
+            timer1.start();
+            emit progressSignal(true,"Data Model is Loading, Please wait!");
+            for (int i = 0; i < BFLY_BID_Tokens.length(); ++i) {
+
+                /**********Create model for BFLY BID*************************/
+                const auto &contract = sharedData->contract_table_hash[BFLY_BID_Tokens[i]];
+                unsigned int unix_time = contract.Expiry;
+                QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+                dt = dt.addYears(10);
+                int targetYear = dt.date().year();
+                bool isLeapYear = QDate::isLeapYear(targetYear);
+
+                // If it is a leap year, and the date is after Feb 29, subtract one day
+                if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+                    dt = dt.addDays(-1);
+                }
+                QString Expiry = dt.toString("MMM dd yyyy").toUpper();
+                QString algo_combination = contract.InstrumentName + " " + Expiry + " " +
+                                           QString::number(contract.StrikePrice / sharedData->strike_price_devider, 'f', sharedData->decimal_precision) + " " +
+                                           contract.OptionType;
+                QStandardItem *itemBFLY = new QStandardItem;
+                itemBFLY->setText(algo_combination);
+                itemBFLY->setData(contract.TokenNumber, Qt::UserRole + 1);
+                QString strik_price = QString::number(contract.StrikePrice / sharedData->strike_price_devider, 'f', sharedData->decimal_precision);
+
+                // Create custom data for sorting
+                QString compositeKey = contract.InstrumentName + "-" + dt.toString("yyyyMMdd") + "-" + strik_price;
+                // Set the composite key as data for sorting
+                itemBFLY->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+               // model_start_strike_BFLY_BID->appendRow(itemBFLY);
+                QMetaObject::invokeMethod(this, [=]() {
+                    model_start_strike_BFLY_BID->appendRow(itemBFLY);
+                }, Qt::QueuedConnection);
+
+                /********************************************************************/
+
+                // Update progress bar in the main thread
+            }
+            emit progressSignal(false,"");
+
+
+            qDebug() << "model_start_strike_BFLY_BID  Time:" << timer1.elapsed() << "milliseconds";
+
+            // Close the progress dialog once done
+        });
+
+
 
     foo_token_number_start_strike = "";
     foo_token_number_end_strike = "";
@@ -114,9 +212,9 @@ void add_algo_btfly_bid::startStrikeEditFinishedAction(){
     float start_strike = sharedData->contract_table_hash[key].StrikePrice;
 
 
-    for(int i=0;i<sorted_keys_BFLY_BID.length();i++) {
+    for(int i=0;i<BFLY_BID_Tokens.length();i++) {
 
-        contract_table tmp = sharedData->contract_table_hash[sorted_keys_BFLY_BID[i]];
+        contract_table tmp = sharedData->contract_table_hash[BFLY_BID_Tokens[i]];
 
         float end_strike = tmp.StrikePrice;
         if(start_strike>end_strike)
@@ -208,8 +306,8 @@ void add_algo_btfly_bid::generateAlgo()
 
     QHash<QString, QString> strikePrice_TokenFiltered;
     QList<int> strikePriceListFiltered;
-    for(int i=0;i<sorted_keys_BFLY_BID.length();i++){
-        contract_table c = sharedData->contract_table_hash[sorted_keys_BFLY_BID[i]];
+    for(int i=0;i<BFLY_BID_Tokens.length();i++){
+        contract_table c = sharedData->contract_table_hash[BFLY_BID_Tokens[i]];
         if(c.StrikePrice<startStrike||c.StrikePrice>endStrike+StrikeDifference+StrikeDifference)
             continue;
 
@@ -452,7 +550,6 @@ void add_algo_btfly_bid::itemSelectedStartStrike(QModelIndex index)
                         lineEdit_Start_strike->setCursorPosition(0);
                         startStrikeEditFinishedAction();
                         startStrikeListView->hide();
-                        qDebug()<<"ListView->hide(): ListView->hide()";
                         break;
                     }
                 }

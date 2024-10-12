@@ -19,7 +19,7 @@ class add_algo_btfly : public QObject
 public:
     explicit add_algo_btfly(QObject *parent = nullptr);
    void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_StrikeDifference_);
-    QStringList sorted_keys_BFLY; // sorted keys for contract_table hash table
+    QStringList BFLY_Tokens;
     //void create_AutoFillModel_StartStrike();
     void selectedAction();
     QString foo_token_number_start_strike;// this for start strike input of btfly
@@ -30,8 +30,9 @@ public:
 
     void startStrikeEditFinishedAction();
     void generateAlgo();
-
+    void clearAllModel();
 signals:
+  void progressSignal(bool, QString);
 
 private slots:
 

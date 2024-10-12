@@ -813,17 +813,124 @@ line-height: normal;
       <item row="6" column="0" colspan="10">
        <layout class="QHBoxLayout" name="horizontalLayout_2">
         <property name="spacing">
-         <number>17</number>
+         <number>0</number>
         </property>
         <item>
-         <spacer name="horizontalSpacer_3">
+         <widget class="QWidget" name="widget_3" native="true">
+          <property name="minimumSize">
+           <size>
+            <width>50</width>
+            <height>35</height>
+           </size>
+          </property>
+          <property name="maximumSize">
+           <size>
+            <width>16777215</width>
+            <height>35</height>
+           </size>
+          </property>
+          <layout class="QVBoxLayout" name="verticalLayout_2">
+           <property name="spacing">
+            <number>5</number>
+           </property>
+           <property name="leftMargin">
+            <number>0</number>
+           </property>
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <property name="rightMargin">
+            <number>0</number>
+           </property>
+           <property name="bottomMargin">
+            <number>5</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_ProgressText">
+             <property name="text">
+              <string>Loading Plese Wait...</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QProgressBar" name="progressBar">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>15</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>0</width>
+               <height>15</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>16777215</width>
+               <height>15</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">#progressBar {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop: 0 rgba(255, 255, 255, 0), /* Transparent at the start */
+        stop: 0.1 rgba(255, 255, 255, 1), /* Fade in effect */
+        stop: 0.9 rgba(255, 255, 255, 1), /* Fully opaque */
+        stop: 1 rgba(255, 255, 255, 0)); /* Transparent at the end */
+    border: 0px solid rgba(255, 255, 255, 1);
+    border-radius: 5px;
+    text-align: center;
+    height: 20px;
+    color: black; /* Set the text color to black or any other color */
+}
+
+#progressBar::chunk {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop: 0 rgba(116, 166, 190, 0), /* Transparent at the start */
+        stop: 0.2 rgba(116, 166, 190, 1), /* Fade in effect */
+        stop: 0.8 rgba(116, 166, 190, 1), /* Fully opaque */
+        stop: 1 rgba(116, 166, 190, 0)); /* Transparent at the end */
+    border-radius: 8px;
+}
+</string>
+             </property>
+             <property name="minimum">
+              <number>0</number>
+             </property>
+             <property name="maximum">
+              <number>0</number>
+             </property>
+             <property name="value">
+              <number>0</number>
+             </property>
+             <property name="textVisible">
+              <bool>true</bool>
+             </property>
+             <property name="invertedAppearance">
+              <bool>false</bool>
+             </property>
+             <property name="format">
+              <string>Please wait</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_4">
           <property name="orientation">
-           <enum>Qt::Horizontal</enum>
+           <enum>Qt::Vertical</enum>
           </property>
           <property name="sizeHint" stdset="0">
            <size>
-            <width>40</width>
-            <height>20</height>
+            <width>20</width>
+            <height>40</height>
            </size>
           </property>
          </spacer>
@@ -861,6 +968,19 @@ line-height: normal;
            <bool>true</bool>
           </property>
          </widget>
+        </item>
+        <item>
+         <spacer name="verticalSpacer_5">
+          <property name="orientation">
+           <enum>Qt::Vertical</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>20</width>
+            <height>40</height>
+           </size>
+          </property>
+         </spacer>
         </item>
         <item>
          <widget class="QPushButton" name="pushButton_Cancel">

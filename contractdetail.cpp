@@ -13,12 +13,12 @@ QHash<QString, contract_table> ContractDetail::m_ContractDetails_Hash; //store t
 QHash<QString, QStringList> ContractDetail::m_ContractDetailsFiltered;
 
 //QStandardItemModel* ContractDetail::model_searchInstrument_BOX_Leg1  = nullptr;
-QStandardItemModel* ContractDetail::model_start_strike_BFLY = nullptr;
-QStandardItemModel* ContractDetail::model_searchInstrument_F2F_Leg1 = nullptr;
-QStandardItemModel* ContractDetail::model_FUT_CON_REV = nullptr;
-QStandardItemModel* ContractDetail::model_start_strike_BFLY_BID = nullptr;
-QStandardItemModel* ContractDetail::model_start_strike_BOX_BID = nullptr;
-QStandardItemModel* ContractDetail::model_F1_F2 = nullptr;
+//QStandardItemModel* ContractDetail::model_start_strike_BFLY = nullptr;
+//QStandardItemModel* ContractDetail::model_searchInstrument_F2F_Leg1 = nullptr;
+//QStandardItemModel* ContractDetail::model_FUT_CON_REV = nullptr;
+//QStandardItemModel* ContractDetail::model_start_strike_BFLY_BID = nullptr;
+//QStandardItemModel* ContractDetail::model_start_strike_BOX_BID = nullptr;
+//QStandardItemModel* ContractDetail::model_F1_F2 = nullptr;
 
 double ContractDetail::devicer_contract;
 double ContractDetail::decimal_precision_contract;
@@ -50,13 +50,13 @@ double estimateModelMemoryUsageMB(QStandardItemModel* model) {
 ContractDetail::ContractDetail() noexcept
 {
     //        model_searchInstrument_BOX_Leg1 = new QStandardItemModel;
-    model_start_strike_BFLY = new QStandardItemModel;
-    model_searchInstrument_F2F_Leg1 = new QStandardItemModel;
-    model_FUT_CON_REV = new QStandardItemModel;
-    model_start_strike_BFLY_BID = new QStandardItemModel;
-    model_start_strike_BOX_BID = new QStandardItemModel;
+//    model_start_strike_BFLY = new QStandardItemModel;
+//    model_searchInstrument_F2F_Leg1 = new QStandardItemModel;
+//    model_FUT_CON_REV = new QStandardItemModel;
+//    //model_start_strike_BFLY_BID = new QStandardItemModel;
+//    model_start_strike_BOX_BID = new QStandardItemModel;
 
-    model_F1_F2 = new QStandardItemModel;
+//    model_F1_F2 = new QStandardItemModel;
 }
 
 ContractDetail &ContractDetail::getInstance()
@@ -140,7 +140,7 @@ void ContractDetail::ReloadContractDetails(userInfo uData)
     }
 #endif
 
-   create_inputFiledAutoFillModel_For_AddAlgoWindow();
+  // create_inputFiledAutoFillModel_For_AddAlgoWindow();
     //std::sort(m_ContractDetails.begin(), m_ContractDetails.end(), [](const ContractDetail& a, const ContractDetail& b) { return a.InstrumentName < b.InstrumentName; });
 }
 
@@ -155,349 +155,340 @@ QHash<QString, contract_table> ContractDetail::GetContracts()
 }
 
 //This function create autfill model for first input field in add algo window(frist leg)
-void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
+//void ContractDetail::create_inputFiledAutoFillModel_For_AddAlgoWindow()
+//{
+//    //        model_searchInstrument_BOX_Leg1->clear();
+//    model_start_strike_BFLY->clear();
+//    model_searchInstrument_F2F_Leg1->clear();
+//    model_FUT_CON_REV->clear();
+//   // model_start_strike_BFLY_BID->clear();
+//    model_start_strike_BOX_BID->clear();
+//    model_F1_F2->clear();
+
+//    QSet<QString> model_data_name_set;
+//    QStringList BFLY_Tokens  = m_ContractDetails_Grouped[PortfolioType::BY];
+
+//    QElapsedTimer timer;
+//    QElapsedTimer timer1;
+//    timer1.start();
+
+//    timer.start();
+//    for(int i=0;i<BFLY_Tokens.length();i++){
+//        const auto& contract = m_ContractDetails_Hash[BFLY_Tokens[i]];
+
+//        /**********Create model for BFLY *************************/
+//        unsigned int unix_time= contract.Expiry;
+//        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//        dt = dt.addYears(10);
+//        int targetYear = dt.date().year();
+//        bool isLeapYear = QDate::isLeapYear(targetYear);
+//        QString instrument_name = contract.InstrumentName;
+
+//        // If it is a leap year, and the date is after Feb 29, subtract one day
+//        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//            dt = dt.addDays(-1);
+//        }
+//        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
+//        QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract)+" "+contract.OptionType;
+//        QStandardItem *itemBFLY = new QStandardItem;
+//        itemBFLY->setText(algo_combination);
+//        itemBFLY->setData(contract.TokenNumber, Qt::UserRole + 1);
+//        QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd") + "-" + QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract);
+//        // Set the composite key as data for sorting
+//        itemBFLY->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+//        model_start_strike_BFLY->appendRow(itemBFLY);
+
+//        /********************************************************************/
+
+//    }
+//    // After the loop, calculate the elapsed time
+//    qint64 elapsedTime = timer.elapsed();  // Time in milliseconds
+//    qDebug() << "Time model_start_strike_BFLY:" << elapsedTime << "milliseconds";
+//    qDebug() << "Time BFLY_Tokens Size:" << BFLY_Tokens.length();
+
+//    //doubt
+//    QSet<QString> model_data_name_set_bfly_bid;
+//    QStringList BFLY_BID_Tokens  = m_ContractDetails_Grouped[PortfolioType::BFLY_BID];
+
+//    for(int i=0;i<BFLY_BID_Tokens.length();i++){
+//        /**********Create model for Mainwindow searchbar*************************/
+//        const auto& contract = m_ContractDetails_Hash[BFLY_BID_Tokens[i]];
+//        QString stock_name=contract.StockName;
+
+//        QString name = stock_name;
+//        if(!model_data_name_set_bfly_bid.contains(name)){
+//            model_data_name_set_bfly_bid.insert(name);
+//            QStandardItem *itemBOXL1 = new QStandardItem;
+//            itemBOXL1->setText(name);
+//            itemBOXL1->setData(contract.StockName, Qt::UserRole + 1);
+//            //                model_searchInstrument_BOX_Leg1->appendRow(itemBOXL1);
+//        }
+//        /********************************************************************/
+//    }
+
+//    for(int i=0;i<BFLY_BID_Tokens.length();i++){
+//        /**********Create model for BOX*************************/
+//        const auto& contract = m_ContractDetails_Hash[BFLY_BID_Tokens[i]];
+//        unsigned int unix_time= contract.Expiry;
+//        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//        dt = dt.addYears(10);
+//        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
+//        QString instrument_name = contract.InstrumentName;
+//        QString strik_price = QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract);
+
+//        QString name = instrument_name+" "+Expiry+" "+strik_price;
+//        if(!model_data_name_set_bfly_bid.contains(name)){
+//            model_data_name_set_bfly_bid.insert(name);
+//            QStandardItem *itemBOXL1 = new QStandardItem;
+//            itemBOXL1->setText(name);
+//            itemBOXL1->setData(contract.TokenNumber, Qt::UserRole + 1);
+//            //                model_searchInstrument_BOX_Leg1->appendRow(itemBOXL1);
+//        }
+//        /********************************************************************/
+
+//        /**********Create model for BFLY BID*************************/
+
+//        unix_time= contract.Expiry;
+//        dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//        dt = dt.addYears(10);
+//        int targetYear = dt.date().year();
+//        bool isLeapYear = QDate::isLeapYear(targetYear);
+
+//        // If it is a leap year, and the date is after Feb 29, subtract one day
+//        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//            dt = dt.addDays(-1);
+//        }
+//        Expiry=dt.toString("MMM dd yyyy").toUpper();
+//        QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract)+" "+contract.OptionType;
+//        QStandardItem *itemBFLY = new QStandardItem;
+//        itemBFLY->setText(algo_combination);
+//        itemBFLY->setData(contract.TokenNumber, Qt::UserRole + 1);
+
+//        // Create custom data for sorting
+//        QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd") + "-" + strik_price;
+//        // Set the composite key as data for sorting
+//        itemBFLY->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+//        model_start_strike_BFLY_BID->appendRow(itemBFLY);
+
+//        /********************************************************************/
+
+//    }
+//    //doubt
+
+
+//    QStringList F2F_Tokens  = m_ContractDetails_Grouped[PortfolioType::F2F];
+
+//    for(int i=0;i<F2F_Tokens.length();i++){
+
+//        /**********Create model for _F2F*************************/
+//        const auto& contract = m_ContractDetails_Hash[F2F_Tokens[i]];
+//        unsigned int unix_time= contract.Expiry;
+//        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//        dt = dt.addYears(10);
+//        int targetYear = dt.date().year();
+//        bool isLeapYear = QDate::isLeapYear(targetYear);
+
+//        // If it is a leap year, and the date is after Feb 29, subtract one day
+//        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//            dt = dt.addDays(-1);
+//        }
+//        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
+//        QString instrument_name = contract.InstrumentName;
+
+
+//        QStandardItem *itemF2FL1 = new QStandardItem;
+//        itemF2FL1->setText(instrument_name+" "+Expiry);
+//        itemF2FL1->setData(contract.TokenNumber, Qt::UserRole + 1);
+//        QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd");
+//        // Set the composite key as data for sorting
+//        itemF2FL1->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+//        model_searchInstrument_F2F_Leg1->appendRow(itemF2FL1);
+//        /********************************************************************/
+
+
+//        /**********Create model for CON_REV*************************/
+//        instrument_name = contract.InstrumentName;//" "+Expiry;
+//        unix_time= contract.Expiry;
+//        dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//        dt = dt.addYears(10);
+//        int targetYear_cr = dt.date().year();
+//        bool isLeapYear_cr = QDate::isLeapYear(targetYear);
+
+//        // If it is a leap year, and the date is after Feb 29, subtract one day
+//        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//            dt = dt.addDays(-1);
+//        }
+//        Expiry=dt.toString("MMM dd yyyy").toUpper();
+
+//        QStandardItem *itemFut = new QStandardItem;
+//        itemFut->setText(instrument_name+" "+Expiry);
+//        itemFut->setData(contract.TokenNumber, Qt::UserRole + 1);
+//        compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd");
+//        // Set the composite key as data for sorting
+//        itemFut->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+//        model_FUT_CON_REV->appendRow(itemFut);
+
+//        /********************************************************************/
+
+//    }
+
+
+//    QStringList CR_Tokens  = m_ContractDetails_Grouped[PortfolioType::CR];
+
+//    for(int i=0;i<CR_Tokens.length();i++){
+
+//    /**********Create model for CON_REV*************************/
+//        const auto& contract = m_ContractDetails_Hash[CR_Tokens[i]];
+
+//        unsigned int unix_time= contract.Expiry;
+//        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//        dt = dt.addYears(10);
+//        int targetYear = dt.date().year();
+//        bool isLeapYear = QDate::isLeapYear(targetYear);
+
+//        // If it is a leap year, and the date is after Feb 29, subtract one day
+//        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//            dt = dt.addDays(-1);
+//        }
+//        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
+//        QString instrument_name = contract.InstrumentName;
+
+//      //  QStandardItem *itemFut = new QStandardItem;
+//      //  itemFut->setText(instrument_name+" "+Expiry);
+//      //  itemFut->setData(contract.TokenNumber, Qt::UserRole + 1);
+//        QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd");
+//        // Set the composite key as data for sorting
+//       // itemFut->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+//       // model_FUT_CON_REV->appendRow(itemFut);
+
+//    /********************************************************************/
+
+
+//        /**********Create model for F1_F2*************************/
+//        QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract)+" "+contract.OptionType;
+//        QStandardItem *itemF1_F2 = new QStandardItem;
+//        itemF1_F2->setText(algo_combination);
+//        itemF1_F2->setData(contract.TokenNumber, Qt::UserRole + 1);
+//        // Set the composite key as data for sorting
+//        itemF1_F2->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+//        model_F1_F2->appendRow(itemF1_F2);
+
+//        /********************************************************************/
+//    }
+
+//    /**********Create model for BX_BID*************************/
+//    QStringList BX_BID_Tokens  = m_ContractDetails_Grouped[PortfolioType::BX_BID];
+
+//    for(int i=0;i<BX_BID_Tokens.length();i++){
+//        const auto& contract = m_ContractDetails_Hash[BX_BID_Tokens[i]];
+//        //Only CE record need to avoaid duplicate
+//        if(contract.OptionType=="PE")
+//            continue;
+//        unsigned int unix_time= contract.Expiry;
+//        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//        dt = dt.addYears(10);
+//        // Check if the target year is a leap year
+//        int targetYear = dt.date().year();
+//        bool isLeapYear = QDate::isLeapYear(targetYear);
+
+//        // If it is a leap year, and the date is after Feb 29, subtract one day
+//        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//            dt = dt.addDays(-1);
+//        }
+
+//        QString Expiry = dt.toString("MMM dd yyyy").toUpper();
+
+//        QString instrument_name = contract.InstrumentName;
+
+//        QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract);
+//        QStandardItem *itemBOX_BID = new QStandardItem;
+//        itemBOX_BID->setText(algo_combination);
+//        itemBOX_BID->setData(contract.TokenNumber, Qt::UserRole + 1);
+
+//        QString strik_price = QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract);
+//        // Create custom data for sorting
+//        QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd") + "-" + strik_price;
+//        // Set the composite key as data for sorting
+//        itemBOX_BID->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+//        model_start_strike_BOX_BID->appendRow(itemBOX_BID);
+//   }
+//    /********************************************************************/
+
+//    qDebug() << "Time  Total:" << timer1.elapsed() << "milliseconds";
+
+//       qDebug() << "model_searchInstrument_F2F_Leg1: " << estimateModelMemoryUsageMB(model_start_strike_BFLY) << " MB";
+//       qDebug() << "model_searchInstrument_F2F_Leg1: " << estimateModelMemoryUsageMB(model_searchInstrument_F2F_Leg1) << " MB";
+//       qDebug() << "model_FUT_CON_REV: " << estimateModelMemoryUsageMB(model_FUT_CON_REV) << " MB";
+//      // qDebug() << "model_start_strike_BFLY_BID: " << estimateModelMemoryUsageMB(model_start_strike_BFLY_BID) << " MB";
+//       qDebug() << "model_start_strike_BOX_BID: " << estimateModelMemoryUsageMB(model_start_strike_BOX_BID) << " MB";
+//       qDebug() << "model_F1_F2: " << estimateModelMemoryUsageMB(model_F1_F2) << " MB";
+
+//}
+
+//QStandardItemModel* ContractDetail::Get_model_searchInstrument_F2F_Leg1()
+//{
+//    return model_searchInstrument_F2F_Leg1;
+//}
+
+
+//QStandardItemModel* ContractDetail::Get_model_FUT_CON_REV()
+//{
+//    return model_FUT_CON_REV;
+//}
+
+
+//QStandardItemModel* ContractDetail::Get_model_start_strike_BFLY()
+//{
+//    return model_start_strike_BFLY;
+//}
+
+//QStandardItemModel* ContractDetail::Get_model_start_strike_BFLY_BID()
+//{
+//    return model_start_strike_BFLY_BID;
+//}
+//QStandardItemModel* ContractDetail::Get_model_start_strike_BOX_BID()
+//{
+//    return model_start_strike_BOX_BID;
+//}
+
+
+//QStandardItemModel* ContractDetail::Get_model_F1_F2()
+//{
+//    return model_F1_F2;
+//}
+//QStringList ContractDetail::Get_F2F_data_list_Sorted_Key()
+//{
+//    return m_ContractDetails_Grouped[PortfolioType::F2F];
+//}
+
+//QStringList ContractDetail::Get_BFLY_data_list_Sorted_Key()
+//{
+//    return  m_ContractDetails_Grouped[PortfolioType::BY];
+//}
+
+//QStringList ContractDetail::Get_BFLY_BID_data_list_Sorted_Key()
+//{
+//    return m_ContractDetails_Grouped[PortfolioType::BFLY_BID];
+//}
+
+//QStringList ContractDetail::Get_BOX_BID_data_list_Sorted_Key()
+//{
+//    return m_ContractDetails_Grouped[PortfolioType::BX_BID];
+//}
+
+QStringList ContractDetail::Get_Tokens_For_PortfolioType(PortfolioType type)
 {
-    //        model_searchInstrument_BOX_Leg1->clear();
-    model_start_strike_BFLY->clear();
-    model_searchInstrument_F2F_Leg1->clear();
-    model_FUT_CON_REV->clear();
-    model_start_strike_BFLY_BID->clear();
-    model_start_strike_BOX_BID->clear();
-    model_F1_F2->clear();
-
-    QSet<QString> model_data_name_set;
-    QStringList BFLY_Tokens  = m_ContractDetails_Grouped[PortfolioType::BY];
-
-    for(int i=0;i<BFLY_Tokens.length();i++){
-        const auto& contract = m_ContractDetails_Hash[BFLY_Tokens[i]];
-
-        /**********Create model for Mainwindow searchbar*************************/
-        QString stock_name=contract.StockName;
-
-        QString name = stock_name;
-        if(!model_data_name_set.contains(name)){
-            model_data_name_set.insert(name);
-            QStandardItem *itemBOXL1 = new QStandardItem;
-            itemBOXL1->setText(name);
-            itemBOXL1->setData(contract.StockName, Qt::UserRole + 1);
-            //                model_searchInstrument_BOX_Leg1->appendRow(itemBOXL1);
-        }
-        /********************************************************************/
-
-        /**********Create model for BOX*************************/
-        unsigned int unix_time= contract.Expiry;
-        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-        dt = dt.addYears(10);
-        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
-        QString instrument_name = contract.InstrumentName;
-        QString strik_price = QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract);
-
-        name = instrument_name+" "+Expiry+" "+strik_price;
-        if(!model_data_name_set.contains(name)){
-            model_data_name_set.insert(name);
-            QStandardItem *itemBOXL1 = new QStandardItem;
-            itemBOXL1->setText(name);
-            itemBOXL1->setData(contract.TokenNumber, Qt::UserRole + 1);
-            //                model_searchInstrument_BOX_Leg1->appendRow(itemBOXL1);
-        }
-        /********************************************************************/
-
-        /**********Create model for BFLY *************************/
-
-        unix_time= contract.Expiry;
-        dt = QDateTime::fromSecsSinceEpoch(unix_time);
-        dt = dt.addYears(10);
-        int targetYear = dt.date().year();
-        bool isLeapYear = QDate::isLeapYear(targetYear);
-
-        // If it is a leap year, and the date is after Feb 29, subtract one day
-        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-            dt = dt.addDays(-1);
-        }
-        Expiry=dt.toString("MMM dd yyyy").toUpper();
-        QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract)+" "+contract.OptionType;
-        QStandardItem *itemBFLY = new QStandardItem;
-        itemBFLY->setText(algo_combination);
-        itemBFLY->setData(contract.TokenNumber, Qt::UserRole + 1);
-        QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd") + "-" + QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract);
-        // Set the composite key as data for sorting
-        itemBFLY->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
-        model_start_strike_BFLY->appendRow(itemBFLY);
-
-        /********************************************************************/
-
-
-
+    if (m_ContractDetails_Grouped.contains(type)) {
+        return m_ContractDetails_Grouped[type];
     }
-    //doubt
-    QSet<QString> model_data_name_set_bfly_bid;
-    QStringList BFLY_BID_Tokens  = m_ContractDetails_Grouped[PortfolioType::BFLY_BID];
-
-    for(int i=0;i<BFLY_BID_Tokens.length();i++){
-        /**********Create model for Mainwindow searchbar*************************/
-        const auto& contract = m_ContractDetails_Hash[BFLY_BID_Tokens[i]];
-        QString stock_name=contract.StockName;
-
-        QString name = stock_name;
-        if(!model_data_name_set_bfly_bid.contains(name)){
-            model_data_name_set_bfly_bid.insert(name);
-            QStandardItem *itemBOXL1 = new QStandardItem;
-            itemBOXL1->setText(name);
-            itemBOXL1->setData(contract.StockName, Qt::UserRole + 1);
-            //                model_searchInstrument_BOX_Leg1->appendRow(itemBOXL1);
-        }
-        /********************************************************************/
-    }
-
-    for(int i=0;i<BFLY_BID_Tokens.length();i++){
-        /**********Create model for BOX*************************/
-        const auto& contract = m_ContractDetails_Hash[BFLY_BID_Tokens[i]];
-        unsigned int unix_time= contract.Expiry;
-        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-        dt = dt.addYears(10);
-        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
-        QString instrument_name = contract.InstrumentName;
-        QString strik_price = QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract);
-
-        QString name = instrument_name+" "+Expiry+" "+strik_price;
-        if(!model_data_name_set_bfly_bid.contains(name)){
-            model_data_name_set_bfly_bid.insert(name);
-            QStandardItem *itemBOXL1 = new QStandardItem;
-            itemBOXL1->setText(name);
-            itemBOXL1->setData(contract.TokenNumber, Qt::UserRole + 1);
-            //                model_searchInstrument_BOX_Leg1->appendRow(itemBOXL1);
-        }
-        /********************************************************************/
-
-        /**********Create model for BFLY BID*************************/
-
-        unix_time= contract.Expiry;
-        dt = QDateTime::fromSecsSinceEpoch(unix_time);
-        dt = dt.addYears(10);
-        int targetYear = dt.date().year();
-        bool isLeapYear = QDate::isLeapYear(targetYear);
-
-        // If it is a leap year, and the date is after Feb 29, subtract one day
-        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-            dt = dt.addDays(-1);
-        }
-        Expiry=dt.toString("MMM dd yyyy").toUpper();
-        QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract)+" "+contract.OptionType;
-        QStandardItem *itemBFLY = new QStandardItem;
-        itemBFLY->setText(algo_combination);
-        itemBFLY->setData(contract.TokenNumber, Qt::UserRole + 1);
-
-        // Create custom data for sorting
-        QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd") + "-" + strik_price;
-        // Set the composite key as data for sorting
-        itemBFLY->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
-        model_start_strike_BFLY_BID->appendRow(itemBFLY);
-
-        /********************************************************************/
-
-    }
-    //doubt
-
-
-    QStringList F2F_Tokens  = m_ContractDetails_Grouped[PortfolioType::F2F];
-
-    for(int i=0;i<F2F_Tokens.length();i++){
-
-        /**********Create model for _F2F*************************/
-        const auto& contract = m_ContractDetails_Hash[F2F_Tokens[i]];
-        unsigned int unix_time= contract.Expiry;
-        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-        dt = dt.addYears(10);
-        int targetYear = dt.date().year();
-        bool isLeapYear = QDate::isLeapYear(targetYear);
-
-        // If it is a leap year, and the date is after Feb 29, subtract one day
-        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-            dt = dt.addDays(-1);
-        }
-        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
-        QString instrument_name = contract.InstrumentName;
-
-
-        QStandardItem *itemF2FL1 = new QStandardItem;
-        itemF2FL1->setText(instrument_name+" "+Expiry);
-        itemF2FL1->setData(contract.TokenNumber, Qt::UserRole + 1);
-        QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd");
-        // Set the composite key as data for sorting
-        itemF2FL1->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
-        model_searchInstrument_F2F_Leg1->appendRow(itemF2FL1);
-        /********************************************************************/
-
-
-        /**********Create model for CON_REV*************************/
-        instrument_name = contract.InstrumentName;//" "+Expiry;
-        unix_time= contract.Expiry;
-        dt = QDateTime::fromSecsSinceEpoch(unix_time);
-        dt = dt.addYears(10);
-        int targetYear_cr = dt.date().year();
-        bool isLeapYear_cr = QDate::isLeapYear(targetYear);
-
-        // If it is a leap year, and the date is after Feb 29, subtract one day
-        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-            dt = dt.addDays(-1);
-        }
-        Expiry=dt.toString("MMM dd yyyy").toUpper();
-
-        QStandardItem *itemFut = new QStandardItem;
-        itemFut->setText(instrument_name+" "+Expiry);
-        itemFut->setData(contract.TokenNumber, Qt::UserRole + 1);
-        compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd");
-        // Set the composite key as data for sorting
-        itemFut->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
-        model_FUT_CON_REV->appendRow(itemFut);
-
-        /********************************************************************/
-
-    }
-
-
-    QStringList CR_Tokens  = m_ContractDetails_Grouped[PortfolioType::CR];
-
-    for(int i=0;i<CR_Tokens.length();i++){
-
-    /**********Create model for CON_REV*************************/
-        const auto& contract = m_ContractDetails_Hash[CR_Tokens[i]];
-
-        unsigned int unix_time= contract.Expiry;
-        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-        dt = dt.addYears(10);
-        int targetYear = dt.date().year();
-        bool isLeapYear = QDate::isLeapYear(targetYear);
-
-        // If it is a leap year, and the date is after Feb 29, subtract one day
-        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-            dt = dt.addDays(-1);
-        }
-        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
-        QString instrument_name = contract.InstrumentName;
-
-      //  QStandardItem *itemFut = new QStandardItem;
-      //  itemFut->setText(instrument_name+" "+Expiry);
-      //  itemFut->setData(contract.TokenNumber, Qt::UserRole + 1);
-        QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd");
-        // Set the composite key as data for sorting
-       // itemFut->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
-       // model_FUT_CON_REV->appendRow(itemFut);
-
-    /********************************************************************/
-
-
-        /**********Create model for F1_F2*************************/
-        QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract)+" "+contract.OptionType;
-        QStandardItem *itemF1_F2 = new QStandardItem;
-        itemF1_F2->setText(algo_combination);
-        itemF1_F2->setData(contract.TokenNumber, Qt::UserRole + 1);
-        // Set the composite key as data for sorting
-        itemF1_F2->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
-        model_F1_F2->appendRow(itemF1_F2);
-
-        /********************************************************************/
-    }
-
-    /**********Create model for BX_BID*************************/
-    QStringList BX_BID_Tokens  = m_ContractDetails_Grouped[PortfolioType::BX_BID];
-
-    for(int i=0;i<BX_BID_Tokens.length();i++){
-        const auto& contract = m_ContractDetails_Hash[BX_BID_Tokens[i]];
-        //Only CE record need to avoaid duplicate
-        if(contract.OptionType=="PE")
-            continue;
-        unsigned int unix_time= contract.Expiry;
-        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-        dt = dt.addYears(10);
-        // Check if the target year is a leap year
-        int targetYear = dt.date().year();
-        bool isLeapYear = QDate::isLeapYear(targetYear);
-
-        // If it is a leap year, and the date is after Feb 29, subtract one day
-        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-            dt = dt.addDays(-1);
-        }
-
-        QString Expiry = dt.toString("MMM dd yyyy").toUpper();
-
-        QString instrument_name = contract.InstrumentName;
-
-        QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract);
-        QStandardItem *itemBOX_BID = new QStandardItem;
-        itemBOX_BID->setText(algo_combination);
-        itemBOX_BID->setData(contract.TokenNumber, Qt::UserRole + 1);
-
-        QString strik_price = QString::number(contract.StrikePrice/devicer_contract,'f',decimal_precision_contract);
-        // Create custom data for sorting
-        QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd") + "-" + strik_price;
-        // Set the composite key as data for sorting
-        itemBOX_BID->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
-        model_start_strike_BOX_BID->appendRow(itemBOX_BID);
+    else {
+       qDebug()<<"PortfolioType: " <<type<< " not exist in m_ContractDetails_Grouped, Debug and fix.";
+       return QStringList(); // or handle it as needed
    }
-    /********************************************************************/
-
-
-
-       qDebug() << "model_searchInstrument_F2F_Leg1: " << estimateModelMemoryUsageMB(model_start_strike_BFLY) << " MB";
-       qDebug() << "model_searchInstrument_F2F_Leg1: " << estimateModelMemoryUsageMB(model_searchInstrument_F2F_Leg1) << " MB";
-       qDebug() << "model_FUT_CON_REV: " << estimateModelMemoryUsageMB(model_FUT_CON_REV) << " MB";
-       qDebug() << "model_start_strike_BFLY_BID: " << estimateModelMemoryUsageMB(model_start_strike_BFLY_BID) << " MB";
-       qDebug() << "model_start_strike_BOX_BID: " << estimateModelMemoryUsageMB(model_start_strike_BOX_BID) << " MB";
-       qDebug() << "model_F1_F2: " << estimateModelMemoryUsageMB(model_F1_F2) << " MB";
 
 }
 
-QStandardItemModel* ContractDetail::Get_model_searchInstrument_F2F_Leg1()
-{
-    return model_searchInstrument_F2F_Leg1;
-}
 
-
-QStandardItemModel* ContractDetail::Get_model_FUT_CON_REV()
-{
-    return model_FUT_CON_REV;
-}
-
-
-QStandardItemModel* ContractDetail::Get_model_start_strike_BFLY()
-{
-    return model_start_strike_BFLY;
-}
-
-QStandardItemModel* ContractDetail::Get_model_start_strike_BFLY_BID()
-{
-    return model_start_strike_BFLY_BID;
-}
-QStandardItemModel* ContractDetail::Get_model_start_strike_BOX_BID()
-{
-    return model_start_strike_BOX_BID;
-}
-
-
-QStandardItemModel* ContractDetail::Get_model_F1_F2()
-{
-    return model_F1_F2;
-}
-QStringList ContractDetail::Get_F2F_data_list_Sorted_Key()
-{
-    return m_ContractDetails_Grouped[PortfolioType::F2F];
-}
-
-QStringList ContractDetail::Get_BFLY_data_list_Sorted_Key()
-{
-    return  m_ContractDetails_Grouped[PortfolioType::BY];
-}
-
-QStringList ContractDetail::Get_BFLY_BID_data_list_Sorted_Key()
-{
-    return m_ContractDetails_Grouped[PortfolioType::BFLY_BID];
-}
-
-QStringList ContractDetail::Get_BOX_BID_data_list_Sorted_Key()
-{
-    return m_ContractDetails_Grouped[PortfolioType::BX_BID];
-}
 /*Hash<QString, contract_table> ContractDetail::GetFutureContracts()
 {
     if (m_ContractDetails.empty())

@@ -1,5 +1,8 @@
 #include "add_algo_f2f.h"
 #include "ContractDetail.h"
+#include <QFuture>
+#include <QtConcurrent/QtConcurrent>
+#include <QProgressDialog>
 
 add_algo_f2f::add_algo_f2f(QObject *parent)
     : QObject{parent}
@@ -7,8 +10,15 @@ add_algo_f2f::add_algo_f2f(QObject *parent)
     //model_searchInstrument_F2F_Leg1 = new QStandardItemModel;
     model_searchInstrument_F2F_Leg2 = new QStandardItemModel;
     sharedData = &AddAlgoSharedVar::getInstance();
+    model_searchInstrument_F2F_Leg1 = new QStandardItemModel;
+    F2F_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::F2F);
 
 }
+void add_algo_f2f::clearAllModel(){
+    model_searchInstrument_F2F_Leg2->clear();
+    model_searchInstrument_F2F_Leg1->clear();
+}
+
 void add_algo_f2f::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_searchInstrument_leg1_,QLineEdit *lineEdit_searchInstrument_leg2_){
     lineEdit_searchInstrument_leg1 = lineEdit_searchInstrument_leg1_;
     lineEdit_searchInstrument_leg2 = lineEdit_searchInstrument_leg2_;
@@ -51,7 +61,7 @@ void add_algo_f2f::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget
 
 
 
-     model_searchInstrument_F2F_Leg1 =  ContractDetail::getInstance().Get_model_searchInstrument_F2F_Leg1();
+     //model_searchInstrument_F2F_Leg1 =  ContractDetail::getInstance().Get_model_searchInstrument_F2F_Leg1();
      CustomSearchWidget *startstrikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_searchInstrument_F2F_Leg1);
      connect(lineEdit_searchInstrument_leg1, SIGNAL(textEdited(QString)),startstrikeCustomWidget, SLOT(filterItems(QString)));
      connect(lineEdit_searchInstrument_leg1, SIGNAL(textChanged(QString)),this, SLOT(slotStartHide(QString)));
@@ -90,6 +100,49 @@ void add_algo_f2f::selectedAction(){
     lineEdit_searchInstrument_leg2->clear();
     startStrikeListView->hide();
     endStrikeListView->hide();
+
+    model_searchInstrument_F2F_Leg1->clear();
+
+    // Create a lambda function for processing in the background
+        QFuture<void> future = QtConcurrent::run([=]() {
+        QElapsedTimer timer1;
+        timer1.start();
+        emit progressSignal(true,"Data Model is Loading, Please wait!");
+        for(int i=0;i<F2F_Tokens.length();i++){
+                /**********Create model for model_searchInstrument_F2F_Leg1*************************/
+                const auto& contract = sharedData->contract_table_hash[F2F_Tokens[i]];
+                unsigned int unix_time= contract.Expiry;
+                QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+                dt = dt.addYears(10);
+                int targetYear = dt.date().year();
+                bool isLeapYear = QDate::isLeapYear(targetYear);
+
+                // If it is a leap year, and the date is after Feb 29, subtract one day
+                if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+                    dt = dt.addDays(-1);
+                }
+                QString Expiry=dt.toString("MMM dd yyyy").toUpper();
+                QString instrument_name = contract.InstrumentName;
+
+
+                QStandardItem *itemF2FL1 = new QStandardItem;
+                itemF2FL1->setText(instrument_name+" "+Expiry);
+                itemF2FL1->setData(contract.TokenNumber, Qt::UserRole + 1);
+                QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd");
+                // Set the composite key as data for sorting
+                itemF2FL1->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+                QMetaObject::invokeMethod(this, [=]() {
+                    model_searchInstrument_F2F_Leg1->appendRow(itemF2FL1);
+                }, Qt::QueuedConnection);
+                /********************************************************************/
+        }
+        emit progressSignal(false,"");
+
+
+        qDebug() << "model_searchInstrument_F2F_Leg1  Time:" << timer1.elapsed() << "milliseconds";
+
+        // Close the progress dialog once done
+    });
 
 
     // Position startStrikeListView below lineEdit_searchInstrument_leg1
@@ -171,10 +224,10 @@ void add_algo_f2f::instrumentEditFinishedAction(){
 
     //QStandardItemModel *model_end_strike = new QStandardItemModel;
     model_searchInstrument_F2F_Leg2->clear();
-    for(int i=0;i<sorted_keys_F2F.length();i++) {
-        if(!sharedData->contract_table_hash.contains(sorted_keys_F2F[i]))
+    for(int i=0;i<F2F_Tokens.length();i++) {
+        if(!sharedData->contract_table_hash.contains(F2F_Tokens[i]))
             continue;
-        contract_table tmp = sharedData->contract_table_hash[sorted_keys_F2F[i]];
+        contract_table tmp = sharedData->contract_table_hash[F2F_Tokens[i]];
 
 //          float end_strike = tmp.StrikePrice;
 //        if(start_strike>end_strike)
@@ -232,54 +285,8 @@ QString add_algo_f2f::fixDecimal(double num,int decimal_precision){
     return str;
 }
 QString   add_algo_f2f::get_Algo_Name(PortfolioType algo_type,int leg1_token_number,int leg2_token_number,int leg3_token_number,double devicer,int decimal_precision){
-    QString Algo_Name="-";
-//    if(algo_type==PortfolioType::F2F){
-//        Algo_Name = "F2F-";//-Nifty";
-//        Algo_Name = Algo_Name+ContractDetail::getInstance().GetStockName(leg1_token_number)+"-"+ContractDetail::getInstance().GetStockName(leg2_token_number);
 
-//    }
-//    else if(algo_type==PortfolioType::BY){
-//        Algo_Name = "Bfly-";//Nifty-18000-CE-200";
-//        double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number).toInt())/devicer;
-//        Algo_Name = Algo_Name+ContractDetail::getInstance().GetStockName(leg2_token_number)+"-"+fixDecimal(diff,decimal_precision);
-
-//    }
-//    else if(algo_type==PortfolioType::CR){
-//        Algo_Name = "Con-Rev-";//Nifty-17000";
-//        QString StockName = ContractDetail::getInstance().GetStockName(leg2_token_number);
-//        StockName.chop(2);
-//        Algo_Name = Algo_Name+StockName+"-"+ContractDetail::getInstance().GetStockName(leg1_token_number);
-//    }
-    if(algo_type==PortfolioType::F2F){
-        Algo_Name = "F2F-";//-Nifty";
-        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg1_token_number,"MMM",algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"MMM",algo_type);
-
-    }
-    else if(algo_type==PortfolioType::BY){
-        Algo_Name = "Bfly-";//Nifty-18000-CE-200";
-       // double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
-       // Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
-    }
-    else if(algo_type==PortfolioType::CR){
-        Algo_Name = "CR-";//Nifty-17000";
-        //            QString StockName = ContractDetail::getInstance().GetStockName(leg2_token_number);
-        //            StockName.chop(2);
-        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type);
-    }
-    else if(algo_type==PortfolioType::BOX){
-        Algo_Name = "BOX-";//18100-18200";
-        QString StockNameLeg1 = ContractDetail::getInstance().GetStockName(leg1_token_number,algo_type);
-        StockNameLeg1.chop(2);
-        QString StockNameLeg3 = ContractDetail::getInstance().GetStockName(leg3_token_number,algo_type);
-        StockNameLeg3.chop(2);
-        Algo_Name = Algo_Name+StockNameLeg1+"-"+StockNameLeg3;
-    }
-    else if(algo_type==PortfolioType::BFLY_BID){
-        Algo_Name = "Bfly-";//Nifty-18000-CE-200";
-        double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
-        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
-    }
-
+    QString Algo_Name = "F2F-"+ContractDetail::getInstance().GetInstrumentName(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg1_token_number,"MMM",algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"MMM",algo_type);
     return Algo_Name.toUpper();
 }
 void add_algo_f2f::generateAlgo(){

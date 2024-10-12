@@ -3,6 +3,9 @@
 #include "custom_q_completer.h"
 #include "contractdetail.h"
 #include "QElapsedTimer"
+#include <QFuture>
+#include <QtConcurrent/QtConcurrent>
+#include <QProgressDialog>
 
 convert_to_algo_bs1221::convert_to_algo_bs1221(QObject *parent)
     : QObject{parent}
@@ -10,7 +13,13 @@ convert_to_algo_bs1221::convert_to_algo_bs1221(QObject *parent)
     //  model_start_strike_BFLY = new QStandardItemModel;
     sharedData = &AddAlgoSharedVar::getInstance();
     model_end_strike = new QStandardItemModel;
+    model_start_strike_BX1221 = new QStandardItemModel;
+    BX1221_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::BX1221);
+}
 
+void convert_to_algo_bs1221::clearAllModel(){
+    model_end_strike->clear();
+    model_start_strike_BX1221->clear();
 }
 
 void convert_to_algo_bs1221::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_){
@@ -52,7 +61,7 @@ void convert_to_algo_bs1221::copyUIElement(QDialog *parentWidget,QTableWidget *t
     endStrikeListView->installEventFilter(eventFilterEnd);
 
 
-    model_start_strike_BX1221 = ContractDetail::getInstance().Get_model_start_strike_BOX_BID();
+    //model_start_strike_BX1221 = ContractDetail::getInstance().Get_model_start_strike_BOX_BID();
     //create qcompleter and fill with abovie model
     CustomSearchWidget *startstrikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_BX1221);
     startstrikeCustomWidget->name = "startStrike";
@@ -83,6 +92,59 @@ void convert_to_algo_bs1221::selectedAction(){
 
     startStrikeListView->hide();
     endStrikeListView->hide();
+
+    model_start_strike_BX1221->clear();
+    // Create a lambda function for processing in the background
+        QFuture<void> future = QtConcurrent::run([=]() {
+        QElapsedTimer timer1;
+        timer1.start();
+        emit progressSignal(true,"Data Model is Loading, Please wait!");
+        /**********Create model for BX_BID*************************/
+
+            for(int i=0;i<BX1221_Tokens.length();i++){
+                const auto& contract = sharedData->contract_table_hash[BX1221_Tokens[i]];
+                //Only CE record need to avoaid duplicate
+                if(contract.OptionType=="PE")
+                    continue;
+                unsigned int unix_time= contract.Expiry;
+                QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+                dt = dt.addYears(10);
+                // Check if the target year is a leap year
+                int targetYear = dt.date().year();
+                bool isLeapYear = QDate::isLeapYear(targetYear);
+
+                // If it is a leap year, and the date is after Feb 29, subtract one day
+                if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+                    dt = dt.addDays(-1);
+                }
+
+                QString Expiry = dt.toString("MMM dd yyyy").toUpper();
+
+                QString instrument_name = contract.InstrumentName;
+
+                QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
+                QStandardItem *itemBOX_BID = new QStandardItem;
+                itemBOX_BID->setText(algo_combination);
+                itemBOX_BID->setData(contract.TokenNumber, Qt::UserRole + 1);
+
+                QString strik_price = QString::number(contract.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
+                // Create custom data for sorting
+                QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd") + "-" + strik_price;
+                // Set the composite key as data for sorting
+                itemBOX_BID->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+                QMetaObject::invokeMethod(this, [=]() {
+                    model_start_strike_BX1221->appendRow(itemBOX_BID);
+                 }, Qt::QueuedConnection);
+
+           }
+            /********************************************************************/
+        emit progressSignal(false,"");
+
+
+        qDebug() << "model_start_strike_BFLY_BID  Time:" << timer1.elapsed() << "milliseconds";
+
+        // Close the progress dialog once done
+    });
 
 
 
@@ -115,8 +177,8 @@ void convert_to_algo_bs1221::createEndStrikeModelAndPopulateListView(){
     float start_strike = sharedData->contract_table_hash[key].StrikePrice;
 
 
-    for(int i=0;i<filtered_tokens_BX1221.length();i++) {
-        contract_table tmp = sharedData->contract_table_hash[filtered_tokens_BX1221[i]];
+    for(int i=0;i<BX1221_Tokens.length();i++) {
+        contract_table tmp = sharedData->contract_table_hash[BX1221_Tokens[i]];
         float end_strike = tmp.StrikePrice;
         if(start_strike>end_strike)
             continue;
@@ -237,8 +299,8 @@ void convert_to_algo_bs1221::generateAlgo()
     // filtered token betweeen start and end strike(endStrike+StrikeDifference) and generate hash with tokens
     QHash<QString, QString> strikePrice_TokenFiltered;
     QList<int> strikePriceListFiltered;
-    for(int i=0;i<filtered_tokens_BX1221.length();i++){
-        contract_table c = sharedData->contract_table_hash[filtered_tokens_BX1221[i]];
+    for(int i=0;i<BX1221_Tokens.length();i++){
+        contract_table c = sharedData->contract_table_hash[BX1221_Tokens[i]];
         if(Instr_Name== c.InstrumentName&&Expiry == c.Expiry&&c.StrikePrice >= startStrike && c.StrikePrice <= endStrike+StrikeDifference){
             QString key = QString::number(c.StrikePrice)+"_"+c.OptionType;
             strikePrice_TokenFiltered.insert(key,QString::number(c.TokenNumber));
@@ -477,7 +539,6 @@ void convert_to_algo_bs1221::itemSelectedStartStrike(QModelIndex index)
                         lineEdit_Start_strike->setCursorPosition(0);
                         createEndStrikeModelAndPopulateListView();
                         startStrikeListView->hide();
-                        qDebug()<<"ListView->hide(): ListView->hide()";
                         break;
                     }
                 }

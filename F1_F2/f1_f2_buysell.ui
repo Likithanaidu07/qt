@@ -29,7 +29,56 @@
    <string>Manual Orders</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="2" column="1">
+   <property name="leftMargin">
+    <number>0</number>
+   </property>
+   <property name="topMargin">
+    <number>0</number>
+   </property>
+   <property name="rightMargin">
+    <number>0</number>
+   </property>
+   <item row="5" column="2">
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="3">
+    <widget class="QLabel" name="label_3">
+     <property name="text">
+      <string>Price</string>
+     </property>
+    </widget>
+   </item>
+   <item row="2" column="5">
+    <widget class="QLabel" name="label_4">
+     <property name="text">
+      <string>No. of Lots</string>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="0">
+    <spacer name="verticalSpacer_3">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>25</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="3" column="1">
     <widget class="QComboBox" name="comboBoxBuySell">
      <property name="minimumSize">
       <size>
@@ -49,90 +98,14 @@
      </item>
     </widget>
    </item>
-   <item row="1" column="1">
+   <item row="2" column="1">
     <widget class="QLabel" name="label">
      <property name="text">
       <string>Buy Sell</string>
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
-    <spacer name="verticalSpacer">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="2" column="8">
-    <spacer name="verticalSpacer_4">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="1" column="3">
-    <widget class="QLabel" name="label_3">
-     <property name="text">
-      <string>Price</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="0">
-    <spacer name="verticalSpacer_3">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="0" column="2">
-    <spacer name="verticalSpacer_2">
-     <property name="orientation">
-      <enum>Qt::Vertical</enum>
-     </property>
-     <property name="sizeHint" stdset="0">
-      <size>
-       <width>20</width>
-       <height>40</height>
-      </size>
-     </property>
-    </spacer>
-   </item>
-   <item row="2" column="2">
-    <widget class="QLineEdit" name="lineEdit_Stockname">
-     <property name="minimumSize">
-      <size>
-       <width>200</width>
-       <height>28</height>
-      </size>
-     </property>
-    </widget>
-   </item>
-   <item row="1" column="5">
-    <widget class="QLabel" name="label_4">
-     <property name="text">
-      <string>No. of Lots</string>
-     </property>
-    </widget>
-   </item>
-   <item row="2" column="7">
+   <item row="3" column="7">
     <widget class="QPushButton" name="pushButtonSubmit">
      <property name="minimumSize">
       <size>
@@ -151,7 +124,17 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="3" colspan="2">
+   <item row="3" column="2">
+    <widget class="QLineEdit" name="lineEdit_Stockname">
+     <property name="minimumSize">
+      <size>
+       <width>200</width>
+       <height>28</height>
+      </size>
+     </property>
+    </widget>
+   </item>
+   <item row="3" column="3" colspan="2">
     <widget class="QDoubleSpinBox" name="doubleSpinBox_price">
      <property name="minimumSize">
       <size>
@@ -167,14 +150,27 @@
      </property>
     </widget>
    </item>
-   <item row="1" column="2">
+   <item row="3" column="8">
+    <spacer name="verticalSpacer_4">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>25</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
+   </item>
+   <item row="2" column="2">
     <widget class="QLabel" name="label_2">
      <property name="text">
       <string>Stockname</string>
      </property>
     </widget>
    </item>
-   <item row="2" column="5" colspan="2">
+   <item row="3" column="5" colspan="2">
     <widget class="QSpinBox" name="spinBoxLot">
      <property name="minimumSize">
       <size>
@@ -185,6 +181,85 @@
      <property name="maximum">
       <number>99999999</number>
      </property>
+    </widget>
+   </item>
+   <item row="1" column="0" colspan="9">
+    <widget class="QWidget" name="widget" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>0</width>
+       <height>12</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>12</height>
+      </size>
+     </property>
+     <layout class="QHBoxLayout" name="horizontalLayout">
+      <property name="spacing">
+       <number>0</number>
+      </property>
+      <property name="leftMargin">
+       <number>0</number>
+      </property>
+      <property name="topMargin">
+       <number>0</number>
+      </property>
+      <property name="rightMargin">
+       <number>0</number>
+      </property>
+      <property name="bottomMargin">
+       <number>0</number>
+      </property>
+      <item>
+       <widget class="QProgressBar" name="progressBar">
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>10</height>
+         </size>
+        </property>
+        <property name="maximumSize">
+         <size>
+          <width>16777215</width>
+          <height>10</height>
+         </size>
+        </property>
+        <property name="styleSheet">
+         <string notr="true">#progressBar {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop: 0 rgba(255, 255, 255, 0), /* Transparent at the start */
+        stop: 0.1 rgba(255, 255, 255, 1), /* Fade in effect */
+        stop: 0.9 rgba(255, 255, 255, 1), /* Fully opaque */
+        stop: 1 rgba(255, 255, 255, 0)); /* Transparent at the end */
+    border: 0px solid rgba(255, 255, 255, 1);
+    border-radius: 5px;
+    text-align: center;
+    height: 20px;
+    color: black; /* Set the text color to black or any other color */
+}
+
+#progressBar::chunk {
+    background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+        stop: 0 rgba(116, 166, 190, 0), /* Transparent at the start */
+        stop: 0.2 rgba(116, 166, 190, 1), /* Fade in effect */
+        stop: 0.8 rgba(116, 166, 190, 1), /* Fully opaque */
+        stop: 1 rgba(116, 166, 190, 0)); /* Transparent at the end */
+    border-radius: 8px;
+}
+</string>
+        </property>
+        <property name="maximum">
+         <number>0</number>
+        </property>
+        <property name="value">
+         <number>-1</number>
+        </property>
+       </widget>
+      </item>
+     </layout>
     </widget>
    </item>
   </layout>

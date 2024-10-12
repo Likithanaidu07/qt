@@ -18,8 +18,8 @@ class add_algo_btfly_bid : public QObject
 public:
     explicit add_algo_btfly_bid(QObject *parent = nullptr);
 
-    void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_);
-    QStringList sorted_keys_BFLY_BID; // sorted keys for contract_table hash table
+    void copyUIElement(QDialog *parentWidget_,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_);
+    QStringList BFLY_BID_Tokens;
     void selectedAction();
     QString foo_token_number_start_strike;// this for start strike input of btfly
     QString foo_token_number_end_strike;// this for start strike input of btfly
@@ -30,7 +30,7 @@ public:
     void generateAlgo();
     void endStrikeEditFinishedAction();
     void initializeUI() ;
-
+    void clearAllModel();
 
 
 private slots:
@@ -57,8 +57,8 @@ private:
     EventFilter *eventFilterStart;
     EventFilter *eventFilterEnd;
 
-
-
+signals:
+  void progressSignal(bool, QString);
 };
 
 

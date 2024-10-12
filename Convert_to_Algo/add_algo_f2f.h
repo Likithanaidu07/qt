@@ -19,7 +19,7 @@ class add_algo_f2f : public QObject
 public:
     explicit add_algo_f2f(QObject *parent = nullptr);
     void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_searchInstrument_leg1_,QLineEdit *lineEdit_searchInstrument_leg2_);
-    QStringList sorted_keys_F2F; // sorted keys for contract_table hash table
+    QStringList F2F_Tokens;
     void create_AutoFillModel_SearchInstrument();
     void selectedAction();
     QString foo_token_number_start_strike;// this for start strike input of F2F
@@ -27,8 +27,9 @@ public:
     void instrumentEditFinishedAction();
     void generateAlgo();
     QStandardItemModel *model_searchInstrument_F2F_Leg1;
-
+    void clearAllModel();
 signals:
+  void progressSignal(bool, QString);
 private:
     QLineEdit *lineEdit_searchInstrument_leg1;
     QLineEdit *lineEdit_searchInstrument_leg2;
