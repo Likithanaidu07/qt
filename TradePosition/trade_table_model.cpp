@@ -275,34 +275,34 @@ QVariant Trade_Table_Model::headerData(int section, Qt::Orientation orientation,
         return QString::number(section);
 
 }
-void Trade_Table_Model::setColumnWidths(QTableView *tableView) const {
-    int maxWidth = 0;
+//void Trade_Table_Model::setColumnWidths(QTableView *tableView) const {
+//    int maxWidth = 0;
 
-    // Calculate the maximum width across all columns and rows
-    for (int col = 0; col < columnCount(); ++col) {
-        // Consider header text width
-        QVariant headerText = this->headerData(col, Qt::Horizontal, Qt::DisplayRole);
-        int headerWidth = tableView->fontMetrics().horizontalAdvance(headerText.toString());
-        maxWidth = qMax(maxWidth, headerWidth);
+//    // Calculate the maximum width across all columns and rows
+//    for (int col = 0; col < columnCount(); ++col) {
+//        // Consider header text width
+//        QVariant headerText = this->headerData(col, Qt::Horizontal, Qt::DisplayRole);
+//        int headerWidth = tableView->fontMetrics().horizontalAdvance(headerText.toString());
+//        maxWidth = qMax(maxWidth, headerWidth);
 
-        // Check the width of each row's text for the current column
-        for (int row = 0; row < rowCount(); ++row) {
-            QModelIndex index = this->index(row, col);
-            QString text = data(index, Qt::DisplayRole).toString();
-            int textWidth = tableView->fontMetrics().horizontalAdvance(text);
+//        // Check the width of each row's text for the current column
+//        for (int row = 0; row < rowCount(); ++row) {
+//            QModelIndex index = this->index(row, col);
+//            QString text = data(index, Qt::DisplayRole).toString();
+//            int textWidth = tableView->fontMetrics().horizontalAdvance(text);
 
-            // Update the maximum width if necessary
-            maxWidth = qMax(maxWidth, textWidth);
-        }
+//            // Update the maximum width if necessary
+//            maxWidth = qMax(maxWidth, textWidth);
+//        }
 
 
-//    // Add some padding
-//    maxWidth += 30;
+////    // Add some padding
+////    maxWidth += 30;
 
-    tableView->setColumnWidth(col, maxWidth);
+//    tableView->setColumnWidth(col, maxWidth);
 
-    tableView->setColumnWidth(OrderId_OB,45);
-    tableView->setColumnWidth(AlgoName_OB,300);
-   // tableView->horizontalHeader()->setSectionResizeMode(_Status, QHeaderView::Fixed);
-}
-}
+//    tableView->setColumnWidth(OrderId_OB,45);
+//    tableView->setColumnWidth(AlgoName_OB,300);
+//   // tableView->horizontalHeader()->setSectionResizeMode(_Status, QHeaderView::Fixed);
+//}
+//}

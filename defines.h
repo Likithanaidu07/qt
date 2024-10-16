@@ -300,6 +300,7 @@ struct userInfo{
     int MaxPortfolioCount;
     int IDXOpenLimit;
     int STKOpenLimit;
+    int MaxActiveCount;
 
     QMap<PortfolioType,QStringList> algoFilterMap;
 

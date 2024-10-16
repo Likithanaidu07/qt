@@ -1134,5 +1134,23 @@ QStringList Table_Portfolios_Model::getAllPortfolioNumbers() {
 #endif
    return portfolioNumbers;
 }
-
-
+int Table_Portfolios_Model::getActivatedPortfolioCount() {
+   QStringList portfolioNumbers;
+   int activatedCount = 0;
+#ifdef MUTEX_DEBUG_LOG
+   qDebug()<<"Entering---getActivatedPortfolioCount";
+#endif
+   QMutexLocker locker(&mutex); // Lock the mutex automatically
+#ifdef MUTEX_DEBUG_LOG
+   qDebug()<<"Setting Mutex---getActivatedPortfolioCount";
+#endif
+   for(int i = 0; i < portfolio_data_list.size(); i++){
+        if (portfolio_data_list[i]->Status) {
+            activatedCount++;
+        }
+   }
+#ifdef MUTEX_DEBUG_LOG
+   qDebug()<<"Exiting---getActivatedPortfolioCount";
+#endif
+   return activatedCount;
+}

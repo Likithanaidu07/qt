@@ -119,7 +119,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
         bool ok = checkDBOpened(msg);
         userLoginInfo.loginResponse = msg;
         if(ok){
-            QSqlQuery query("SELECT UserId, UserName,Password,STKOpenLimit,IDXOpenLimit,MaxPortfolioCount,BFLY_BIDInFilter,BYInFilter,F2FInFilter,CRInFilter,F1_F2InFilter FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
+            QSqlQuery query("SELECT UserId, UserName,Password,STKOpenLimit,IDXOpenLimit,MaxPortfolioCount,MaxActiveCount,BFLY_BIDInFilter,BYInFilter,F2FInFilter,CRInFilter,F1_F2InFilter FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
             if(!query.exec())
             {
                 // Error Handling, check query.lastError(), probably return
@@ -197,6 +197,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
 
                     userLoginInfo.UserId = query.value(rec.indexOf("UserId")).toInt();
                     userLoginInfo.MaxPortfolioCount = query.value(rec.indexOf("MaxPortfolioCount")).toInt();
+                    userLoginInfo.MaxActiveCount = query.value(rec.indexOf("MaxActiveCount")).toInt();
                     userLoginInfo.loggedIn = true;
                     userLoginInfo.loginResponse = "Login Sucess";
                     userLoginInfo.errorCode = T_LoginErroCode::OK;
@@ -1022,6 +1023,9 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
         else{
             QSqlRecord rec = query.record();
             while (query.next()) {
+
+
+
 
                 QString Buy_Sell = query.value(rec.indexOf("BuySellIndicator")).toString();
                 if(Buy_Sell=="1")
