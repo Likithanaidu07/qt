@@ -126,7 +126,7 @@ void add_algo_btfly_bid::selectedAction(){
             QFuture<void> future = QtConcurrent::run([=]() {
             QElapsedTimer timer1;
             timer1.start();
-            emit progressSignal(true,"Data Model is Loading, Please wait!");
+            emit progressSignal(true,"Loading...");
             for (int i = 0; i < BFLY_BID_Tokens.length(); ++i) {
 
                 /**********Create model for BFLY BID*************************/

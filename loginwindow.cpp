@@ -21,8 +21,8 @@ loginwindow::loginwindow(QWidget *parent) :
     ui->lineEditUsername->setText("JNK81");
     ui->lineEdit_Password->setText("123");
 #endif
-   // ui->lineEditUsername->setText("JNK81");
-   // ui->lineEdit_Password->setText("123");
+    //ui->lineEditUsername->setText("JNK81");
+    //ui->lineEdit_Password->setText("123");
 
  //   MainWindowObj = (MainWindow*) parent;
     QFontDatabase::addApplicationFont(":/RacingSansOne-Regular.ttf");
@@ -156,6 +156,12 @@ void loginwindow::on_pushButtonlogin_clicked()
                     else if(userData.errorCode == T_LoginErroCode::PASSWORD_WRONG){
                         ui->label_wron_input->setVisible(true);
                         ui->label_wron_input->setText("Wrong Password !");
+                    }
+                    else if(userData.errorCode == T_LoginErroCode::INACTIVE){
+                        QMessageBox msgBox(this);
+                        msgBox.setText(userData.loginResponse);
+                        msgBox.setIcon(QMessageBox::Warning);
+                        msgBox.exec();
                     }
                 }
                 else

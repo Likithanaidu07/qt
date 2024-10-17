@@ -121,15 +121,18 @@ void add_algo_con_rev::selectedAction(){
 
     model_Fut_CR->clear();
 
+    Fut_Tokens.clear();
+    Fut_Tokens = ContractDetail::getInstance().Get_Tokens_For_IntrumentType(InstrumentType::FUT_INSTRUMENT);
+
     // Create a lambda function for processing in the background
                QFuture<void> future = QtConcurrent::run([=]() {
                QElapsedTimer timer1;
                timer1.start();
-               emit progressSignal(true,"Data Model is Loading, Please wait!");
-               for(int i=0;i<CON_REV_Tokens.length();i++){
+               emit progressSignal(true,"Loading...");
+               for(int i=0;i<Fut_Tokens.length();i++){
 
                        /**********Create model for model_Fut_CR*************************/
-                       const auto& contract = sharedData->contract_table_hash[CON_REV_Tokens[i]];
+                       const auto& contract = sharedData->contract_table_hash[Fut_Tokens[i]];
 
                        unsigned int unix_time= contract.Expiry;
                        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
@@ -516,7 +519,7 @@ void add_algo_con_rev::generateAlgo(){
                     Leg3_strike_list.append(QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice));
                     Leg2_list.append(leg2);
                     Leg3_list.append(leg3);
-                    QString Algo_Name ="CR-"+Instr_Name+"-"+dt.toString("ddMMM").toUpper()+"-"+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+"-"+dt3.toString("ddMMM").toUpper();
+                    QString Algo_Name ="CR-"+Instr_Name+"-"+dt.toString("ddMMM").toUpper()+"-"+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
                     Algo_Name_list.append(Algo_Name);
                     break;
                 }

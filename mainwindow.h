@@ -117,6 +117,9 @@ private:
     Settings_Window *sett_win= nullptr;
     QStringList savedWatchItems;
     QList<watch_data_card*> watchCardWidgetList;
+    QTimer* TableRefreshTimer;
+    QStringList summarydatList;
+
 
     loadingdatawindow *loadingDataWinodw;
     SortSettingPopUp *sortWin; // Add this line
@@ -170,7 +173,7 @@ private:
 
     void start_dataLoadingThread();
     void stop_dataLoadingThread();
-    void refreshTableIn_Intervel();
+    void refreshTables();
     void loggedOut();
     void stopBG_Threads();
 
@@ -253,7 +256,9 @@ private:
       void updateWatchDataCard(Indices_Data_Struct data);
 
 public slots:
+    void startTableRefreshTimer();
     void openSettingsWindow();
+    void onPortfolioAdded();
     void profolioTableEditFinshedSlot(QString val,QModelIndex);
     void onRequestDeleteConfirmation(const QStringList &PortFoliosToDelete);
 //    void edit_Started_PortFolio_Table(int row,int col);

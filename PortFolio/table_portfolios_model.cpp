@@ -1135,4 +1135,46 @@ QStringList Table_Portfolios_Model::getAllPortfolioNumbers() {
    return portfolioNumbers;
 }
 
+// Implementation of removeRowsByIndices
+bool Table_Portfolios_Model::removeRowsByIndices(const QList<int> &portFolioIdxToDelete)
+{
+    if (portFolioIdxToDelete.isEmpty())
+        return false;
+
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Entering---removeRowsByIndices";
+#endif
+    QMutexLocker locker(&mutex); // Lock the mutex automatically
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Setting Mutex---removeRowsByIndices";
+#endif
+
+    if (portFolioIdxToDelete.isEmpty())
+            return false;
+
+        // Sort the indices in descending order to avoid index shifting
+        QList<int> sortedIndices = portFolioIdxToDelete;
+        std::sort(sortedIndices.begin(), sortedIndices.end(), std::greater<int>());
+
+        // Start removing rows in reverse order
+        for (int row : sortedIndices) {
+            if (row < 0 || row >= portfolio_data_list.size()) {
+                continue;  // Skip invalid rows
+            }
+
+            beginRemoveRows(QModelIndex(), row, row);
+
+            // Remove the portfolio object at the current row and delete it if needed
+            delete portfolio_data_list.takeAt(row);
+
+            endRemoveRows();
+        }
+
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Exiting---removeRowsByIndices";
+#endif
+
+    return true;
+}
+
 

@@ -98,7 +98,7 @@ void convert_to_algo_bs1221::selectedAction(){
         QFuture<void> future = QtConcurrent::run([=]() {
         QElapsedTimer timer1;
         timer1.start();
-        emit progressSignal(true,"Data Model is Loading, Please wait!");
+        emit progressSignal(true,"Loading...");
         /**********Create model for BX_BID*************************/
 
             for(int i=0;i<BX1221_Tokens.length();i++){

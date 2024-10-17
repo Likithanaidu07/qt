@@ -99,7 +99,7 @@ void convert_to_algo_box_bid::selectedAction(){
         QFuture<void> future = QtConcurrent::run([=]() {
         QElapsedTimer timer1;
         timer1.start();
-        emit progressSignal(true,"Data Model is Loading, Please wait!");
+        emit progressSignal(true,"Loading...");
         for(int i=0;i<BX_BID_Tokens.length();i++){
                 const auto& contract = sharedData->contract_table_hash[BX_BID_Tokens[i]];
                 //Only CE record need to avoaid duplicate

@@ -41,6 +41,7 @@ protected:
     bool eventFilter(QObject *watched, QEvent *event) override;
 
 signals:
+    void portfolioAddedSignal();
 
 
 private slots:

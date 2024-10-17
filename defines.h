@@ -174,7 +174,7 @@ enum PortfolioType
     R2L = 200,
     OPEN_BY = 205, // open btfy
     OPEN_BOX = 206, // open btfy
-    F1_F2 = 207,
+    F1_F2 = 208,
     BFLY_BID = 250,
     CR = 251,
     CR_JELLY= 252,
@@ -189,6 +189,12 @@ enum PortfolioType
 
     Spread = 1000,
     INVALID
+};
+
+enum InstrumentType{
+    FUT_INSTRUMENT = 50000, // IMPORTANT! make sure this value does not given PortfolioType enum, if given there changes here with different value
+    OPT_INSTRUMENT = 50001, // IMPORTANT! make sure this value does not given PortfolioType enum, if given there changes here with different value
+
 };
 
 enum algo_data_insert_status{
@@ -223,6 +229,7 @@ enum T_LoginErroCode{
     DB_ERROR = 3,
     OK=4,
     NOK=5,
+    INACTIVE=5,
 
 
 };
@@ -301,7 +308,7 @@ struct userInfo{
     int IDXOpenLimit;
     int STKOpenLimit;
 
-    QMap<PortfolioType,QStringList> algoFilterMap;
+    QMap<int,QStringList> algoFilterMap;
 
 };
 
@@ -396,9 +403,9 @@ enum BID_TYPE{
     INDEX_ALGO_Open_BOX
 };
 
-enum NOTIFICATION_TYPE
+enum BACKEND_CMD_TYPE
 {
-    CMD_ID_DEFAULT = 0,
+    CMD_ID_KEEP_ALIVE = 0,
     CMD_ID_PORTTFOLIO_NEW_1 = 1,
     CMD_ID_TRADE_UPDATED_100 = 100,
     CMD_ID_TRADE_UPDATED_200 = 200,

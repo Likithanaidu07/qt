@@ -36,6 +36,8 @@ public slots:
     void slotstockNameListViewHide(QString);
     void itemSelectedStockName(QModelIndex index);
 
+signals:
+    void portfolioAddedSignal();
 private:
     Ui::F1_F2_BuySell *ui;
     QListView *stockNameListView;

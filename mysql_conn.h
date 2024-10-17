@@ -103,13 +103,13 @@ public:
 
     QList<QHash<QString,QString>> getOrderPopUPData(QString user_id, QString portfolioNumber,QString PortfolioType);
     QList<QHash<QString,QString>> getTradePopUPData(QString user_id, QString localOrderID, int lotSize );
-    algo_data_insert_status place_F1F2_Order(QString userID,QString Leg1TokenNumber,QString sellprice,QString sellqty,QString buyprice,QString buyqty,int MaxPortfolioCount,QString &msg,bool checkDuplicateExist);
+    algo_data_insert_status place_F1F2_Order(QString userID,QString Leg1TokenNumber,QString sellprice,QString sellqty,QString buyprice,QString buyqty,int MaxPortfolioCount,QString orderQty,QString &msg,bool checkDuplicateExist);
     ///
     /// \brief loadCurrentDayLogs to load logs of one day
     ///
     void loadCurrentDayLogs();
     QHash<QString, contract_table> prpareContractDataFromDB(QString queryStr, QSqlDatabase *db,QStringList &tokenData);
-    QList<PortfolioType> getPortfolioTypesForInstrumentType(const QString& data, const QMap<PortfolioType, QStringList>& algoFilterMap);
+    QList<int> getPortfolioTypesForInstrumentType(const QString& data, const QMap<int, QStringList>& algoFilterMap);
 
 private:
     bool checkDBOpened( QString &mesg);

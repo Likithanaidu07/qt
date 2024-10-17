@@ -97,7 +97,7 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
     QFuture<void> future = QtConcurrent::run([=]() {
     //QElapsedTimer timer1;
     //timer1.start();
-    QStringList CR_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::CR);
+        QStringList CR_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::CR);
         for(int i=0;i<CR_Tokens.length();i++){
 
             /**********Create model for F1_F2*************************/
@@ -222,27 +222,30 @@ void F1_F2_BuySell::on_pushButtonSubmit_clicked()
     QString buyprice="0";
     QString buyqty="0";
     QString msg="0";
-
+    QString orderQunatity = "0";
 
 
     int lotSize=ContractDetail::getInstance().GetLotSize(token_number.toInt(),PortfolioType::F1_F2);
     if(buy_mode){
         buyprice = QString::number(ui->doubleSpinBox_price->value()* devicer);
         buyqty = QString::number(ui->spinBoxLot->value()* lotSize);
+        orderQunatity = buyqty;
     }
     else{
         sellprice = QString::number(ui->doubleSpinBox_price->value()* devicer);
         sellqty = QString::number(ui->spinBoxLot->value()* lotSize);
+        orderQunatity = sellqty;
     }
 
     mysql_conn *db_conn = new mysql_conn(0, "add_algo_db_conn");
-    algo_data_insert_status status = db_conn->place_F1F2_Order(QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,msg,true);
+    algo_data_insert_status status = db_conn->place_F1F2_Order(QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,true);
     if(status == algo_data_insert_status::EXIST){
          QMessageBox::StandardButton reply;
          reply = QMessageBox::question(this, "Duplicate record!", "Record already exist for selected Stock Name!. Do you want to proceed?",QMessageBox::Yes | QMessageBox::No);
          if (reply == QMessageBox::Yes) {
-             algo_data_insert_status status1 = db_conn->place_F1F2_Order(QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,msg,false);
+             algo_data_insert_status status1 = db_conn->place_F1F2_Order(QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,false);
              if(status1 == algo_data_insert_status::INSERTED){
+                     emit portfolioAddedSignal();
                      QMessageBox msgBox;
                      msgBox.setWindowTitle("Success");
                      msgBox.setIcon(QMessageBox::Information);
@@ -263,6 +266,7 @@ void F1_F2_BuySell::on_pushButtonSubmit_clicked()
          }
     }
     else if(status == algo_data_insert_status::INSERTED){
+        emit portfolioAddedSignal();
         QMessageBox msgBox;
         msgBox.setWindowTitle("Success");
         msgBox.setIcon(QMessageBox::Information);
@@ -272,6 +276,7 @@ void F1_F2_BuySell::on_pushButtonSubmit_clicked()
         ui->spinBoxLot->setValue(0);
         ui->doubleSpinBox_price->setValue(0.00);
         token_number = "";
+
     }
     else{
         QMessageBox msgBox;
@@ -306,9 +311,11 @@ void F1_F2_BuySell::on_comboBoxBuySell_currentTextChanged(const QString &arg1)
 void F1_F2_BuySell::setBuyMode(bool buy_mode_){
     if(buy_mode_){
         ui->comboBoxBuySell->setCurrentText("Buy");
+         buy_mode = true;
     }
     else{
         ui->comboBoxBuySell->setCurrentText("Sell");
+        buy_mode = false;
     }
 }
 void F1_F2_BuySell::keyPressEvent(QKeyEvent *event)

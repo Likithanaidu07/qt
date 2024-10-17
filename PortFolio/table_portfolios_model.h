@@ -41,6 +41,7 @@ public:
     QStringList getTradedHighlight_ExcludeList();
     QStringList  TradedHighlight_ExcludeList;
     void updateMarketRate(const QHash<QString, MBP_Data_Struct>& data);
+    bool removeRowsByIndices(const QList<int> &portFolioIdxToDelete);
 
 
 private:

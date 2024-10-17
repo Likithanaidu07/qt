@@ -61,6 +61,7 @@ public:
    // QStringList Get_BFLY_BID_data_list_Sorted_Key();
    // QStringList Get_BOX_BID_data_list_Sorted_Key();
     QStringList Get_Tokens_For_PortfolioType(PortfolioType type);
+    QStringList Get_Tokens_For_IntrumentType(InstrumentType type);
 
    // QHash<QString, contract_table> GetFutureContracts();
     QHash<QString, contract_table> GetContracts(QString type);

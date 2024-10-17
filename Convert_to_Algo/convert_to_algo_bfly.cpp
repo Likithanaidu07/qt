@@ -119,7 +119,7 @@ void add_algo_btfly::selectedAction(){
         QFuture<void> future = QtConcurrent::run([=]() {
         QElapsedTimer timer1;
         timer1.start();
-        emit progressSignal(true,"Data Model is Loading, Please wait!");
+        emit progressSignal(true,"Loading...");
         for(int i=0;i<BFLY_Tokens.length();i++){
                 const auto& contract = sharedData->contract_table_hash[BFLY_Tokens[i]];
 

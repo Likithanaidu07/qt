@@ -15,7 +15,8 @@ add_algo_cr_jelly_bid::add_algo_cr_jelly_bid(QObject *parent)
     model_end_strike_CR_JELLY_BID = new QStandardItemModel;
 
     model_Fut_CR_JELLY_BID = new QStandardItemModel;
-    CR_JELLY_BID_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::CR_JELLY);
+    //CR_JELLY_BID_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::CR_JELLY);
+    CR_JELLY_BID_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::CR); // no filter for CR_JELLY in rt_usertable so re using CR
 
 }
 
@@ -122,16 +123,19 @@ void add_algo_cr_jelly_bid::selectedAction(){
     endStrikeListView->hide();
 
 
+    Fut_Tokens.clear();
+    Fut_Tokens = ContractDetail::getInstance().Get_Tokens_For_IntrumentType(InstrumentType::FUT_INSTRUMENT);
     model_Fut_CR_JELLY_BID->clear();
 
     // Create a lambda function for processing in the background
         QFuture<void> future = QtConcurrent::run([=]() {
         QElapsedTimer timer1;
         timer1.start();
-        emit progressSignal(true,"Data Model is Loading, Please wait!");
-        for(int i=0;i<CR_JELLY_BID_Tokens.length();i++){
+        emit progressSignal(true,"Loading...");
+        qDebug()<<"Fut_Tokens: "<<Fut_Tokens.size();
+        for(int i=0;i<Fut_Tokens.length();i++){
                 /**********Create model for model_Fut_CR_JELLY_BID*************************/
-                const auto& contract = sharedData->contract_table_hash[CR_JELLY_BID_Tokens[i]];
+                const auto& contract = sharedData->contract_table_hash[Fut_Tokens[i]];
                 unsigned int unix_time= contract.Expiry;
                 QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
                 dt = dt.addYears(10);
@@ -158,7 +162,7 @@ void add_algo_cr_jelly_bid::selectedAction(){
                 /********************************************************************/
        }
         emit progressSignal(false,"");
-        qDebug() << "CR_JELLY_BID_Tokens  Time:" << timer1.elapsed() << "milliseconds";
+        qDebug() << "model_Fut_CR_JELLY_BID  Time:" << timer1.elapsed() << "milliseconds";
 
         // Close the progress dialog once done
     });

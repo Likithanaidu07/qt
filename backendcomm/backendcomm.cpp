@@ -33,7 +33,7 @@ void BackendComm::onThreadMoved() {
 
 void BackendComm::createSocket(){
     socket = new QTcpSocket(this);
-    connect(this, &BackendComm::newMessageReceived, this, &BackendComm::processMessage);
+   // connect(this, &BackendComm::newMessageReceived, this, &BackendComm::processMessage);
     connect(socket, &QTcpSocket::readyRead, this, &BackendComm::readSocket);
     connect(socket, &QTcpSocket::disconnected, this, &BackendComm::socket_disconnected);
     connect(socket, &QAbstractSocket::errorOccurred, this, &BackendComm::displayError);
@@ -187,7 +187,7 @@ QByteArray BackendComm::intToByteArray(int value)
 }
 
 void BackendComm::sendKeepAlive(){
-    quint16 command = NOTIFICATION_TYPE::CMD_ID_DEFAULT;
+    quint16 command = BACKEND_CMD_TYPE::CMD_ID_KEEP_ALIVE;
     QByteArray data = intToByteArray(UserId);
     QByteArray pkt = this->createPacket(command, data);
     this->insertData(pkt);
@@ -254,30 +254,78 @@ BackendComm::~BackendComm()
 
 void BackendComm::readSocket()
 {
-    QByteArray buffer;
 
-    QDataStream socketStream(socket);
-    socketStream.setVersion(QDataStream::Qt_6_3);
+    QTcpSocket *socket = static_cast<QTcpSocket*>(sender());
+       QByteArray data = socket->readAll();
 
-    socketStream.startTransaction();
-    socketStream >> buffer;
+       // Ensure that the received data has at least 4 bytes (2 bytes for length, 2 bytes for command)
+       if (data.size() >= 4)
+       {
+           QDataStream stream(data);
+           stream.setByteOrder(QDataStream::LittleEndian); // Ensure we read in the correct byte order
 
-    if(!socketStream.commitTransaction())
-    {
-        QString message = QString("%1 :: Waiting for more data to come..").arg(socket->socketDescriptor());
-        emit newMessageReceived(message);
-        return;
-    }
+           // Read the total size (first 2 bytes, not really needed but part of the packet)
+           quint16 totalSize;
+           stream >> totalSize;
 
-    QString header = buffer.mid(0,128);
-    QString fileType = header.split(",")[0].split(":")[1];
+           // Read the command (next 2 bytes)
+           quint16 command;
+           stream >> command;
 
-    buffer = buffer.mid(128);
+           qDebug() << "BackendComm::  Command received: " << command;
 
-    if(fileType=="message"){
-        QString message = QString("%1 :: %2").arg(socket->socketDescriptor()).arg(QString::fromStdString(buffer.toStdString()));
-        emit newMessageReceived(message);
-    }
+
+           switch (command) {
+               case BACKEND_CMD_TYPE::CMD_ID_TRADE_UPDATED_200:
+                        emit socketData("TRADE_UPDATED",SocketDataType::BACKEND_COMM_SOCKET_DATA);
+
+                        break;
+
+               default:
+                    break;
+           }
+
+           // Read the rest of the message (remaining bytes)
+          // QByteArray message = data.mid(4); // Skipping first 4 bytes (size + command)
+          // qDebug() << "BackendComm:: Message received: " << message.toHex();
+       }
+       else
+       {
+           qDebug() << "BackendComm:: Received data is too short to contain a valid packet.";
+       }
+
+//   QByteArray data = socket->readAll();
+//           qDebug() << "Data received: " << data;
+
+
+
+//    QByteArray buffer;
+
+//    QDataStream socketStream(socket);
+//    socketStream.setVersion(QDataStream::Qt_6_3);
+
+//    socketStream.startTransaction();
+//    socketStream >> buffer;
+
+//    if(!socketStream.commitTransaction())
+//    {
+//        QString message = QString("%1 :: Waiting for more data to come..").arg(socket->socketDescriptor());
+//        emit newMessageReceived(message);
+//        return;
+//    }
+
+//    QString header = buffer.mid(0,128);
+//    QString fileType = header.split(",")[0].split(":")[1];
+
+//    buffer = buffer.mid(128);
+
+//    qDebug()<<"Backend data Received:"<<header;
+
+
+//    if(fileType=="message"){
+//        QString message = QString("%1 :: %2").arg(socket->socketDescriptor()).arg(QString::fromStdString(buffer.toStdString()));
+//        emit newMessageReceived(message);
+//    }
 }
 
 void BackendComm::socket_connected(){
@@ -320,6 +368,6 @@ void BackendComm::displayError(QAbstractSocket::SocketError socketError)
 
 void BackendComm::processMessage(const QString& str)
 {
-    emit socketData(str,SocketDataType::BACKEND_COMM_SOCKET_MESSAGE);
+    emit socketData(str,SocketDataType::BACKEND_COMM_SOCKET_DATA);
 }
 

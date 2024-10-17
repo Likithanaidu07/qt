@@ -119,7 +119,8 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
         bool ok = checkDBOpened(msg);
         userLoginInfo.loginResponse = msg;
         if(ok){
-            QSqlQuery query("SELECT UserId, UserName,Password,STKOpenLimit,IDXOpenLimit,MaxPortfolioCount,BFLY_BIDInFilter,BYInFilter,F2FInFilter,CRInFilter,F1_F2InFilter FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
+           // QSqlQuery query("SELECT UserId, UserName,Password,STKOpenLimit,IDXOpenLimit,MaxPortfolioCount,BFLY_BIDInFilter,BYInFilter,F2FInFilter,CRInFilter,F1_F2InFilter FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
+            QSqlQuery query("SELECT * FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
             if(!query.exec())
             {
                 // Error Handling, check query.lastError(), probably return
@@ -131,6 +132,8 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                 QSqlRecord rec = query.record();
                 QString storedPassword = query.value(rec.indexOf("Password")).toString();
                 if (storedPassword == password) {
+                    QString IsActive = query.value(rec.indexOf("IsActive")).toString();
+                    if(IsActive=="1"){
 
 #ifndef DISABLE_MULTI_USER_LOGIN_CHECK
                     // check user already logged in from different system
@@ -180,7 +183,9 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
 
                     userLoginInfo.algoFilterMap[PortfolioType::BX_BID] =  OPT_Instruments;//(BOX_BIDInFilter.isNull() || BOX_BIDInFilter.trimmed().isEmpty())  ? InstrumentTypeAll  : BOX_BIDInFilter.split(",");
 
-                     userLoginInfo.algoFilterMap[PortfolioType::BX1221] =  OPT_Instruments;
+                    userLoginInfo.algoFilterMap[PortfolioType::BX1221] =  OPT_Instruments;
+                    userLoginInfo.algoFilterMap[InstrumentType::FUT_INSTRUMENT] =  FUT_Instruments;
+
 
                     QString BYInFilter = query.value(rec.indexOf("BYInFilter")).toString();
                     userLoginInfo.algoFilterMap[PortfolioType::BY] =  (BYInFilter.isNull() || BYInFilter.trimmed().isEmpty())  ? InstrumentTypeAll  : BYInFilter.split(",");
@@ -227,7 +232,39 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                         qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
                         qDebug() << "Query Str: " << qryStr;
                     }
-              }
+                    }
+                    //User is not active
+                    else{
+                        userLoginInfo.loggedIn = false;
+                        userLoginInfo.loginResponse = "UserId is not active.";
+                        userLoginInfo.errorCode = T_LoginErroCode::INACTIVE;
+
+                        QString localIP = "";
+                        const QHostAddress &localhost = QHostAddress(QHostAddress::LocalHost);
+                        for (const QHostAddress &address: QNetworkInterface::allAddresses()) {
+                            if (address.protocol() == QAbstractSocket::IPv4Protocol && address != localhost){
+                                //qDebug() << address.toString();
+                                localIP =  address.toString();
+                            }
+                        }
+
+                        QTime currentTime = QTime::currentTime();
+                        QString formattedTime = currentTime.toString(LOG_TIME_FORMAT);
+                        QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedTime)";
+                        QSqlQuery query1(db);
+                        query1.prepare(qryStr);
+                        query1.bindValue(":logMessage", "Inactve User:" + UserName_ + " try to login from from [" + localIP + "]");
+                        query1.bindValue(":userName", UserName_);
+                        query1.bindValue(":formattedTime", QDateTime::currentDateTime().toSecsSinceEpoch());
+                        if (!query1.exec())
+                        {
+                            qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
+                            qDebug() << "Query Str: " << qryStr;
+                        }
+                    }
+
+
+                }
 
                 else
                 {
@@ -2029,8 +2066,8 @@ void mysql_conn::getNetPosTableData_BackUp(double &BuyValue_summary,double &Sell
     }
 }
 
-QList<PortfolioType> mysql_conn::getPortfolioTypesForInstrumentType(const QString& data, const QMap<PortfolioType, QStringList>& algoFilterMap) {
-    QList<PortfolioType> matchingPortfolios;
+QList<int> mysql_conn::getPortfolioTypesForInstrumentType(const QString& data, const QMap<int, QStringList>& algoFilterMap) {
+    QList<int> matchingPortfolios;
 
     // Iterate through each PortfolioType and QStringList in algoFilterMap
     for (auto it = algoFilterMap.begin(); it != algoFilterMap.end(); ++it) {
@@ -2104,7 +2141,7 @@ QHash<QString, contract_table>  mysql_conn::getContractTable( QHash<int , QStrin
                 contractTableData.insert( query.value(rec.indexOf("Token")).toString(), contractTableTmp);
 
                 QStringList PortfolioAll;
-                QList<PortfolioType>  portfolio_types = getPortfolioTypesForInstrumentType(contractTableTmp.InstrumentType,userData.algoFilterMap);
+                QList<int>  portfolio_types = getPortfolioTypesForInstrumentType(contractTableTmp.InstrumentType,userData.algoFilterMap);
                 for(int i=0;i<portfolio_types.length();i++){
                     m_ContractDetails_Grouped_[portfolio_types[i]].append(QString::number(contractTableTmp.TokenNumber));
                     PortfolioAll.append(QString::number(portfolio_types[i]));
@@ -2734,7 +2771,7 @@ QString mysql_conn::getAlgoTypeQuery(PortfolioType type, userInfo userLoginInfo)
 }
 
 
-algo_data_insert_status mysql_conn::place_F1F2_Order(QString userID,QString Leg1TokenNumber,QString sellprice,QString sellqty,QString buyprice,QString buyqty,int MaxPortfolioCount,QString &msg,bool checkDuplicateExist){
+algo_data_insert_status mysql_conn::place_F1F2_Order(QString userID,QString Leg1TokenNumber,QString sellprice,QString sellqty,QString buyprice,QString buyqty,int MaxPortfolioCount,QString orderQty,QString &msg,bool checkDuplicateExist){
     QMutexLocker lock(&mutex);
 
     QString ClientID = "0";
@@ -2805,7 +2842,7 @@ algo_data_insert_status mysql_conn::place_F1F2_Order(QString userID,QString Leg1
                             query.bindValue(":SellPriceDifference", sellprice);
                             query.bindValue(":SellTotalQuantity", sellqty);
                             query.bindValue(":SellTradedQuantity", 0);
-                            query.bindValue(":OrderQuantity", 0);
+                            query.bindValue(":OrderQuantity", orderQty);
 
 
 

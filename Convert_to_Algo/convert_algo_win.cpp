@@ -789,7 +789,7 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
         msgBox.exec();
     }
 
-
+    bool portfolioAdded =false;
     for(int k=0;k<selectedIds.length();k++){
         for(int i=0;i<sharedData->algo_data_list.size();i++){
             if(selectedIds[k]!=sharedData->algo_data_list[i].table_row_unique_id)
@@ -802,6 +802,7 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
             algo_data_insert_status status = db_conn->insertToAlgoTable(sharedData->algo_data_list[i],sharedData->MaxPortfolioCount,msg);
             //emit insert_algo_data_signal(algo_data_list);
             if(status==algo_data_insert_status::INSERTED){
+                portfolioAdded = true;
                 //  QString Algo_Name = algo_type+"-"+sharedData->algo_data_list[i].Algo_Name;
                 //db_conn->logToDB(QString("Portfolio Added "));
                 sharedData->algo_data_list[i].uploaded=true;
@@ -837,7 +838,7 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                                       " Inserted New Algo: "+ Algo_Name +"</span> </p>";
 
                 emit display_log_text_signal(htmlContent);
-                 db_conn->logToDB(QString("Portfolio Added "+Algo_Name));
+                db_conn->logToDB(QString("Portfolio Added "+Algo_Name));
             }
             else if(status==algo_data_insert_status::FAILED){
                 ui->tableWidget->item(tableRowIDx, ui->tableWidget->columnCount()-1)->setForeground(QBrush(QColor(200, 0, 0)));
@@ -853,6 +854,10 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
             ui->tableWidget->item(tableRowIDx, ui->tableWidget->columnCount()-1)->setText(msg);
 
         }
+    }
+
+    if(portfolioAdded){
+        emit portfolioAddedSignal();
     }
     ///remove already added item from list.
     QMutableListIterator<algo_data_to_insert> i(sharedData->algo_data_list);

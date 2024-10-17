@@ -1111,6 +1111,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     instilizeWatchUIOnTopBar();
 
+
+    TableRefreshTimer = new QTimer(this);
+    TableRefreshTimer->setSingleShot(true);  // Make it behave like singleShot
+    connect(TableRefreshTimer, &QTimer::timeout, this, &MainWindow::start_dataLoadingThread);
+
 }
 
 
@@ -1661,7 +1666,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
         }
 
             //send notifcation to backend server
-            quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+            quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
             const unsigned char dataBytes[] = { 0xFF, 0xFF };
             QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
             QByteArray msg = backend_comm->createPacket(command, data);
@@ -1715,29 +1720,58 @@ void MainWindow::loadContract(){
 
 void MainWindow::start_dataLoadingThread(){
 
-    futureBackGroundDBThread = QtConcurrent::run(&MainWindow::refreshTableIn_Intervel,this);
+    futureBackGroundDBThread = QtConcurrent::run(&MainWindow::refreshTables,this);
 
 }
 
 void MainWindow::stop_dataLoadingThread(){
 
-    quit_db_data_load_thread.storeRelaxed(1); // this will quit the data loding thread.
+   // quit_db_data_load_thread.storeRelaxed(1); // this will quit the data loding thread.
     futureBackGroundDBThread.waitForFinished();
 }
 
-void MainWindow::refreshTableIn_Intervel(){
+void MainWindow::startTableRefreshTimer() {
+    // This method runs in the main thread, and starts the QTimer safely
+    int timeOut = 2000;
+    if (!TableRefreshTimer->isActive()) {
+        TableRefreshTimer->start(timeOut);  // Start the timer for 2 seconds
+        qDebug() << "Timer started...";
+    } else {
+        qDebug() << "TableRefreshTimer is already running, skipping this call.";
+    }
+}
+
+void MainWindow::refreshTables(){
     qDebug()<<"Started data loading thread.....";
+
+     int timeOut = 2000;
+
+    if(data_loading_thread_running.loadRelaxed()==1){
+        QMetaObject::invokeMethod(this, "startTableRefreshTimer", Qt::QueuedConnection);
+        qDebug()<<" data loading thread already running, skipping.....";
+        return;
+    }
+
+    ///check algos are deleting if so do not load.
+    if(deletingPortFolioFlg.loadRelaxed()==1){
+        QMetaObject::invokeMethod(this, "startTableRefreshTimer", Qt::QueuedConnection);
+        qDebug()<<" PortFolios delete is going in, table refresh will do in next "<<timeOut<<" ms.....";
+        return;
+    }
+
+    QElapsedTimer timer;
+    timer.start();
+
     data_loading_thread_running.storeRelaxed(1);
 
-    int data_load_intervell = 1000;// in m-sec
-    while(1){
-        QElapsedTimer timer;
-        timer.start();
 
-        //check algos are deleting if so do not load.
-        if(deletingPortFolioFlg.loadRelaxed()==0){
-            loadDataAndUpdateTable(T_Table::PORTFOLIO);
-        }
+  //  int data_load_intervell = 1000;// in m-sec
+   // while(1){
+
+
+
+
+        loadDataAndUpdateTable(T_Table::PORTFOLIO);
         loadDataAndUpdateTable(T_Table::TRADE);
         loadDataAndUpdateTable(T_Table::NET_POS);
         loadDataAndUpdateTable(T_Table::SUMMARY);
@@ -1746,21 +1780,23 @@ void MainWindow::refreshTableIn_Intervel(){
 
         //loadMysQLData(Table::ORDER);*/
 
-        auto elapsed = timer.elapsed();
+       /* auto elapsed = timer.elapsed();
         if( timer.elapsed()<data_load_intervell){
             //  qDebug()<<"sleeping... "<<data_load_intervell-elapsed;
 
             QThread::msleep(data_load_intervell-elapsed);
-        }
+        }*/
 
 
-        if(quit_db_data_load_thread.loadRelaxed()==1)
-            break;
+      //  if(quit_db_data_load_thread.loadRelaxed()==1)
+          //  break;
         //break;// this need to be removed
-    }
+  //  }
+       // QThread::sleep(5);
+
     qDebug()<<"Exiting data loading thread.....";
     data_loading_thread_running.storeRelaxed(0);
-
+    qDebug() << "refreshTables took :" << timer.elapsed() << "milliseconds";
 
     //
     //QTimer::singleShot(2000, this, &MainWindow::refreshTableIn_Intervel);
@@ -1817,7 +1853,8 @@ void MainWindow::loadDataAndUpdateTable(int table){
 
         if(PortFoliosToDelete.size()){
          // QString msg = "Token not exist in contract table for  Portfolios ('" + PortFoliosToDelete.join("','") + "')!. Deleting it.";
-          if(showMessagOnceFlg){
+            //If the contract has no data for the portflios delete it
+            if(showMessagOnceFlg){
               emit requestDeleteConfirmation(PortFoliosToDelete);
              showMessagOnceFlg = false;
           }
@@ -1896,8 +1933,9 @@ void MainWindow::onRequestDeleteConfirmation(const QStringList &PortFoliosToDele
             QMessageBox::warning(this, "Error", "Failed to delete the portfolios: " + msg);
         }
         else{
+
             //send notifcation to backend server
-            quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+            quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
             const unsigned char dataBytes[] = { 0xFF, 0xFF };
             QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
             QByteArray msg = backend_comm->createPacket(command, data);
@@ -1914,7 +1952,7 @@ QString MainWindow::fixDecimal(double num,int decimal_precision){
 }
 void MainWindow::updateSummaryLabels()
 {
-    QStringList summarydatList;
+    summarydatList.clear();
     summarydatList.append(QString::number(AlgoCount));
     summarydatList.append(QString::number(OrderCount));
     summarydatList.append(QString::number(TraderCount));
@@ -1926,7 +1964,7 @@ void MainWindow::updateSummaryLabels()
     summarydatList.append(QString::number(NetQty));
 
 
-    emit data_summary_update_signal(summarydatList);
+   // emit data_summary_update_signal(summarydatList);
 
 
 
@@ -1993,7 +2031,7 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 #ifdef ENABLE_BACKEND_DEBUG_MSG
         qDebug()<<"Backend Data: Backend Socket Error"<<msg;
 #endif
- ui->label_3->setText("Status :"  "Connection Error");
+        ui->label_3->setText("Status :"  "Connection Error");
         ui->label_3->setStyleSheet("color: red;");
     }
     //ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(255, 32, 36);border-radius:6px;color:#000;");
@@ -2001,10 +2039,18 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 #ifdef ENABLE_BACKEND_DEBUG_MSG
         qDebug()<<"Backend Data: Backend Socket Connected"<<msg;
 #endif
- ui->label_3->setText("Status :""Connected");
+        ui->label_3->setText("Status :""Connected");
         ui->label_3->setStyleSheet("color: #013220;");
 
     }
+    else if(msgType == SocketDataType::BACKEND_COMM_SOCKET_DATA){
+        if(msg == "TRADE_UPDATED"){
+            //refresh all table from here.
+            start_dataLoadingThread();
+        }
+    }
+
+
     // ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(94, 255, 107);border-radius:6px;color:#000;");
 }
 void MainWindow::stop_backend_comm_socket_worker(){
@@ -2079,9 +2125,11 @@ void MainWindow::updatePortFolioStatus(QModelIndex index){
                     bool success = db_conn->updateDB_Table(Query,msg);
                     if(success){
                         //refresh sorting
+                        start_dataLoadingThread();
+
                         reloadSortSettFlg.storeRelaxed(1);
                         db_conn->logToDB(QString("Activated portfolio ["+PortfolioNumber+"]"));
-                        quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+                        quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
                         const unsigned char dataBytes[] = { 0x01};
                         QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
                         QByteArray msg = backend_comm->createPacket(command, data);
@@ -2099,10 +2147,12 @@ void MainWindow::updatePortFolioStatus(QModelIndex index){
                 bool success = db_conn->updateDB_Table(Query,msg);
                 if(success){
                     //refresh sorting
+                    start_dataLoadingThread();
+
                     reloadSortSettFlg.storeRelaxed(1);
                     db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));
 
-                    quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+                    quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
                     const unsigned char dataBytes[] = { 0x00};
                     QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
                     QByteArray msg = backend_comm->createPacket(command, data);
@@ -2437,11 +2487,13 @@ void MainWindow::startall_Button_clicked()
         bool success =  db_conn->updateDB_Table(Query,msg);
         if(success){
             db_conn->logToDB(QString("Enabled Algos [" + joinedPortfolioNumbers + "]"));
-            quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+            quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
             const unsigned char dataBytes[] = { 0x01};
             QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
             QByteArray msg = backend_comm->createPacket(command, data);
             backend_comm->insertData(msg);
+            start_dataLoadingThread();
+
         }
 
 
@@ -2469,11 +2521,14 @@ void MainWindow::stopall_Button_clicked()
         bool success =  db_conn->updateDB_Table(Query,msg);
         if(success){
             db_conn->logToDB(QString("Disabled  Algos ["+joinedPortfolioNumbers+"]"));
-            quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+            quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
             const unsigned char dataBytes[] = { 0x01};
             QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
             QByteArray msg = backend_comm->createPacket(command, data);
             backend_comm->insertData(msg);
+
+            start_dataLoadingThread();
+
         }
 }
 
@@ -2551,6 +2606,8 @@ void MainWindow::ConvertAlgo_button_clicked(){
 
     if(!convertalgo){
         convertalgo=new ConvertAlgo_Win(this);
+        connect(convertalgo, &ConvertAlgo_Win::portfolioAddedSignal, this, &MainWindow::onPortfolioAdded);
+
         qDebug()<<"Creating convertalgo....";
     }
 
@@ -2560,6 +2617,17 @@ void MainWindow::ConvertAlgo_button_clicked(){
     convertalgo->show();
 }
 
+
+void MainWindow::onPortfolioAdded(){
+
+    quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+    const unsigned char dataBytes[] = { 0x01};
+    QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
+    QByteArray msg = backend_comm->createPacket(command, data);
+    backend_comm->insertData(msg);
+
+    start_dataLoadingThread();
+}
 
 QModelIndexList  MainWindow::getSelectedPortFolioIndexs(){
     QModelIndexList selection = T_Portfolio_Table->selectionModel()->selectedRows();
@@ -2590,82 +2658,89 @@ void MainWindow::Delete_clicked_slot()
         return;
    }
 
+
+   // Multiple rows can be selected
+   //QString logs;
+   QStringList activeAlgoList;
+   QStringList portFoliosToDelete;
+   QList<int> portFolioIdxToDelete;
+
+  // QString notDeletedMSg;
+
+   for (int i = 0; i < selected.count(); i++)
+   {
+       QModelIndex index = selected.at(i);
+       PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());
+
+       if (!P) {
+           qDebug() << "updatePortFolioStatus----- portfolio null, need to debug this code.";
+           continue;
+       }
+
+       QString PortfolioNumber = QString::number(P->PortfolioNumber);
+
+       if (P->Status == true)
+       {
+           //logs = "PortfolioNumber '" + PortfolioNumber + "' is Active, cannot delete.";
+           activeAlgoList.append(PortfolioNumber);
+          // db_conn->logToDB(logs);
+           continue;
+       }
+       portFoliosToDelete.append(PortfolioNumber);
+       portFolioIdxToDelete.append(index.row());
+
+
+   }
+
    // Now that we know rows are selected, ask for delete confirmation
    QMessageBox::StandardButton reply;
-   reply = QMessageBox::question(this, "Delete Portfolio From Database?", "Delete the portfolio?",  QMessageBox::Yes|QMessageBox::No);
+   reply = QMessageBox::question(this, "Delete Portfolio From Database?", "Delete following  portfolios ["+portFoliosToDelete.join(",")+"] from DB?",  QMessageBox::Yes|QMessageBox::No);
 
    if (reply == QMessageBox::Yes)
    {
-        // Multiple rows can be selected
-        QString logs;
-        QStringList activeAlgoList;
-        QStringList notDeletedList;
-        QString notDeletedMSg;
+
 
         deletingPortFolioFlg.storeRelaxed(1);
-
-        for (int i = 0; i < selected.count(); i++)
-        {
-            QModelIndex index = selected.at(i);
-            PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());
-
-            if (!P) {
-                qDebug() << "updatePortFolioStatus----- portfolio null, need to debug this code.";
-                continue;
-            }
-
-            QString PortfolioNumber = QString::number(P->PortfolioNumber);
-
-            if (P->Status == true)
-            {
-                logs = "PortfolioNumber '" + PortfolioNumber + "' is Active, cannot delete.";
-                activeAlgoList.append(PortfolioNumber);
-                db_conn->logToDB(logs);
-                continue;
-            }
-
-            QString msg;
-            bool ret = db_conn->deleteAlgo(PortfolioNumber, msg);
-
-            if (ret == true)
-            {
-                logs = "PortfolioNumber '" + PortfolioNumber + "' deleted successfully.";
-                db_conn->logToDB(logs);
-
-                // Send notification to backend server
-                quint16 command = NOTIFICATION_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
-                const unsigned char dataBytes[] = { 0xFF, 0xFF };
-                QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
-                QByteArray msg = backend_comm->createPacket(command, data);
-                backend_comm->insertData(msg);
-            }
-            else
-            {
-                notDeletedList.append(PortfolioNumber);
-                notDeletedMSg= msg;
-                logs = "PortfolioNumber '"+PortfolioNumber+"' not Deleted, "+msg;
-                db_conn->logToDB(logs);
-                qDebug() << "PortfolioNumber: " << PortfolioNumber << " not Deleted, Info: " << msg;
-            }
-            delete P;
+        QString msg; // You can define msg as per your requirement
+        bool ret = db_conn->deleteAlgos(portFoliosToDelete, msg);
+        if (!ret) {
+            QMessageBox::warning(this, "Error", "Failed to delete the portfolios: " + portFoliosToDelete.join(",")+", Error:"+ msg);
         }
+        else{
+            //delete from model too and refersh the enitre table,
+            T_Portfolio_Model->removeRowsByIndices(portFolioIdxToDelete);
+            start_dataLoadingThread();
+
+
+            //send notifcation to backend server
+            quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+            const unsigned char dataBytes[] = { 0xFF, 0xFF };
+            QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
+            QByteArray msg = backend_comm->createPacket(command, data);
+            backend_comm->insertData(msg);
+
+            db_conn->logToDB("Deleted  portfolios ["+portFoliosToDelete.join(",")+" from DB");
+        }
+
 
         deletingPortFolioFlg.storeRelaxed(0);
 
         if (!activeAlgoList.empty())
         {
+            db_conn->logToDB("Portfolios ["+activeAlgoList.join(",")+" are Active, cannot delete. from DB");
+
             QMessageBox msgBox;
             msgBox.setText("Active algo cannot be deleted,\n disable the algo No. " + activeAlgoList.join(",") + " and then try again.\n");
             msgBox.setIcon(QMessageBox::Information);
             msgBox.exec();
         }
-        if(!notDeletedList.empty())
+        /*if(!notDeletedList.empty())
         {
             QMessageBox msgBox;
             msgBox.setText(notDeletedMSg +" ["+ notDeletedList.join(",") +"]\n");
             msgBox.setIcon(QMessageBox::Information);
             msgBox.exec();
-        }
+        }*/
 
     }
 }
@@ -3211,6 +3286,7 @@ void MainWindow::sorting_Button_clicked(){
            sortWin = new SortSettingPopUp();
            connect(sortWin, &SortSettingPopUp::reloadSortSettingSignal, [this]() {
                reloadSortSettFlg.storeRelaxed(1);
+               start_dataLoadingThread();
            });
        }
       else{
@@ -3218,6 +3294,7 @@ void MainWindow::sorting_Button_clicked(){
           sortWin = new SortSettingPopUp();
           connect(sortWin, &SortSettingPopUp::reloadSortSettingSignal, [this]() {
               reloadSortSettFlg.storeRelaxed(1);
+              start_dataLoadingThread();
           });
       }
        sortWin->show();
@@ -3228,6 +3305,8 @@ void MainWindow::sorting_Button_clicked(){
 //For Buy
 void MainWindow::F1_clicked_slot(){
    F1_F2_BuySell *F1F2 = new F1_F2_BuySell(nullptr,devicer,decimal_precision);
+   connect(F1F2, &F1_F2_BuySell::portfolioAddedSignal, this, &MainWindow::onPortfolioAdded);
+
    F1F2->setAttribute(Qt::WA_DeleteOnClose);
    F1F2->userData = this->userData;
    F1F2->show();
@@ -3236,6 +3315,7 @@ void MainWindow::F1_clicked_slot(){
 //For Sell
 void MainWindow::F2_clicked_slot(){
     F1_F2_BuySell *F1F2 = new F1_F2_BuySell(nullptr,devicer,decimal_precision);
+    connect(F1F2, &F1_F2_BuySell::portfolioAddedSignal, this, &MainWindow::onPortfolioAdded);
     F1F2->setAttribute(Qt::WA_DeleteOnClose);
     F1F2->userData = this->userData;
     F1F2->show();
@@ -3331,8 +3411,8 @@ void MainWindow::onSummaryActionTriggered(){
     Qt::WindowFlags flags = SC->windowFlags();
     SC->setWindowFlags(flags | Qt::Tool);
     SC->setAttribute(Qt::WA_DeleteOnClose);
-    connect(this, &MainWindow::data_summary_update_signal, SC, &Summary_cards::updateSummaryData);
-
+    //connect(this, &MainWindow::data_summary_update_signal, SC, &Summary_cards::updateSummaryData);
+    SC->updateSummaryData(summarydatList);
     SC->show();
 }
 

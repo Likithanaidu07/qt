@@ -488,6 +488,18 @@ QStringList ContractDetail::Get_Tokens_For_PortfolioType(PortfolioType type)
 
 }
 
+QStringList ContractDetail::Get_Tokens_For_IntrumentType(InstrumentType type)
+{
+    if (m_ContractDetails_Grouped.contains(type)) {
+        return m_ContractDetails_Grouped[type];
+    }
+    else {
+       qDebug()<<"PortfolioType: " <<type<< " not exist in m_ContractDetails_Grouped, Debug and fix.";
+       return QStringList(); // or handle it as needed
+   }
+
+}
+
 
 /*Hash<QString, contract_table> ContractDetail::GetFutureContracts()
 {

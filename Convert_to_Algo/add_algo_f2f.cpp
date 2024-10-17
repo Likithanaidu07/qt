@@ -107,7 +107,7 @@ void add_algo_f2f::selectedAction(){
         QFuture<void> future = QtConcurrent::run([=]() {
         QElapsedTimer timer1;
         timer1.start();
-        emit progressSignal(true,"Data Model is Loading, Please wait!");
+        emit progressSignal(true,"Loading...");
         for(int i=0;i<F2F_Tokens.length();i++){
                 /**********Create model for model_searchInstrument_F2F_Leg1*************************/
                 const auto& contract = sharedData->contract_table_hash[F2F_Tokens[i]];
