@@ -30,6 +30,7 @@ public:
     void setEditingFlg(int row,int val);
     void updatePortFolioStatusValue(int row,QString statusVal);
     QStringList getAllPortfolioNumbers();
+    int getActivatedPortfolioCount();
 
     PortfolioObject * getPortFolioAt(int idx) const ;
 

@@ -71,7 +71,10 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
         ui->lineEdit_EndStrike_BoxBid,
         ui->lineEdit_StrikeDifference_BoxBid,
         ui->lineEdit_EndStrike_Bs1221,
-        ui->lineEdit_StrikeDifference_Bs1221
+        ui->lineEdit_StrikeDifference_Bs1221,
+        ui->lineEdit_EndStrike_CRJellyBid,
+        ui->lineEdit_Start_strike_CRJellyBid,
+        ui->lineEdit_Fut_CRJellyBid
     }){
         w->setStyleSheet(LineEdit_SS);
         QFont font=w->font();

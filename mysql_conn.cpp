@@ -202,6 +202,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
 
                     userLoginInfo.UserId = query.value(rec.indexOf("UserId")).toInt();
                     userLoginInfo.MaxPortfolioCount = query.value(rec.indexOf("MaxPortfolioCount")).toInt();
+                    userLoginInfo.MaxActiveCount = query.value(rec.indexOf("MaxActiveCount")).toInt();
                     userLoginInfo.loggedIn = true;
                     userLoginInfo.loginResponse = "Login Sucess";
                     userLoginInfo.errorCode = T_LoginErroCode::OK;
@@ -1059,6 +1060,9 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
         else{
             QSqlRecord rec = query.record();
             while (query.next()) {
+
+
+
 
                 QString Buy_Sell = query.value(rec.indexOf("BuySellIndicator")).toString();
                 if(Buy_Sell=="1")

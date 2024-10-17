@@ -309,15 +309,15 @@ MainWindow::MainWindow(QWidget *parent)
             connect(ConvertAlgo_button, SIGNAL(clicked()), this, SLOT(ConvertAlgo_button_clicked()));
             //Frame 364.png
             ConvertAlgo_button->setToolButtonStyle(Qt::ToolButtonIconOnly);
-          //  ConvertAlgo_button->setIcon(QIcon(":/BuildAlgo.png"));
-            ConvertAlgo_button->setText("Build Algo");
+            ConvertAlgo_button->setIcon(QIcon(":/BuildAlgo.png"));
+            ConvertAlgo_button->setToolTip("Build Algo");
 
             const char convert_to_algo_button[]="QToolButton {"
-                                                //  "border-radius: 4px;" "border: 1px solid #188CCA;"
+                                               "border-radius: 4px;"
                                                   "background: #495057;"
                                                   "text-align: center;"
                                                   "color: #FFF;"
-                                                  "font-size: 12px;"
+                                                  //"font-size: 12px;"
 //                                                  "font-style: normal;"
 //                                                  "font-weight: 500;"
 //                                                  "line-height: normal;"
@@ -418,7 +418,7 @@ MainWindow::MainWindow(QWidget *parent)
                 "QToolButton {"
                 "border-radius: 4px;"
                 "border: 1px solid #4F5D75;"
-                "background: #345D71;"
+                "background: #106B9A;"
 //                "color: #4F5D75;"
 //                "font-style: normal;"
 //                "font-size: 12px;"
@@ -428,8 +428,8 @@ MainWindow::MainWindow(QWidget *parent)
                 "}"
                 "QToolButton:hover {"
                 "border-radius: 4px;"
-                "border: 1px solid #4F5D75;"
-                "background: #4F5D75;"
+                "border: 1px solid #495057;"
+                "background: #495057;"
                 "color: #FFF;"
                 "font-family: Work Sans;"
 //                "font-size: 12px;"
@@ -450,15 +450,15 @@ MainWindow::MainWindow(QWidget *parent)
 
 
                 internalLayout->addWidget(ConvertAlgo_button);
-            //    internalLayout->addWidget(switchBox);
-                internalLayout->addSpacerItem(spc);
-                //internalLayout->addWidget(line_edit_trade_search);
+
+                //internalLayout->addSpacerItem(spc);
+
                 internalLayout->addWidget(button1);
                 internalLayout->addWidget(button2);
                 internalLayout->addWidget(button3);
                 internalLayout->addWidget(button6);
                 internalLayout->addWidget(button4);
-               //  internalLayout->addSpacerItem(spc);
+                 internalLayout->addSpacerItem(spc);
                 //internalLayout->addWidget(button5);
                 //internalLayout->addWidget(line_edit_trade_search);
                 lay->addWidget(test, 0, 0);
@@ -555,6 +555,14 @@ MainWindow::MainWindow(QWidget *parent)
     //This will make first column fixed size
     T_Portfolio_Table->horizontalHeader()->setSectionResizeMode(PortfolioData_Idx::_Status, QHeaderView::Fixed);
     T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_Status, 60); // Set width to fixed pixels
+    int Portfolio_columnCount = T_Portfolio_Table->model()->columnCount(); // Get the column count from the model
+
+    for (int col = 0; col < Portfolio_columnCount; ++col) {
+        if (col != PortfolioData_Idx::_Status) {
+            T_Portfolio_Table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
+        }
+    }
+
 
     /***********Init portfolio table Window**************************/
 
@@ -687,6 +695,17 @@ MainWindow::MainWindow(QWidget *parent)
 
     trade_table->show();
     restoreTableViewColumnState(trade_table);
+    int Trade_columnCount = trade_table->model()->columnCount();
+
+    // First, set the resize mode to fit the contents
+    for (int col = 0; col < Trade_columnCount; ++col) {
+        trade_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
+    }
+    // Then, allow user  to resize the columns
+    trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+
+
+
 
     //connect this signal only after every table init completed, or else it will overwrite table state with defult setting before restore previous state
    // connect(headerViews, &QHeaderView::sectionResized, this, &MainWindow::onTradeTableHeader_Rearranged,Qt::UniqueConnection);
@@ -781,6 +800,17 @@ MainWindow::MainWindow(QWidget *parent)
     dock_win_net_pos->setWidget(net_pos_table);
     net_pos_table->show();
     restoreTableViewColumnState(net_pos_table);
+    int netpos_columnCount = net_pos_table->model()->columnCount();
+
+    // First, set the resize mode to fit the contents
+    for (int col = 0; col < netpos_columnCount; ++col) {
+        net_pos_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
+    }
+
+    // Allow user to resize columns interactively after fitting to contents
+    net_pos_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+
+
     /************Net Position Window********************************/
 
 
@@ -847,27 +877,36 @@ MainWindow::MainWindow(QWidget *parent)
     liners_table->setHorizontalHeader(headerViewrs);
 
     liners_model = new Liners_Model();
-    liners_delegate* liner_delegate=new liners_delegate;
-     liners_table->setObjectName("liners_table");
+    liners_delegate* liner_delegate = new liners_delegate;
+    liners_table->setObjectName("liners_table");
     liners_table->setModel(liners_model);
     liners_table->setItemDelegate(liner_delegate);
 
-    liners_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
-    //liners_table->setColumnWidth(1,300);
+    // Disable the global Interactive setting for now
+    // liners_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Comment this out
+
     liners_table->horizontalHeader()->setStretchLastSection(true);
     liners_table->verticalHeader()->setVisible(false);
-    /*  net_pos_table->setStyleSheet("QTableView {selection-background-color: #EFB37F;"
-                                        "selection-color: #4D4D4D;"
-                                        "color:#3D3D3D;"
-                                        "} "
-                                        "QHeaderView { background-color: #C0AAE5;color:#3D3D3D;} QHeaderView::section { background-color:#C0AAE5;color:#3D3D3D;font-weight: 400; }");*/
 
+    // Set up selection behavior
     liners_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     liners_table->setSelectionMode(QAbstractItemView::SingleSelection);
 
     dock_win_liners->setWidget(liners_table);
     liners_table->show();
     restoreTableViewColumnState(liners_table);
+
+    int liners_columnCount = liners_table->model()->columnCount();
+    for (int col = 0; col < liners_columnCount; ++col) {
+        liners_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
+    }
+    for (int col = 0; col < liners_columnCount; ++col) {
+        liners_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Interactive);
+    }
+
+
+
+
     /************Liners Window********************************/
 
 
@@ -993,12 +1032,18 @@ MainWindow::MainWindow(QWidget *parent)
     missed_trade_table->verticalHeader()->setVisible(false);
     missed_trade_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     missed_trade_table->setSelectionMode(QAbstractItemView::SingleSelection);
-    connect(missed_trade_table->horizontalHeader(), &QHeaderView::sectionMoved, this, &MainWindow::onMissed_trade_tableHeader_Rearranged,Qt::UniqueConnection);
+    connect(missed_trade_table->horizontalHeader(), &QHeaderView::sectionMoved, this, &MainWindow::onMissed_trade_tableHeader_Rearranged, Qt::UniqueConnection);
+
     dock_win_missed_trades->setWidget(missed_trade_table);
     missed_trade_table->show();
     restoreTableViewColumnState(missed_trade_table);
 
-    /************Missed Trades ********************************/
+    int missedtrades_columnCount = missed_trade_table->model()->columnCount();
+    for (int col = 0; col < missedtrades_columnCount; ++col) {
+        missed_trade_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
+    }
+
+      /************Missed Trades ********************************/
 
 
 
@@ -1328,6 +1373,14 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             qDebug()<<"portfolio_table_updating_db----- in progress.";
                 return;
         }
+//        int activatedCount = T_Portfolio_Model->getActivatedPortfolioCount(); // Correct type: int
+//        if (activatedCount >= userData.MaxActiveCount) {
+//                //show the message here
+//                qDebug() << "profolioTableEditFinshedSlot----- no active portfolio found.";
+//                return;
+//        }
+//        qDebug() << "Activated portfolio count:" << activatedCount;
+
 
         portfolio_table_updating_db.storeRelaxed(1);
 
@@ -1341,9 +1394,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
 
         QString PortfolioNumber = QString::number(P->PortfolioNumber);//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
-        T_Portfolio_Model->setEditingFlg(index.row(),0);//portfolio_data_list[index.row()]->edting.storeRelaxed(0);
-
-        //Update status data to DB
+        T_Portfolio_Model->setEditingFlg(index.row(),0);
         if (index.column() == PortfolioData_Idx::_Status) {
             if (valStr == "0") {
             QString Query = "UPDATE Portfolios SET Status='DisabledByUser' WHERE PortfolioNumber=" + PortfolioNumber;
@@ -1351,8 +1402,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             bool success = db_conn->updateDB_Table(Query, msg);
             if (success) {
                 db_conn->logToDB(QString("Disabled portfolio [" + PortfolioNumber + "]"));
-                // refresh sorting
-                reloadSortSettFlg.storeRelaxed(1);
+                reloadSortSettFlg.storeRelaxed(1);  // Refresh sorting
             } else {
                 QMessageBox msgBox;
                 msgBox.setWindowTitle("Update Status Failed");
@@ -1361,21 +1411,12 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 msgBox.exec();
             }
             } else {
-            if (P->OrderQuantity == 0) {
-                QMessageBox msgBox;
-                msgBox.setText("Portfolio can't be enabled if OrderQuantity is 0.");
-                msgBox.setIcon(QMessageBox::Warning);
-                msgBox.exec();
-                return;  // Prevent enabling the portfolio
-            }
-
             QString Query = "UPDATE Portfolios SET Status='Active' WHERE PortfolioNumber=" + PortfolioNumber;
             QString msg;
             bool success = db_conn->updateDB_Table(Query, msg);
             if (success) {
                 db_conn->logToDB(QString("Activated portfolio [" + PortfolioNumber + "]"));
-                // refresh sorting
-                reloadSortSettFlg.storeRelaxed(1);
+                reloadSortSettFlg.storeRelaxed(1);  // Refresh sorting
             } else {
                 QMessageBox msgBox;
                 msgBox.setWindowTitle("Update Status Failed");
@@ -1385,6 +1426,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             }
             }
         }
+
+
 
         /*else if(index.column() == PortfolioData_Idx::_Alias) {
             // Skip checking for duplicate alias names
@@ -2094,6 +2137,17 @@ void MainWindow::updatePortFolioStatus(QModelIndex index){
 
     if(portfolio_table_updating_db.loadRelaxed()==1){
         qDebug()<<"portfolio_table_updating_db----- in progress.";
+        return;
+    }
+
+    int activatedCount = T_Portfolio_Model->getActivatedPortfolioCount(); // Correct type: int
+    if (activatedCount >= userData.MaxActiveCount) {
+        //show the message here
+        QMessageBox msgBox;
+        msgBox.setText("Maximum Active Portfolio Limit Reached. Cannot activate more portfolios.");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
+        qDebug() << "profolioTableEditFinshedSlot----- no active portfolio found.";
         return;
     }
 

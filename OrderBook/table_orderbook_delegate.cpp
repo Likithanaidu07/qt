@@ -1,5 +1,6 @@
 #include "table_orderbook_delegate.h"
 #include "qsortfilterproxymodel.h"
+#include <QLineEdit>
 
 Table_OrderBook_Delegate::Table_OrderBook_Delegate(QObject *parent)  : QStyledItemDelegate{parent}
 {
@@ -13,8 +14,25 @@ bool Table_OrderBook_Delegate::eventFilter(QObject *object, QEvent *event) {
             view->clearSelection();
         }
     }
+
+//    if (event->type() == QEvent::KeyPress) {
+//        QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
+//        if (keyEvent->key() == Qt::Key_Escape) {
+//            if (auto searchField = view->parent()->findChild<QLineEdit*>("lineEditSearch")) {
+//                searchField->clear();  // Clear the search field
+//            }
+//            m_highlightText.clear();  // Clear any text highlight
+
+//            qDebug("Search cleared on Esc key press.");
+//            view->update();
+//            return true;
+//        }
+//    }
+
+    // Pass the event to the base class or other event handlers
     return QStyledItemDelegate::eventFilter(object, event);
 }
+
 
 void Table_OrderBook_Delegate::setHighlightText(const QString &text) {
     // Implement logic to store and handle highlight text
@@ -133,6 +151,12 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
         if (Leg1_OrderState == "6" || Leg3_OrderState == "6" || Leg4_OrderState == "6" || Leg2_OrderState == "6") {
             bgColor = QColor(215, 207, 232);  // Light purple background color
         }
+        else if (Leg1_OrderState == "5" || Leg3_OrderState == "5" || Leg4_OrderState == "5" || Leg2_OrderState == "5") {
+            bgColor = QColor(215, 207, 232);  // Light purple background color
+        }
+        else if (Leg1_OrderState == "13" || Leg3_OrderState == "13" || Leg4_OrderState == "13" || Leg2_OrderState == "13") {
+            bgColor = QColor(215, 207, 232);  // Light purple background color
+        }
 
         // Set the background color
         painter->fillRect(option.rect, bgColor);
@@ -216,7 +240,7 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
         int highlightStartX = fullTextRect.left() + beforeWidth;
         QRect highlightRect(highlightStartX, opt.rect.top(), matchWidth, opt.rect.height());
 
-        painter->fillRect(highlightRect, QColor(163, 163, 161));
+        painter->fillRect(highlightRect, QColor(229, 229, 227));
 
         // Ensure text is always drawn in black
 
@@ -267,3 +291,4 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
 
 
 }
+
