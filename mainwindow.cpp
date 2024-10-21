@@ -317,10 +317,10 @@ MainWindow::MainWindow(QWidget *parent)
                                                   "background: #495057;"
                                                   "text-align: center;"
                                                   "color: #FFF;"
-                                                  //"font-size: 12px;"
-//                                                  "font-style: normal;"
-//                                                  "font-weight: 500;"
-//                                                  "line-height: normal;"
+                                                  "min-width: 22px;"   // Set minimum width
+                                                  "max-width: 22px;"   // Set maximum width
+                                                  "min-height: 22px;"  // Set minimum height
+                                                  "max-height: 22px;"
                                                   "}"
                                                   "QToolButton:hover{"
                                                   "border-radius: 4px;"
@@ -1479,174 +1479,157 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 int columnIdx = i.key();
                 QString valStr = i.value();
                 switch (columnIdx) {
-                case PortfolioData_Idx::_OrderQuantity:{
-                    int lotSize = P->GetLotSize();//T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
-                    double val = valStr.toDouble();
-                    val=val*lotSize;
-                    double vfq = P->VolumeFreezeQty;//T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
+                case PortfolioData_Idx::_OrderQuantity: {
+                int lotSize = P->GetLotSize(); // T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                double val = valStr.toDouble();
+                val = val * lotSize;
+                double vfq = P->VolumeFreezeQty; // T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
 
+                if (val > vfq) {
+                    QMessageBox msgBox;
+                    msgBox.setText("Cannot update OrderQuantity");
+                    msgBox.setText("OrderQuantity cannot be greater than VolumeFreezeQty " + QString::number(vfq / lotSize));
+                    msgBox.setIcon(QMessageBox::Warning);
+                    msgBox.exec();
+                } else {
+                    int val1 = valStr.toInt();
+                    int BuyTotalQuantity = P->BuyTotalQuantity; // T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity;
+                    int SellTotalQuantity = P->SellTotalQuantity; // T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity;
+                    int qty = BuyTotalQuantity;
 
+                    if (BuyTotalQuantity == 0)
+                        qty = SellTotalQuantity;
+                    else if (SellTotalQuantity == 0)
+                        qty = BuyTotalQuantity;
+                    else if (BuyTotalQuantity > SellTotalQuantity)
+                        qty = BuyTotalQuantity;
+                    else
+                        qty = SellTotalQuantity;
 
-                    if(val > vfq){
+                    if (val1 > qty) {
                         QMessageBox msgBox;
                         msgBox.setText("Cannot update OrderQuantity");
-                        msgBox.setText("OrderQuantity cannot be greater than VolumeFreezeQty "+QString::number(vfq/lotSize));
+                        msgBox.setText("OrderQuantity cannot be greater than totalQty " + QString::number(qty));
                         msgBox.setIcon(QMessageBox::Warning);
                         msgBox.exec();
+                    } else {
+                        updateQueryList.append("OrderQuantity=" + QString::number(val));
+                        logMsg = logMsg + "OrderQuantity [" + QString::number(val1) + "], ";
                     }
-                    else{
-                        //write
-                        int val1 = valStr.toInt();
-                        int BuyTotalQuantity = P->BuyTotalQuantity;// T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity;
-                        int SellTotalQuantity = P->SellTotalQuantity;// T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity;
-                        int qty = BuyTotalQuantity;
-                        if(BuyTotalQuantity==0)
-                            qty = SellTotalQuantity;
-                        else if(SellTotalQuantity==0)
-                            qty = BuyTotalQuantity;
+                }
+                }
+                break;
 
-                        else if(BuyTotalQuantity>SellTotalQuantity)
-                            qty = BuyTotalQuantity;
-                        else
-                            qty = SellTotalQuantity;
-                        //check the condtion
-                        if(val1 >qty){
-                            QMessageBox msgBox;
-                            msgBox.setText("Cannot update OrderQuantity");
-                            msgBox.setText("OrderQuantity cannot be greater than totalQty "+QString::number(qty));
-                            msgBox.setIcon(QMessageBox::Warning);
-                            msgBox.exec();
-                        }
-                        else{
-                            updateQueryList.append("OrderQuantity="+QString::number(val));
-                            logMsg = logMsg+"OrderQuantity ["+QString::number(val1)+"], ";
-                        }
+                case PortfolioData_Idx::_BuyTotalQuantity: {
+                double TQ = valStr.toDouble();
+                int bTTQ = P->BuyTradedQuantity; // T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTradedQuantity;
+                QString InstrumentType = ContractDetail::getInstance().GetInstrumentType(P->Leg1TokenNo, P->PortfolioType.toInt());
+
+                if (InstrumentType == "OPTIDX" || InstrumentType == "FUTIDX") {
+                    if (TQ > userData.IDXOpenLimit + bTTQ) {
+                        QMessageBox msgBox;
+                        msgBox.setText("BTQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
+                        msgBox.setIcon(QMessageBox::Warning);
+                        msgBox.exec();
+                        break;
+                    }
+                } else if (InstrumentType == "OPTSTK" || InstrumentType == "FUTSTK") {
+                    if (TQ > userData.STKOpenLimit + bTTQ) {
+                        QMessageBox msgBox;
+                        msgBox.setText("BTQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
+                        msgBox.setIcon(QMessageBox::Warning);
+                        msgBox.exec();
+                        break;
                     }
                 }
 
-                    break;
+                double TTQ = P->BuyTradedQuantity;
+                if (TQ < TTQ) {
+                    QMessageBox msgBox;
+                    msgBox.setText("BTQ cannot be less than Traded Quantity " + QString::number(TTQ));
+                    msgBox.setIcon(QMessageBox::Warning);
+                    msgBox.exec();
+                } else {
+                    double OrderQty = P->OrderQuantity;
 
-                    case PortfolioData_Idx::_BuyTotalQuantity:{
-                    double TQ = valStr.toDouble();
-                    int bTTQ= P->BuyTradedQuantity;//T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTradedQuantity;
+                    if (TQ < OrderQty && P->SellTotalQuantity < OrderQty) {
+                        // Only show this if both BTQ and STQ are less than OrderQuantity
+                        QMessageBox msgBox;
+                        msgBox.setText("BTQ Should not be less than OrderQuantity, which is " + QString::number(OrderQty));
+                        msgBox.setIcon(QMessageBox::Warning);
+                        msgBox.exec();
+                    } else {
+                        // Proceed with updating the values
+                        int lotSize = P->GetLotSize();
+                        double val = valStr.toDouble();
+                        val = val * lotSize;
 
-                    QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(P->Leg1TokenNo,P->PortfolioType.toInt());
-
-
-                    if (InstrumentType == "OPTIDX" || InstrumentType == "FUTIDX") {
-
-                        if (TQ > userData.IDXOpenLimit+bTTQ) {
-                            QMessageBox msgBox;
-                            msgBox.setText("BTQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
-                            msgBox.setIcon(QMessageBox::Warning);
-                            msgBox.exec();
-                            break;
+                        if (P->OrderQuantity == 0) {
+                            updateQueryList.append("OrderQuantity=" + QString::number(lotSize));
                         }
+
+                        updateQueryList.append("BuyTotalQuantity=" + QString::number(val));
+                        logMsg = logMsg + "BuyTotalQuantity [" + QString::number(val) + "], ";
                     }
-                    else if (InstrumentType == "OPTSTK" || InstrumentType == "FUTSTK") {
+                }
+                }
+                break;
 
-                        if (TQ > userData.STKOpenLimit+bTTQ) {
-                            QMessageBox msgBox;
-                            msgBox.setText("BTQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
-                            msgBox.setIcon(QMessageBox::Warning);
-                            msgBox.exec();
-                            break;
-                        }
+                case PortfolioData_Idx::_SellTotalQuantity: {
+                double TQ = valStr.toDouble();
+                int sTTQ = P->SellTradedQuantity;
+                QString InstrumentType = ContractDetail::getInstance().GetInstrumentType(P->Leg1TokenNo, P->PortfolioType.toInt());
+
+                if (InstrumentType == "OPTIDX" || InstrumentType == "FUTIDX") {
+                    if (TQ > userData.IDXOpenLimit + sTTQ) {
+                        QMessageBox msgBox;
+                        msgBox.setText("STQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
+                        msgBox.setIcon(QMessageBox::Warning);
+                        msgBox.exec();
+                        break;
                     }
-
-                    double TTQ = P->BuyTradedQuantity;
-
-                    if (TQ < TTQ) {
-                            QMessageBox msgBox;
-                            msgBox.setText("BTQ cannot be less than Traded Quantity is " + QString::number(TTQ));
-                            msgBox.setIcon(QMessageBox::Warning);
-                            msgBox.exec();
-
-                        }
-                        else {
-
-                            double OrderQty = P->OrderQuantity;
-                            if(TQ<OrderQty){
-                               // show the error mesg here
-                                QMessageBox msgBox;
-                                msgBox.setText("BTQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
-                                msgBox.setIcon(QMessageBox::Warning);
-                                msgBox.exec();
-                            }
-                            else{
-                                int lotSize = P->GetLotSize();
-                                double val = valStr.toDouble();
-                                val=val*lotSize;
-                                if(P->OrderQuantity==0){
-                                    updateQueryList.append("OrderQuantity="+QString::number(lotSize));
-                                }
-                                updateQueryList.append("BuyTotalQuantity="+QString::number(val));
-                                logMsg = logMsg+"BuyTotalQuantity ["+QString::number(val)+"], ";
-                            }
-
-                        }
-
-
+                } else if (InstrumentType == "OPTSTK" || InstrumentType == "FUTSTK") {
+                    if (TQ > userData.STKOpenLimit + sTTQ) {
+                        QMessageBox msgBox;
+                        msgBox.setText("STQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
+                        msgBox.setIcon(QMessageBox::Warning);
+                        msgBox.exec();
+                        break;
                     }
-                    break;
+                }
 
-                    case PortfolioData_Idx::_SellTotalQuantity:{
-                        double TQ = valStr.toDouble();
-                       int sTTQ= P->SellTradedQuantity;
-                        QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(P->Leg1TokenNo,P->PortfolioType.toInt());
+                double TTQ = P->SellTradedQuantity;
+                if (TQ < TTQ) {
+                    QMessageBox msgBox;
+                    msgBox.setText("STQ cannot be less than Traded Quantity is " + QString::number(TTQ));
+                    msgBox.setIcon(QMessageBox::Warning);
+                    msgBox.exec();
+                } else {
+                    double OrderQty = P->OrderQuantity;
 
+                    if (TQ < OrderQty && P->BuyTotalQuantity < OrderQty) {
+                        // Only show this if both STQ and BTQ are less than OrderQuantity
+                        QMessageBox msgBox;
+                        msgBox.setText("STQ Should not be less than OrderQuantity, which is " + QString::number(OrderQty));
+                        msgBox.setIcon(QMessageBox::Warning);
+                        msgBox.exec();
+                    } else {
+                        // Proceed with updating the values
+                        int lotSize = P->GetLotSize();
+                        double val = valStr.toDouble();
+                        val = val * lotSize;
 
-                        if (InstrumentType == "OPTIDX" || InstrumentType == "FUTIDX") {
-
-                            if (TQ > userData.IDXOpenLimit + sTTQ) {
-                                QMessageBox msgBox;
-                                msgBox.setText("STQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
-                                msgBox.setIcon(QMessageBox::Warning);
-                                msgBox.exec();
-                                break;
-                            }
+                        if (P->OrderQuantity == 0) {
+                            updateQueryList.append("OrderQuantity=" + QString::number(lotSize));
                         }
-                        else if (InstrumentType == "OPTSTK" || InstrumentType == "FUTSTK") {
 
-                            if (TQ > userData.STKOpenLimit + sTTQ) {
-                                QMessageBox msgBox;
-                                msgBox.setText("STQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
-                                msgBox.setIcon(QMessageBox::Warning);
-                                msgBox.exec();
-                                break;
-                            }
-                        }
-                        double TTQ = P->SellTradedQuantity;
-
-                        if (TQ < TTQ) {
-                            QMessageBox msgBox;
-                            msgBox.setText("STQ cannot be less than Traded Quantity is " + QString::number(TTQ));
-                            msgBox.setIcon(QMessageBox::Warning);
-                            msgBox.exec();
-                        }
-                        else {
-                            double OrderQty = P->OrderQuantity;
-                            if(TQ<OrderQty){
-                                // show the error mesg here
-                                QMessageBox msgBox;
-                                msgBox.setText("STQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
-                                msgBox.setIcon(QMessageBox::Warning);
-                                msgBox.exec();
-                            }
-                            else{
-                                int lotSize = P->GetLotSize();
-                                double val = valStr.toDouble();
-                                val=val*lotSize;
-                                if(P->OrderQuantity==0){
-                                    updateQueryList.append("OrderQuantity="+QString::number(lotSize));
-                                }
-                                updateQueryList.append("SellTotalQuantity="+QString::number(val));
-                                logMsg = logMsg+"SellTotalQuantity ["+QString::number(val)+"], ";
-                            }
-
-                        }
+                        updateQueryList.append("SellTotalQuantity=" + QString::number(val));
+                        logMsg = logMsg + "SellTotalQuantity [" + QString::number(val) + "], ";
                     }
-                    break;
+                }
+                }
+                break;
+
 
                     case PortfolioData_Idx::_BuyPriceDifference:{
                         QString BuyPriceDifference = QString::number(P->BuyPriceDifference*devicer,'f',decimal_precision);
@@ -1927,7 +1910,8 @@ void MainWindow::loadDataAndUpdateTable(int table){
     case T_Table::TRADE:{
 //        OutputDebugStringA("Test1 \n");
         //QHash<QString, PortFolioData_Less> PortFolioHash = T_Portfolio_Model->getPortFolioDataLess();
-        db_conn->getTradeTableData(TraderCount,trade_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash);
+        QStringList TradeTableHighlight_ExcludeList = trade_model->getTradeTableHighlight_ExcludeList();
+        db_conn->getTradeTableData(TraderCount,trade_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,TradeTableHighlight_ExcludeList);
         emit data_loded_signal(T_Table::TRADE);
         updateSummaryLabels();
         break;
@@ -2133,96 +2117,84 @@ QString MainWindow::base64_decode(QString str){
 }
 
 
-void MainWindow::updatePortFolioStatus(QModelIndex index){
-
-    if(portfolio_table_updating_db.loadRelaxed()==1){
-        qDebug()<<"portfolio_table_updating_db----- in progress.";
-        return;
+void MainWindow::updatePortFolioStatus(QModelIndex index) {
+    if (portfolio_table_updating_db.loadRelaxed() == 1) {
+            qDebug() << "Portfolio table updating is in progress.";
+            return;
     }
-
-    int activatedCount = T_Portfolio_Model->getActivatedPortfolioCount(); // Correct type: int
-    if (activatedCount >= userData.MaxActiveCount) {
-        //show the message here
-        QMessageBox msgBox;
-        msgBox.setText("Maximum Active Portfolio Limit Reached. Cannot activate more portfolios.");
-        msgBox.setIcon(QMessageBox::Warning);
-        msgBox.exec();
-        qDebug() << "profolioTableEditFinshedSlot----- no active portfolio found.";
-        return;
-    }
-
-
     portfolio_table_updating_db.storeRelaxed(1);
 
-   // QModelIndexList selection = T_Portfolio_Table->selectionModel()->selectedRows();
-  //  for(int i=0; i< selection.count(); i++)
-  //  {
-           // QModelIndex index = selection.at(i);
+    // Get the portfolio object at the given row index
+    PortfolioObject *P = T_Portfolio_Model->getPortFolioAt(index.row());
+    if (!P) {
+            qDebug() << "updatePortFolioStatus: portfolio is null, need to debug.";
+            portfolio_table_updating_db.storeRelaxed(0);
+            return;
+    }
 
-            PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());
-            if (!P) {
-                qDebug()<<"updatePortFolioStatus----- portfolio null, need to debug this code.";
+    // Get the portfolio number and status
+    QString PortfolioNumber = QString::number(P->PortfolioNumber);
+    portfolio_status status = static_cast<portfolio_status>(P->StatusVal.toInt());
+
+    // Set the editing flag for this portfolio row
+    T_Portfolio_Model->setEditingFlg(index.row(), 1);
+
+    if (status == portfolio_status::Filled || status == portfolio_status::DisabledByUser) {
+            // Activate the portfolio if the active portfolio count is below the limit
+            int activatedCount = T_Portfolio_Model->getActivatedPortfolioCount();
+            if (activatedCount >= userData.MaxActiveCount) {
+                QMessageBox msgBox;
+                msgBox.setText("Maximum Active Portfolio Limit Reached. Cannot activate more portfolios.");
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.exec();
+                qDebug() << "updatePortFolioStatus: Maximum active portfolio limit reached.";
+                portfolio_table_updating_db.storeRelaxed(0);
                 return;
             }
-            QString PortfolioNumber = QString::number(P->PortfolioNumber);//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_PortfolioNumber).data().toString();
-            T_Portfolio_Model->setEditingFlg(index.row(),1);//T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(1);
 
-            portfolio_status status = static_cast<portfolio_status>(P->StatusVal.toInt());// static_cast<portfolio_status>(T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal.toInt());//T_Portfolio_Model->index(index.row(),PortfolioData_Idx::_Status).data().toString();
-            //status is in uncheck state so make it toggle(checked)
-            if(status == portfolio_status::Filled || status == portfolio_status::DisabledByUser){
-                //int lotSize = P->GetLotSize();
-                //check remaing qunatity is greater than 1 lot
-                    T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::Active));//portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::Active);
-                   // T_Portfolio_Model->refreshTable();
-                    QString Query = "UPDATE Portfolios SET Status='Active' where PortfolioNumber="+PortfolioNumber;
-                    QString msg;
-                    bool success = db_conn->updateDB_Table(Query,msg);
-                    if(success){
-                        //refresh sorting
-                        start_dataLoadingThread();
+            // Activate portfolio in UI and update the database
+            T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::Active));
+            QString Query = "UPDATE Portfolios SET Status='Active' WHERE PortfolioNumber=" + PortfolioNumber;
+            QString msg;
+            if (db_conn->updateDB_Table(Query, msg)) {
+                // Log success and trigger backend communication
+                start_dataLoadingThread();
+                reloadSortSettFlg.storeRelaxed(1);
+                db_conn->logToDB(QString("Activated portfolio [" + PortfolioNumber + "]"));
 
-                        reloadSortSettFlg.storeRelaxed(1);
-                        db_conn->logToDB(QString("Activated portfolio ["+PortfolioNumber+"]"));
-                        quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
-                        const unsigned char dataBytes[] = { 0x01};
-                        QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
-                        QByteArray msg = backend_comm->createPacket(command, data);
-                        backend_comm->insertData(msg);
-                    }
-                }
-
-
-            //status is in check state so make it toggle(uncheck)
-            else{
-                T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::DisabledByUser));//T_Portfolio_Model->portfolio_data_list[index.row()]->StatusVal = QString::number(portfolio_status::DisabledByUser);
-               // T_Portfolio_Model->refreshTable();
-                QString Query = "UPDATE Portfolios SET Status='DisabledByUser' where PortfolioNumber="+PortfolioNumber;
-                QString msg;
-                bool success = db_conn->updateDB_Table(Query,msg);
-                if(success){
-                    //refresh sorting
-                    start_dataLoadingThread();
-
-                    reloadSortSettFlg.storeRelaxed(1);
-                    db_conn->logToDB(QString("Disabled portfolio ["+PortfolioNumber+"]"));
-
-                    quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
-                    const unsigned char dataBytes[] = { 0x00};
-                    QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
-                    QByteArray msg = backend_comm->createPacket(command, data);
-                    backend_comm->insertData(msg);
-                }
+                // Send activation command to backend
+                quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+                const unsigned char dataBytes[] = { 0x01 };
+                QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
+                QByteArray msg = backend_comm->createPacket(command, data);
+                backend_comm->insertData(msg);
             }
+    } else {
+            // Deactivate portfolio in UI and update the database
+            T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::DisabledByUser));
+            QString Query = "UPDATE Portfolios SET Status='DisabledByUser' WHERE PortfolioNumber=" + PortfolioNumber;
+            QString msg;
+            if (db_conn->updateDB_Table(Query, msg)) {
+                // Log success and trigger backend communication
+                start_dataLoadingThread();
+                reloadSortSettFlg.storeRelaxed(1);
+                db_conn->logToDB(QString("Disabled portfolio [" + PortfolioNumber + "]"));
 
+                // Send deactivation command to backend
+                quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+                const unsigned char dataBytes[] = { 0x00 };
+                QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
+                QByteArray msg = backend_comm->createPacket(command, data);
+                backend_comm->insertData(msg);
+            }
+    }
 
-
-
-        T_Portfolio_Model->setEditingFlg(index.row(),0);//T_Portfolio_Model->portfolio_data_list[index.row()]->edting.storeRelaxed(0);
-        delete P;
-
-   // }
+    // Reset the editing flag and clean up
+    T_Portfolio_Model->setEditingFlg(index.row(), 0);
+    delete P;
     portfolio_table_updating_db.storeRelaxed(0);
 }
+
 
 //void MainWindow::resizePortFolioTableColWidthSlot(int width)
 //{

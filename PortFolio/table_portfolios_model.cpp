@@ -1223,4 +1223,5 @@ int Table_Portfolios_Model::getActivatedPortfolioCount() {
 
 
 
->>>>>>> .theirs
+
+

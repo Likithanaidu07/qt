@@ -125,7 +125,8 @@ enum OrderBook_Idx{
     Expiry_OB,
     BuyorSell_OB,
     LotSize_OB,
-    TraderData_OB
+    TraderData_OB,
+    TradeTable_Hihglight_OB
 };
 
 enum Liners_Idx{
