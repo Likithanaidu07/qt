@@ -25,7 +25,9 @@ public:
     void setBuyMode(bool buy_mode_);
     double priceSingleStepValue;
     bool updateLTPOnPriceInput;
-
+    QMutex mutex;
+    QHash<QString, MBP_Data_Struct> localMBP_Data;
+    void refreshMarketDataTable();
 protected:
     void showEvent(QShowEvent *event) override;
 

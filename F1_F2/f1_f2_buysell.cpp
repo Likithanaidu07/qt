@@ -5,6 +5,7 @@
 #include <QFuture>
 #include <QtConcurrent/QtConcurrent>
 #include <QProgressDialog>
+#include "QMessageBox"
 
 F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_precision) :
     QDialog(parent),
@@ -165,6 +166,13 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
     ui->tableViewMarkerRate->horizontalHeader()->setDefaultAlignment(Qt::AlignRight);
     QHeaderView* header = ui->tableViewMarkerRate->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::Fixed);  // Disable resizing for all columns
+    ui->tableViewMarkerRate->horizontalHeader()->setStyleSheet(
+        "QHeaderView::section {"
+        "    background-color: #D6FCF0;"  // Transparent background
+        "    font-weight: bold;"              // Bold font
+        "    border: none;"
+        "}"
+    );
 
 
     // Disable scrollbars (both horizontal and vertical)
@@ -185,7 +193,7 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
 
 
        ui->tableViewMarkerRate->setStyleSheet("#tableViewMarkerRate { background: transparent; border: none; }");
-       QPalette palette = ui->tableViewMarkerRate->palette();
+      // QPalette palette = ui->tableViewMarkerRate->palette();
        // Set custom colors for alternating rows
      //  palette.setColor(QPalette::Base, QColor(200, 200, 200));        // Normal row color (white)
      //  palette.setColor(QPalette::AlternateBase, QColor(230, 230, 230)); // Alternating row color (light gray)
@@ -246,6 +254,7 @@ void F1_F2_BuySell::itemSelectedStockName(QModelIndex index)
 
         qDebug()<<"F_F2--> token_number: "<<token_number<<"   OperatingRangeslowPriceRange: "<<c.OperatingRangeslowPriceRange/devicer<<"   OperatingRangeshighPriceRange:"<<c.OperatingRangeshighPriceRange/devicer;
         qDebug()<<"F_F2--> token_number: "<<token_number<<"   VolumeFreezeQty: "<<c.VolumeFreezeQty<<"   LotSize:"<<c.LotSize << "  maxLot: "<<c.VolumeFreezeQty/c.LotSize << "  MinimumSpread: "<<c.MinimumSpread;
+        refreshMarketDataTable();
 
 
     }
@@ -259,7 +268,7 @@ void F1_F2_BuySell::itemSelectedStockName(QModelIndex index)
 
 
 void F1_F2_BuySell::adjustValue(){
-    updateLTPOnPriceInput = false;
+   // updateLTPOnPriceInput = false;
     // Ensure the value is a multiple of the current step (either 0.01 or 0.05)
            double step = ui->doubleSpinBox_price->singleStep();
            double value = ui->doubleSpinBox_price->value();
@@ -338,6 +347,10 @@ void F1_F2_BuySell::on_pushButtonSubmit_clicked()
                      //ui->doubleSpinBox_price->setValue(ui->doubleSpinBox_price->minimum());
                      ui->doubleSpinBox_price->clear();
 
+                     QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tableViewMarkerRate->model());
+                     model->removeRows(0, model->rowCount());
+                     ui->label_lastTradedPrice->clear();
+
                      token_number = "";
                  }
                  else{
@@ -357,9 +370,18 @@ void F1_F2_BuySell::on_pushButtonSubmit_clicked()
         msgBox.setText("Order placed successfully.");
         msgBox.exec();
         ui->lineEdit_Stockname->clear();
-        ui->spinBoxLot->setValue(ui->spinBoxLot->minimum());
-        ui->doubleSpinBox_price->setValue(ui->doubleSpinBox_price->minimum());
+        //ui->spinBoxLot->setValue(ui->spinBoxLot->minimum());
+        //ui->doubleSpinBox_price->setValue(ui->doubleSpinBox_price->minimum());
+        //ui->spinBoxLot->setValue(ui->spinBoxLot->minimum());
+        ui->spinBoxLot->clear();
+        //ui->doubleSpinBox_price->setValue(ui->doubleSpinBox_price->minimum());
+        ui->doubleSpinBox_price->clear();
+
+        QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tableViewMarkerRate->model());
+        model->removeRows(0, model->rowCount());
+
         token_number = "";
+        ui->label_lastTradedPrice->clear();
 
     }
     else{
@@ -387,12 +409,27 @@ void F1_F2_BuySell::on_comboBoxBuySell_currentTextChanged(const QString &arg1)
         buy_mode = true;
        // this->setWindowTitle("F1: BuyManual");
         this->setStyleSheet("#F1_F2_BuySell { background-color: #D6FCF0; }");
+        ui->tableViewMarkerRate->horizontalHeader()->setStyleSheet(
+            "QHeaderView::section {"
+            "    background-color: #D6FCF0;"  // Transparent background
+            "    font-weight: bold;"              // Bold font
+            "    border: none;"
+            "}"
+        );
 
      }
      else{
          buy_mode = false;
          // this->setWindowTitle("F2: SellManual");
          this->setStyleSheet("#F1_F2_BuySell { background-color: #FED9D9; }");
+         ui->tableViewMarkerRate->horizontalHeader()->setStyleSheet(
+             "QHeaderView::section {"
+             "    background-color: #FED9D9;"  // Transparent background
+             "    font-weight: bold;"              // Bold font
+             "    border: none;"                              // Remove header section borders
+
+             "}"
+         );
 
      }
 }
@@ -401,12 +438,26 @@ void F1_F2_BuySell::setBuyMode(bool buy_mode_){
         ui->comboBoxBuySell->setCurrentText("Buy");
         buy_mode = true;
         this->setStyleSheet("#F1_F2_BuySell { background-color: #D6FCF0; }");
+        ui->tableViewMarkerRate->horizontalHeader()->setStyleSheet(
+            "QHeaderView::section {"
+            "    background-color: #D6FCF0;"  // Transparent background
+            "    font-weight: bold;"              // Bold font
+            "    border: none;"
+            "}"
+        );
 
     }
     else{
         ui->comboBoxBuySell->setCurrentText("Sell");
         buy_mode = false;
         this->setStyleSheet("#F1_F2_BuySell { background-color: #FED9D9; }");
+        ui->tableViewMarkerRate->horizontalHeader()->setStyleSheet(
+            "QHeaderView::section {"
+            "    background-color: #FED9D9;"  // Transparent background
+            "    font-weight: bold;"              // Bold font
+            "    border: none;"
+            "}"
+        );
 
     }
 }
@@ -421,6 +472,12 @@ void F1_F2_BuySell::keyPressEvent(QKeyEvent *event)
 }
 
 void F1_F2_BuySell::slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct>& data){
+
+    mutex.lock();
+    localMBP_Data = data;             // Assign the received data to the class variable
+    mutex.unlock();
+
+    refreshMarketDataTable();
 
    /*QStringList CR_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::CR);
 
@@ -466,12 +523,17 @@ void F1_F2_BuySell::slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct>& dat
                 qDebug() << "Invalid token key, unable to convert to int:" << *it;
             }
         }*/
+}
+
+void F1_F2_BuySell::refreshMarketDataTable(){
 
     if(token_number!=""){
         QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tableViewMarkerRate->model());
-        if(data.contains(token_number)){
+        mutex.lock();
+        if(localMBP_Data.contains(token_number)){
             model->removeRows(0, model->rowCount());
-            MBP_Data_Struct d = data[token_number];
+            MBP_Data_Struct d = localMBP_Data[token_number];
+            mutex.unlock();
 
 
 //            for(int i=0;i<5;i++){
@@ -489,6 +551,12 @@ void F1_F2_BuySell::slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct>& dat
             ui->label_lastTradedPrice->setText(QString::number(ltp,'f',2));
             if(updateLTPOnPriceInput){
                 ui->doubleSpinBox_price->setValue(ltp);
+                qDebug()<<" setting doubleSpinBox_price:"<<ltp;
+                if(ltp>ui->doubleSpinBox_price->maximum()){
+                    QMessageBox::information(this, "Warning", "LTP: ",QString::number(ltp)+" is greater than HighPriceRange: "+QString::number(ui->doubleSpinBox_price->maximum())+" Toekn = "+token_number);
+
+                }
+
                 updateLTPOnPriceInput = false;
             }
 
@@ -518,6 +586,9 @@ void F1_F2_BuySell::slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct>& dat
             }
 
 
+        }
+        else{
+            mutex.unlock();
         }
     }
 
