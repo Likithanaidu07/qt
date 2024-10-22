@@ -1114,7 +1114,7 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
     return tradeData;
 
 }
-void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_table, Order_F1_F2_Model *f1f2_order_table_model,Liners_Model *liners_model ,QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash,QStringList TradeTableHilightExcludeList)
+void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_table, Order_F1_F2_Model *f1f2_order_table_model,Liners_Model *liners_model ,QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash/*,QStringList TradeTableHilightExcludeList*/)
 {
     QMutexLocker lock(&mutex);
 
@@ -1165,10 +1165,10 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 QString traderData =  query.value(rec.indexOf("Trader_Data")).toString();
                 int Algo_ID_Int = query.value(rec.indexOf("PortfolioNumber")).toInt();
 
-                QString TradeTable_highlight = "1";
-                if (TradeTableHilightExcludeList.contains(traderData)) {
-                    TradeTable_highlight = "0";
-                }
+//                QString TradeTable_highlight = "1";
+//                if (TradeTableHilightExcludeList.contains(traderData)) {
+//                    TradeTable_highlight = "0";
+//                }
 
                 if(Algo_ID_Int>1500000){
                     Buy_Sell = "Buy";
@@ -1399,7 +1399,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
 //                 if (portfolio_type == PortfolioType::F2F||portfolio_type == PortfolioType::BFLY_BID||portfolio_type == PortfolioType::CR||portfolio_type == PortfolioType::CR_JELLY){
 //                       Leg4_OrderStateStr = "-";
 //                }
-                QString Stockname = ContractDetail::getInstance().GetInstrumentName(leg1_token_number,portfolio_type);
+                QString Stockname = ContractDetail::getInstance().GetStockName(leg1_token_number,portfolio_type);
                 int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
 
 //                Leg1_OrderStateStr = ContractDetail::getInstance().GetStockName(leg1_token_number,portfolio_type)+" "+"["+(QString::number(Leg1_Total_Volume/lotSize))+"]";
@@ -1509,6 +1509,18 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
 
                     break;
                 }
+                case PortfolioType::F1_F2: {
+
+                    int strikePriceLeg1 = ContractDetail::getInstance().GetStrikePrice(leg1_token_number, portfolio_type).toInt()* devicer;
+                    if (Leg1BuySellIndicator == 1) {
+                        Exch_Price_val = static_cast<double>(leg1Price ) / devicer;
+                    } else {
+                        Exch_Price_val = static_cast<double>(leg1Price) / devicer;
+
+                    }
+
+                    break;
+                }
 
 
                 default:
@@ -1527,10 +1539,11 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 if(qty>0&&lotSize>0) // to prevent crash
                     qty = qty / lotSize;
                 QString Traded_Lot = QString::number(qty);
-
                 QString Remaining_Lot = QString::number(static_cast<double>(query.value(rec.indexOf("RemainingQty")).toDouble()) / lotSize);
                 long long Trade_Time = query.value(rec.indexOf("Leg2_TimeOrderEnteredHost")).toLongLong();
+                long long f1_f2Trade_Time = query.value(rec.indexOf("Leg1_TimeOrderEnteredHost")).toLongLong();
                 QDateTime dt = QDateTime::fromSecsSinceEpoch(Trade_Time);
+                QDateTime dt1 = QDateTime::fromSecsSinceEpoch(f1_f2Trade_Time);
                 if (portfolio_type == PortfolioType::BX_BID) {
                     std::vector<int> legOrderStates = {Leg1_OrderState, Leg2_OrderState, Leg3_OrderState, Leg4_OrderState};
                     std::vector<QString> legTimeFields = {
@@ -1553,18 +1566,29 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 dt = dt.toUTC();
 
                 QStringList rowList;
+                 if(portfolio_type != PortfolioType::F1_F2)
                 rowList.append(Algo_ID);
                 rowList.append(order_id);
                 //                rowList.append(Volant_No);
+                if (portfolio_type == PortfolioType::F1_F2) {
+                rowList.append(Stockname);
+                } else {
                 rowList.append(Algo_Name);
+                }
                 rowList.append(User_Price);
                 rowList.append(Exch_Price);
                 if(portfolio_type != PortfolioType::F1_F2)
                     rowList.append(Jackpot); // Jackpot data not required or F1_F2
                 rowList.append(Traded_Lot);
+                if(portfolio_type != PortfolioType::F1_F2)
                 rowList.append(Remaining_Lot);
                 //  rowList.append(Buy_Sell);
+                if (portfolio_type != PortfolioType::F1_F2) {
                 rowList.append(dt.toString("hh:mm:ss"));
+                }
+                else{
+                 rowList.append(dt1.toString("hh:mm:ss"));
+                }
                 rowList.append(Leg1_OrderStateStr);
                 rowList.append(Leg2_OrderStateStr);
                 rowList.append(Leg3_OrderStateStr);
@@ -1577,7 +1601,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 rowList.append(Buy_Sell);
                 rowList.append(QString::number(lotSize));
                 rowList.append(traderData);
-                rowList.append(TradeTable_highlight);
+                //rowList.append(TradeTable_highlight);
 
 
 //                rowList.append(Leg1_OrderState); // this should be the 4th last data inserted to the row

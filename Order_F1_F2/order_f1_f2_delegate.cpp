@@ -94,8 +94,8 @@ void Order_F1_F2_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &
 
     if (c == F1F2_Order_Data_Idx::ExchPrice_F1F2 ||
         c == F1F2_Order_Data_Idx::UserPrice_F1F2 ||
-        c == F1F2_Order_Data_Idx::TradedLot_F1F2 ||
-        c == F1F2_Order_Data_Idx::RemainingLot_F1F2) {
+        c == F1F2_Order_Data_Idx::TradedLot_F1F2 /*||
+        c == F1F2_Order_Data_Idx::RemainingLot_F1F2*/) {
 
         QString buy_sell = order_list[F1F2_Order_Data_Idx::BuyorSell_F1F2];
 
@@ -135,7 +135,7 @@ void Order_F1_F2_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &
 
     } else if (c == F1F2_Order_Data_Idx::OrderId_F1F2 ||
                c == F1F2_Order_Data_Idx::AlgoName_F1F2 ||
-               c == F1F2_Order_Data_Idx::AlgoNo_F1F2 ||
+//               c == F1F2_Order_Data_Idx::AlgoNo_F1F2 ||
                c == F1F2_Order_Data_Idx::Leg1State_F1F2 ||
                c == F1F2_Order_Data_Idx::Leg3State_F1F2 ||
                c == F1F2_Order_Data_Idx::Leg4State_F1F2   ||
@@ -198,7 +198,7 @@ void Order_F1_F2_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &
         painter->fillRect(option.rect, color);
     }
 
-    if (c == F1F2_Order_Data_Idx::TradeTime_F1F2 || c == F1F2_Order_Data_Idx::AlgoNo_F1F2 || c == F1F2_Order_Data_Idx::UserPrice_F1F2) {
+    if (c == F1F2_Order_Data_Idx::TradeTime_F1F2 /*|| c == F1F2_Order_Data_Idx::AlgoNo_F1F2*/ || c == F1F2_Order_Data_Idx::UserPrice_F1F2) {
         QStyleOptionViewItem op(option);
 
         double borderWidth = 1;

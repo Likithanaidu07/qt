@@ -131,13 +131,13 @@ enum OrderBook_Idx{
 
 
 enum F1F2_Order_Data_Idx{
-    AlgoNo_F1F2=0,
-    OrderId_F1F2,
+    //AlgoNo_F1F2=0,
+    OrderId_F1F2=0,
     AlgoName_F1F2,
     UserPrice_F1F2,
     ExchPrice_F1F2,
     TradedLot_F1F2,
-    RemainingLot_F1F2,
+    //RemainingLot_F1F2,
     TradeTime_F1F2,
     Leg1State_F1F2,
     BidLegState_F1F2,

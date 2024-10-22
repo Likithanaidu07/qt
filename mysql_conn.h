@@ -52,6 +52,8 @@ struct Liners_Data{
     QList<double> NetQty;
     QList<double> profit;
     QString Traded_Lot;
+    QString StockName;
+
 
 };
 
@@ -88,7 +90,7 @@ public:
     bool modifytype(QString value,QString user_id,QString &msg);
     bool resetPassword(const QString &new_password,QString user_id,QString &msg);
     QString get_Algo_Name(int algo_type,int leg1_token_number,int leg2_token_number,int leg3_token_number,double devicer,int decimal_precision);
-    void  getTradeTableData(int &TraderCount,Trade_Table_Model *model,Order_F1_F2_Model * f1f2_order_table_model,Liners_Model *liners_model ,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash,QStringList TradeTableHilightExcludeList);
+    void  getTradeTableData(int &TraderCount,Trade_Table_Model *model,Order_F1_F2_Model * f1f2_order_table_model,Liners_Model *liners_model ,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash/*,QStringList TradeTableHilightExcludeList*/);
     void  getNetPosTableData(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id);
     void  getNetPosTableData_BackUp(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash);
     void getMissedTradeData(Missed_Trade_Table_Model* model,QString user_id);

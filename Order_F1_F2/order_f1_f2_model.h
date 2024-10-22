@@ -27,13 +27,13 @@ private:
     int col_count;
 
 
-    QStringList header={  "Algo No",
+    QStringList header={  /*"Algo No",*/
                           "Order Id",
-                          "Algo Name",
+                          "StockName",
                           "User Price",
                           "Exch Price",
                           "Traded Lot",
-                          "Remaining Lot",
+//                          "Remaining Lot",
                           "Time"};
 
 };
