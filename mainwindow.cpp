@@ -716,7 +716,7 @@ MainWindow::MainWindow(QWidget *parent)
     /***********Init F1F2 Order  Window**************************/
     QPixmap pixmapdock_order_f1f2_close(":/dock_close.png");
 
-    dock_win_f1f2_order =  new CDockWidget(tr("F1F2 Trades"));
+    dock_win_f1f2_order =  new CDockWidget(tr("Manual Trades"));
 
     connect(dock_win_f1f2_order, SIGNAL(visibilityChanged(bool)), this, SLOT(OnF1F2OrderDockWidgetVisiblityChanged(bool)));
    // subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_f1f2_order);
@@ -733,7 +733,7 @@ MainWindow::MainWindow(QWidget *parent)
     QHBoxLayout *f1f2_order_title_layout=new QHBoxLayout(f1f2_order_titlebar);
     f1f2_order_title_layout->setSpacing(10);
     f1f2_order_title_layout->setContentsMargins(17,8,10,6);
-    QLabel *f1f2_order_label=new QLabel("F1F2 Trades");
+    QLabel *f1f2_order_label=new QLabel("Manual Trades");
     QFont font_f1f2_order_label=f1f2_order_label->font();
     font_f1f2_order_label.setFamily("Work Sans");
     f1f2_order_label->setFont(font_f1f2_order_label);
@@ -2042,8 +2042,8 @@ void MainWindow::loadDataAndUpdateTable(int table){
     case T_Table::TRADE:{
 //        OutputDebugStringA("Test1 \n");
         //QHash<QString, PortFolioData_Less> PortFolioHash = T_Portfolio_Model->getPortFolioDataLess();
-        QStringList TradeTableHighlight_ExcludeList = trade_model->getTradeTableHighlight_ExcludeList();
-        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,TradeTableHighlight_ExcludeList);
+     //   QStringList TradeTableHighlight_ExcludeList = trade_model->getTradeTableHighlight_ExcludeList();
+        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash/*,TradeTableHighlight_ExcludeList*/);
         emit data_loded_signal(T_Table::TRADE);
         updateSummaryLabels();
         break;
@@ -2089,7 +2089,7 @@ void MainWindow::onRequestDeleteConfirmation(const QStringList &PortFoliosToDele
         bool ret = db_conn->deleteAlgos(PortFoliosToDelete, msg);
 
         if (!ret) {
-            QMessageBox::warning(this, "Error", "Failed to delete the portfolios: " + msg);
+            QMessageBox::warning(this, "Error", "Failed to delete the portfolios: " );
         }
         else{
 
@@ -2642,26 +2642,47 @@ void MainWindow::startall_Button_clicked()
         }
 
         QStringList portfolioNumbers = T_Portfolio_Model->getAllPortfolioNumbers();
-        QString joinedPortfolioNumber = portfolioNumbers.join(", ");
-        QString Querys = "UPDATE Portfolios SET Status='inactive' WHERE PortfolioNumber IN (" + joinedPortfolioNumber + ")";
+        QString joinedPortfolioNumbers = portfolioNumbers.join(", ");
+
+        // First, disable all selected portfolios by setting their status to 'DisabledByUser'
+        QString disableQuery = "UPDATE Portfolios SET Status='DisabledByUser' WHERE PortfolioNumber IN (" + joinedPortfolioNumbers + ")";
+        QString msg;
+        bool disableSuccess = db_conn->updateDB_Table(disableQuery, msg);
+
+        if (!disableSuccess) {
+            // Handle error if disabling portfolios failed
+            QMessageBox::warning(this, "Error", "Failed to disable portfolios.");
+            return;
+        }
+
+        // Limit portfolios to be activated to MaxActiveCount
         if (portfolioNumbers.size() > userData.MaxActiveCount) {
             portfolioNumbers = portfolioNumbers.mid(0, userData.MaxActiveCount); // Get first MaxActiveCount portfolios
         }
-        QString joinedPortfolioNumbers = portfolioNumbers.join(", ");
-        QString Query = "UPDATE Portfolios SET Status='Active' WHERE PortfolioNumber IN (" + joinedPortfolioNumbers + ")";
-        QString msg;
 
-        bool success = db_conn->updateDB_Table(Query, msg);
+        joinedPortfolioNumbers = portfolioNumbers.join(", ");
+
+        // Then, activate the selected portfolios
+        QString activateQuery = "UPDATE Portfolios SET Status='Active' WHERE PortfolioNumber IN (" + joinedPortfolioNumbers + ")";
+        bool success = db_conn->updateDB_Table(activateQuery, msg);
+
         if (success) {
             db_conn->logToDB(QString("Enabled Algos [" + joinedPortfolioNumbers + "]"));
+
+            // Send backend command
             quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
             const unsigned char dataBytes[] = { 0x01 };
             QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
             QByteArray msg = backend_comm->createPacket(command, data);
             backend_comm->insertData(msg);
+
+            // Start data loading thread
             start_dataLoadingThread();
+        } else {
+            QMessageBox::warning(this, "Error", "Failed to activate portfolios.");
         }
 }
+
 
 void MainWindow::stopall_Button_clicked()
 {
@@ -2880,7 +2901,7 @@ void MainWindow::Delete_clicked_slot()
         QString msg; // You can define msg as per your requirement
         bool ret = db_conn->deleteNonTradedAlgos(portFoliosToDelete, msg);
         if (!ret) {
-            QMessageBox::warning(this, "Error", "Failed to delete the portfolios: " + portFoliosToDelete.join(",")+", Error:"+ msg);
+            QMessageBox::warning(this, "Error", "Executed Trades cannot be deleted: " + portFoliosToDelete.join(","));
         }
         else{
             //delete from model too and refersh the enitre table,

@@ -30,19 +30,19 @@ void order_f1_f2_tableheaderview::paintSection(QPainter* painter, const QRect& r
     QApplication::style()->drawControl(QStyle::CE_Header, &opt, painter);*/
 
     Qt::Alignment align = (Qt::AlignHCenter | Qt::AlignVCenter);
-    if (logicalIndex == F1F2_Order_Data_Idx::AlgoNo_F1F2)
+    /*if (logicalIndex == F1F2_Order_Data_Idx::AlgoNo_F1F2)
 
     {
         //        painter->fillRect(rect, QColor::fromRgba(qRgba(108,117,125,255)));
     }
-    else if(logicalIndex == F1F2_Order_Data_Idx::AlgoName_F1F2)
+    else*/ if(logicalIndex == F1F2_Order_Data_Idx::AlgoName_F1F2)
     {
          //        painter->fillRect(rect, QColor::fromRgba(qRgba(108,117,125,255)));
     }
     else if(logicalIndex == F1F2_Order_Data_Idx::ExchPrice_F1F2||
              logicalIndex == F1F2_Order_Data_Idx::UserPrice_F1F2 ||
-             logicalIndex == F1F2_Order_Data_Idx::TradedLot_F1F2 ||
-             logicalIndex == F1F2_Order_Data_Idx::RemainingLot_F1F2)
+             logicalIndex == F1F2_Order_Data_Idx::TradedLot_F1F2 /*||
+             logicalIndex == F1F2_Order_Data_Idx::RemainingLot_F1F2*/)
     {
         //        painter->fillRect(rect, QColor::fromRgba(qRgba(108,117,125,255)));
     }
@@ -72,7 +72,7 @@ void order_f1_f2_tableheaderview::paintSection(QPainter* painter, const QRect& r
     //    painter->setPen(QColor::fromRgba(qRgba(50, 50, 50, 53))); // Set the border color
     if(logicalIndex == F1F2_Order_Data_Idx::AlgoName_F1F2
         || logicalIndex == F1F2_Order_Data_Idx::Leg4State_F1F2
-        || logicalIndex == F1F2_Order_Data_Idx::RemainingLot_F1F2){
+        /*|| logicalIndex == F1F2_Order_Data_Idx::RemainingLot_F1F2*/){
         //painter->setPen(QColor("#6C757D"));
         painter->drawLine(rect.topRight(), rect.bottomRight());
     }

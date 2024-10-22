@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1029</width>
+    <width>1065</width>
     <height>912</height>
    </rect>
   </property>
@@ -728,7 +728,7 @@ background: #46454d;
                 </size>
                </property>
                <property name="text">
-                <string>F1F2 Trades</string>
+                <string>Manual Trades</string>
                </property>
               </widget>
              </item>
@@ -965,7 +965,7 @@ background: transperent;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1029</width>
+     <width>1065</width>
      <height>21</height>
     </rect>
    </property>
