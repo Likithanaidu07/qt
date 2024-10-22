@@ -846,6 +846,10 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
         double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+"-"+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
     }
+    else if(algo_type==PortfolioType::F1_F2){
+        Algo_Name = "F1_F2-";//Nifty-18000-CE-200";
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg1_token_number,"MMM",algo_type);
+    }
 
     return Algo_Name.toUpper();
 }
@@ -1108,11 +1112,12 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
     return tradeData;
 
 }
-void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Liners_Model *liners_model ,QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash)
+void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_table, Order_F1_F2_Model *f1f2_order_table_model,Liners_Model *liners_model ,QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash)
 {
     QMutexLocker lock(&mutex);
 
     QList <QStringList> trade_data_listTmp;
+    QList <QStringList> f1f2_trade_data_listTmp;
 
     // QList <QStringList> algo_pos_data_listTmp;
     QList <QStringList> liners_listTmp;
@@ -1125,7 +1130,19 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
 
        // QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and (Leg1_OrderState=7 and Leg2_OrderState=7 and Leg3_OrderState=7) ORDER BY Trader_Data DESC";
        // QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and  Leg1_OrderState=7 or Leg2_OrderState=7 or Leg3_OrderState=7 or Leg4_OrderState = 7  ORDER BY Trader_Data DESC";
-        QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' AND (Leg1_OrderState=7 OR Leg2_OrderState=7 OR Leg3_OrderState=7 OR Leg4_OrderState=7) ORDER BY Trader_Data DESC";
+        //QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' AND (Leg1_OrderState=7 OR Leg2_OrderState=7 OR Leg3_OrderState=7 OR Leg4_OrderState=7) ORDER BY Trader_Data DESC";
+        QString query_str =
+            "SELECT O.*, P.PortfolioType "
+            "FROM Order_Table_Bid O "
+            "INNER JOIN Portfolios P "
+            "ON CASE "
+            "    WHEN O.PortfolioNumber > 1500000 THEN O.PortfolioNumber - 1500000 "
+            "    ELSE O.PortfolioNumber "
+            "END = P.PortfolioNumber "
+            "WHERE O.Trader_ID='" + user_id + "' "
+            "AND (O.Leg1_OrderState=7 OR O.Leg2_OrderState=7 OR O.Leg3_OrderState=7 OR O.Leg4_OrderState=7) "
+            "ORDER BY O.Trader_Data DESC";
+
 
         //QString sqlquery ="SELECT COUNT(*) FROM Order_Table_Bid WHERE Order_Table_Bid.Trader_ID='"+user_id+"'";
         //QString query_str = "SELECT COUNT(*) FROM (SELECT * FROM Order_Table_Bid WHERE Trader_ID='" + user_id + "' AND Leg2_OrderState=7 ORDER BY Trader_Data DESC) AS SubQuery";
@@ -1155,15 +1172,18 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
                     Algo_ID = QString::number(Algo_ID_Int);
                 }
 
-                int portfolio_type = -1;
+                //int portfolio_type = -1;
+                int portfolio_type = query.value(rec.indexOf("PortfolioType")).toInt();
 
-                if(PortFolioTypeHash.contains(Algo_ID)){
+                /*if(PortFolioTypeHash.contains(Algo_ID)){
                     PortFolioData_Less P = PortFolioTypeHash[Algo_ID];
                     portfolio_type = P.PortfolioType.toInt();
                 }
                 else{
                     continue;
-                }
+                }*/
+
+                //qDebug()<<"portfolio_type: "<<portfolio_type <<" Algo_ID: "<<Algo_ID;
 
                 int Leg1_OrderState = query.value(rec.indexOf("Leg1_OrderState")).toInt();
                 int Leg3_OrderState = query.value(rec.indexOf("Leg3_OrderState")).toInt();
@@ -1532,7 +1552,8 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
                 rowList.append(Algo_Name);
                 rowList.append(User_Price);
                 rowList.append(Exch_Price);
-                rowList.append(Jackpot);
+                if(portfolio_type != PortfolioType::F1_F2)
+                    rowList.append(Jackpot); // Jackpot data not required or F1_F2
                 rowList.append(Traded_Lot);
                 rowList.append(Remaining_Lot);
                 //  rowList.append(Buy_Sell);
@@ -1557,7 +1578,14 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
            //    rowList.append(traderData); // this should be the last data inserted to the row
 
 
-               trade_data_listTmp.append(rowList);
+               if(portfolio_type == PortfolioType::F1_F2){
+                   f1f2_trade_data_listTmp.append(rowList);
+                   continue;
+               }
+               else
+                   trade_data_listTmp.append(rowList);
+
+
                TraderCount=trade_data_listTmp.size();
 
                 QString linersDataKey = Algo_ID;
@@ -1596,7 +1624,8 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *model,Lin
 
 
 //
-            model->setDataList(trade_data_listTmp);
+            trade_table->setDataList(trade_data_listTmp);
+            f1f2_order_table_model->setDataList(f1f2_trade_data_listTmp);
 
             //iterate Liners_Data_Hash and create a QStringList;
             for (const QString &key : Liners_Data_Hash.keys()) {
@@ -2163,10 +2192,11 @@ QHash<QString, contract_table>  mysql_conn::getContractTable( QHash<int , QStrin
                             << contractTableTmp.StrikePrice
                             << contractTableTmp.LotSize
                             << contractTableTmp.Expiry
-                            << contractTableTmp.TokenNumber
                             << contractTableTmp.StockName
                             << contractTableTmp.MinimumSpread
-                            << contractTableTmp.VolumeFreezeQty;
+                            << contractTableTmp.VolumeFreezeQty
+                            << contractTableTmp.OperatingRangeslowPriceRange
+                            << contractTableTmp.OperatingRangeshighPriceRange;
                     }
                     else{
                         qDebug()<<"Waring: Cannot find portfolio type(InstrumentType) for contract table token = "<<contractTableTmp.TokenNumber;
@@ -2286,6 +2316,83 @@ bool mysql_conn::deleteAlgos(QStringList PortfolioNumbers,QString &msg)
     }
     return ret;
 }
+
+bool mysql_conn::deleteNonTradedAlgos(QStringList PortfolioNumbers, QString &msg)
+{
+    QMutexLocker lock(&mutex);
+    bool ret = true;  // Assume success unless we hit an issue
+
+    if (!checkDBOpened(msg)) {
+        msg = "Delete Portfolio cannot connect to Database: " + db.lastError().text();
+        qDebug() << msg;
+        return false;
+    }
+
+    // Step 1: Check which PortfolioNumbers exist in the Trades table
+    QSqlQuery query(db);
+    QStringList queryPortfolios;
+    for (const QString &PortfolioNumber : PortfolioNumbers) {
+        queryPortfolios << "'" + PortfolioNumber + "'";
+        queryPortfolios << "'" + QString::number(PortfolioNumber.toInt() + 1500000) + "'";
+    }
+
+    QString checkQuery = "SELECT DISTINCT PortfolioNumber FROM Trades WHERE PortfolioNumber IN (" + queryPortfolios.join(",") + ")";
+    qDebug() << "Check trades query: " << checkQuery;
+    query.prepare(checkQuery);
+
+    if (!query.exec()) {
+        msg = "Error checking Trades: " + query.lastError().text();
+        qDebug() << query.lastError().text();
+        return false;  // Return if there's a problem executing the query
+    }
+
+    // Step 2: Collect PortfolioNumbers that exist in Trades
+    QStringList existingInTrades;
+    while (query.next()) {
+        existingInTrades << query.value(0).toString();
+    }
+
+    // Step 3: Remove portfolios that exist in Trades from the deletion list
+    QStringList portfoliosToDelete;
+    for (const QString &PortfolioNumber : PortfolioNumbers) {
+        if (!existingInTrades.contains(PortfolioNumber) && !existingInTrades.contains(QString::number(PortfolioNumber.toInt() + 1500000))) {
+            portfoliosToDelete << PortfolioNumber;
+        }
+    }
+
+    if (portfoliosToDelete.isEmpty()) {
+        msg = "No portfolios available for deletion. All portfolios have existing trades.";
+        return false;
+    }
+
+    // Step 4: Delete remaining portfolios in one query
+    QSqlQuery deleteQuery(db);
+    QString deleteStr = "DELETE FROM Portfolios WHERE PortfolioNumber IN ('" + portfoliosToDelete.join("','") + "')";
+    qDebug() << "Delete query: " << deleteStr;
+    deleteQuery.prepare(deleteStr);
+
+    if (!deleteQuery.exec()) {
+        msg = "Error deleting portfolios: " + deleteQuery.lastError().text();
+        qDebug() << deleteQuery.lastError().text();
+        ret = false;
+    } else {
+        int rowsAffected = deleteQuery.numRowsAffected();
+        if (rowsAffected > 0) {
+            msg = "Portfolios " + portfoliosToDelete.join("', '") + " deleted successfully.";
+        } else {
+            msg = "Deletion failed for some portfolios.";
+            ret = false;
+        }
+    }
+
+    // Step 5: Inform about the skipped portfolios due to existing trades
+    if (!existingInTrades.isEmpty()) {
+        msg += "\n Trades Portfolios were skipped: " + existingInTrades.join("', '");
+    }
+
+    return ret;
+}
+
 
 algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,int MaxPortfolioCount,QString &msg){
     QMutexLocker lock(&mutex);
@@ -2659,7 +2766,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                 query.bindValue(":SellTotalQuantity", 0);
                                 query.bindValue(":SellTradedQuantity", 0);
                                 query.bindValue(":OrderQuantity", 0);
-                                query.bindValue(":ModifyType", 2);
+                                query.bindValue(":ModifyType", 1);
 
                             }
 

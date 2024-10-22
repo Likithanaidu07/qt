@@ -40,6 +40,9 @@ SOURCES += \
     NetPosition/net_position_table_headerview.cpp \
     NetPosition/net_position_table_model.cpp \
     OrderBook/table_orderbook_delegate.cpp \
+    Order_F1_F2/order_f1_f2_delegate.cpp \
+    Order_F1_F2/order_f1_f2_model.cpp \
+    Order_F1_F2/order_f1_f2_tableheaderview.cpp \
     PortFolio/PortfolioParser.cpp \
     PortFolio/portfolio_Object.cpp \
     PortFolio/portfolio_searchfilterproxymodel.cpp \
@@ -106,6 +109,9 @@ HEADERS += \
     NetPosition/net_position_table_headerview.h \
     NetPosition/net_position_table_model.h \
     OrderBook/table_orderbook_delegate.h \
+    Order_F1_F2/order_f1_f2_delegate.h \
+    Order_F1_F2/order_f1_f2_model.h \
+    Order_F1_F2/order_f1_f2_tableheaderview.h \
     PortFolio/PortfolioParser.h \
     PortFolio/portfolio_Object.h \
     PortFolio/portfolio_searchfilterproxymodel.h \

@@ -540,7 +540,7 @@ QHash<QString, contract_table> ContractDetail::GetContracts(QString type)
 
 }
 
-contract_table ContractDetail::GetDetail(int token, int type)
+contract_table ContractDetail::GetDetail(int token)
 {
     if (m_ContractDetails_Hash.empty())
     {
@@ -831,7 +831,23 @@ qint64 ContractDetail::GetExpiry(int token,int type)
                      QString PortfolioType;
 
                      contract_table contractT;
-                     in >> PortfolioType>> contractT.TokenNumber >> contractT.InstrumentType >> contractT.InstrumentName >> contractT.OptionType >> contractT.StrikePrice >> contractT.LotSize >> contractT.Expiry >> contractT.TokenNumber >> contractT.StockName >> contractT.MinimumSpread >> contractT.VolumeFreezeQty;
+                     in >> PortfolioType>>
+                             contractT.TokenNumber >>
+                             contractT.InstrumentType >>
+                             contractT.InstrumentName >>
+                             contractT.OptionType >>
+                             contractT.StrikePrice >>
+                             contractT.LotSize >>
+                             contractT.Expiry >>
+                             contractT.StockName >>
+                             contractT.MinimumSpread >>
+                             contractT.VolumeFreezeQty>>
+                             contractT.OperatingRangeslowPriceRange>>
+                             contractT.OperatingRangeshighPriceRange;
+
+
+
+
                      if(contractT.Expiry>0){
                          if(actualMin>contractT.Expiry)
                              actualMin = contractT.Expiry;

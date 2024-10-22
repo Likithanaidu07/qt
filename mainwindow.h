@@ -61,6 +61,10 @@
 #include <QTextStream>
 #include <QDir>
 
+#include "Order_F1_F2/order_f1_f2_delegate.h"
+#include "Order_F1_F2/order_f1_f2_model.h"
+#include "Order_F1_F2/order_f1_f2_tableheaderview.h"
+
 using namespace ads;
 
 class mysql_conn;
@@ -207,6 +211,11 @@ private:
 
 
 
+    QTableView *f1f2_order_table;
+    Order_F1_F2_Model *f1f2_order_table_model;
+    CDockWidget *dock_win_f1f2_order;
+
+
 //    QLineEdit *line_edit_trade_search;
 //    QList<LiveDataWidget*> liveDataWidgetList;
 
@@ -280,7 +289,7 @@ public slots:
     void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
     void T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index);
     void trade_table_cellDoubleClicked(const QModelIndex &index);
-
+    void f1f2_order_table_cellDoubleClicked(const QModelIndex &index);
     void slotAddLogForAddAlgoRecord(QString str);
     void slotHideProgressBar();
     void startall_Button_clicked();
@@ -292,6 +301,8 @@ public slots:
     void onTradeTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
     void onNetposTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
     void onLinersTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
+    void onF1F2OrderTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
+
     void onCombined_tracker_tableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
     void onMissed_trade_tableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
 
@@ -331,6 +342,8 @@ private slots:
 //    void OnDockWidgetClose(UiUtils::DockWidgetType p_Type);
     void OnAlgorithmDockWidgetVisiblityChanged(bool p_Visible);
     void OnOrderBookDockWidgetVisiblityChanged(bool p_Visible);
+    void OnF1F2OrderDockWidgetVisiblityChanged(bool p_Visible);
+
     void OnPositionsDockWidgetVisiblityChanged(bool p_Visible);
     void OnHPDockWidgetVisiblityChanged(bool p_Visible);
     void OnMTDockWidgetVisiblityChanged(bool p_Visible);
@@ -354,6 +367,8 @@ private slots:
   //  void on_MissedTrade_Close_clicked();
 
   //  void on_comboBox_currentTextChanged(const QString &arg1);
+
+    void on_F1F2Trade_Button_clicked();
 
 protected:
     virtual void closeEvent(QCloseEvent* event) override;

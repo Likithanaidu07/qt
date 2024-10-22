@@ -265,7 +265,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
 
         case PortfolioType::R2L:
         {
-            contract_table c2 = ContractDetail::getInstance().GetDetail(obj.Leg1TokenNo,type);
+            contract_table c2 = ContractDetail::getInstance().GetDetail(obj.Leg1TokenNo);
 
             obj.Leg1 = ContractDetail::getInstance().GetStrikePrice(obj.Leg1TokenNo,type);
             obj.Leg2 = ContractDetail::getInstance().GetStrikePrice(obj.Leg2TokenNo,type);
@@ -368,12 +368,12 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
             obj.AdditionalData3 = query.value("AdditionalData3").toString();//Convert.ToString(reader["AdditionalData3"]);
             obj.AdditionalData4 = query.value("AdditionalData4").toString();//Convert.ToString(reader["AdditionalData4"]);
 
-            contract_table leg1 = ContractDetail::getInstance().GetDetail(obj.Leg2TokenNo,type);
-            contract_table leg2 = ContractDetail::getInstance().GetDetail(obj.Leg3TokenNo,type);
+            contract_table leg1 = ContractDetail::getInstance().GetDetail(obj.Leg2TokenNo);
+            contract_table leg2 = ContractDetail::getInstance().GetDetail(obj.Leg3TokenNo);
             obj.Leg1 = (ContractDetail::getInstance().GetStrikePrice(leg1.TokenNumber,type))+(leg1.OptionType);
             obj.Leg2 = (ContractDetail::getInstance().GetStrikePrice(leg2.TokenNumber,type))+(leg2.OptionType);//String.Format("{0}{1}", leg2.GetStrikePrice(), leg2.OptionType);
 
-            contract_table detail = ContractDetail::getInstance().GetDetail(obj.AdditionalData2.toInt(),type);
+            contract_table detail = ContractDetail::getInstance().GetDetail(obj.AdditionalData2.toInt());
             obj.Leg3 = (ContractDetail::getInstance().GetStrikePrice(detail.TokenNumber,type))+(detail.OptionType);
             break;
         }
@@ -385,13 +385,13 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
             obj.AdditionalData3 = query.value("AdditionalData3").toString();//Convert.ToString(reader["AdditionalData3"]);
             obj.AdditionalData4 = query.value("AdditionalData4").toString();//Convert.ToString(reader["AdditionalData4"]);
 
-            contract_table leg1 = ContractDetail::getInstance().GetDetail(obj.Leg2TokenNo,type);
-            contract_table leg2 = ContractDetail::getInstance().GetDetail(obj.Leg4TokenNo,type);
+            contract_table leg1 = ContractDetail::getInstance().GetDetail(obj.Leg2TokenNo);
+            contract_table leg2 = ContractDetail::getInstance().GetDetail(obj.Leg4TokenNo);
             obj.Leg1 = (ContractDetail::getInstance().GetStrikePrice(leg1.TokenNumber,type))+(leg1.OptionType);
             obj.Leg2 = (ContractDetail::getInstance().GetStrikePrice(leg2.TokenNumber,type))+(leg2.OptionType);
 
-            contract_table detail1 = ContractDetail::getInstance().GetDetail(obj.AdditionalData2.toInt(),type);
-            contract_table detail2 = ContractDetail::getInstance().GetDetail(obj.AdditionalData3.toInt(),type);
+            contract_table detail1 = ContractDetail::getInstance().GetDetail(obj.AdditionalData2.toInt());
+            contract_table detail2 = ContractDetail::getInstance().GetDetail(obj.AdditionalData3.toInt());
             obj.Leg3 = QString("{0}{1}, {2}{3}")+(ContractDetail::getInstance().GetStrikePrice(detail1.TokenNumber,type))+(detail1.OptionType)+(ContractDetail::getInstance().GetStrikePrice(detail2.TokenNumber,type))+(detail2.OptionType);
             break;
         }
@@ -402,14 +402,14 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
             obj.AdditionalData3 = query.value("AdditionalData3").toString();//Convert.ToString(reader["AdditionalData3"]);
             obj.AdditionalData4 = query.value("AdditionalData4").toString();//Convert.ToString(reader["AdditionalData4"]);
 
-            contract_table leg1 = ContractDetail::getInstance().GetDetail(obj.Leg2TokenNo,type);
-            contract_table leg2 = ContractDetail::getInstance().GetDetail(obj.Leg5TokenNo,type);
+            contract_table leg1 = ContractDetail::getInstance().GetDetail(obj.Leg2TokenNo);
+            contract_table leg2 = ContractDetail::getInstance().GetDetail(obj.Leg5TokenNo);
             obj.Leg1 = (ContractDetail::getInstance().GetStrikePrice(leg1.TokenNumber,type), leg1.OptionType);
             obj.Leg2 = (ContractDetail::getInstance().GetStrikePrice(leg1.TokenNumber,type), leg2.OptionType);
 
-            contract_table detail1 = ContractDetail::getInstance().GetDetail(obj.AdditionalData2.toInt(),type);
-            contract_table detail2 = ContractDetail::getInstance().GetDetail(obj.AdditionalData3.toInt(),type);
-            contract_table detail3 = ContractDetail::getInstance().GetDetail(obj.AdditionalData4.toInt(),type);
+            contract_table detail1 = ContractDetail::getInstance().GetDetail(obj.AdditionalData2.toInt());
+            contract_table detail2 = ContractDetail::getInstance().GetDetail(obj.AdditionalData3.toInt());
+            contract_table detail3 = ContractDetail::getInstance().GetDetail(obj.AdditionalData4.toInt());
             obj.Leg3 = QString("{0}{1}, {2}{3}, {4}{5}")+(ContractDetail::getInstance().GetStrikePrice(detail1.TokenNumber,type)+(detail1.OptionType)+(ContractDetail::getInstance().GetStrikePrice(detail3.TokenNumber,type))+(detail3.OptionType));
             break;
         }

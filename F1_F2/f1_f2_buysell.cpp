@@ -14,6 +14,14 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
 {
     ui->setupUi(this);
     token_number = "";
+    priceSingleStepValue = 0.01;
+    updateLTPOnPriceInput = false;
+
+    this->setStyleSheet("#F1_F2_BuySell { background-color: #D6FCF0; }");
+    // Assuming 'ui->tableViewMarkerRate' is your QTableView
+
+
+
 
     const char pushButton_SS[]="border-radius: 8px;""border: 1px solid #485F6B;""background: #485F6B;""color: #FFF;""    text-align: center;""    font-size: 14px;""    font-style: normal;""    font-weight: 500;""    line-height: normal;";
     ui->pushButtonSubmit->setStyleSheet(pushButton_SS);
@@ -45,6 +53,9 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
     QFont font1=ui->doubleSpinBox_price->font();
     font.setFamily("Work Sans");
     ui->doubleSpinBox_price->setFont(font1);
+    ui->doubleSpinBox_price->setDecimals(2);
+    connect(ui->doubleSpinBox_price, QOverload<double>::of(&QDoubleSpinBox::valueChanged),
+                   this, &F1_F2_BuySell::adjustValue);
 
     ui->spinBoxLot->setStyleSheet(LineEdit_SS);
     QFont font2=ui->spinBoxLot->font();
@@ -77,6 +88,8 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
     connect(ui->lineEdit_Stockname, SIGNAL(textEdited(QString)),startstrikeCustomWidget, SLOT(filterItems(QString)));
     connect(ui->lineEdit_Stockname, SIGNAL(textChanged(QString)),this, SLOT(slotstockNameListViewHide(QString)));
 
+
+
     //QPoint globalPos = this->mapToGlobal(QPoint(0, 0));
 
     // Calculate the new position for stockNameListView
@@ -94,6 +107,7 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
     ui->spinBoxLot->setEnabled(false);
     ui->pushButtonSubmit->setEnabled(false);
 
+
     QFuture<void> future = QtConcurrent::run([=]() {
     //QElapsedTimer timer1;
     //timer1.start();
@@ -101,7 +115,7 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
         for(int i=0;i<CR_Tokens.length();i++){
 
             /**********Create model for F1_F2*************************/
-            contract_table contract = ContractDetail::getInstance().GetDetail(CR_Tokens[i].toInt(),PortfolioType::F1_F2);
+            contract_table contract = ContractDetail::getInstance().GetDetail(CR_Tokens[i].toInt());
 
             unsigned int unix_time= contract.Expiry;
             QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
@@ -142,6 +156,48 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
     });
 
 
+    // initlaize marker rate table view
+    QStandardItemModel *model = new QStandardItemModel(this);
+    ui->tableViewMarkerRate->setModel(model);
+
+    // Set up the headers if needed
+    model->setHorizontalHeaderLabels({"Price", "Qty","Price", "Qty"});
+    ui->tableViewMarkerRate->horizontalHeader()->setDefaultAlignment(Qt::AlignRight);
+    QHeaderView* header = ui->tableViewMarkerRate->horizontalHeader();
+    header->setSectionResizeMode(QHeaderView::Fixed);  // Disable resizing for all columns
+
+
+    // Disable scrollbars (both horizontal and vertical)
+       ui->tableViewMarkerRate->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+       ui->tableViewMarkerRate->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+       // Set fixed width for each column
+       int columnCount = ui->tableViewMarkerRate->model()->columnCount();
+       for (int col = 0; col < columnCount; ++col) {
+           ui->tableViewMarkerRate->setColumnWidth(col, 75);  // Set column width to 100 (adjust as necessary)
+       }
+
+       // Optionally resize to fit contents (use this if column widths should adapt to content)
+       // ui->tableViewMarkerRate->resizeColumnsToContents();
+
+       // Ensure the table view adjusts its size to the columns and rows
+       ui->tableViewMarkerRate->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+
+
+       ui->tableViewMarkerRate->setStyleSheet("#tableViewMarkerRate { background: transparent; border: none; }");
+       QPalette palette = ui->tableViewMarkerRate->palette();
+       // Set custom colors for alternating rows
+     //  palette.setColor(QPalette::Base, QColor(200, 200, 200));        // Normal row color (white)
+     //  palette.setColor(QPalette::AlternateBase, QColor(230, 230, 230)); // Alternating row color (light gray)
+
+       // Apply the palette to the table view
+     //  ui->tableViewMarkerRate->setPalette(palette);
+
+       // Enable alternating row colors
+    //   ui->tableViewMarkerRate->setAlternatingRowColors(true);
+
+
+
 }
 
 void F1_F2_BuySell::showEvent(QShowEvent *event)
@@ -167,18 +223,29 @@ void F1_F2_BuySell::itemSelectedStockName(QModelIndex index)
     token_number ="";
     if(index.isValid())
     {
+        updateLTPOnPriceInput = true;
         QVariant dData = index.data(Qt::DisplayRole);
         QVariant data = index.data( Qt::UserRole + 1);
         token_number = data.toString();
         ui->lineEdit_Stockname->setText(index.data(Qt::DisplayRole).toString());
-        contract_table c = ContractDetail::getInstance().GetDetail(token_number.toInt(),PortfolioType::F1_F2);
+        contract_table c = ContractDetail::getInstance().GetDetail(token_number.toInt());
         ui->doubleSpinBox_price->setMinimum(c.OperatingRangeslowPriceRange/devicer);
         ui->doubleSpinBox_price->setMaximum(c.OperatingRangeshighPriceRange/devicer);
-        ui->spinBoxLot->setMinimum(0);
+        ui->doubleSpinBox_price->setValue(ui->doubleSpinBox_price->minimum());
+
+        ui->spinBoxLot->setMinimum(1);
         ui->spinBoxLot->setMaximum(c.VolumeFreezeQty/c.LotSize);
+        ui->spinBoxLot->setValue(ui->spinBoxLot->minimum());
+
+        if(c.MinimumSpread == 5)
+            priceSingleStepValue = 0.05;
+        else if(c.MinimumSpread == 1)
+            priceSingleStepValue = 0.01;
+
+        ui->doubleSpinBox_price->setSingleStep(priceSingleStepValue);   // Default increment step
 
         qDebug()<<"F_F2--> token_number: "<<token_number<<"   OperatingRangeslowPriceRange: "<<c.OperatingRangeslowPriceRange/devicer<<"   OperatingRangeshighPriceRange:"<<c.OperatingRangeshighPriceRange/devicer;
-        qDebug()<<"F_F2--> token_number: "<<token_number<<"   VolumeFreezeQty: "<<c.VolumeFreezeQty<<"   LotSize:"<<c.LotSize << "  maxLot"<<c.VolumeFreezeQty/c.LotSize;
+        qDebug()<<"F_F2--> token_number: "<<token_number<<"   VolumeFreezeQty: "<<c.VolumeFreezeQty<<"   LotSize:"<<c.LotSize << "  maxLot: "<<c.VolumeFreezeQty/c.LotSize << "  MinimumSpread: "<<c.MinimumSpread;
 
 
     }
@@ -190,6 +257,20 @@ void F1_F2_BuySell::itemSelectedStockName(QModelIndex index)
     stockNameListView->hide();
 }
 
+
+void F1_F2_BuySell::adjustValue(){
+    updateLTPOnPriceInput = false;
+    // Ensure the value is a multiple of the current step (either 0.01 or 0.05)
+           double step = ui->doubleSpinBox_price->singleStep();
+           double value = ui->doubleSpinBox_price->value();
+           double newValue = qRound(value / step) * step;
+
+           if (newValue != value) {
+               ui->doubleSpinBox_price->blockSignals(true);  // Prevent recursive signal emission
+               ui->doubleSpinBox_price->setValue(newValue);
+               ui->doubleSpinBox_price->blockSignals(false);
+           }
+}
 
 
 F1_F2_BuySell::~F1_F2_BuySell()
@@ -252,8 +333,11 @@ void F1_F2_BuySell::on_pushButtonSubmit_clicked()
                      msgBox.setText("Order placed successfully.");
                      msgBox.exec();
                      ui->lineEdit_Stockname->clear();
-                     ui->spinBoxLot->setValue(0);
-                     ui->doubleSpinBox_price->setValue(0.00);
+                     //ui->spinBoxLot->setValue(ui->spinBoxLot->minimum());
+                     ui->spinBoxLot->clear();
+                     //ui->doubleSpinBox_price->setValue(ui->doubleSpinBox_price->minimum());
+                     ui->doubleSpinBox_price->clear();
+
                      token_number = "";
                  }
                  else{
@@ -273,8 +357,8 @@ void F1_F2_BuySell::on_pushButtonSubmit_clicked()
         msgBox.setText("Order placed successfully.");
         msgBox.exec();
         ui->lineEdit_Stockname->clear();
-        ui->spinBoxLot->setValue(0);
-        ui->doubleSpinBox_price->setValue(0.00);
+        ui->spinBoxLot->setValue(ui->spinBoxLot->minimum());
+        ui->doubleSpinBox_price->setValue(ui->doubleSpinBox_price->minimum());
         token_number = "";
 
     }
@@ -302,20 +386,28 @@ void F1_F2_BuySell::on_comboBoxBuySell_currentTextChanged(const QString &arg1)
      if(arg1=="Buy"){
         buy_mode = true;
        // this->setWindowTitle("F1: BuyManual");
+        this->setStyleSheet("#F1_F2_BuySell { background-color: #D6FCF0; }");
+
      }
      else{
          buy_mode = false;
          // this->setWindowTitle("F2: SellManual");
+         this->setStyleSheet("#F1_F2_BuySell { background-color: #FED9D9; }");
+
      }
 }
 void F1_F2_BuySell::setBuyMode(bool buy_mode_){
     if(buy_mode_){
         ui->comboBoxBuySell->setCurrentText("Buy");
-         buy_mode = true;
+        buy_mode = true;
+        this->setStyleSheet("#F1_F2_BuySell { background-color: #D6FCF0; }");
+
     }
     else{
         ui->comboBoxBuySell->setCurrentText("Sell");
         buy_mode = false;
+        this->setStyleSheet("#F1_F2_BuySell { background-color: #FED9D9; }");
+
     }
 }
 void F1_F2_BuySell::keyPressEvent(QKeyEvent *event)
@@ -327,3 +419,108 @@ void F1_F2_BuySell::keyPressEvent(QKeyEvent *event)
         ui->doubleSpinBox_price->clear();
     }
 }
+
+void F1_F2_BuySell::slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct>& data){
+
+   /*QStringList CR_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::CR);
+
+    for (auto it = data.keyBegin(); it != data.keyEnd(); ++it) {
+            bool ok;
+            // Convert the key (QString) to an integer
+            int tokenInt = it->toInt(&ok);  // Use toInt() with error checking
+
+            if (ok) {
+                // If conversion was successful, fetch the contract details
+                if(ContractDetail::getInstance().checkTokenExist(tokenInt)){
+                    if(CR_Tokens.contains(*it)){
+                        qDebug()<<"token exist in CR_Tokens Too: "<<*it;
+                        contract_table contract = ContractDetail::getInstance().GetDetail(tokenInt);
+
+                        unsigned int unix_time= contract.Expiry;
+                        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+                        dt = dt.addYears(10);
+                        int targetYear = dt.date().year();
+                        bool isLeapYear = QDate::isLeapYear(targetYear);
+
+                        // If it is a leap year, and the date is after Feb 29, subtract one day
+                        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+                            dt = dt.addDays(-1);
+                        }
+                        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
+                        QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer,'f',decimal_precision)+" "+contract.OptionType;
+                        qDebug()<<"algo_combination: "<<algo_combination;
+
+                    }
+                    else{
+                        qDebug()<<"token not exist in CR_Tokens: "<<*it;
+                    }
+                }
+                else{
+                    qDebug()<<"-------slowDataRecv_Slot: token not exist in Contract: "<<*it;
+
+                }
+
+                // Print the token and any additional information you need
+            } else {
+                // Handle the case where the key is not a valid integer
+                qDebug() << "Invalid token key, unable to convert to int:" << *it;
+            }
+        }*/
+
+    if(token_number!=""){
+        QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tableViewMarkerRate->model());
+        if(data.contains(token_number)){
+            model->removeRows(0, model->rowCount());
+            MBP_Data_Struct d = data[token_number];
+
+
+//            for(int i=0;i<5;i++){
+//                QList<QStandardItem *> rowData;
+//                //buy
+//                rowData.append(new QStandardItem(d.recordBuffer[i].price));
+//                rowData.append(new QStandardItem(d.recordBuffer[i].quantity));
+//                //sell
+//                rowData.append(new QStandardItem(d.recordBuffer[i+5].price));
+//                rowData.append(new QStandardItem(d.recordBuffer[i+5].quantity));
+//                model->appendRow(rowData);  // Add new row
+//            }
+
+            double ltp = d.lastTradedPrice.toDouble()/devicer;
+            ui->label_lastTradedPrice->setText(QString::number(ltp,'f',2));
+            if(updateLTPOnPriceInput){
+                ui->doubleSpinBox_price->setValue(ltp);
+                updateLTPOnPriceInput = false;
+            }
+
+            for (int i = 0; i < 5; i++) {
+                QList<QStandardItem *> rowData;
+
+                // Buy - Set text alignment to right
+                QStandardItem *buyPriceItem = new QStandardItem(QString::number(d.recordBuffer[i].price.toDouble()/devicer,'f',2));
+                buyPriceItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                QStandardItem *buyQuantityItem = new QStandardItem(QString::number(d.recordBuffer[i].quantity.toDouble(),'f',0));
+                buyQuantityItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+
+                // Sell - Set text alignment to right
+                QStandardItem *sellPriceItem = new QStandardItem(QString::number(d.recordBuffer[i+5].price.toDouble()/devicer,'f',2));
+                sellPriceItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                QStandardItem *sellQuantityItem = new QStandardItem(QString::number(d.recordBuffer[i+5].quantity.toDouble(),'f',0));
+                sellQuantityItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+
+                // Append items to row
+                rowData.append(buyPriceItem);
+                rowData.append(buyQuantityItem);
+                rowData.append(sellPriceItem);
+                rowData.append(sellQuantityItem);
+
+                // Add the row to the model
+                model->appendRow(rowData);
+            }
+
+
+        }
+    }
+
+
+}
+

@@ -712,6 +712,138 @@ MainWindow::MainWindow(QWidget *parent)
 
     /***********Init Order Book Window**************************/
 
+
+    /***********Init F1F2 Order  Window**************************/
+    QPixmap pixmapdock_order_f1f2_close(":/dock_close.png");
+
+    dock_win_f1f2_order =  new CDockWidget(tr("F1F2 Trades"));
+
+    connect(dock_win_f1f2_order, SIGNAL(visibilityChanged(bool)), this, SLOT(OnF1F2OrderDockWidgetVisiblityChanged(bool)));
+   // subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_f1f2_order);
+   // dock_win_f1f2_order->setAllowedAreas(Qt::AllDockWidgetAreas);
+    dock_win_f1f2_order->setStyleSheet(dock_style);
+    dock_win_f1f2_order->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
+    dock_win_f1f2_order->setMinimumSize(200,150);
+    const auto autoHideContainerTradeF1F2 = DockManagerMainPanel->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_f1f2_order);
+    autoHideContainerTradeF1F2->setSize(480);
+
+    //create a titlebar
+    QWidget *f1f2_order_titlebar=new QWidget;
+    f1f2_order_titlebar->setStyleSheet(DockTitleBar_Style);
+    QHBoxLayout *f1f2_order_title_layout=new QHBoxLayout(f1f2_order_titlebar);
+    f1f2_order_title_layout->setSpacing(10);
+    f1f2_order_title_layout->setContentsMargins(17,8,10,6);
+    QLabel *f1f2_order_label=new QLabel("F1F2 Trades");
+    QFont font_f1f2_order_label=f1f2_order_label->font();
+    font_f1f2_order_label.setFamily("Work Sans");
+    f1f2_order_label->setFont(font_f1f2_order_label);
+    f1f2_order_label->setStyleSheet("color: #495057; font-size: 16px; font-style: normal; font-weight: bold; line-height: normal;");
+    QSpacerItem* f1f2_order_spacer=new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QLineEdit* line_edit_f1f2_order = new QLineEdit;
+    line_edit_f1f2_order->setMaximumWidth(160);
+    line_edit_f1f2_order->setStyleSheet(lineedit_dock_SS);
+    QToolButton* f1f2_order_close=new QToolButton();
+    connect(f1f2_order_close, &QToolButton::clicked, [=](){ dock_win_f1f2_order->close();});
+    f1f2_order_close->setIcon(pixmapdock_order_f1f2_close);
+    f1f2_order_close->setIconSize(QSize(14, 14));
+    f1f2_order_title_layout->addWidget(f1f2_order_label);
+    f1f2_order_title_layout->addSpacerItem(f1f2_order_spacer);
+    f1f2_order_title_layout->addWidget(line_edit_f1f2_order);
+    f1f2_order_title_layout->addWidget(f1f2_order_close);
+    //dock_win_f1f2_order->setTitleBarWidget(f1f2_order_titlebar);
+
+
+    QWidget* container_f1f2_order = new QWidget;
+    dock_win_f1f2_order->setWidget(container_f1f2_order);
+    QGridLayout *lay_F1F2_Order_Window = new QGridLayout(container_f1f2_order);
+    lay_F1F2_Order_Window->setContentsMargins(0, 0, 0, 0);
+    lay_F1F2_Order_Window->setSpacing(3);
+    lay_F1F2_Order_Window->setRowStretch(0, 0); //set minimum hieght for first row
+    lay_F1F2_Order_Window->setRowStretch(1, 1);//set maximum hieght for second row table
+
+
+
+
+//    connect(button_Trade, &QPushButton::clicked, this, &MainWindow::tradeTableSerachNext);
+//    connect(line_edit_trade, &QLineEdit::textChanged, this, &MainWindow::tradeTableSerachTxtChanged);
+
+
+
+
+    f1f2_order_table = new QTableView();
+    connect(f1f2_order_table, &QTableView::doubleClicked, this, &MainWindow::f1f2_order_table_cellDoubleClicked);
+
+  //  f1f2_order_table->setStyleSheet(tableview_SS);
+    f1f2_order_table->horizontalHeader()->setFixedHeight(32);
+    f1f2_order_table->horizontalHeader()->setFont(headerfont);
+    f1f2_order_table->setShowGrid(false);
+    f1f2_order_table->setAlternatingRowColors(true);
+
+    order_f1_f2_tableheaderview* f1f2_order_headerViews = new order_f1_f2_tableheaderview(Qt::Horizontal, f1f2_order_table);
+    f1f2_order_headerViews->setFixedHeight(32);
+    f1f2_order_headerViews->setFont(headerfont);
+    f1f2_order_headerViews->setStyleSheet(
+        "   background: #495867;"
+        "   border: none;"
+        "   color: #FFF; "
+        "   text-align: center; "
+        "   font-size: 12px; "
+        "   font-style: normal; "
+        "   font-weight: 600; "
+        "   line-height: normal;"
+        );
+//    f1f2_order_headerViews->setSectionsMovable(true);
+//    f1f2_order_headerViews->setHighlightSections(true);
+     connect(f1f2_order_headerViews, &QHeaderView::sectionMoved, this, &MainWindow::onF1F2OrderTableHeader_Rearranged,Qt::UniqueConnection);
+
+    //f1f2_order_table->setHorizontalHeader(f1f2_order_headerViews);
+    f1f2_order_table->setHorizontalHeader(f1f2_order_headerViews);
+    // Connect the horizontal header's sectionResized signal using a lambda function
+
+
+    lay_F1F2_Order_Window->addWidget(f1f2_order_table, 1, 0, 1, 3);
+
+    f1f2_order_table_model = new Order_F1_F2_Model();
+    f1f2_order_table->setObjectName("f1f2_order_table");
+    Order_F1_F2_Delegate* f1f2_order_delegate=new Order_F1_F2_Delegate;
+    f1f2_order_table->setModel(f1f2_order_table_model);
+    f1f2_order_table->setItemDelegate(f1f2_order_delegate);
+    //T_order_Delegate =  new trade_table_delegate();
+    //f1f2_order_table->setItemDelegate(T_order_Delegate);
+
+
+    // Configure column resizing
+    //f1f2_order_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
+   // f1f2_order_table->setColumnWidth(1,300);
+
+    f1f2_order_table->horizontalHeader()->setStretchLastSection(true);
+    f1f2_order_table->verticalHeader()->setVisible(false);
+    // f1f2_order_table->setStyleSheet("QHeaderView { background-color: #111111;} QHeaderView::section { background-color:#555555;color:#eeeeee;font-weight: 400; }");
+    f1f2_order_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+    f1f2_order_table->setSelectionBehavior(QAbstractItemView::SelectRows);
+    f1f2_order_table->setSelectionMode(QAbstractItemView::SingleSelection);
+    /*f1f2_order_table->setStyleSheet("QTableView {selection-background-color: #EFB37F;"
+                                            "selection-color: #4D4D4D;"
+                                            "color:#3D3D3D;"
+                                            "} "
+                                            "QHeaderView { background-color: #C0AAE5;color:#3D3D3D;} QHeaderView::section { background-color:#C0AAE5;color:#3D3D3D;font-weight: 400; }");*/
+
+    f1f2_order_table->show();
+    restoreTableViewColumnState(f1f2_order_table);
+    int f1f2_order_columnCount = f1f2_order_table->model()->columnCount();
+
+    // First, set the resize mode to fit the contents
+    for (int col = 0; col < f1f2_order_columnCount; ++col) {
+        f1f2_order_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
+    }
+    // Then, allow user  to resize the columns
+    f1f2_order_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+
+    //connect this signal only after every table init completed, or else it will overwrite table state with defult setting before restore previous state
+   // connect(f1f2_order_headerViews, &QHeaderView::sectionResized, this, &MainWindow::onTradeTableHeader_Rearranged,Qt::UniqueConnection);
+
+    /***********Init F1F2 Order  Window**************************/
+
     /************Positions Window********************************/
     QPixmap pixmapdock_position_close(":/dock_close.png");
 
@@ -1927,7 +2059,7 @@ void MainWindow::loadDataAndUpdateTable(int table){
     case T_Table::TRADE:{
 //        OutputDebugStringA("Test1 \n");
         //QHash<QString, PortFolioData_Less> PortFolioHash = T_Portfolio_Model->getPortFolioDataLess();
-        db_conn->getTradeTableData(TraderCount,trade_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash);
+        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash);
         emit data_loded_signal(T_Table::TRADE);
         updateSummaryLabels();
         break;
@@ -2339,6 +2471,15 @@ void MainWindow::on_OrderBook_Button_clicked()
    // ui->OrderBook_Close->setVisible(true);
 }
 
+void MainWindow::on_F1F2Trade_Button_clicked()
+{
+    //8
+    //dock_win_trade->show();
+    dock_win_f1f2_order->toggleView(true);
+
+    ui->F1F2Trade_widget->setStyleSheet(stylesheetvis);
+   // ui->OrderBook_Close->setVisible(true);
+}
 
 //void MainWindow::on_OrderBook_Close_clicked()
 //{
@@ -2604,6 +2745,16 @@ void MainWindow::OnOrderBookDockWidgetVisiblityChanged(bool p_Visible)
         ui->OrderBook_Widget->setStyleSheet("");
   //  ui->OrderBook_Close->setVisible(p_Visible);
 }
+void MainWindow::OnF1F2OrderDockWidgetVisiblityChanged(bool p_Visible)
+{
+    if(p_Visible)
+        ui->F1F2Trade_widget->setStyleSheet(stylesheetvis);
+    else
+        ui->F1F2Trade_widget->setStyleSheet("");
+  //  ui->OrderBook_Close->setVisible(p_Visible);
+}
+
+
 
 void MainWindow::OnPositionsDockWidgetVisiblityChanged(bool p_Visible)
 {
@@ -2756,7 +2907,7 @@ void MainWindow::Delete_clicked_slot()
 
         deletingPortFolioFlg.storeRelaxed(1);
         QString msg; // You can define msg as per your requirement
-        bool ret = db_conn->deleteAlgos(portFoliosToDelete, msg);
+        bool ret = db_conn->deleteNonTradedAlgos(portFoliosToDelete, msg);
         if (!ret) {
             QMessageBox::warning(this, "Error", "Failed to delete the portfolios: " + portFoliosToDelete.join(",")+", Error:"+ msg);
         }
@@ -2766,14 +2917,24 @@ void MainWindow::Delete_clicked_slot()
             start_dataLoadingThread();
 
 
+
+
             //send notifcation to backend server
             quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
             const unsigned char dataBytes[] = { 0xFF, 0xFF };
             QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
-            QByteArray msg = backend_comm->createPacket(command, data);
-            backend_comm->insertData(msg);
+            QByteArray bckend_msg = backend_comm->createPacket(command, data);
+            backend_comm->insertData(bckend_msg);
 
             db_conn->logToDB("Deleted  portfolios ["+portFoliosToDelete.join(",")+" from DB");
+
+            QMessageBox msgBox(this);
+            msgBox.setWindowTitle("Algo Delete");
+            msgBox.setText(msg);
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.exec();
+
+
         }
 
 
@@ -2844,6 +3005,14 @@ void MainWindow::trade_table_cellDoubleClicked(const QModelIndex &index){
     }
 
 }
+
+void MainWindow::f1f2_order_table_cellDoubleClicked(const QModelIndex &index){
+
+
+}
+
+
+
 
 
 
@@ -3294,6 +3463,11 @@ void MainWindow::onTradeTableHeader_Rearranged(int logicalIndex, int oldVisualIn
      saveTableViewColumnState(trade_table);
 }
 
+void MainWindow::onF1F2OrderTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
+     saveTableViewColumnState(f1f2_order_table);
+}
+
+
 void MainWindow::onNetposTableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
      saveTableViewColumnState(net_pos_table);
 }
@@ -3360,6 +3534,8 @@ void MainWindow::sorting_Button_clicked(){
 void MainWindow::F1_clicked_slot(){
    F1_F2_BuySell *F1F2 = new F1_F2_BuySell(nullptr,devicer,decimal_precision);
    connect(F1F2, &F1_F2_BuySell::portfolioAddedSignal, this, &MainWindow::onPortfolioAdded);
+   QObject::connect(slowData, SIGNAL(newSlowDataReceivedSignal(const QHash<QString, MBP_Data_Struct> &)), F1F2, SLOT(slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct> &)));
+
 
    F1F2->setAttribute(Qt::WA_DeleteOnClose);
    F1F2->userData = this->userData;
@@ -3370,6 +3546,8 @@ void MainWindow::F1_clicked_slot(){
 void MainWindow::F2_clicked_slot(){
     F1_F2_BuySell *F1F2 = new F1_F2_BuySell(nullptr,devicer,decimal_precision);
     connect(F1F2, &F1_F2_BuySell::portfolioAddedSignal, this, &MainWindow::onPortfolioAdded);
+    QObject::connect(slowData, SIGNAL(newSlowDataReceivedSignal(const QHash<QString, MBP_Data_Struct> &)), F1F2, SLOT(slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct> &)));
+
     F1F2->setAttribute(Qt::WA_DeleteOnClose);
     F1F2->userData = this->userData;
     F1F2->show();
@@ -3902,3 +4080,7 @@ void MainWindow::exportTableViewToCSV(){
 
 
 }
+
+
+
+

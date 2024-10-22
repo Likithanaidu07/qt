@@ -67,7 +67,7 @@ public:
     QHash<QString, contract_table> GetContracts(QString type);
 
     int GetLotSize(int token, int type);
-    contract_table GetDetail(int token, int type);
+    contract_table GetDetail(int token);
     bool checkTokenExist(int token);
 
     QString GetStockName(int token, int type);

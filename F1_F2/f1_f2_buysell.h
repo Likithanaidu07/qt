@@ -23,6 +23,8 @@ public:
     userInfo userData;
     bool buy_mode;
     void setBuyMode(bool buy_mode_);
+    double priceSingleStepValue;
+    bool updateLTPOnPriceInput;
 
 protected:
     void showEvent(QShowEvent *event) override;
@@ -35,6 +37,8 @@ private slots:
 public slots:
     void slotstockNameListViewHide(QString);
     void itemSelectedStockName(QModelIndex index);
+    void adjustValue();
+    void slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct>& data);
 
 signals:
     void portfolioAddedSignal();
