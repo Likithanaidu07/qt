@@ -309,7 +309,7 @@ struct userInfo{
     int IDXOpenLimit;
     int STKOpenLimit;
     int MaxActiveCount;
-
+    QStringList ExFilterPF;
     QMap<int,QStringList> algoFilterMap;
 
 };

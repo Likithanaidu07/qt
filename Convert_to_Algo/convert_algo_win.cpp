@@ -5,8 +5,8 @@
 
 extern MainWindow *MainWindowObj;
 
-ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
-    QDialog(parent),
+ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
+    QDialog(parent), ExFilterPF(list),
     ui(new Ui::ConvertAlgo_Win)
 {
     ui->setupUi(this);
@@ -222,20 +222,35 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent) :
     ui->comboBox_AlgoType->lineEdit()->setPlaceholderText("Build Algo");  // Set the placeholder text
     ui->comboBox_AlgoType->setEditable(false);  // Set it back to non-editable to function as a normal combo box
 
-    // Add the items to the dropdown
-        ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
-//        ui->comboBox_AlgoType->clear();
+    QStringList comboxItems;
+    comboxItems.append("BFLY_BID");
+    comboxItems.append("CR-BID");
+    comboxItems.append("CRJELLY-BID");
+    comboxItems.append("BX-BID");
+    comboxItems.append("F2F-BID");
+    for (const QString& item : comboxItems) {
+        if (!ExFilterPF.contains(item)) {  // Add only if it is NOT in ExFilterPF
+            ui->comboBox_AlgoType->addItem(item);
+        }
+    }
+
+
+
+
+//    // Add the items to the dropdown
 //        ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
+////        ui->comboBox_AlgoType->clear();
+////        ui->comboBox_AlgoType->addItem(BFLY_BID_TYPE);
 
-      //  ui->comboBox_AlgoType->addItem("BFLY");
-        ui->comboBox_AlgoType->addItem("CR-BID");
-//        ui->comboBox_AlgoType->addItem("BOX");
-//        ui->comboBox_AlgoType->addItem("Open-BFLY");
-//        ui->comboBox_AlgoType->addItem("Open-BOX");
+//      //  ui->comboBox_AlgoType->addItem("BFLY");
+//        ui->comboBox_AlgoType->addItem("CR-BID");
+////        ui->comboBox_AlgoType->addItem("BOX");
+////        ui->comboBox_AlgoType->addItem("Open-BFLY");
+////        ui->comboBox_AlgoType->addItem("Open-BOX");
 
-        ui->comboBox_AlgoType->addItem("CRJELLY-BID");
-        ui->comboBox_AlgoType->addItem("BX-BID");
-        ui->comboBox_AlgoType->addItem("F2F-BID");
+//        ui->comboBox_AlgoType->addItem("CRJELLY-BID");
+//        ui->comboBox_AlgoType->addItem("BX-BID");
+//        ui->comboBox_AlgoType->addItem("F2F-BID");
       //  ui->comboBox_AlgoType->addItem("BX1221");
         ui->comboBox_AlgoType->setStyleSheet(
             "QComboBox {"

@@ -36,7 +36,8 @@ struct net_pos_data_{
     double BuyValue;
     double SellValue;
     double Net_Qty;
-  int lotSize;
+    int lotSize;
+
 
     //QString MTM;
 };

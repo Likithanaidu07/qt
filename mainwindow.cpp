@@ -2495,35 +2495,33 @@ void MainWindow::startall_Button_clicked()
 {
         QMessageBox::StandardButton reply;
         reply = QMessageBox::question(this, "Confirmation", "Are you sure you want to activate all selected algos?",
-                                      QMessageBox::Yes|QMessageBox::No);
+                                      QMessageBox::Yes | QMessageBox::No);
         if (reply == QMessageBox::No) {
             return;
         }
 
         QStringList portfolioNumbers = T_Portfolio_Model->getAllPortfolioNumbers();
-        /*for(int i = 0; i < T_Portfolio_Model->portfolio_data_list.size(); i++){
-            if (T_Portfolio_Model->portfolio_data_list[i]) {
-            portfolioNumbers.append(QString::number(T_Portfolio_Model->portfolio_data_list[i]->PortfolioNumber));
-            }
-        }*/
+        QString joinedPortfolioNumber = portfolioNumbers.join(", ");
+        QString Querys = "UPDATE Portfolios SET Status='inactive' WHERE PortfolioNumber IN (" + joinedPortfolioNumber + ")";
+        if (portfolioNumbers.size() > userData.MaxActiveCount) {
+            portfolioNumbers = portfolioNumbers.mid(0, userData.MaxActiveCount); // Get first MaxActiveCount portfolios
+        }
         QString joinedPortfolioNumbers = portfolioNumbers.join(", ");
         QString Query = "UPDATE Portfolios SET Status='Active' WHERE PortfolioNumber IN (" + joinedPortfolioNumbers + ")";
         QString msg;
 
-        bool success =  db_conn->updateDB_Table(Query,msg);
-        if(success){
+        bool success = db_conn->updateDB_Table(Query, msg);
+        if (success) {
             db_conn->logToDB(QString("Enabled Algos [" + joinedPortfolioNumbers + "]"));
             quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
-            const unsigned char dataBytes[] = { 0x01};
+            const unsigned char dataBytes[] = { 0x01 };
             QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
             QByteArray msg = backend_comm->createPacket(command, data);
             backend_comm->insertData(msg);
             start_dataLoadingThread();
-
         }
-
-
 }
+
 void MainWindow::stopall_Button_clicked()
 {
         QMessageBox::StandardButton reply;
@@ -2631,7 +2629,8 @@ void MainWindow::on_Algorithms_Button_clicked()
 void MainWindow::ConvertAlgo_button_clicked(){
 
     if(!convertalgo){
-        convertalgo=new ConvertAlgo_Win(this);
+
+        convertalgo=new ConvertAlgo_Win(this,userData.ExFilterPF);
         connect(convertalgo, &ConvertAlgo_Win::portfolioAddedSignal, this, &MainWindow::onPortfolioAdded);
 
         qDebug()<<"Creating convertalgo....";

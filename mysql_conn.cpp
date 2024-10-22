@@ -203,6 +203,8 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                     userLoginInfo.UserId = query.value(rec.indexOf("UserId")).toInt();
                     userLoginInfo.MaxPortfolioCount = query.value(rec.indexOf("MaxPortfolioCount")).toInt();
                     userLoginInfo.MaxActiveCount = query.value(rec.indexOf("MaxActiveCount")).toInt();
+                    QString ExFilterPF = query.value(rec.indexOf("ExFilterPF")).toString();
+                    userLoginInfo.ExFilterPF.append(ExFilterPF.split(","));  // Split by comma and append
                     userLoginInfo.loggedIn = true;
                     userLoginInfo.loginResponse = "Login Sucess";
                     userLoginInfo.errorCode = T_LoginErroCode::OK;
