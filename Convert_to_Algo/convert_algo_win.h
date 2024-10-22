@@ -28,9 +28,10 @@ class ConvertAlgo_Win : public QDialog
 {
     Q_OBJECT
 public:
-    explicit ConvertAlgo_Win(QWidget *parent = nullptr);
+    explicit ConvertAlgo_Win(QWidget *parent = nullptr,const QStringList &list = QStringList());
     bool pressed;
     QPoint position;
+     userInfo userData;
     void update_contract_tableData(QString foo_user_id_,int MaxPortfolioCount_);
     ~ConvertAlgo_Win();
 
@@ -83,6 +84,7 @@ private:
     convert_to_algo_box_bid *algoBoxBid;
 
      convert_to_algo_bs1221 *algoBx1221;
+      QStringList ExFilterPF;
 
 
     void sort_data_and_populate_model(QHash<QString, contract_table> contract_table_/*,QHash<QString, contract_table> cd_contract_table_*/);

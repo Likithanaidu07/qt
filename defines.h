@@ -125,7 +125,8 @@ enum OrderBook_Idx{
     Expiry_OB,
     BuyorSell_OB,
     LotSize_OB,
-    TraderData_OB
+    TraderData_OB,
+    TradeTable_Hihglight_OB
 };
 
 
@@ -333,7 +334,7 @@ struct userInfo{
     int IDXOpenLimit;
     int STKOpenLimit;
     int MaxActiveCount;
-
+    QStringList ExFilterPF;
     QMap<int,QStringList> algoFilterMap;
 
 };

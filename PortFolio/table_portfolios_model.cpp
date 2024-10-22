@@ -1200,7 +1200,3 @@ int Table_Portfolios_Model::getActivatedPortfolioCount() {
    return activatedCount;
 }
 
-
-
-
-

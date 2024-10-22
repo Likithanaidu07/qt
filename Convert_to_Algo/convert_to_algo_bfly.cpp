@@ -120,6 +120,8 @@ void add_algo_btfly::selectedAction(){
         QElapsedTimer timer1;
         timer1.start();
         emit progressSignal(true,"Loading...");
+        qDebug() << "BFLY_Tokens.length()  :" <<BFLY_Tokens.length() << "";
+
         for(int i=0;i<BFLY_Tokens.length();i++){
                 const auto& contract = sharedData->contract_table_hash[BFLY_Tokens[i]];
 

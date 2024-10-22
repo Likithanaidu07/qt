@@ -24,6 +24,10 @@ public:
     QStringList getTradedPortFolioList();
     QStringList getTradedDataForIdx(int idx);
     void setColumnWidths(QTableView *tableView) const;
+    QStringList getTradeTableHighlight_ExcludeList();
+    QStringList  TradeTableHighlight_ExcludeList;
+public slots:
+    void selectionChangedSlot(int currentIdx);
 
 private:
     int col_count;

@@ -2,10 +2,15 @@
 #include <qfont.h>
 #include <QTableView>
 #include <QHeaderView>
+#include <QStandardPaths>
+#include "QSettings"
 
 Trade_Table_Model::Trade_Table_Model(QObject *parent) : QAbstractTableModel(parent)
 {
     col_count = header.count();
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
+    QSettings settings(appDataPath + "/tradeTableHighlight_ExcludeList.dat", QSettings::IniFormat);
+    TradeTableHighlight_ExcludeList = settings.value("tradeTableHighlight_ExcludeList").toStringList();
 }
 int Trade_Table_Model::rowCount(const QModelIndex & /*parent*/) const
 {
@@ -254,7 +259,9 @@ QStringList Trade_Table_Model::getTradedDataForIdx(int idx){
     }
     return data;
 }
-
+QStringList Trade_Table_Model::getTradeTableHighlight_ExcludeList(){
+    return TradeTableHighlight_ExcludeList;
+}
 QStringList Trade_Table_Model::getTradedPortFolioList(){
     QStringList tradedPortFolios;
     for(int j=0;j<trade_data_list.length();j++){
@@ -306,3 +313,17 @@ QVariant Trade_Table_Model::headerData(int section, Qt::Orientation orientation,
 //   // tableView->horizontalHeader()->setSectionResizeMode(_Status, QHeaderView::Fixed);
 //}
 //}
+void Trade_Table_Model::selectionChangedSlot(int currentIdx) {
+    if (currentIdx != -1) {
+        if (trade_data_list[currentIdx][TradeTable_Hihglight_OB] == "1") {
+            trade_data_list[currentIdx][TradeTable_Hihglight_OB] = "0";
+            if (!TradeTableHighlight_ExcludeList.contains(trade_data_list[currentIdx][TradeTable_Hihglight_OB])) {
+                TradeTableHighlight_ExcludeList.append(trade_data_list[currentIdx][TradeTable_Hihglight_OB]);
+                QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
+                QSettings settings(appDataPath + "/tradedHighlight_ExcludeList.dat", QSettings::IniFormat);
+                settings.setValue("TradeTableHighlight_ExcludeList", TradeTableHighlight_ExcludeList);
+            }
+        }
+    }
+}
+
