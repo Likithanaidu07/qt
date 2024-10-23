@@ -1,4 +1,4 @@
-#include "convert_to_algo_bs1221.h"
+#include "convert_to_algo_bs1221_1331.h"
 
 #include "custom_q_completer.h"
 #include "contractdetail.h"
@@ -7,22 +7,22 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QProgressDialog>
 
-convert_to_algo_bs1221::convert_to_algo_bs1221(QObject *parent)
+convert_to_algo_bs1221_1331::convert_to_algo_bs1221_1331(QObject *parent)
     : QObject{parent}
 {
     //  model_start_strike_BFLY = new QStandardItemModel;
     sharedData = &AddAlgoSharedVar::getInstance();
     model_end_strike = new QStandardItemModel;
     model_start_strike_BX1221 = new QStandardItemModel;
-    BX1221_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::BX1221);
+    BX1221_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::BS1221);
 }
 
-void convert_to_algo_bs1221::clearAllModel(){
+void convert_to_algo_bs1221_1331::clearAllModel(){
     model_end_strike->clear();
     model_start_strike_BX1221->clear();
 }
 
-void convert_to_algo_bs1221::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_){
+void convert_to_algo_bs1221_1331::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_){
 
     lineEdit_Start_strike = lineEdit_Start_strike_;
     lineEdit_EndStrike = lineEdit_EndStrike_;
@@ -81,7 +81,7 @@ void convert_to_algo_bs1221::copyUIElement(QDialog *parentWidget,QTableWidget *t
 }
 
 
-void convert_to_algo_bs1221::selectedAction(){
+void convert_to_algo_bs1221_1331::selectedAction(){
 
     foo_token_number_start_strike = "";
     foo_token_number_end_strike = "";
@@ -161,7 +161,7 @@ void convert_to_algo_bs1221::selectedAction(){
 }
 
 
-void convert_to_algo_bs1221::createEndStrikeModelAndPopulateListView(){
+void convert_to_algo_bs1221_1331::createEndStrikeModelAndPopulateListView(){
 
 
     model_end_strike->clear();
@@ -227,7 +227,7 @@ void convert_to_algo_bs1221::createEndStrikeModelAndPopulateListView(){
 
 
 }
-void convert_to_algo_bs1221::generateAlgo()
+void convert_to_algo_bs1221_1331::generateAlgo()
 {
 
 
@@ -465,7 +465,7 @@ void convert_to_algo_bs1221::generateAlgo()
 
         algo_data_to_insert data;
         data.Algo_Status = "DisabledByUser";
-        data.algo_type = QString::number(PortfolioType::BX1221);
+        data.algo_type = QString::number(PortfolioType::BS1221);
         data.exchange = sharedData->exchange;
         data.table_row_unique_id = sharedData->unique_id;
         data.user_id = sharedData->foo_user_id;
@@ -507,17 +507,17 @@ void convert_to_algo_bs1221::generateAlgo()
 
 }
 
-void convert_to_algo_bs1221::slotStartHide(QString)
+void convert_to_algo_bs1221_1331::slotStartHide(QString)
 {
     endStrikeListView->hide();
 }
 
-void convert_to_algo_bs1221::slotEndHide(QString)
+void convert_to_algo_bs1221_1331::slotEndHide(QString)
 {    startStrikeListView->hide();
 
 }
 
-void convert_to_algo_bs1221::itemSelectedStartStrike(QModelIndex index)
+void convert_to_algo_bs1221_1331::itemSelectedStartStrike(QModelIndex index)
 {
     if(index.isValid())
     {
@@ -552,7 +552,7 @@ void convert_to_algo_bs1221::itemSelectedStartStrike(QModelIndex index)
     }
 }
 
-void convert_to_algo_bs1221::itemSelectedEndStrike(QModelIndex index)
+void convert_to_algo_bs1221_1331::itemSelectedEndStrike(QModelIndex index)
 {
     if(index.isValid())
     {

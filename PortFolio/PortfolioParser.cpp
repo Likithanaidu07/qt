@@ -174,7 +174,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         else if(obj.PortfolioType==QString::number(PortfolioType::BX_BID)){
             obj.QuantityRatio="1:1:1:1";
         }
-        else if(obj.PortfolioType==QString::number(PortfolioType::BX1221)){
+        else if(obj.PortfolioType==QString::number(PortfolioType::BS1221)){
             obj.QuantityRatio="1:2:2:1";
         }
         else{
@@ -192,7 +192,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         else if(obj.PortfolioType==QString::number(PortfolioType::BX_BID)){
             obj.BidLeg = "-";
         }
-        else if(obj.PortfolioType==QString::number(PortfolioType::BX1221)){
+        else if(obj.PortfolioType==QString::number(PortfolioType::BS1221)){
             obj.BidLeg = "-";
         }
         else{
@@ -518,7 +518,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
             obj.AdditionalData1 = query.value("AdditionalData1").toString();//.Convert.ToString(reader["AdditionalData1"]);
             break;
 
-        case PortfolioType::BX1221:
+        case PortfolioType::BS1221:
             obj.Leg1 = ContractDetail::getInstance().GetStrikePrice(obj.Leg1TokenNo,type);
             obj.Leg2 = ContractDetail::getInstance().GetStrikePrice(obj.Leg2TokenNo,type);
             obj.Leg3 = ContractDetail::getInstance().GetStrikePrice(obj.Leg3TokenNo,type);
@@ -709,7 +709,7 @@ QString PortfolioParser::get_Algo_Name(PortfolioType algo_type,int leg1_token_nu
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff);
         Algo_Name_For_Sorting = "BX-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff);
     }
-    else if(algo_type==PortfolioType::BX1221){
+    else if(algo_type==PortfolioType::BS1221){
         Algo_Name = "BX1221-";//Nifty-18000-CE-200";
         double diff = (ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff);
@@ -1460,7 +1460,7 @@ void PortfolioParser::CalculatePriceDifference(PortfolioObject &portfolio, QHash
         case PortfolioType::BOX:
         case PortfolioType::BX_BID:
             return CalculateBoxPriceDifference(portfolio,MBP_Data_Hash,devicer,decimal_precision,portfolio.PortfolioTypeEnum);
-        case PortfolioType::BX1221:
+        case PortfolioType::BS1221:
             return CalculateBoxPriceDifference(portfolio,MBP_Data_Hash,devicer,decimal_precision,portfolio.PortfolioTypeEnum);
 
 

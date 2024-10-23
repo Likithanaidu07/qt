@@ -99,7 +99,7 @@ QString PortfolioObject::getPortFolioTypeString(QString portfolioType)
     PortFolioType_String.insert(QString::number(PortfolioType::BYC_5L), "BY 5L");
     PortFolioType_String.insert(QString::number(PortfolioType::BYC_4L), "BY 4L");
 
-    PortFolioType_String.insert(QString::number(PortfolioType::BX1221), "BY 1221");
+    PortFolioType_String.insert(QString::number(PortfolioType::BS1221), "BY 1221");
     PortFolioType_String.insert(QString::number(PortfolioType::BS), "BY 1331");
     PortFolioType_String.insert(QString::number(PortfolioType::R2L), "RATIO");
     PortFolioType_String.insert(QString::number(PortfolioType::BFLY_BID), "BLFY BID");
@@ -114,7 +114,7 @@ QString PortfolioObject::getPortFolioTypeString(QString portfolioType)
 QString PortfolioObject::Price()
 {
     //Price
-    if (PortfolioTypeEnum == PortfolioType::BY || PortfolioTypeEnum == PortfolioType::BS || PortfolioTypeEnum == PortfolioType::BX1221
+    if (PortfolioTypeEnum == PortfolioType::BY || PortfolioTypeEnum == PortfolioType::BS || PortfolioTypeEnum == PortfolioType::BS1221
         || PortfolioTypeEnum == PortfolioType::BFLY_BID)
         return QString::number(Leg2.toDouble() - Leg1.toDouble(), 'f',decimal_precision);
     if (PortfolioTypeEnum == PortfolioType::R3L)

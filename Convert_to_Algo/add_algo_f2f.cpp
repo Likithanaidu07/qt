@@ -232,7 +232,7 @@ void add_algo_f2f::instrumentEditFinishedAction(){
 //          float end_strike = tmp.StrikePrice;
 //        if(start_strike>end_strike)
 //          continue;
-        if(tmp.InstrumentName==Instr_Name&&tmp.Expiry>startExpiry){
+        if(tmp.InstrumentName==Instr_Name&&tmp.Expiry!=startExpiry){
 
             unsigned int unix_time= tmp.Expiry;
             QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);

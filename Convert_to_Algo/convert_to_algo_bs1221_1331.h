@@ -1,5 +1,5 @@
-#ifndef CONVERT_TO_ALGO_BS1221_H
-#define CONVERT_TO_ALGO_BS1221_H
+#ifndef CONVERT_TO_ALGO_BS1221_1331_H
+#define CONVERT_TO_ALGO_BS1221_1331_H
 
 #include <QObject>
 #include "QLineEdit"
@@ -11,12 +11,12 @@
 #include "QDateTime"
 #include "eventfilterlistview.h"
 
-    class convert_to_algo_bs1221 : public QObject
+    class convert_to_algo_bs1221_1331 : public QObject
     {
         Q_OBJECT
 
     public:
-        explicit convert_to_algo_bs1221(QObject *parent = nullptr);
+        explicit convert_to_algo_bs1221_1331(QObject *parent = nullptr);
         void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_);
         QStringList BX1221_Tokens; // filtered token for BOX_BID
         void selectedAction();
@@ -62,4 +62,4 @@
     };
 
 
-#endif // CONVERT_TO_ALGO_BS1221_H
+#endif // CONVERT_TO_ALGO_BS1221_1331_H

@@ -70,8 +70,8 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
         ui->lineEdit_Start_strike_BoxBid,
         ui->lineEdit_EndStrike_BoxBid,
         ui->lineEdit_StrikeDifference_BoxBid,
-        ui->lineEdit_EndStrike_Bs1221,
-        ui->lineEdit_StrikeDifference_Bs1221,
+        ui->lineEdit_EndStrike_Bs1221_1331,
+        ui->lineEdit_StrikeDifference_Bs1221_1331,
         ui->lineEdit_EndStrike_CRJellyBid,
         ui->lineEdit_Start_strike_CRJellyBid,
         ui->lineEdit_Fut_CRJellyBid
@@ -172,9 +172,9 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
 
 
     /*******Class to generate bs1221 algos************/
-    algoBx1221= new convert_to_algo_bs1221();
-    algoBx1221->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_Bs1221,ui->lineEdit_EndStrike_Bs1221,ui->lineEdit_StrikeDifference_Bs1221);
-    connect(algoBx1221,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
+    algoBS_1221_1331= new convert_to_algo_bs1221_1331();
+    algoBS_1221_1331->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_Bs1221_1331,ui->lineEdit_EndStrike_Bs1221_1331,ui->lineEdit_StrikeDifference_Bs1221_1331);
+    connect(algoBS_1221_1331,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
     /*******Class to generate BtFly-bid algos************/
 
 
@@ -228,6 +228,9 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
     comboxItems.append("CRJELLY-BID");
     comboxItems.append("BX-BID");
     comboxItems.append("F2F-BID");
+    comboxItems.append("BS1221");
+    comboxItems.append("BS1331");
+
     for (const QString& item : comboxItems) {
         if (!ExFilterPF.contains(item)) {  // Add only if it is NOT in ExFilterPF
             ui->comboBox_AlgoType->addItem(item);
@@ -251,7 +254,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
 //        ui->comboBox_AlgoType->addItem("CRJELLY-BID");
 //        ui->comboBox_AlgoType->addItem("BX-BID");
 //        ui->comboBox_AlgoType->addItem("F2F-BID");
-      //  ui->comboBox_AlgoType->addItem("BX1221");
+      //  ui->comboBox_AlgoType->addItem("BS1221");
         ui->comboBox_AlgoType->setStyleSheet(
             "QComboBox {"
             "    font-weight: bold;"
@@ -336,8 +339,8 @@ void ConvertAlgo_Win::hideAnyListViewVisible(){
     algoBoxBid->slotStartHide("");
     algoBoxBid->slotEndHide("");
 
-    algoBx1221->slotStartHide("");
-    algoBx1221->slotStartHide("");
+    algoBS_1221_1331->slotStartHide("");
+    algoBS_1221_1331->slotStartHide("");
 
 }
 
@@ -346,7 +349,7 @@ void ConvertAlgo_Win::on_Close_clicked()
 {
 
 
-    algoBx1221->clearAllModel();
+    algoBS_1221_1331->clearAllModel();
     algoBoxBid->clearAllModel();
     algoCRJellyBid->clearAllModel();
     algoBtFlyBid->clearAllModel();
@@ -372,7 +375,7 @@ void ConvertAlgo_Win::keyPressEvent(QKeyEvent *event)
         ui->lineEdit_Start_strike_ConvRev->clear();
         ui->lineEdit_Start_strike_f2f->clear();
         ui->lineEdit_Start_strike_BoxBid->clear();
-        ui->lineEdit_Start_strike_Bs1221->clear();
+        ui->lineEdit_Start_strike_Bs1221_1331->clear();
 
         ui->lineEdit_EndStrike_Btfy->clear();
         ui->lineEdit_EndStrike_BtfyBid->clear();
@@ -380,7 +383,7 @@ void ConvertAlgo_Win::keyPressEvent(QKeyEvent *event)
         ui->lineEdit_EndStrike_f2f->clear();
         ui->lineEdit_Fut_ConvRev->clear();
         ui->lineEdit_EndStrike_BoxBid->clear();
-        ui->lineEdit_EndStrike_Bs1221->clear();
+        ui->lineEdit_EndStrike_Bs1221_1331->clear();
         on_comboBox_AlgoType_currentTextChanged(ui->comboBox_AlgoType->currentText());
 
 
@@ -435,8 +438,8 @@ void ConvertAlgo_Win::update_contract_tableData(QString foo_user_id_,int MaxPort
  //   algoBoxBid->filtered_tokens_BX_BID = ContractDetail::getInstance().Get_BOX_BID_data_list_Sorted_Key();//sharedData->FO_BFLY_BID_data_list_Sorted_Key;
   //  algoBoxBid->model_start_strike_BOX_BID = ContractDetail::getInstance().Get_model_start_strike_BOX_BID();  //get the model generated from contract class for start strike
 
-   // algoBx1221->filtered_tokens_BX1221 = ContractDetail::getInstance().Get_BOX_BID_data_list_Sorted_Key();//sharedData->FO_BFLY_BID_data_list_Sorted_Key;
-  //  algoBx1221->model_start_strike_BX1221 = ContractDetail::getInstance().Get_model_start_strike_BOX_BID();  //get the model generated from contract class for start strike
+   // algoBS_1221_1331->filtered_tokens_BS1221 = ContractDetail::getInstance().Get_BOX_BID_data_list_Sorted_Key();//sharedData->FO_BFLY_BID_data_list_Sorted_Key;
+  //  algoBS_1221_1331->model_start_strike_BS1221 = ContractDetail::getInstance().Get_model_start_strike_BOX_BID();  //get the model generated from contract class for start strike
 
    // algoConRev->sorted_keys_CON_REV = sharedData->FO_BFLY_data_list_Sorted_Key;
    // algoConRev->sorted_keys_F2F = sharedData->FO_F2F_data_list_Sorted_Key;
@@ -577,7 +580,7 @@ void ConvertAlgo_Win::resetTableWidget() {
         headers = {"Algo Name", "Strike/Expiry1", "Strike/Expiry2", "Strike/Expiry3", "Status"};
     } else if (algoType == "BX-BID") {
         headers = {"Algo Name", "Expiry", "Strike1", "Strike2", "Strike3", "Strike4", "Status"};
-    } else if (algoType == "BX1221") {
+    } else if (algoType == "BS1221") {
         headers = {"Algo Name", "Expiry", "Strike1", "Strike2", "Strike3", "Strike4", "Reserved", "Reserved", "Status"};
     }
 
@@ -663,8 +666,8 @@ void ConvertAlgo_Win::on_pushButtonAdd_clicked()
     else if(algo_type=="BX-BID"){
         algoBoxBid->generateAlgo();
     }
-    else if(algo_type=="BX1221"){
-        algoBx1221->generateAlgo();
+    else if(algo_type=="BS1221"){
+        algoBS_1221_1331->generateAlgo();
     }
 //    if(algo_type=="BOX"){
 //        algoBOX->generateAlgo();
@@ -727,9 +730,9 @@ void ConvertAlgo_Win::on_comboBox_AlgoType_currentTextChanged(const QString algo
         ui->stackedWidget->setCurrentWidget(ui->pagBoxBid);
         algoBoxBid->selectedAction();
     }
-    else if(algoType=="BX1221"){
-        ui->stackedWidget->setCurrentWidget(ui->pagBS1221);
-        algoBx1221->selectedAction();
+    else if(algoType=="BS1221"){
+        ui->stackedWidget->setCurrentWidget(ui->pagBS1221_1331);
+        algoBS_1221_1331->selectedAction();
     }
 //    else if(algoType=="2L Straddle"){
 
@@ -844,8 +847,8 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                     algo_type="CRJELLY";
                 else if(algo_type==QString::number(PortfolioType::BX_BID))
                     algo_type="BX-BID";
-                else if(algo_type==QString::number(PortfolioType::BX1221))
-                    algo_type="BX1221";
+                else if(algo_type==QString::number(PortfolioType::BS1221))
+                    algo_type="BS1221";
 
 
 
@@ -916,8 +919,8 @@ void ConvertAlgo_Win::on_pushButton_Reset_clicked()
     ui->lineEdit_Start_strike_BoxBid->clear();
     ui->lineEdit_EndStrike_BoxBid->clear();
 
-    ui->lineEdit_Start_strike_Bs1221->clear();
-    ui->lineEdit_EndStrike_Bs1221->clear();
+    ui->lineEdit_Start_strike_Bs1221_1331->clear();
+    ui->lineEdit_EndStrike_Bs1221_1331->clear();
 }
 
 

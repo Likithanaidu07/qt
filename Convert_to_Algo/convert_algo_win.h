@@ -15,7 +15,7 @@
 #include "Common/macros.h"
 #include "add_algo_cr_jelly_bid.h"
 #include "add_algo_f2f.h"
-#include "convert_to_algo_bs1221.h"
+#include "convert_to_algo_bs1221_1331.h"
 enum UI_UPDATE_TYPE{
     LOADED_MODEL=0
 };
@@ -83,7 +83,7 @@ private:
     add_algo_btfly_bid *algoBtFlyBid;
     convert_to_algo_box_bid *algoBoxBid;
 
-     convert_to_algo_bs1221 *algoBx1221;
+     convert_to_algo_bs1221_1331 *algoBS_1221_1331;
       QStringList ExFilterPF;
 
 

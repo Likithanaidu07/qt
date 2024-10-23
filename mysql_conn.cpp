@@ -183,7 +183,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
 
                     userLoginInfo.algoFilterMap[PortfolioType::BX_BID] =  OPT_Instruments;//(BOX_BIDInFilter.isNull() || BOX_BIDInFilter.trimmed().isEmpty())  ? InstrumentTypeAll  : BOX_BIDInFilter.split(",");
 
-                    userLoginInfo.algoFilterMap[PortfolioType::BX1221] =  OPT_Instruments;
+                    userLoginInfo.algoFilterMap[PortfolioType::BS1221] =  OPT_Instruments;
                     userLoginInfo.algoFilterMap[InstrumentType::FUT_INSTRUMENT] =  FUT_Instruments;
 
 
@@ -843,7 +843,7 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type)+"-"+QString::number(diff)/*+"-"+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type)*/;
     }
 
-    else if(algo_type==PortfolioType::BX1221){
+    else if(algo_type==PortfolioType::BS1221){
         Algo_Name = "BX1221-";//Nifty-18000-CE-200";
         double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+"-"+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
@@ -988,7 +988,7 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
                     break;
                 }
 
-                case PortfolioType::BX1221:{
+                case PortfolioType::BS1221:{
                     if(Leg1BuySellIndicator==1){
                         Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
                     }
@@ -2532,7 +2532,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                               " and Leg4TokenNo="+data.Leg4_token_number;
 
                     //BX1221
-                    else if(data.algo_type==QString::number(PortfolioType::BX1221))
+                    else if(data.algo_type==QString::number(PortfolioType::BS1221))
                         str = "select  TraderID from Portfolios where TraderID="+data.user_id+
                               " and PortfolioType="+ data.algo_type+
                               " and Leg1TokenNo="+data.Leg1_token_number+
@@ -2833,7 +2833,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                             }
 
                             //BX1221l
-                            else if(data.algo_type==QString::number(PortfolioType::BX1221)){
+                            else if(data.algo_type==QString::number(PortfolioType::BS1221)){
                                 query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
                                               "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo,Leg4TokenNo"
                                               ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
