@@ -559,7 +559,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     for (int col = 0; col < Portfolio_columnCount; ++col) {
         if (col != PortfolioData_Idx::_Status) {
-            T_Portfolio_Table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
+            T_Portfolio_Table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Interactive);
         }
     }
 
@@ -1611,62 +1611,73 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 int columnIdx = i.key();
                 QString valStr = i.value();
                 switch (columnIdx) {
-                case PortfolioData_Idx::_OrderQuantity: {
-                int lotSize = P->GetLotSize(); // T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+                case PortfolioData_Idx::_OrderQuantity:{
+                int lotSize = P->GetLotSize();//T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
                 double val = valStr.toDouble();
-                val = val * lotSize;
-                double vfq = P->VolumeFreezeQty; // T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
+                val=val*lotSize;
+                double vfq = P->VolumeFreezeQty;//T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
 
-                if (val > vfq) {
+
+
+                if(val > vfq){
                     QMessageBox msgBox;
                     msgBox.setText("Cannot update OrderQuantity");
-                    msgBox.setText("OrderQuantity cannot be greater than VolumeFreezeQty " + QString::number(vfq / lotSize));
+                    msgBox.setText("OrderQuantity cannot be greater than VolumeFreezeQty "+QString::number(vfq/lotSize));
                     msgBox.setIcon(QMessageBox::Warning);
                     msgBox.exec();
-                } else {
+                }
+                else{
+                    //write
                     int val1 = valStr.toInt();
-                    int BuyTotalQuantity = P->BuyTotalQuantity; // T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity;
-                    int SellTotalQuantity = P->SellTotalQuantity; // T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity;
+                    int BuyTotalQuantity = P->BuyTotalQuantity;// T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity;
+                    int SellTotalQuantity = P->SellTotalQuantity;// T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity;
                     int qty = BuyTotalQuantity;
-
-                    if (BuyTotalQuantity == 0)
+                    if(BuyTotalQuantity==0)
                         qty = SellTotalQuantity;
-                    else if (SellTotalQuantity == 0)
+                    else if(SellTotalQuantity==0)
                         qty = BuyTotalQuantity;
-                    else if (BuyTotalQuantity > SellTotalQuantity)
+
+                    else if(BuyTotalQuantity>SellTotalQuantity)
                         qty = BuyTotalQuantity;
                     else
                         qty = SellTotalQuantity;
-
-                    if (val1 > qty) {
+                    //check the condtion
+                    if(val1 >qty){
                         QMessageBox msgBox;
                         msgBox.setText("Cannot update OrderQuantity");
-                        msgBox.setText("OrderQuantity cannot be greater than totalQty " + QString::number(qty));
+                        msgBox.setText("OrderQuantity cannot be greater than totalQty "+QString::number(qty));
                         msgBox.setIcon(QMessageBox::Warning);
                         msgBox.exec();
-                    } else {
-                        updateQueryList.append("OrderQuantity=" + QString::number(val));
-                        logMsg = logMsg + "OrderQuantity [" + QString::number(val1) + "], ";
+                    }
+                    else{
+                        updateQueryList.append("OrderQuantity="+QString::number(val));
+                        logMsg = logMsg+"OrderQuantity ["+QString::number(val1)+"], ";
                     }
                 }
                 }
+
                 break;
 
-                case PortfolioData_Idx::_BuyTotalQuantity: {
+                case PortfolioData_Idx::_BuyTotalQuantity:{
                 double TQ = valStr.toDouble();
-                int bTTQ = P->BuyTradedQuantity; // T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTradedQuantity;
-                QString InstrumentType = ContractDetail::getInstance().GetInstrumentType(P->Leg1TokenNo, P->PortfolioType.toInt());
+                int bTTQ= P->BuyTradedQuantity;//T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTradedQuantity;
+
+                QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(P->Leg1TokenNo,P->PortfolioType.toInt());
+
 
                 if (InstrumentType == "OPTIDX" || InstrumentType == "FUTIDX") {
-                    if (TQ > userData.IDXOpenLimit + bTTQ) {
+
+                    if (TQ > userData.IDXOpenLimit+bTTQ) {
                         QMessageBox msgBox;
                         msgBox.setText("BTQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
                         msgBox.setIcon(QMessageBox::Warning);
                         msgBox.exec();
                         break;
                     }
-                } else if (InstrumentType == "OPTSTK" || InstrumentType == "FUTSTK") {
-                    if (TQ > userData.STKOpenLimit + bTTQ) {
+                }
+                else if (InstrumentType == "OPTSTK" || InstrumentType == "FUTSTK") {
+
+                    if (TQ > userData.STKOpenLimit+bTTQ) {
                         QMessageBox msgBox;
                         msgBox.setText("BTQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
                         msgBox.setIcon(QMessageBox::Warning);
@@ -1676,43 +1687,49 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 }
 
                 double TTQ = P->BuyTradedQuantity;
+
                 if (TQ < TTQ) {
                     QMessageBox msgBox;
-                    msgBox.setText("BTQ cannot be less than Traded Quantity " + QString::number(TTQ));
+                    msgBox.setText("BTQ cannot be less than Traded Quantity is " + QString::number(TTQ));
                     msgBox.setIcon(QMessageBox::Warning);
                     msgBox.exec();
-                } else {
-                    double OrderQty = P->OrderQuantity;
 
-                    if (TQ < OrderQty && P->SellTotalQuantity < OrderQty) {
-                        // Only show this if both BTQ and STQ are less than OrderQuantity
+                }
+                else {
+
+                    double OrderQty = P->OrderQuantity;
+                    if(TQ<OrderQty){
+                        // show the error mesg here
                         QMessageBox msgBox;
-                        msgBox.setText("BTQ Should not be less than OrderQuantity, which is " + QString::number(OrderQty));
+                        msgBox.setText("BTQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
                         msgBox.setIcon(QMessageBox::Warning);
                         msgBox.exec();
-                    } else {
-                        // Proceed with updating the values
+                    }
+                    else{
                         int lotSize = P->GetLotSize();
                         double val = valStr.toDouble();
-                        val = val * lotSize;
-
-                        if (P->OrderQuantity == 0) {
-                            updateQueryList.append("OrderQuantity=" + QString::number(lotSize));
+                        val=val*lotSize;
+                        if(P->OrderQuantity==0){
+                            updateQueryList.append("OrderQuantity="+QString::number(lotSize));
                         }
-
-                        updateQueryList.append("BuyTotalQuantity=" + QString::number(val));
-                        logMsg = logMsg + "BuyTotalQuantity [" + QString::number(val) + "], ";
+                        updateQueryList.append("BuyTotalQuantity="+QString::number(val));
+                        logMsg = logMsg+"BuyTotalQuantity ["+QString::number(val)+"], ";
                     }
+
                 }
+
+
                 }
                 break;
 
-                case PortfolioData_Idx::_SellTotalQuantity: {
+                case PortfolioData_Idx::_SellTotalQuantity:{
                 double TQ = valStr.toDouble();
-                int sTTQ = P->SellTradedQuantity;
-                QString InstrumentType = ContractDetail::getInstance().GetInstrumentType(P->Leg1TokenNo, P->PortfolioType.toInt());
+                int sTTQ= P->SellTradedQuantity;
+                QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(P->Leg1TokenNo,P->PortfolioType.toInt());
+
 
                 if (InstrumentType == "OPTIDX" || InstrumentType == "FUTIDX") {
+
                     if (TQ > userData.IDXOpenLimit + sTTQ) {
                         QMessageBox msgBox;
                         msgBox.setText("STQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
@@ -1720,7 +1737,9 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                         msgBox.exec();
                         break;
                     }
-                } else if (InstrumentType == "OPTSTK" || InstrumentType == "FUTSTK") {
+                }
+                else if (InstrumentType == "OPTSTK" || InstrumentType == "FUTSTK") {
+
                     if (TQ > userData.STKOpenLimit + sTTQ) {
                         QMessageBox msgBox;
                         msgBox.setText("STQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
@@ -1729,35 +1748,34 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                         break;
                     }
                 }
-
                 double TTQ = P->SellTradedQuantity;
+
                 if (TQ < TTQ) {
                     QMessageBox msgBox;
                     msgBox.setText("STQ cannot be less than Traded Quantity is " + QString::number(TTQ));
                     msgBox.setIcon(QMessageBox::Warning);
                     msgBox.exec();
-                } else {
+                }
+                else {
                     double OrderQty = P->OrderQuantity;
-
-                    if (TQ < OrderQty && P->BuyTotalQuantity < OrderQty) {
-                        // Only show this if both STQ and BTQ are less than OrderQuantity
+                    if(TQ<OrderQty){
+                        // show the error mesg here
                         QMessageBox msgBox;
-                        msgBox.setText("STQ Should not be less than OrderQuantity, which is " + QString::number(OrderQty));
+                        msgBox.setText("STQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
                         msgBox.setIcon(QMessageBox::Warning);
                         msgBox.exec();
-                    } else {
-                        // Proceed with updating the values
+                    }
+                    else{
                         int lotSize = P->GetLotSize();
                         double val = valStr.toDouble();
-                        val = val * lotSize;
-
-                        if (P->OrderQuantity == 0) {
-                            updateQueryList.append("OrderQuantity=" + QString::number(lotSize));
+                        val=val*lotSize;
+                        if(P->OrderQuantity==0){
+                            updateQueryList.append("OrderQuantity="+QString::number(lotSize));
                         }
-
-                        updateQueryList.append("SellTotalQuantity=" + QString::number(val));
-                        logMsg = logMsg + "SellTotalQuantity [" + QString::number(val) + "], ";
+                        updateQueryList.append("SellTotalQuantity="+QString::number(val));
+                        logMsg = logMsg+"SellTotalQuantity ["+QString::number(val)+"], ";
                     }
+
                 }
                 }
                 break;
