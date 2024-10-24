@@ -35,7 +35,7 @@ void SlowData::socket_conn_info_Slot(QString info){
 
 void SlowData::dataExchangeSlot(MBP_Data_Struct data){
 
-    //  qDebug()<<data.token;
+    //qDebug()<<data.token;
     QMutexLocker lock(&leg_n_tokens_Mutex);
     if(leg_n_tokens.contains(data.token)){
         QMutexLocker lock(&MBP_Data_Hash_Mutex);
@@ -52,6 +52,15 @@ void SlowData::setLeg_n_token(QStringList tokens){
     leg_n_tokens.clear();
     leg_n_tokens = tokens;
 }
+
+void SlowData::addLeg_n_token(QString token){
+    QMutexLocker lock(&leg_n_tokens_Mutex);
+    if(!leg_n_tokens.contains(token)){
+        leg_n_tokens.append(token);
+        qDebug()<<"leg_n_tokens: "<<leg_n_tokens;
+    }
+}
+
 
 QHash<QString, MBP_Data_Struct> SlowData::getMBP_Data_Hash()
 {

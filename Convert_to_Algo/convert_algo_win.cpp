@@ -228,8 +228,8 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
     comboxItems.append("CRJELLY-BID");
     comboxItems.append("BX-BID");
     comboxItems.append("F2F-BID");
-    comboxItems.append("BS1221");
-    comboxItems.append("BS1331");
+    comboxItems.append("BS1221-BID");
+    comboxItems.append("BS1331-BID");
 
     for (const QString& item : comboxItems) {
         if (!ExFilterPF.contains(item)) {  // Add only if it is NOT in ExFilterPF
@@ -254,7 +254,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
 //        ui->comboBox_AlgoType->addItem("CRJELLY-BID");
 //        ui->comboBox_AlgoType->addItem("BX-BID");
 //        ui->comboBox_AlgoType->addItem("F2F-BID");
-      //  ui->comboBox_AlgoType->addItem("BS1221");
+      //  ui->comboBox_AlgoType->addItem("BS1221-BID");
         ui->comboBox_AlgoType->setStyleSheet(
             "QComboBox {"
             "    font-weight: bold;"
@@ -580,8 +580,10 @@ void ConvertAlgo_Win::resetTableWidget() {
         headers = {"Algo Name", "Strike/Expiry1", "Strike/Expiry2", "Strike/Expiry3", "Status"};
     } else if (algoType == "BX-BID") {
         headers = {"Algo Name", "Expiry", "Strike1", "Strike2", "Strike3", "Strike4", "Status"};
-    } else if (algoType == "BS1221") {
-        headers = {"Algo Name", "Expiry", "Strike1", "Strike2", "Strike3", "Strike4", "Reserved", "Reserved", "Status"};
+    } else if (algoType == "BS1221-BID") {
+        headers = {"Algo Name", "Expiry", "Strike1", "Strike2", "Strike3", "Strike4", "Status"};
+    }else if (algoType == "BS1331-BID") {
+        headers = {"Algo Name", "Expiry", "Strike1", "Strike2", "Strike3", "Strike4", "Status"};
     }
 
     ui->tableWidget->clear();
@@ -666,7 +668,10 @@ void ConvertAlgo_Win::on_pushButtonAdd_clicked()
     else if(algo_type=="BX-BID"){
         algoBoxBid->generateAlgo();
     }
-    else if(algo_type=="BS1221"){
+    else if(algo_type=="BS1221-BID"){
+        algoBS_1221_1331->generateAlgo();
+    }
+    else if(algo_type=="BS1331-BID"){
         algoBS_1221_1331->generateAlgo();
     }
 //    if(algo_type=="BOX"){
@@ -730,9 +735,13 @@ void ConvertAlgo_Win::on_comboBox_AlgoType_currentTextChanged(const QString algo
         ui->stackedWidget->setCurrentWidget(ui->pagBoxBid);
         algoBoxBid->selectedAction();
     }
-    else if(algoType=="BS1221"){
+    else if(algoType=="BS1221-BID"){
         ui->stackedWidget->setCurrentWidget(ui->pagBS1221_1331);
-        algoBS_1221_1331->selectedAction();
+        algoBS_1221_1331->selectedAction(PortfolioType::BS1221);
+    }
+    else if(algoType=="BS1331-BID"){
+        ui->stackedWidget->setCurrentWidget(ui->pagBS1221_1331);
+        algoBS_1221_1331->selectedAction(PortfolioType::BS1331);
     }
 //    else if(algoType=="2L Straddle"){
 
@@ -848,7 +857,9 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                 else if(algo_type==QString::number(PortfolioType::BX_BID))
                     algo_type="BX-BID";
                 else if(algo_type==QString::number(PortfolioType::BS1221))
-                    algo_type="BS1221";
+                    algo_type="BS1221-BID";
+                else if(algo_type==QString::number(PortfolioType::BS1331))
+                    algo_type="BS1331-BID";
 
 
 

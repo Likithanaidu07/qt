@@ -184,6 +184,8 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                     userLoginInfo.algoFilterMap[PortfolioType::BX_BID] =  OPT_Instruments;//(BOX_BIDInFilter.isNull() || BOX_BIDInFilter.trimmed().isEmpty())  ? InstrumentTypeAll  : BOX_BIDInFilter.split(",");
 
                     userLoginInfo.algoFilterMap[PortfolioType::BS1221] =  OPT_Instruments;
+                    userLoginInfo.algoFilterMap[PortfolioType::BS1331] =  OPT_Instruments;
+
                     userLoginInfo.algoFilterMap[InstrumentType::FUT_INSTRUMENT] =  FUT_Instruments;
 
 
@@ -2531,8 +2533,8 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                               " and Leg3TokenNo="+data.Leg3_token_number+
                               " and Leg4TokenNo="+data.Leg4_token_number;
 
-                    //BX1221
-                    else if(data.algo_type==QString::number(PortfolioType::BS1221))
+                    //BS1221 or BS1331
+                    else if(data.algo_type==QString::number(PortfolioType::BS1221)||data.algo_type==QString::number(PortfolioType::BS1331))
                         str = "select  TraderID from Portfolios where TraderID="+data.user_id+
                               " and PortfolioType="+ data.algo_type+
                               " and Leg1TokenNo="+data.Leg1_token_number+
@@ -2833,7 +2835,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                             }
 
                             //BX1221l
-                            else if(data.algo_type==QString::number(PortfolioType::BS1221)){
+                            else if(data.algo_type==QString::number(PortfolioType::BS1221)||data.algo_type==QString::number(PortfolioType::BS1331)){
                                 query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
                                               "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo,Leg4TokenNo"
                                               ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"

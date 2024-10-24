@@ -2571,15 +2571,7 @@ void MainWindow::on_close_clicked()
 
     //loggedOut();
     //portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser;
-    saveTableViewColumnState(T_Portfolio_Table);
-    saveTableViewColumnState(trade_table);
-    saveTableViewColumnState(net_pos_table);
-    saveTableViewColumnState(liners_table);
-    saveTableViewColumnState(combined_tracker_table);
-    saveTableViewColumnState(missed_trade_table);
 
-
-    stopBG_Threads();
     close();
 }
 
@@ -3572,6 +3564,17 @@ void MainWindow::closeEvent(QCloseEvent* event)
 {
     // Delete dock manager here to delete all floating widgets. This ensures
     // that all top level windows of the dock manager are properly closed
+
+    saveTableViewColumnState(T_Portfolio_Table);
+    saveTableViewColumnState(trade_table);
+    saveTableViewColumnState(net_pos_table);
+    saveTableViewColumnState(liners_table);
+    saveTableViewColumnState(combined_tracker_table);
+    saveTableViewColumnState(missed_trade_table);
+
+
+    stopBG_Threads();
+
     saveDockManagerState();
 
     DockManagerMainPanel->deleteLater();

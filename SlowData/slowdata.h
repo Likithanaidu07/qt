@@ -14,6 +14,8 @@ public:
     void startSlowDataSocket();
     QHash<QString, MBP_Data_Struct> getMBP_Data_Hash();
     void setLeg_n_token(QStringList);
+    void addLeg_n_token(QString);
+
 private:
     SlowDataSocket *slowData_socket;
     static QMutex mutex;

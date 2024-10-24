@@ -7,6 +7,8 @@
 #include "Convert_to_Algo/eventfilterlistview.h"
 #include "custom_q_completer.h"
 #include "mysql_conn.h"
+#include "SlowData/slowdata.h"
+
 
 namespace Ui {
 class F1_F2_BuySell;
@@ -51,6 +53,7 @@ private:
     QStandardItemModel *model_stock_name;
     double devicer;
     double decimal_precision;
+    SlowData slowData;
 
 };
 

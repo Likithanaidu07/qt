@@ -6,7 +6,6 @@
 #include <QtConcurrent/QtConcurrent>
 #include <QProgressDialog>
 #include "QMessageBox"
-
 F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_precision) :
     QDialog(parent),
     ui(new Ui::F1_F2_BuySell),
@@ -110,8 +109,8 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
 
 
     QFuture<void> future = QtConcurrent::run([=]() {
-    //QElapsedTimer timer1;
-    //timer1.start();
+    QElapsedTimer timer1;
+    timer1.start();
         QStringList CR_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::CR);
         for(int i=0;i<CR_Tokens.length();i++){
 
@@ -151,13 +150,14 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
         QMetaObject::invokeMethod(ui->spinBoxLot, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, true));
         QMetaObject::invokeMethod(ui->pushButtonSubmit, "setEnabled", Qt::QueuedConnection, Q_ARG(bool, true));
 
-        //qDebug() << "itemF1_F2  Time:" << timer1.elapsed() << "milliseconds";
+        qDebug() << "F1_F2 model creation took  Time:" << timer1.elapsed() << "milliseconds";
 
         // Close the progress dialog once done
     });
 
 
     // initlaize marker rate table view
+
     QStandardItemModel *model = new QStandardItemModel(this);
     ui->tableViewMarkerRate->setModel(model);
 
@@ -231,10 +231,19 @@ void F1_F2_BuySell::itemSelectedStockName(QModelIndex index)
     token_number ="";
     if(index.isValid())
     {
+
+        QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tableViewMarkerRate->model());
+        model->removeRows(0, model->rowCount());
+        ui->label_lastTradedPrice->clear();
+
+
         updateLTPOnPriceInput = true;
         QVariant dData = index.data(Qt::DisplayRole);
         QVariant data = index.data( Qt::UserRole + 1);
         token_number = data.toString();
+
+        slowData.addLeg_n_token(token_number);
+
         ui->lineEdit_Stockname->setText(index.data(Qt::DisplayRole).toString());
         contract_table c = ContractDetail::getInstance().GetDetail(token_number.toInt());
         ui->doubleSpinBox_price->setMinimum(c.OperatingRangeslowPriceRange/devicer);
