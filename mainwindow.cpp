@@ -364,8 +364,10 @@ MainWindow::MainWindow(QWidget *parent)
             connect(button4, SIGNAL(clicked()), this, SLOT(sorting_Button_clicked()));
 
             QToolButton* button5 = new QToolButton();
+            button5->setText("Refresh");
             //button5->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            button5->setToolTip("Portfolio Colour");
+            button5->setToolTip("Refresh");
+            connect(button5, SIGNAL(clicked()), this, SLOT(refresh_Button_clicked()));
 
             QToolButton* button6 = new QToolButton();
           //  button6->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -458,6 +460,7 @@ MainWindow::MainWindow(QWidget *parent)
                 internalLayout->addWidget(button3);
                 internalLayout->addWidget(button6);
                 internalLayout->addWidget(button4);
+                 internalLayout->addWidget(button5);
                  internalLayout->addSpacerItem(spc);
                 //internalLayout->addWidget(button5);
                 //internalLayout->addWidget(line_edit_trade_search);
@@ -701,8 +704,12 @@ MainWindow::MainWindow(QWidget *parent)
     for (int col = 0; col < Trade_columnCount; ++col) {
         trade_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
     }
-    // Then, allow user  to resize the columns
-    trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+
+    // Allow users to manually resize the columns after setting them to fit contents
+    trade_table->horizontalHeader()->setSectionsMovable(true);
+    trade_table->horizontalHeader()->setStretchLastSection(true);
+
+  //  trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 
 
 
@@ -1617,8 +1624,6 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 val=val*lotSize;
                 double vfq = P->VolumeFreezeQty;//T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
 
-
-
                 if(val > vfq){
                     QMessageBox msgBox;
                     msgBox.setText("Cannot update OrderQuantity");
@@ -1779,6 +1784,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 }
                 }
                 break;
+
+
 
 
                     case PortfolioData_Idx::_BuyPriceDifference:{
@@ -2061,9 +2068,30 @@ void MainWindow::loadDataAndUpdateTable(int table){
 //        OutputDebugStringA("Test1 \n");
         //QHash<QString, PortFolioData_Less> PortFolioHash = T_Portfolio_Model->getPortFolioDataLess();
      //   QStringList TradeTableHighlight_ExcludeList = trade_model->getTradeTableHighlight_ExcludeList();
-        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash/*,TradeTableHighlight_ExcludeList*/);
+        QStringList algosToDisable; //class variable
+        QStringList algosExludeListFromJackpotDisable; //class varible
+
+        QStringList enabledPortfolios;// this will be locat variable
+
+
+        algosToDisable.clear();
+        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,algosToDisable/*,TradeTableHighlight_ExcludeList*/);
         emit data_loded_signal(T_Table::TRADE);
         updateSummaryLabels();
+
+        //check algosToDisable included in algosExludeListFromJackpotDisable, if so remove
+        //check algosToDisable included in enabledPortfolios, then use it, if not include remove from algosToDisable
+        if(algosToDisable.length()>0){
+          // Create a comma-separated string from the QStringList
+          QString portfolioNumberStr = algosToDisable.join(", ");
+
+          // Construct the SQL query
+          QString Query = QString("UPDATE Portfolios SET Status='DisabledByUser' WHERE PortfolioNumber IN (%1)").arg(portfolioNumberStr);
+
+          QString msg;
+          bool success = db_conn->updateDB_Table(Query, msg);
+        }
+
         break;
     }
    /* case T_Table::Liners:{
@@ -2318,6 +2346,14 @@ void MainWindow::updatePortFolioStatus(QModelIndex index) {
                 QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
                 QByteArray msg = backend_comm->createPacket(command, data);
                 backend_comm->insertData(msg);
+
+
+
+                //check the PortfolioNumber numebr exist in algostoDiable, if exist theren writerto the file.
+                //write to the file
+                //add the algosExlude
+
+
             }
     } else {
             // Deactivate portfolio in UI and update the database
@@ -2571,7 +2607,15 @@ void MainWindow::on_close_clicked()
 
     //loggedOut();
     //portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser;
+    saveTableViewColumnState(T_Portfolio_Table);
+    saveTableViewColumnState(trade_table);
+    saveTableViewColumnState(net_pos_table);
+    saveTableViewColumnState(liners_table);
+    saveTableViewColumnState(combined_tracker_table);
+    saveTableViewColumnState(missed_trade_table);
 
+
+    stopBG_Threads();
     close();
 }
 
@@ -2726,6 +2770,10 @@ void MainWindow::stopall_Button_clicked()
             start_dataLoadingThread();
 
         }
+}
+
+void MainWindow::refresh_Button_clicked(){
+  start_dataLoadingThread();
 }
 
 
@@ -3564,17 +3612,6 @@ void MainWindow::closeEvent(QCloseEvent* event)
 {
     // Delete dock manager here to delete all floating widgets. This ensures
     // that all top level windows of the dock manager are properly closed
-
-    saveTableViewColumnState(T_Portfolio_Table);
-    saveTableViewColumnState(trade_table);
-    saveTableViewColumnState(net_pos_table);
-    saveTableViewColumnState(liners_table);
-    saveTableViewColumnState(combined_tracker_table);
-    saveTableViewColumnState(missed_trade_table);
-
-
-    stopBG_Threads();
-
     saveDockManagerState();
 
     DockManagerMainPanel->deleteLater();
