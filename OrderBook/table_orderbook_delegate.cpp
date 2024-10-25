@@ -97,11 +97,48 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
 
         QString buy_sell = order_list[OrderBook_Idx::BuyorSell_OB];
 
+        if (c == OrderBook_Idx::Jackpot_OB) {
+            QString jackpotStr = order_list[OrderBook_Idx::Jackpot_OB];
+            QString userPriceStr = order_list[OrderBook_Idx::UserPrice_OB];  // Variable for user price
+            bool okJackpot, okUserPrice;
+
+            double jackpotValue = jackpotStr.toDouble(&okJackpot);  // Convert jackpot QString to double
+            double userPriceValue = userPriceStr.toDouble(&okUserPrice);  // Convert user price QString to double
+
+            // Check if both conversions were successful
+            if (okJackpot && okUserPrice) {
+                // Check if jackpot value is less than 20% of user price
+                if (jackpotValue < (userPriceValue * 0.2)) {
+                    QColor lightReddishPink("#FF9A9A");  // Light reddish pink color
+                    op.palette.setColor(QPalette::Highlight, Qt::transparent);
+                    op.palette.setColor(QPalette::HighlightedText, Qt::black);
+                    painter->fillRect(option.rect, lightReddishPink);
+
+                    // Set text color and print the jackpot value inside the cell
+                    painter->setPen(Qt::black);  // Set the text color to black
+                    painter->drawText(option.rect, Qt::AlignCenter, jackpotStr);  // Draw the value centered in the cell
+
+                    double borderWidth = 0.5;
+                    QColor myColor(108, 117, 125);
+                    QPen pen(myColor);
+                    pen.setWidthF(borderWidth);
+                    painter->setPen(pen);
+                    painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
+
+                    // Optionally return early if no further drawing is needed
+                    return;
+                }
+            }
+        }
+
+
+
+        // Default blue color for Buy/Sell highlight
         QColor color("#42A5F5");
         op.palette.setColor(QPalette::Highlight, color);
 
         if (buy_sell == "Sell") {
-            QColor color("#FED9D9");
+            QColor color("#FED9D9");  // Light red for Sell
             op.palette.setColor(QPalette::Highlight, Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText, Qt::black);
             painter->fillRect(option.rect, color);
@@ -118,7 +155,7 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
             painter->drawLine(p1, p2);
         }
         else if (buy_sell == "Buy") {
-            QColor color("#D6FCF0");
+            QColor color("#D6FCF0");  // Light green for Buy
             op.palette.setColor(QPalette::Highlight, Qt::transparent);
             op.palette.setColor(QPalette::HighlightedText, Qt::black);
             painter->fillRect(option.rect, color);
@@ -130,8 +167,9 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
             painter->setPen(pen);
             painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
         }
+    }
 
-    } else if (c == OrderBook_Idx::OrderId_OB ||
+     else if (c == OrderBook_Idx::OrderId_OB ||
                c == OrderBook_Idx::AlgoName_OB ||
                c == OrderBook_Idx::AlgoNo_OB ||
                c == OrderBook_Idx::Leg1State_OB ||
@@ -157,8 +195,7 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
         else if (Leg1_OrderState == "13" || Leg3_OrderState == "13" || Leg4_OrderState == "13" || Leg2_OrderState == "13") {
             bgColor = QColor(215, 207, 232);  // Light purple background color
         }
-
-        // Set the background color
+       // Set the background color
         painter->fillRect(option.rect, bgColor);
 
         // Set the text color and draw the text

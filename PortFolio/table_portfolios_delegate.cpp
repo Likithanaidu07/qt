@@ -451,36 +451,24 @@ QSize Table_Portfolios_Delegate::sizeHint(const QStyleOptionViewItem &option, co
 {
     // Get the text from the model
     QString text = index.data(Qt::DisplayRole).toString();
-
     // Calculate the size needed for the cell based on the content
     QFontMetrics fm(option.font);
     QSize size = fm.size(0, text);
-
     // Optionally, add some padding
     size += QSize(10, 10);
-
     return size;
 }
-
-
-
 void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const
 {
-
-
     QStyleOptionViewItem op(option);
-
     const Portfolio_SearchFilterProxyModel *proxyModel = qobject_cast<const Portfolio_SearchFilterProxyModel*>(index.model());
     QModelIndex mappedIndex = proxyModel->mapToSource(index);
     const Table_Portfolios_Model *portfolioModel = qobject_cast<const Table_Portfolios_Model*>(proxyModel->sourceModel());
     PortfolioObject *portfolio = portfolioModel->getPortFolioAt(mappedIndex.row());
-
     auto c= mappedIndex.column();
-
     if (!portfolio) {
         return;
     }
-
     QColor textColor(108, 117, 125);
     QPen pen(textColor);
 
@@ -543,11 +531,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->drawPixmap(imageRect, imagePixmap);
 
         }
-
-        //
-
-
-    }
+        }
 
     else if (c==PortfolioData_Idx::_PortfolioNumber || c==PortfolioData_Idx::_AlgoName)
     {

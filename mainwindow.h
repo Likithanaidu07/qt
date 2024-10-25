@@ -294,6 +294,7 @@ public slots:
     void slotHideProgressBar();
     void startall_Button_clicked();
     void stopall_Button_clicked();
+    void refresh_Button_clicked();
     void updateSummaryLabels();
     void showMessageSlot(QString);
     void sorting_Button_clicked();

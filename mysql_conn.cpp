@@ -1116,7 +1116,7 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
     return tradeData;
 
 }
-void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_table, Order_F1_F2_Model *f1f2_order_table_model,Liners_Model *liners_model ,QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash/*,QStringList TradeTableHilightExcludeList*/)
+void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_table, Order_F1_F2_Model *f1f2_order_table_model,Liners_Model *liners_model ,QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash,QStringList &algosToDisable)
 {
     QMutexLocker lock(&mutex);
 
@@ -1217,8 +1217,6 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 int leg2_token_number = query.value(rec.indexOf("Leg2_Tok_No")).toInt();
                 int leg3_token_number = query.value(rec.indexOf("Leg3_Tok_No")).toInt();
                 int leg4_token_number = query.value(rec.indexOf("Leg4_Tok_No")).toInt();
-
-
 
                 QString Algo_Name = "";
                 QString Expiry = "";
@@ -1535,6 +1533,11 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 double userPriceVal = query.value(rec.indexOf("DesiredRate")).toDouble() / devicer;
                 double JackpotVal =(Exch_Price_val-userPriceVal);
                 QString Jackpot = QString::number(JackpotVal,'f',decimal_precision);
+
+                if(JackpotVal<userPriceVal*0.2){
+                    algosToDisable.append(Algo_ID);
+                    algosToDisable.append(Algo_ID);
+                }
  //               QString BidLeg = ContractDetail::getInstance().GetStockName(leg2_token_number,portfolio_type)+ " "+"["+(QString::number(Leg2_Total_Volume/lotSize))+"]";
                 //int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
 
