@@ -10,6 +10,7 @@
 #include "QMessageBox"
 #include "QDateTime"
 #include "eventfilterlistview.h"
+#include "custom_q_completer.h"
 
     class convert_to_algo_bs1221_1331 : public QObject
     {
@@ -59,6 +60,7 @@
         EventFilter *eventFilterStart;
         EventFilter *eventFilterEnd;
         PortfolioType Portfolio_Type;
+        CustomSearchWidget *endstrikeCustomWidget;
     };
 
 

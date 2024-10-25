@@ -178,7 +178,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
             obj.QuantityRatio="1:2:2:1";
         }
         else if(obj.PortfolioType==QString::number(PortfolioType::BS1331)){
-            obj.QuantityRatio="1:2:2:1";
+            obj.QuantityRatio="1:3:3:1";
         }
         else{
             obj.QuantityRatio="N/A";
@@ -566,7 +566,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         obj.BuyRemainingQuantity = totalQty - obj.BuyTradedQuantity;
         CalculatePriceDifference(obj,MBP_Data_Hash,devicer_,decimal_precision_);
         CalculateAveragePrice(obj,averagePriceList,devicer_,decimal_precision_);
-        obj.AlgoName = get_Algo_Name(obj.PortfolioTypeEnum,obj.Leg1TokenNo,obj.Leg2TokenNo,obj.Leg3TokenNo,devicer_,decimal_precision_,obj.AlgoNameForSorting);
+        obj.AlgoName = get_Algo_Name(obj.PortfolioTypeEnum,obj.Leg1TokenNo,obj.Leg2TokenNo,obj.Leg3TokenNo,obj.Leg4TokenNo,devicer_,decimal_precision_,obj.AlgoNameForSorting);
 
         //obj.AlgoName = obj.AlgoNameForSorting;// this should remove
         return true;
@@ -654,7 +654,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
 
         return false;
     }*/
-QString PortfolioParser::get_Algo_Name(PortfolioType algo_type,int leg1_token_number,int leg2_token_number,int leg3_token_number,double devicer,int decimal_precision,QString &Algo_Name_For_Sorting){
+QString PortfolioParser::get_Algo_Name(PortfolioType algo_type,int leg1_token_number,int leg2_token_number,int leg3_token_number,int leg4_token_number,double devicer,int decimal_precision,QString &Algo_Name_For_Sorting){
     QString Algo_Name="-";
     if(algo_type==PortfolioType::F2F){
         Algo_Name = "F2F-";//-Nifty";
@@ -726,16 +726,32 @@ QString PortfolioParser::get_Algo_Name(PortfolioType algo_type,int leg1_token_nu
         Algo_Name_For_Sorting = "BX-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff);
     }
     else if(algo_type==PortfolioType::BS1221 ){
-        Algo_Name = "BX1221-";//Nifty-18000-CE-200";
-        double diff = (ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
-        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff);
-        Algo_Name_For_Sorting = "BX1221-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff);
+        Algo_Name = "BS12-";//Nifty-18000-CE-200";
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+
+                ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+
+                ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+
+                ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type) +"-"+
+                ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
+
+        Algo_Name_For_Sorting = "BS12-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+
+                ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+
+                ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+
+                ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type) +"-"+
+                ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
     }
     else if(algo_type==PortfolioType::BS1331 ){
-        Algo_Name = "BX1221-";//Nifty-18000-CE-200";
-        double diff = (ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
-        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff);
-        Algo_Name_For_Sorting = "BX1221-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff);
+        Algo_Name = "BS13-";//Nifty-18000-CE-200";
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+
+                ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+
+                ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+
+                ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type) +"-"+
+                ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
+
+        Algo_Name_For_Sorting = "BS13-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+
+                ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+
+                ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+
+                ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type) +"-"+
+                ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
     }
 
 

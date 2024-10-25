@@ -16,7 +16,7 @@ class PortfolioParser
 public:
 
     bool ToObject(QSqlQuery &query, PortfolioObject &obj, QHash<QString, MBP_Data_Struct> MBP_Data_Hash, QHash<QString, PortfolioAvgPrice> averagePriceList, double devicer_, int decimal_precision_);
-    QString get_Algo_Name(PortfolioType algo_type, int leg1_token_number, int leg2_token_number, int leg3_token_number, double devicer, int decimal_precision,QString &Algo_Name_For_Sorting);
+    QString get_Algo_Name(PortfolioType algo_type, int leg1_token_number, int leg2_token_number, int leg3_token_number,int leg4_token_number, double devicer, int decimal_precision,QString &Algo_Name_For_Sorting);
     QString fixDecimal(double num, int decimal_precision);
     void CalculateAveragePrice(PortfolioObject &portfolio, QHash<QString, PortfolioAvgPrice> averagePriceList, double devicer, int decimal_precision);
     void CalculatePriceDifference(PortfolioObject &portfolio, QHash<QString, MBP_Data_Struct> MBP_Data_Hash, double devicer, int decimal_precision);

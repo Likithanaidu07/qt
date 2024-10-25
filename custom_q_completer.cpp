@@ -5,7 +5,6 @@ const int custom_q_completer::CompleteRole = Qt::UserRole + 1;
 custom_q_completer::custom_q_completer(QObject *parent)
     : QCompleter{parent}
 {
-
 }
 
 
@@ -24,6 +23,8 @@ CustomSearchWidget::CustomSearchWidget(QListView *customListView, QStandardItemM
     : QWidget(parent), listView(customListView), model(_model),debounceTimer(new QTimer(this))
 {
     currentText = "";
+    sortAscendingOrder = true;
+
   //  id= QDateTime::currentDateTime().toString("hh:mm:ss");
     // Fill the completionData with initial data
     QStringList completionData;
@@ -110,7 +111,10 @@ void CustomSearchWidget::do_filterItems(const QString &text) {
     proxyModel->setSortRole(ConvertAlog_Model_Roles::CustomSortingDataRole); // Sort by custom date roleCompositeKeyRole
     // Sort after setting the filter
    // proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive); // Optional: set case sensitivity
-    proxyModel->sort(0, Qt::AscendingOrder); // Sort by column 0 (adjust column index as needed) in ascending order
+    if(sortAscendingOrder)
+        proxyModel->sort(0, Qt::AscendingOrder); // Sort by column 0 (adjust column index as needed) in ascending order
+    else
+        proxyModel->sort(0, Qt::DescendingOrder); // Sort by column 0 (adjust column index as needed) in Descending order
 
     // Show or hide the list view based on the filter result
     if (proxyModel->rowCount() > 0) {
@@ -135,7 +139,10 @@ void CustomSearchWidget::do_filterItems(const QString &text) {
    // proxyModel->setSortRole(Qt::UserRole + 2); // Sort by custom date role
     // Sort after setting the filter
     //proxyModel->setSortCaseSensitivity(Qt::CaseInsensitive); // Optional: set case sensitivity
-    proxyModel->sort(0, Qt::AscendingOrder); // Sort by column 0 (adjust column index as needed) in ascending order
+    if(sortAscendingOrder)
+        proxyModel->sort(0, Qt::AscendingOrder); // Sort by column 0 (adjust column index as needed) in ascending order
+    else
+         proxyModel->sort(0, Qt::DescendingOrder); // Sort by column 0 (adjust column index as needed) in Descending order
 
     // Show or hide the list view based on the filter result
     if (proxyModel->rowCount() > 0) {

@@ -94,6 +94,7 @@ public:
 
     CustomSearchWidget(QListView *customListView, QStandardItemModel *_model, QWidget *parent = nullptr);
     QString name;
+    bool sortAscendingOrder;
 
 public slots:
 
@@ -124,7 +125,6 @@ public:
     static const int CompleteRole;
     QString get_foo_token_number_for_selected(const QModelIndex &index) const;
     virtual QString pathFromIndex(const QModelIndex &index) const;
-
 
 signals:
 

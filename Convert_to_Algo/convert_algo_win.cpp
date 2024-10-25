@@ -228,8 +228,8 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
     comboxItems.append("CRJELLY-BID");
     comboxItems.append("BX-BID");
     comboxItems.append("F2F-BID");
-    comboxItems.append("BS1221-BID");
-    comboxItems.append("BS1331-BID");
+    comboxItems.append("BS12-BID");
+    comboxItems.append("BS13-BID");
 
     for (const QString& item : comboxItems) {
         if (!ExFilterPF.contains(item)) {  // Add only if it is NOT in ExFilterPF
@@ -254,7 +254,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
 //        ui->comboBox_AlgoType->addItem("CRJELLY-BID");
 //        ui->comboBox_AlgoType->addItem("BX-BID");
 //        ui->comboBox_AlgoType->addItem("F2F-BID");
-      //  ui->comboBox_AlgoType->addItem("BS1221-BID");
+      //  ui->comboBox_AlgoType->addItem("BS12-BID");
         ui->comboBox_AlgoType->setStyleSheet(
             "QComboBox {"
             "    font-weight: bold;"
@@ -580,9 +580,9 @@ void ConvertAlgo_Win::resetTableWidget() {
         headers = {"Algo Name", "Strike/Expiry1", "Strike/Expiry2", "Strike/Expiry3", "Status"};
     } else if (algoType == "BX-BID") {
         headers = {"Algo Name", "Expiry", "Strike1", "Strike2", "Strike3", "Strike4", "Status"};
-    } else if (algoType == "BS1221-BID") {
+    } else if (algoType == "BS12-BID") {
         headers = {"Algo Name", "Expiry", "Strike1", "Strike2", "Strike3", "Strike4", "Status"};
-    }else if (algoType == "BS1331-BID") {
+    }else if (algoType == "BS13-BID") {
         headers = {"Algo Name", "Expiry", "Strike1", "Strike2", "Strike3", "Strike4", "Status"};
     }
 
@@ -668,10 +668,10 @@ void ConvertAlgo_Win::on_pushButtonAdd_clicked()
     else if(algo_type=="BX-BID"){
         algoBoxBid->generateAlgo();
     }
-    else if(algo_type=="BS1221-BID"){
+    else if(algo_type=="BS12-BID"){
         algoBS_1221_1331->generateAlgo();
     }
-    else if(algo_type=="BS1331-BID"){
+    else if(algo_type=="BS13-BID"){
         algoBS_1221_1331->generateAlgo();
     }
 //    if(algo_type=="BOX"){
@@ -735,11 +735,11 @@ void ConvertAlgo_Win::on_comboBox_AlgoType_currentTextChanged(const QString algo
         ui->stackedWidget->setCurrentWidget(ui->pagBoxBid);
         algoBoxBid->selectedAction();
     }
-    else if(algoType=="BS1221-BID"){
+    else if(algoType=="BS12-BID"){
         ui->stackedWidget->setCurrentWidget(ui->pagBS1221_1331);
         algoBS_1221_1331->selectedAction(PortfolioType::BS1221);
     }
-    else if(algoType=="BS1331-BID"){
+    else if(algoType=="BS13-BID"){
         ui->stackedWidget->setCurrentWidget(ui->pagBS1221_1331);
         algoBS_1221_1331->selectedAction(PortfolioType::BS1331);
     }
@@ -857,9 +857,9 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                 else if(algo_type==QString::number(PortfolioType::BX_BID))
                     algo_type="BX-BID";
                 else if(algo_type==QString::number(PortfolioType::BS1221))
-                    algo_type="BS1221-BID";
+                    algo_type="BS12-BID";
                 else if(algo_type==QString::number(PortfolioType::BS1331))
-                    algo_type="BS1331-BID";
+                    algo_type="BS13-BID";
 
 
 
@@ -944,7 +944,7 @@ void ConvertAlgo_Win::on_pushButtonDelete_clicked()
         QTableWidgetItem *item=ui->tableWidget->item(selected[i].row(),0);
         selectedIds.append(item->data(Qt::UserRole + 1).toInt());
         selectedrowsIDx.append(selected[i].row());
-        qDebug()<<item->data(Qt::UserRole + 1).toInt();
+       // qDebug()<<item->data(Qt::UserRole + 1).toInt();
 
     }
 

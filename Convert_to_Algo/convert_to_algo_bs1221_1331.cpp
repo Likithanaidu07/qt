@@ -1,6 +1,5 @@
 #include "convert_to_algo_bs1221_1331.h"
 
-#include "custom_q_completer.h"
 #include "contractdetail.h"
 #include "QElapsedTimer"
 #include <QFuture>
@@ -73,7 +72,7 @@ void convert_to_algo_bs1221_1331::copyUIElement(QDialog *parentWidget,QTableWidg
 
 
     // create qcompleter and fill with above model
-    CustomSearchWidget *endstrikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike);
+    endstrikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike);
     endstrikeCustomWidget->name = "endStrike";
     connect(lineEdit_EndStrike, SIGNAL(textEdited(QString)),endstrikeCustomWidget, SLOT(filterItems(QString)));
 
@@ -180,6 +179,15 @@ void convert_to_algo_bs1221_1331::createEndStrikeModelAndPopulateListView(){
     long long Expiry = sharedData->contract_table_hash[key].Expiry;
     float start_strike = sharedData->contract_table_hash[key].StrikePrice;
     QString OptionType = sharedData->contract_table_hash[key].OptionType;
+
+    if(OptionType=="CE"){
+        endstrikeCustomWidget->sortAscendingOrder = true;
+    }
+    else{
+        endstrikeCustomWidget->sortAscendingOrder = false;
+    }
+
+
 
 
     for(int i=0;i<BS1XX1_Tokens.length();i++) {
@@ -579,11 +587,17 @@ void convert_to_algo_bs1221_1331::generateAlgo()
 
     if(Start_Strike_Option_Type=="CE"){
         lowerStrikeLimit = startStrike;
-        upperStrikeLimit = endStrike+StrikeDifference*4;
+        if(Portfolio_Type == PortfolioType::BS1331)
+            upperStrikeLimit = endStrike+StrikeDifference*3;
+        else
+            upperStrikeLimit = endStrike+StrikeDifference*4;
     }
     else{
-        lowerStrikeLimit = endStrike-StrikeDifference*4;
-        upperStrikeLimit = startStrike+StrikeDifference*4;
+        if(Portfolio_Type == PortfolioType::BS1331)
+            lowerStrikeLimit = endStrike-StrikeDifference*3;
+        else
+            lowerStrikeLimit = endStrike-StrikeDifference*4;
+        upperStrikeLimit = startStrike;
     }
 
     for(int i=0;i<BS1XX1_Tokens.length();i++){
@@ -600,7 +614,11 @@ void convert_to_algo_bs1221_1331::generateAlgo()
             strikePriceListFiltered.append(c.StrikePrice);
         }
     }
-    std::sort(strikePriceListFiltered.begin(), strikePriceListFiltered.end());
+    if(Start_Strike_Option_Type=="CE")
+        std::sort(strikePriceListFiltered.begin(), strikePriceListFiltered.end());
+    else
+        std::sort(strikePriceListFiltered.begin(), strikePriceListFiltered.end(), std::greater<>());
+
 
     QList<QString> Leg1_token_number_list;
     QList<QString> Leg2_token_number_list;
@@ -609,6 +627,7 @@ void convert_to_algo_bs1221_1331::generateAlgo()
 
     QList<QString> Algo_Name_list;
 
+    //qDebug()<<strikePriceListFiltered;
     for(int i=0;i<strikePriceListFiltered.length();i++){
 
         int leg1Strike = 0;
@@ -660,17 +679,21 @@ void convert_to_algo_bs1221_1331::generateAlgo()
         QString key3 = QString::number(leg3Strike);
         QString key4 = QString::number(leg4Strike);
 
+      // qDebug()<<key1<<"  "<<key2<<"  "<<key3<<"  "<<key4;
+
         if(strikePrice_TokenFiltered.contains(key1)&&strikePrice_TokenFiltered.contains(key2)&&strikePrice_TokenFiltered.contains(key3)&&strikePrice_TokenFiltered.contains(key4)){
             Leg1_token_number_list.append(strikePrice_TokenFiltered[key1]);
             Leg2_token_number_list.append(strikePrice_TokenFiltered[key2]);
             Leg3_token_number_list.append(strikePrice_TokenFiltered[key3]);
             Leg4_token_number_list.append(strikePrice_TokenFiltered[key4]);
 
-            QString portfoliNameStr = "BS1221_BID";
+            QString portfoliNameStr = "BS12";
             if(Portfolio_Type==PortfolioType::BS1331)
-                portfoliNameStr = "BS1331_BID";
+                portfoliNameStr = "BS13";
 
-            QString Algo_Name = portfoliNameStr+"-" + Start_Strike_InstrumentName+"-"+dt.toString("ddMMM").toUpper()+"-"+QString::number(leg2Strike/sharedData->strike_price_devider,'f', sharedData->decimal_precision)+"-"+QString::number(StrikeDifference/sharedData->strike_price_devider,'f', sharedData->decimal_precision)+"-"+Start_Strike_Option_Type;
+            QString Algo_Name = portfoliNameStr+"-" + Start_Strike_InstrumentName+"-"+dt.toString("ddMMM").toUpper()+"-"+QString::number(leg2Strike/sharedData->strike_price_devider,'f',0)+"-"+QString::number(leg3Strike/sharedData->strike_price_devider,'f',0)+"-"+Start_Strike_Option_Type;
+
+
             Algo_Name_list.append(Algo_Name);
             if(Algo_Name_list.size()==sharedData->ROW_LIMIT){
                 QMessageBox msgBox;
