@@ -18,6 +18,7 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
     updateLTPOnPriceInput = false;
 
     this->setStyleSheet("#F1_F2_BuySell { background-color: #D6FCF0; }");
+    ui->tableviewBG->setStyleSheet("#tableviewBG { background-color: #FFFFFF; }");
     // Assuming 'ui->tableViewMarkerRate' is your QTableView
 
 
@@ -171,7 +172,7 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
     header->setSectionResizeMode(QHeaderView::Fixed);  // Disable resizing for all columns
     ui->tableViewMarkerRate->horizontalHeader()->setStyleSheet(
         "QHeaderView::section {"
-        "    background-color: #D6FCF0;"  // Transparent background
+        "    background-color: #FFFFFF;"  // Transparent background
         "    font-weight: bold;"              // Bold font
         "    border: none;"
         "}"
@@ -195,7 +196,7 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
        ui->tableViewMarkerRate->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
 
 
-       ui->tableViewMarkerRate->setStyleSheet("#tableViewMarkerRate { background: transparent; border: none; }");
+       ui->tableViewMarkerRate->setStyleSheet("#tableViewMarkerRate { background: #FFFFFF; border: none; }");
       // QPalette palette = ui->tableViewMarkerRate->palette();
        // Set custom colors for alternating rows
      //  palette.setColor(QPalette::Base, QColor(200, 200, 200));        // Normal row color (white)
@@ -423,7 +424,7 @@ void F1_F2_BuySell::on_comboBoxBuySell_currentTextChanged(const QString &arg1)
         this->setStyleSheet("#F1_F2_BuySell { background-color: #D6FCF0; }");
         ui->tableViewMarkerRate->horizontalHeader()->setStyleSheet(
             "QHeaderView::section {"
-            "    background-color: #D6FCF0;"  // Transparent background
+            "    background-color: #FFFFFF;"  // Transparent background
             "    font-weight: bold;"              // Bold font
             "    border: none;"
             "}"
@@ -436,7 +437,7 @@ void F1_F2_BuySell::on_comboBoxBuySell_currentTextChanged(const QString &arg1)
          this->setStyleSheet("#F1_F2_BuySell { background-color: #FED9D9; }");
          ui->tableViewMarkerRate->horizontalHeader()->setStyleSheet(
              "QHeaderView::section {"
-             "    background-color: #FED9D9;"  // Transparent background
+             "    background-color: #FFFFFF;"  // Transparent background
              "    font-weight: bold;"              // Bold font
              "    border: none;"                              // Remove header section borders
 
@@ -452,7 +453,7 @@ void F1_F2_BuySell::setBuyMode(bool buy_mode_){
         this->setStyleSheet("#F1_F2_BuySell { background-color: #D6FCF0; }");
         ui->tableViewMarkerRate->horizontalHeader()->setStyleSheet(
             "QHeaderView::section {"
-            "    background-color: #D6FCF0;"  // Transparent background
+            "    background-color: #FFFFFF;"  // Transparent background
             "    font-weight: bold;"              // Bold font
             "    border: none;"
             "}"
@@ -465,7 +466,7 @@ void F1_F2_BuySell::setBuyMode(bool buy_mode_){
         this->setStyleSheet("#F1_F2_BuySell { background-color: #FED9D9; }");
         ui->tableViewMarkerRate->horizontalHeader()->setStyleSheet(
             "QHeaderView::section {"
-            "    background-color: #FED9D9;"  // Transparent background
+            "    background-color: #FFFFFF;"  // Transparent background
             "    font-weight: bold;"              // Bold font
             "    border: none;"
             "}"
@@ -578,14 +579,20 @@ void F1_F2_BuySell::refreshMarketDataTable(){
                 // Buy - Set text alignment to right
                 QStandardItem *buyPriceItem = new QStandardItem(QString::number(d.recordBuffer[i].price.toDouble()/devicer,'f',2));
                 buyPriceItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                buyPriceItem->setForeground(QBrush(QColor("#819BDD")));
                 QStandardItem *buyQuantityItem = new QStandardItem(QString::number(d.recordBuffer[i].quantity.toDouble(),'f',0));
                 buyQuantityItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                buyQuantityItem->setForeground(QBrush(QColor("#819BDD")));
+
 
                 // Sell - Set text alignment to right
                 QStandardItem *sellPriceItem = new QStandardItem(QString::number(d.recordBuffer[i+5].price.toDouble()/devicer,'f',2));
                 sellPriceItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                sellPriceItem->setForeground(QBrush(QColor("#E77C5A")));
+
                 QStandardItem *sellQuantityItem = new QStandardItem(QString::number(d.recordBuffer[i+5].quantity.toDouble(),'f',0));
                 sellQuantityItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
+                sellQuantityItem->setForeground(QBrush(QColor("#E77C5A")));
 
                 // Append items to row
                 rowData.append(buyPriceItem);
