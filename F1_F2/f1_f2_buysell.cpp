@@ -111,11 +111,12 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
     QFuture<void> future = QtConcurrent::run([=]() {
     QElapsedTimer timer1;
     timer1.start();
-        QStringList CR_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::CR);
-        for(int i=0;i<CR_Tokens.length();i++){
+        QStringList F1_F2_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::F1_F2);
+        qDebug()<<"F1_F2_Tokens size: "<<F1_F2_Tokens.size();
+        for(int i=0;i<F1_F2_Tokens.length();i++){
 
             /**********Create model for F1_F2*************************/
-            contract_table contract = ContractDetail::getInstance().GetDetail(CR_Tokens[i].toInt());
+            contract_table contract = ContractDetail::getInstance().GetDetail(F1_F2_Tokens[i].toInt());
 
             unsigned int unix_time= contract.Expiry;
             QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
@@ -135,8 +136,10 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
             // Set the composite key as data for sorting
              QString compositeKey = contract.InstrumentName + "-" + dt.toString("yyyyMMdd");
             itemF1_F2->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
-            model_stock_name->appendRow(itemF1_F2);
-
+           // model_stock_name->appendRow(itemF1_F2);
+            QMetaObject::invokeMethod(this, [=]() {
+                model_stock_name->appendRow(itemF1_F2);
+            }, Qt::QueuedConnection);
 
 
             /********************************************************************/

@@ -179,12 +179,13 @@ void convert_to_algo_bs1221_1331::createEndStrikeModelAndPopulateListView(){
     QString Option_Type =sharedData->contract_table_hash[key].OptionType;
     long long Expiry = sharedData->contract_table_hash[key].Expiry;
     float start_strike = sharedData->contract_table_hash[key].StrikePrice;
+    QString OptionType = sharedData->contract_table_hash[key].OptionType;
 
 
     for(int i=0;i<BS1XX1_Tokens.length();i++) {
         contract_table tmp = sharedData->contract_table_hash[BS1XX1_Tokens[i]];
         float end_strike = tmp.StrikePrice;
-        if(Instr_Name=="CE"){
+        if(OptionType=="CE"){
             if(end_strike<start_strike){
                 //qDebug()<<"CE--"<<end_strike;
                 continue;
@@ -192,7 +193,7 @@ void convert_to_algo_bs1221_1331::createEndStrikeModelAndPopulateListView(){
 
         }
 
-        if(Instr_Name=="PE"){
+        if(OptionType=="PE"){
             if(end_strike>start_strike){
                // qDebug()<<"PE--"<<end_strike;
                 continue;
@@ -581,8 +582,8 @@ void convert_to_algo_bs1221_1331::generateAlgo()
         upperStrikeLimit = endStrike+StrikeDifference*4;
     }
     else{
-        lowerStrikeLimit = startStrike-StrikeDifference*4;
-        upperStrikeLimit = endStrike+StrikeDifference*4;
+        lowerStrikeLimit = endStrike-StrikeDifference*4;
+        upperStrikeLimit = startStrike+StrikeDifference*4;
     }
 
     for(int i=0;i<BS1XX1_Tokens.length();i++){

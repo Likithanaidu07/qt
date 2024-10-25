@@ -272,7 +272,7 @@ void BackendComm::readSocket()
            quint16 command;
            stream >> command;
 
-           qDebug() << "BackendComm::  Command received: " << command;
+           //qDebug() << "BackendComm::  Command received: " << command;
 
 
            switch (command) {
