@@ -697,22 +697,21 @@ MainWindow::MainWindow(QWidget *parent)
                                             "QHeaderView { background-color: #C0AAE5;color:#3D3D3D;} QHeaderView::section { background-color:#C0AAE5;color:#3D3D3D;font-weight: 400; }");*/
 
     trade_table->show();
+    // Restore the previous state of the table view if any
     restoreTableViewColumnState(trade_table);
-    int Trade_columnCount = trade_table->model()->columnCount();
 
-    // First, set the resize mode to fit the contents
+    int Trade_columnCount = trade_table->model()->columnCount();
     for (int col = 0; col < Trade_columnCount; ++col) {
         trade_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
     }
 
-    // Allow users to manually resize the columns after setting them to fit contents
     trade_table->horizontalHeader()->setSectionsMovable(true);
     trade_table->horizontalHeader()->setStretchLastSection(true);
 
-  //  trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-
-
-
+    // Now change the mode to allow interactive resizing
+    for (int col = 0; col < Trade_columnCount; ++col) {
+        trade_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Interactive);
+    }
 
     //connect this signal only after every table init completed, or else it will overwrite table state with defult setting before restore previous state
    // connect(headerViews, &QHeaderView::sectionResized, this, &MainWindow::onTradeTableHeader_Rearranged,Qt::UniqueConnection);
@@ -838,13 +837,19 @@ MainWindow::MainWindow(QWidget *parent)
     f1f2_order_table->show();
     restoreTableViewColumnState(f1f2_order_table);
     int f1f2_order_columnCount = f1f2_order_table->model()->columnCount();
-
-    // First, set the resize mode to fit the contents
     for (int col = 0; col < f1f2_order_columnCount; ++col) {
         f1f2_order_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
     }
-    // Then, allow user  to resize the columns
-    f1f2_order_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+
+    f1f2_order_table->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
+    f1f2_order_table->horizontalHeader()->setSectionsMovable(true);
+    f1f2_order_table->horizontalHeader()->setStretchLastSection(true);
+
+    // Delay setting to Interactive to ensure initial resize completes
+    for (int col = 0; col < f1f2_order_columnCount; ++col) {
+        f1f2_order_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Interactive);
+    }
+
 
     //connect this signal only after every table init completed, or else it will overwrite table state with defult setting before restore previous state
    // connect(f1f2_order_headerViews, &QHeaderView::sectionResized, this, &MainWindow::onTradeTableHeader_Rearranged,Qt::UniqueConnection);
