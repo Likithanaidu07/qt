@@ -1536,7 +1536,6 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
 
                 if(JackpotVal<userPriceVal*0.2){
                     algosToDisable.append(Algo_ID);
-                    algosToDisable.append(Algo_ID);
                 }
  //               QString BidLeg = ContractDetail::getInstance().GetStockName(leg2_token_number,portfolio_type)+ " "+"["+(QString::number(Leg2_Total_Volume/lotSize))+"]";
                 //int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);

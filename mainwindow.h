@@ -123,7 +123,7 @@ private:
     QList<watch_data_card*> watchCardWidgetList;
     QTimer* TableRefreshTimer;
     QStringList summarydatList;
-
+    QTimer* Trade_TableRefreshTimer;
 
     loadingdatawindow *loadingDataWinodw;
     SortSettingPopUp *sortWin; // Add this line
@@ -178,6 +178,8 @@ private:
     void start_dataLoadingThread();
     void stop_dataLoadingThread();
     void refreshTables();
+    void refreshTradeTable();
+
     void loggedOut();
     void stopBG_Threads();
 

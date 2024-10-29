@@ -1179,9 +1179,9 @@ bool Table_Portfolios_Model::removeRowsByIndices(const QList<int> &portFolioIdxT
 }
 
 
-int Table_Portfolios_Model::getActivatedPortfolioCount() {
+QStringList Table_Portfolios_Model::getActivatedPortfolios() {
    QStringList portfolioNumbers;
-   int activatedCount = 0;
+  // int activatedCount = 0;
 #ifdef MUTEX_DEBUG_LOG
    qDebug()<<"Entering---getActivatedPortfolioCount";
 #endif
@@ -1191,12 +1191,13 @@ int Table_Portfolios_Model::getActivatedPortfolioCount() {
 #endif
    for(int i = 0; i < portfolio_data_list.size(); i++){
         if (portfolio_data_list[i]->Status) {
-            activatedCount++;
+             portfolioNumbers.append(QString::number(portfolio_data_list[i]->PortfolioNumber));
+            //activatedCount++;
         }
    }
 #ifdef MUTEX_DEBUG_LOG
    qDebug()<<"Exiting---getActivatedPortfolioCount";
 #endif
-   return activatedCount;
+   return portfolioNumbers;
 }
 

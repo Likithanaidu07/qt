@@ -579,20 +579,20 @@ void F1_F2_BuySell::refreshMarketDataTable(){
                 // Buy - Set text alignment to right
                 QStandardItem *buyPriceItem = new QStandardItem(QString::number(d.recordBuffer[i].price.toDouble()/devicer,'f',2));
                 buyPriceItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                buyPriceItem->setForeground(QBrush(QColor("#819BDD")));
+                buyPriceItem->setForeground(QBrush(QColor("#4184f3")));
                 QStandardItem *buyQuantityItem = new QStandardItem(QString::number(d.recordBuffer[i].quantity.toDouble(),'f',0));
                 buyQuantityItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                buyQuantityItem->setForeground(QBrush(QColor("#819BDD")));
+                buyQuantityItem->setForeground(QBrush(QColor("#4184f3")));
 
 
                 // Sell - Set text alignment to right
                 QStandardItem *sellPriceItem = new QStandardItem(QString::number(d.recordBuffer[i+5].price.toDouble()/devicer,'f',2));
                 sellPriceItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                sellPriceItem->setForeground(QBrush(QColor("#E77C5A")));
+                sellPriceItem->setForeground(QBrush(QColor("#ff5722 ")));
 
                 QStandardItem *sellQuantityItem = new QStandardItem(QString::number(d.recordBuffer[i+5].quantity.toDouble(),'f',0));
                 sellQuantityItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                sellQuantityItem->setForeground(QBrush(QColor("#E77C5A")));
+                sellQuantityItem->setForeground(QBrush(QColor("#ff5722 ")));
 
                 // Append items to row
                 rowData.append(buyPriceItem);

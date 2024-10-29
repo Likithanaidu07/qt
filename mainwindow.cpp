@@ -1300,6 +1300,12 @@ MainWindow::MainWindow(QWidget *parent)
     TableRefreshTimer->setSingleShot(true);  // Make it behave like singleShot
     connect(TableRefreshTimer, &QTimer::timeout, this, &MainWindow::start_dataLoadingThread);
 
+
+    Trade_TableRefreshTimer = new QTimer(this);
+    connect(Trade_TableRefreshTimer, &QTimer::timeout, this, [this]() {
+        QtConcurrent::run(&MainWindow::refreshTradeTable, this);
+    });
+
 }
 
 
@@ -1895,6 +1901,10 @@ void MainWindow::loadContract(){
 
         if(loggedInFlg.loadRelaxed()==1){
             start_dataLoadingThread();
+            QMetaObject::invokeMethod(this, [this]() {
+                Trade_TableRefreshTimer->start(1000); // Start the timer on the main thread
+            }, Qt::QueuedConnection);
+
         }
     };
     emit update_ui_signal(LOADED_MODEL);
@@ -1922,6 +1932,36 @@ void MainWindow::startTableRefreshTimer() {
     } else {
         qDebug() << "TableRefreshTimer is already running, skipping this call.";
     }
+}
+
+
+void MainWindow::refreshTradeTable(){
+    //qDebug()<<"refreshTradeTable thread.....";
+
+     int timeOut = 2000;
+
+    if(data_loading_thread_running.loadRelaxed()==1){
+        QMetaObject::invokeMethod(this, "startTableRefreshTimer", Qt::QueuedConnection);
+        qDebug()<<" data loading thread already running, skipping.....";
+        return;
+    }
+
+    ///check algos are deleting if so do not load.
+    if(deletingPortFolioFlg.loadRelaxed()==1){
+        QMetaObject::invokeMethod(this, "startTableRefreshTimer", Qt::QueuedConnection);
+        qDebug()<<" PortFolios delete is going in, table refresh will do in next "<<timeOut<<" ms.....";
+        return;
+    }
+
+   //QElapsedTimer timer;
+   // timer.start();
+
+    data_loading_thread_running.storeRelaxed(1);
+    loadDataAndUpdateTable(T_Table::TRADE);
+   // qDebug()<<"Exiting refreshTradeTable loading thread.....";
+    data_loading_thread_running.storeRelaxed(0);
+    //qDebug() << "refreshTradeTable took :" << timer.elapsed() << "milliseconds";
+
 }
 
 void MainWindow::refreshTables(){
@@ -2071,7 +2111,6 @@ void MainWindow::loadDataAndUpdateTable(int table){
         QStringList algosToDisable; //class variable
         QStringList algosExludeListFromJackpotDisable; //class varible
 
-        QStringList enabledPortfolios;// this will be locat variable
 
 
         algosToDisable.clear();
@@ -2080,17 +2119,33 @@ void MainWindow::loadDataAndUpdateTable(int table){
         updateSummaryLabels();
 
         //check algosToDisable included in algosExludeListFromJackpotDisable, if so remove
-        //check algosToDisable included in enabledPortfolios, then use it, if not include remove from algosToDisable
-        if(algosToDisable.length()>0){
+
+        QStringList enabledPortfolios = T_Portfolio_Model->getActivatedPortfolios();
+        // Remove items from algosToDisable that are not in enabledPortfolios( this check is for, no need to disable already disabled one)
+        for (auto it = algosToDisable.begin(); it != algosToDisable.end(); ) {
+            if (!enabledPortfolios.contains(*it)) {
+                it = algosToDisable.erase(it);  // Remove element and update iterator
+            } else {
+                ++it;  // Move to the next element
+            }
+        }
+
+        //Disable code for now
+        /*if(algosToDisable.length()>0){
           // Create a comma-separated string from the QStringList
           QString portfolioNumberStr = algosToDisable.join(", ");
 
           // Construct the SQL query
           QString Query = QString("UPDATE Portfolios SET Status='DisabledByUser' WHERE PortfolioNumber IN (%1)").arg(portfolioNumberStr);
-
           QString msg;
           bool success = db_conn->updateDB_Table(Query, msg);
-        }
+          if(success){
+              qDebug()<<QString("Jackpot is greater than 20%, disabled the follwing portfolios: (%1)").arg(portfolioNumberStr);
+          }
+          else{
+              qDebug()<<QString("Disable failed for portfolios (%1), Jackpot  greater than 20% check. Error: "+msg).arg(portfolioNumberStr);
+          }
+        }*/
 
         break;
     }
@@ -2319,13 +2374,13 @@ void MainWindow::updatePortFolioStatus(QModelIndex index) {
 
     if (status == portfolio_status::Filled || status == portfolio_status::DisabledByUser) {
             // Activate the portfolio if the active portfolio count is below the limit
-            int activatedCount = T_Portfolio_Model->getActivatedPortfolioCount();
-            if (activatedCount >= userData.MaxActiveCount) {
+            QStringList activatedPortFolios = T_Portfolio_Model->getActivatedPortfolios();
+            if (activatedPortFolios.size() >= userData.MaxActiveCount) {
                 QMessageBox msgBox;
                 msgBox.setText("Maximum Active Portfolio Limit Reached. Cannot activate more portfolios.");
                 msgBox.setIcon(QMessageBox::Warning);
                 msgBox.exec();
-                qDebug() << "updatePortFolioStatus: Maximum active portfolio limit reached.";
+                qDebug() << "updatePortFolioStatus: Maximum active portfolio limit reached, ActivatedPortFolios ="<<activatedPortFolios.size()<<", Limit="<<userData.MaxActiveCount;
                 portfolio_table_updating_db.storeRelaxed(0);
                 return;
             }
@@ -2440,6 +2495,9 @@ void MainWindow::stopBG_Threads(){
 }
 */
 void MainWindow::stopBG_Threads(){
+
+    Trade_TableRefreshTimer->stop();
+
     QElapsedTimer timer;
 
     // Measure stop_dataLoadingThread
@@ -2600,24 +2658,6 @@ void MainWindow::on_Templates_Button_clicked()
 //    ui->Templates_Close->setVisible(false);
 //}
 
-void MainWindow::on_close_clicked()
-{
-    db_conn->logToDB("Logged Out");
-
-
-    //loggedOut();
-    //portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser;
-    saveTableViewColumnState(T_Portfolio_Table);
-    saveTableViewColumnState(trade_table);
-    saveTableViewColumnState(net_pos_table);
-    saveTableViewColumnState(liners_table);
-    saveTableViewColumnState(combined_tracker_table);
-    saveTableViewColumnState(missed_trade_table);
-
-
-    stopBG_Threads();
-    close();
-}
 
 
 void MainWindow::on_minimize_clicked()
@@ -3605,6 +3645,16 @@ void MainWindow::F2_clicked_slot(){
 
 }
 
+void MainWindow::on_close_clicked()
+{
+    db_conn->logToDB("Logged Out");
+
+
+    //loggedOut();
+    //portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser;
+
+    close();
+}
 
 
 
@@ -3612,6 +3662,16 @@ void MainWindow::closeEvent(QCloseEvent* event)
 {
     // Delete dock manager here to delete all floating widgets. This ensures
     // that all top level windows of the dock manager are properly closed
+    saveTableViewColumnState(T_Portfolio_Table);
+    saveTableViewColumnState(trade_table);
+    saveTableViewColumnState(net_pos_table);
+    saveTableViewColumnState(liners_table);
+    saveTableViewColumnState(combined_tracker_table);
+    saveTableViewColumnState(missed_trade_table);
+
+
+    stopBG_Threads();
+
     saveDockManagerState();
 
     DockManagerMainPanel->deleteLater();
