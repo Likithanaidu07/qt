@@ -57,7 +57,7 @@ void SlowData::addLeg_n_token(QString token){
     QMutexLocker lock(&leg_n_tokens_Mutex);
     if(!leg_n_tokens.contains(token)){
         leg_n_tokens.append(token);
-        qDebug()<<"leg_n_tokens: "<<leg_n_tokens;
+        //qDebug()<<"leg_n_tokens: "<<leg_n_tokens;
     }
 }
 

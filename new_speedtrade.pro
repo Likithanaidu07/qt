@@ -61,6 +61,7 @@ SOURCES += \
     TradePosition/tradetable_searchfilterproxymodel.cpp \
     TradePosition/tradetableheaderview.cpp \
     backendcomm/backendcomm.cpp \
+    cache_file_io.cpp \
     contractdetail.cpp \
     customDelegate.cpp \
     custom_grid_table/gridtableheadermodel.cpp \
@@ -132,6 +133,7 @@ HEADERS += \
     TradePosition/tradetable_searchfilterproxymodel.h \
     TradePosition/tradetableheaderview.h \
     backendcomm/backendcomm.h \
+    cache_file_io.h \
     contractdetail.h \
     customDelegate.h \
     custom_grid_table/gridtableheadermodel.h \

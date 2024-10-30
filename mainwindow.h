@@ -5,6 +5,7 @@
 #include <QStackedWidget>
 #include <QtConcurrent/QtConcurrent>
 #include "QListWidgetItem"
+#include <QWaitCondition>
 
 #include <QTableView>
 #include <QDockWidget>
@@ -64,6 +65,7 @@
 #include "Order_F1_F2/order_f1_f2_delegate.h"
 #include "Order_F1_F2/order_f1_f2_model.h"
 #include "Order_F1_F2/order_f1_f2_tableheaderview.h"
+#include "cache_file_io.h"
 
 using namespace ads;
 
@@ -121,9 +123,9 @@ private:
     Settings_Window *sett_win= nullptr;
     QStringList savedWatchItems;
     QList<watch_data_card*> watchCardWidgetList;
-    QTimer* TableRefreshTimer;
+  //  QTimer* TableRefreshTimer;
     QStringList summarydatList;
-    QTimer* Trade_TableRefreshTimer;
+   // QTimer* Trade_TableRefreshTimer;
 
     loadingdatawindow *loadingDataWinodw;
     SortSettingPopUp *sortWin; // Add this line
@@ -147,6 +149,11 @@ private:
     ads::CDockManager* DockManagerMainPanel;
  //  ads::CDockManager *DockManagerSidePanel;
 
+    cache_file_io *CacheFileIO;
+    QStringList algosToDisableOnExchangePriceLimit; //algo id to disable when ExchangePrice cross 20% of userPrice
+    QStringList algosToDisableOnExchangePriceLimitExludedList; //algo id should exclude from ExchangePrice disable. This will load from tmpe file
+
+
 
     void createINIFileIfNotExist();
     void loadSettings();
@@ -164,7 +171,9 @@ private:
     void loadContract();
     QFuture<void> futureBackGroundDBThread;
     QAtomicInt quit_db_data_load_thread;
-    QAtomicInt data_loading_thread_running;
+    QAtomicInt refresh_entire_table;
+
+   // QAtomicInt data_loading_thread_running;
     QAtomicInt contractDetailsLoaded;
     QAtomicInt loggedInFlg;
     QAtomicInt reloadSortSettFlg; // this flag is used for reloading sorting config
@@ -174,11 +183,14 @@ private:
     BackendComm *backend_comm;
     QThread *backend_comm_thread;
 
+    QWaitCondition waitConditionDataLoadThread;
+    QMutex DataLoadMutex;
 
     void start_dataLoadingThread();
     void stop_dataLoadingThread();
     void refreshTables();
-    void refreshTradeTable();
+    //void refreshTradeTable();
+    void triggerImmediate_refreshTables();
 
     void loggedOut();
     void stopBG_Threads();
@@ -267,7 +279,7 @@ private:
       void updateWatchDataCard(Indices_Data_Struct data);
 
 public slots:
-    void startTableRefreshTimer();
+   // void startTableRefreshTimer();
     void openSettingsWindow();
     void onPortfolioAdded();
     void profolioTableEditFinshedSlot(QString val,QModelIndex);

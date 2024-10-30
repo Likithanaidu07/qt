@@ -21,6 +21,12 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
     ui->tableviewBG->setStyleSheet("#tableviewBG { background-color: #FFFFFF; }");
     // Assuming 'ui->tableViewMarkerRate' is your QTableView
 
+    setTabOrder(ui->comboBoxBuySell,ui->lineEdit_Stockname);
+    setTabOrder(ui->lineEdit_Stockname,ui->doubleSpinBox_price);
+    setTabOrder(ui->doubleSpinBox_price,ui->spinBoxLot);
+    setTabOrder(ui->spinBoxLot,ui->pushButtonSubmit);
+    setTabOrder(ui->pushButtonSubmit,ui->comboBoxBuySell);
+
 
 
 
@@ -71,11 +77,12 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
     QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     // to make floating window
     stockNameListView = new QListView(this);
+    stockNameListView->setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::Tool);
+
     connect(stockNameListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedStockName(QModelIndex)));
     stockNameListView->setSizePolicy(sizePolicy);
     stockNameListView->setFixedSize(230, 200);
     stockNameListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    stockNameListView->setWindowFlags(Qt::ToolTip);
 
     stockNameListView->hide();
 
@@ -265,8 +272,8 @@ void F1_F2_BuySell::itemSelectedStockName(QModelIndex index)
 
         ui->doubleSpinBox_price->setSingleStep(priceSingleStepValue);   // Default increment step
 
-        qDebug()<<"F_F2--> token_number: "<<token_number<<"   OperatingRangeslowPriceRange: "<<c.OperatingRangeslowPriceRange/devicer<<"   OperatingRangeshighPriceRange:"<<c.OperatingRangeshighPriceRange/devicer;
-        qDebug()<<"F_F2--> token_number: "<<token_number<<"   VolumeFreezeQty: "<<c.VolumeFreezeQty<<"   LotSize:"<<c.LotSize << "  maxLot: "<<c.VolumeFreezeQty/c.LotSize << "  MinimumSpread: "<<c.MinimumSpread;
+        //qDebug()<<"F_F2--> token_number: "<<token_number<<"   OperatingRangeslowPriceRange: "<<c.OperatingRangeslowPriceRange/devicer<<"   OperatingRangeshighPriceRange:"<<c.OperatingRangeshighPriceRange/devicer;
+        //qDebug()<<"F_F2--> token_number: "<<token_number<<"   VolumeFreezeQty: "<<c.VolumeFreezeQty<<"   LotSize:"<<c.LotSize << "  maxLot: "<<c.VolumeFreezeQty/c.LotSize << "  MinimumSpread: "<<c.MinimumSpread;
         refreshMarketDataTable();
 
 
@@ -299,6 +306,8 @@ F1_F2_BuySell::~F1_F2_BuySell()
 {
     model_stock_name->clear();
     delete model_stock_name;
+    stockNameListView->hide();
+    delete stockNameListView;
     delete ui;
 }
 
@@ -329,83 +338,98 @@ void F1_F2_BuySell::on_pushButtonSubmit_clicked()
 
 
     int lotSize=ContractDetail::getInstance().GetLotSize(token_number.toInt(),PortfolioType::F1_F2);
+
+    QString confirmationMsg ="";
     if(buy_mode){
         buyprice = QString::number(ui->doubleSpinBox_price->value()* devicer);
         buyqty = QString::number(ui->spinBoxLot->value()* lotSize);
         orderQunatity = buyqty;
+
+        confirmationMsg ="Buy "+ui->lineEdit_Stockname->text()+" @ "+QString::number(ui->doubleSpinBox_price->value())+" for "+QString::number(ui->spinBoxLot->value())+" lot. Would you like to proceed?";
     }
     else{
         sellprice = QString::number(ui->doubleSpinBox_price->value()* devicer);
         sellqty = QString::number(ui->spinBoxLot->value()* lotSize);
         orderQunatity = sellqty;
-    }
-
-    mysql_conn *db_conn = new mysql_conn(0, "add_algo_db_conn");
-    algo_data_insert_status status = db_conn->place_F1F2_Order(QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,true);
-    if(status == algo_data_insert_status::EXIST){
-         QMessageBox::StandardButton reply;
-         reply = QMessageBox::question(this, "Duplicate record!", "Record already exist for selected Stock Name!. Do you want to proceed?",QMessageBox::Yes | QMessageBox::No);
-         if (reply == QMessageBox::Yes) {
-             algo_data_insert_status status1 = db_conn->place_F1F2_Order(QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,false);
-             if(status1 == algo_data_insert_status::INSERTED){
-                     emit portfolioAddedSignal();
-                     QMessageBox msgBox;
-                     msgBox.setWindowTitle("Success");
-                     msgBox.setIcon(QMessageBox::Information);
-                     msgBox.setText("Order placed successfully.");
-                     msgBox.exec();
-                     ui->lineEdit_Stockname->clear();
-                     //ui->spinBoxLot->setValue(ui->spinBoxLot->minimum());
-                     ui->spinBoxLot->clear();
-                     //ui->doubleSpinBox_price->setValue(ui->doubleSpinBox_price->minimum());
-                     ui->doubleSpinBox_price->clear();
-
-                     QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tableViewMarkerRate->model());
-                     model->removeRows(0, model->rowCount());
-                     ui->label_lastTradedPrice->clear();
-
-                     token_number = "";
-                 }
-                 else{
-                     QMessageBox msgBox;
-                     msgBox.setWindowTitle("Failed.");
-                     msgBox.setIcon(QMessageBox::Warning);
-                     msgBox.setText(msg);
-                     msgBox.exec();
-                 }
-         }
-    }
-    else if(status == algo_data_insert_status::INSERTED){
-        emit portfolioAddedSignal();
-        QMessageBox msgBox;
-        msgBox.setWindowTitle("Success");
-        msgBox.setIcon(QMessageBox::Information);
-        msgBox.setText("Order placed successfully.");
-        msgBox.exec();
-        ui->lineEdit_Stockname->clear();
-        //ui->spinBoxLot->setValue(ui->spinBoxLot->minimum());
-        //ui->doubleSpinBox_price->setValue(ui->doubleSpinBox_price->minimum());
-        //ui->spinBoxLot->setValue(ui->spinBoxLot->minimum());
-        ui->spinBoxLot->clear();
-        //ui->doubleSpinBox_price->setValue(ui->doubleSpinBox_price->minimum());
-        ui->doubleSpinBox_price->clear();
-
-        QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tableViewMarkerRate->model());
-        model->removeRows(0, model->rowCount());
-
-        token_number = "";
-        ui->label_lastTradedPrice->clear();
+        confirmationMsg ="Sell "+ui->lineEdit_Stockname->text()+" @ "+QString::number(ui->doubleSpinBox_price->value())+" for "+QString::number(ui->spinBoxLot->value())+" lot. Would you like to proceed?";
 
     }
-    else{
-        QMessageBox msgBox;
-        msgBox.setWindowTitle("Failed");
-        msgBox.setIcon(QMessageBox::Warning);
-        msgBox.setText(msg);
-        msgBox.exec();
+
+
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Add Manual Order?", confirmationMsg,QMessageBox::Yes | QMessageBox::No);
+
+    if (reply == QMessageBox::Yes) {
+        mysql_conn *db_conn = new mysql_conn(0, "add_algo_db_conn");
+        algo_data_insert_status status = db_conn->place_F1F2_Order(QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,true);
+        if(status == algo_data_insert_status::EXIST){
+             QMessageBox::StandardButton reply;
+             reply = QMessageBox::question(this, "Duplicate record!", "Record already exist for selected Stock Name!. Do you want to proceed?",QMessageBox::Yes | QMessageBox::No);
+             if (reply == QMessageBox::Yes) {
+                 algo_data_insert_status status1 = db_conn->place_F1F2_Order(QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,false);
+                 if(status1 == algo_data_insert_status::INSERTED){
+                         emit portfolioAddedSignal();
+                         QMessageBox msgBox;
+                         msgBox.setWindowTitle("Success");
+                         msgBox.setIcon(QMessageBox::Information);
+                         msgBox.setText("Order placed successfully.");
+                         msgBox.exec();
+                         ui->lineEdit_Stockname->clear();
+                         //ui->spinBoxLot->setValue(ui->spinBoxLot->minimum());
+                         ui->spinBoxLot->clear();
+                         //ui->doubleSpinBox_price->setValue(ui->doubleSpinBox_price->minimum());
+                         ui->doubleSpinBox_price->clear();
+
+                         QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tableViewMarkerRate->model());
+                         model->removeRows(0, model->rowCount());
+                         ui->label_lastTradedPrice->clear();
+
+                         token_number = "";
+                     }
+                     else{
+                         QMessageBox msgBox;
+                         msgBox.setWindowTitle("Failed.");
+                         msgBox.setIcon(QMessageBox::Warning);
+                         msgBox.setText(msg);
+                         msgBox.exec();
+                     }
+             }
+        }
+        else if(status == algo_data_insert_status::INSERTED){
+            emit portfolioAddedSignal();
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("Success");
+            msgBox.setIcon(QMessageBox::Information);
+            msgBox.setText("Order placed successfully.");
+            msgBox.exec();
+            ui->lineEdit_Stockname->clear();
+            //ui->spinBoxLot->setValue(ui->spinBoxLot->minimum());
+            //ui->doubleSpinBox_price->setValue(ui->doubleSpinBox_price->minimum());
+            //ui->spinBoxLot->setValue(ui->spinBoxLot->minimum());
+            ui->spinBoxLot->clear();
+            //ui->doubleSpinBox_price->setValue(ui->doubleSpinBox_price->minimum());
+            ui->doubleSpinBox_price->clear();
+
+            QStandardItemModel *model = static_cast<QStandardItemModel *>(ui->tableViewMarkerRate->model());
+            model->removeRows(0, model->rowCount());
+
+            token_number = "";
+            ui->label_lastTradedPrice->clear();
+
+        }
+        else{
+            QMessageBox msgBox;
+            msgBox.setWindowTitle("Failed");
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.setText(msg);
+            msgBox.exec();
+        }
+
+        delete db_conn;
     }
 
-    delete db_conn;
+
+
 
 }
 
@@ -474,13 +498,18 @@ void F1_F2_BuySell::setBuyMode(bool buy_mode_){
 
     }
 }
+
 void F1_F2_BuySell::keyPressEvent(QKeyEvent *event)
 {
-    if (event->key() == Qt::Key_Escape)
-    {
+    if (event->key() == Qt::Key_Escape){
         ui->lineEdit_Stockname->clear();
         ui->spinBoxLot->clear();
         ui->doubleSpinBox_price->clear();
+        event->accept();                    // Accept the event to indicate it was handled
+    }
+
+    else{
+        QWidget::keyPressEvent(event); // Pass other key events to the base class
     }
 }
 
@@ -588,11 +617,11 @@ void F1_F2_BuySell::refreshMarketDataTable(){
                 // Sell - Set text alignment to right
                 QStandardItem *sellPriceItem = new QStandardItem(QString::number(d.recordBuffer[i+5].price.toDouble()/devicer,'f',2));
                 sellPriceItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                sellPriceItem->setForeground(QBrush(QColor("#ff5722 ")));
+                sellPriceItem->setForeground(QBrush(QColor("#ff5722")));
 
                 QStandardItem *sellQuantityItem = new QStandardItem(QString::number(d.recordBuffer[i+5].quantity.toDouble(),'f',0));
                 sellQuantityItem->setTextAlignment(Qt::AlignRight | Qt::AlignVCenter);
-                sellQuantityItem->setForeground(QBrush(QColor("#ff5722 ")));
+                sellQuantityItem->setForeground(QBrush(QColor("#ff5722")));
 
                 // Append items to row
                 rowData.append(buyPriceItem);

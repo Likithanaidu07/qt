@@ -220,6 +220,7 @@ MainWindow::MainWindow(QWidget *parent)
     reloadSortSettFlg.storeRelaxed(1);
     deletingPortFolioFlg.storeRelaxed(0);
     quit_db_data_load_thread.storeRelaxed(0);
+    refresh_entire_table.storeRelaxed(1);
     portfolio_table_updating_db.storeRelaxed(0);
     portfolio_table_slected_idx_for_editing.store(-1);
     loggedInFlg.storeRelaxed(0);
@@ -1301,15 +1302,20 @@ MainWindow::MainWindow(QWidget *parent)
     instilizeWatchUIOnTopBar();
 
 
-    TableRefreshTimer = new QTimer(this);
+  /*  TableRefreshTimer = new QTimer(this);
     TableRefreshTimer->setSingleShot(true);  // Make it behave like singleShot
-    connect(TableRefreshTimer, &QTimer::timeout, this, &MainWindow::start_dataLoadingThread);
+    connect(TableRefreshTimer, &QTimer::timeout, this, &MainWindow::start_dataLoadingThread);*/
 
 
-    Trade_TableRefreshTimer = new QTimer(this);
+    /*Trade_TableRefreshTimer = new QTimer(this);
     connect(Trade_TableRefreshTimer, &QTimer::timeout, this, [this]() {
         QtConcurrent::run(&MainWindow::refreshTradeTable, this);
-    });
+    });*/
+
+
+    //Read
+    CacheFileIO = new cache_file_io();
+    algosToDisableOnExchangePriceLimitExludedList = CacheFileIO->readFile_ExludedAlgos_ExchangePriceLimit(); // this list contain algos whcih will excluded while autmatic disable on  ExchangePriceLimit reach
 
 }
 
@@ -1846,7 +1852,16 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                                 " WHERE PortfolioNumber=" + PortfolioNumber;
                 bool success = db_conn->updateDB_Table(Query,msg);
                 if(success){
+                    triggerImmediate_refreshTables();
                     db_conn->logToDB(logMsg+ " updated for Algo No="+PortfolioNumber);
+
+                    //send notifcation to backend server
+                    quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+                    const unsigned char dataBytes[] = { 0xFF, 0xFF };
+                    QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
+                    QByteArray msg = backend_comm->createPacket(command, data);
+                    backend_comm->insertData(msg);
+
                 }
                 else{
                     QMessageBox msgBox;
@@ -1859,12 +1874,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
         }
 
-            //send notifcation to backend server
-            quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
-            const unsigned char dataBytes[] = { 0xFF, 0xFF };
-            QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
-            QByteArray msg = backend_comm->createPacket(command, data);
-            backend_comm->insertData(msg);
+
 
             portfolio_table_updating_db.storeRelaxed(0);
 
@@ -1906,9 +1916,9 @@ void MainWindow::loadContract(){
 
         if(loggedInFlg.loadRelaxed()==1){
             start_dataLoadingThread();
-            QMetaObject::invokeMethod(this, [this]() {
+          /*  QMetaObject::invokeMethod(this, [this]() {
                 Trade_TableRefreshTimer->start(1000); // Start the timer on the main thread
-            }, Qt::QueuedConnection);
+            }, Qt::QueuedConnection);*/
 
         }
     };
@@ -1924,30 +1934,29 @@ void MainWindow::start_dataLoadingThread(){
 
 void MainWindow::stop_dataLoadingThread(){
 
-   // quit_db_data_load_thread.storeRelaxed(1); // this will quit the data loding thread.
+    quit_db_data_load_thread.storeRelaxed(1); // this will quit the data loding thread.
     futureBackGroundDBThread.waitForFinished();
 }
-
+/*
 void MainWindow::startTableRefreshTimer() {
     // This method runs in the main thread, and starts the QTimer safely
     int timeOut = 2000;
     if (!TableRefreshTimer->isActive()) {
         TableRefreshTimer->start(timeOut);  // Start the timer for 2 seconds
-        qDebug() << "Timer started...";
+        qDebug() << "TableRefreshTimer started...";
     } else {
         qDebug() << "TableRefreshTimer is already running, skipping this call.";
     }
-}
+}*/
 
-
-void MainWindow::refreshTradeTable(){
-    //qDebug()<<"refreshTradeTable thread.....";
+/*void MainWindow::refreshTradeTable(){
+    qDebug()<<"refresh Trade-Table thread.....";
 
      int timeOut = 2000;
 
     if(data_loading_thread_running.loadRelaxed()==1){
         QMetaObject::invokeMethod(this, "startTableRefreshTimer", Qt::QueuedConnection);
-        qDebug()<<" data loading thread already running, skipping.....";
+        qDebug()<<"Trade data loading thread already running, skipping.....";
         return;
     }
 
@@ -1963,20 +1972,20 @@ void MainWindow::refreshTradeTable(){
 
     data_loading_thread_running.storeRelaxed(1);
     loadDataAndUpdateTable(T_Table::TRADE);
-   // qDebug()<<"Exiting refreshTradeTable loading thread.....";
+    qDebug()<<"Exiting refresh Trade-Table loading thread.....";
     data_loading_thread_running.storeRelaxed(0);
     //qDebug() << "refreshTradeTable took :" << timer.elapsed() << "milliseconds";
 
-}
+}*/
 
 void MainWindow::refreshTables(){
-    qDebug()<<"Started data loading thread.....";
+    qDebug()<<"------------Started data loading thread.....";
 
-     int timeOut = 2000;
+   // int timeOut = 2000;
 
-    if(data_loading_thread_running.loadRelaxed()==1){
+    /*if(data_loading_thread_running.loadRelaxed()==1){
         QMetaObject::invokeMethod(this, "startTableRefreshTimer", Qt::QueuedConnection);
-        qDebug()<<" data loading thread already running, skipping.....";
+        qDebug()<<"------------data loading thread already running, skipping.....";
         return;
     }
 
@@ -1985,49 +1994,71 @@ void MainWindow::refreshTables(){
         QMetaObject::invokeMethod(this, "startTableRefreshTimer", Qt::QueuedConnection);
         qDebug()<<" PortFolios delete is going in, table refresh will do in next "<<timeOut<<" ms.....";
         return;
-    }
+    }*/
+
+   // data_loading_thread_running.storeRelaxed(1);
 
     QElapsedTimer timer;
-    timer.start();
 
-    data_loading_thread_running.storeRelaxed(1);
-
-
-  //  int data_load_intervell = 1000;// in m-sec
-   // while(1){
+    int data_load_interval = 2000; // in m-sec
+    while(1){
 
 
+        timer.restart();
+        if(refresh_entire_table.loadRelaxed()==1){
+            qDebug()<<"Refreshing entire table.....";
+
+            loadDataAndUpdateTable(T_Table::PORTFOLIO);
+            loadDataAndUpdateTable(T_Table::TRADE);
+            loadDataAndUpdateTable(T_Table::NET_POS);
+            loadDataAndUpdateTable(T_Table::SUMMARY);
+            loadDataAndUpdateTable(T_Table::MISSED_TRADE);
+            refresh_entire_table.storeRelaxed(0);
+        }
+        else{
+            loadDataAndUpdateTable(T_Table::TRADE);
+            //qDebug()<<"Refreshing TRADE table.....";
+
+        }
 
 
-        loadDataAndUpdateTable(T_Table::PORTFOLIO);
-        loadDataAndUpdateTable(T_Table::TRADE);
-        loadDataAndUpdateTable(T_Table::NET_POS);
-        loadDataAndUpdateTable(T_Table::SUMMARY);
-        loadDataAndUpdateTable(T_Table::MISSED_TRADE);
 
 
-        //loadMysQLData(Table::ORDER);*/
 
-       /* auto elapsed = timer.elapsed();
-        if( timer.elapsed()<data_load_intervell){
-            //  qDebug()<<"sleeping... "<<data_load_intervell-elapsed;
+        // Calculate the remaining time to wait
+        int elapsed = timer.elapsed();
+        int remainingWaitTime = data_load_interval - elapsed;
 
-            QThread::msleep(data_load_intervell-elapsed);
-        }*/
+        // Lock the mutex and wait for the remaining time or until woken up
+        if (remainingWaitTime > 0) {
+            DataLoadMutex.lock();  // Lock the mutex
+            waitConditionDataLoadThread.wait(&DataLoadMutex, remainingWaitTime); // Wait with timeout
+            DataLoadMutex.unlock();  // Unlock after waiting
+        }
 
 
-      //  if(quit_db_data_load_thread.loadRelaxed()==1)
-          //  break;
-        //break;// this need to be removed
-  //  }
+
+     if(quit_db_data_load_thread.loadRelaxed()==1)
+           break;
+   }
        // QThread::sleep(5);
 
-    qDebug()<<"Exiting data loading thread.....";
-    data_loading_thread_running.storeRelaxed(0);
-    qDebug() << "refreshTables took :" << timer.elapsed() << "milliseconds";
+    qDebug()<<"------------ Exiting data loading thread.....";
+  //  data_loading_thread_running.storeRelaxed(0);
+   // qDebug() << "refreshTables took :" << timer.elapsed() << "milliseconds";
 
     //
     //QTimer::singleShot(2000, this, &MainWindow::refreshTableIn_Intervel);
+}
+
+void MainWindow::triggerImmediate_refreshTables() {
+
+    refresh_entire_table.storeRelaxed(1);
+
+    // Lock the mutex, wake the condition, then unlock
+    DataLoadMutex.lock();
+    waitConditionDataLoadThread.wakeAll();
+    DataLoadMutex.unlock();
 }
 
 
@@ -2113,44 +2144,54 @@ void MainWindow::loadDataAndUpdateTable(int table){
 //        OutputDebugStringA("Test1 \n");
         //QHash<QString, PortFolioData_Less> PortFolioHash = T_Portfolio_Model->getPortFolioDataLess();
      //   QStringList TradeTableHighlight_ExcludeList = trade_model->getTradeTableHighlight_ExcludeList();
-        QStringList algosToDisable; //class variable
-        QStringList algosExludeListFromJackpotDisable; //class varible
 
 
-
-        algosToDisable.clear();
-        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,algosToDisable/*,TradeTableHighlight_ExcludeList*/);
+       // algosToDisableOnExchangePriceLimit.clear();
+        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,algosToDisableOnExchangePriceLimit/*,TradeTableHighlight_ExcludeList*/);
         emit data_loded_signal(T_Table::TRADE);
         updateSummaryLabels();
 
-        //check algosToDisable included in algosExludeListFromJackpotDisable, if so remove
 
-        QStringList enabledPortfolios = T_Portfolio_Model->getActivatedPortfolios();
-        // Remove items from algosToDisable that are not in enabledPortfolios( this check is for, no need to disable already disabled one)
-        for (auto it = algosToDisable.begin(); it != algosToDisable.end(); ) {
-            if (!enabledPortfolios.contains(*it)) {
-                it = algosToDisable.erase(it);  // Remove element and update iterator
-            } else {
+
+        //check algosToDisableOnExchangePriceLimit included in algosExludeListFromExchangePriceDisable, if so remove
+        for (auto it = algosToDisableOnExchangePriceLimit.begin(); it != algosToDisableOnExchangePriceLimit.end(); ) {
+            if (algosToDisableOnExchangePriceLimitExludedList.contains(*it)) {
+                it = algosToDisableOnExchangePriceLimit.erase(it);  // Remove element and update iterator
+            }
+            else {
                 ++it;  // Move to the next element
             }
         }
 
+        QStringList portfoliosToDisable;
+        // Remove items from algosToDisable that are not in enabledPortfolios( this check is for, no need to disable already disabled one)
+        QStringList enabledPortfolios = T_Portfolio_Model->getActivatedPortfolios();
+        for (const QString &algo : algosToDisableOnExchangePriceLimit) {
+            if (enabledPortfolios.contains(algo)) {
+                portfoliosToDisable.append(algo);
+            }
+        }
         //Disable code for now
-        /*if(algosToDisable.length()>0){
+        if(portfoliosToDisable.length()>0){
+
+
           // Create a comma-separated string from the QStringList
-          QString portfolioNumberStr = algosToDisable.join(", ");
+          QString portfolioNumberStr = portfoliosToDisable.join(", ");
 
           // Construct the SQL query
           QString Query = QString("UPDATE Portfolios SET Status='DisabledByUser' WHERE PortfolioNumber IN (%1)").arg(portfolioNumberStr);
           QString msg;
           bool success = db_conn->updateDB_Table(Query, msg);
           if(success){
-              qDebug()<<QString("Jackpot is greater than 20%, disabled the follwing portfolios: (%1)").arg(portfolioNumberStr);
+              triggerImmediate_refreshTables();
+              qDebug()<<QString("Exchange Price is greater than 20%, disabled the follwing portfolios: (%1)").arg(portfolioNumberStr);
           }
           else{
-              qDebug()<<QString("Disable failed for portfolios (%1), Jackpot  greater than 20% check. Error: "+msg).arg(portfolioNumberStr);
+              QMetaObject::invokeMethod(this, "showError", Qt::QueuedConnection,
+                                        Q_ARG(QString, "Disable failed for portfolios (%1), Exchange Price greater than 20% check Error: " + msg));
+              qDebug()<<QString("Disable failed for portfolios (%1), Exchange Price  greater than 20% check. Error: "+msg).arg(portfolioNumberStr);
           }
-        }*/
+        }
 
         break;
     }
@@ -2311,7 +2352,7 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
     else if(msgType == SocketDataType::BACKEND_COMM_SOCKET_DATA){
         if(msg == "TRADE_UPDATED"){
             //refresh all table from here.
-            start_dataLoadingThread();
+            triggerImmediate_refreshTables();
         }
     }
 
@@ -2391,12 +2432,13 @@ void MainWindow::updatePortFolioStatus(QModelIndex index) {
             }
 
             // Activate portfolio in UI and update the database
-            T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::Active));
             QString Query = "UPDATE Portfolios SET Status='Active' WHERE PortfolioNumber=" + PortfolioNumber;
             QString msg;
             if (db_conn->updateDB_Table(Query, msg)) {
+                T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::Active));
+
                 // Log success and trigger backend communication
-                start_dataLoadingThread();
+                triggerImmediate_refreshTables();
                 reloadSortSettFlg.storeRelaxed(1);
                 db_conn->logToDB(QString("Activated portfolio [" + PortfolioNumber + "]"));
 
@@ -2409,20 +2451,26 @@ void MainWindow::updatePortFolioStatus(QModelIndex index) {
 
 
 
-                //check the PortfolioNumber numebr exist in algostoDiable, if exist theren writerto the file.
-                //write to the file
-                //add the algosExlude
-
+                //check the PortfolioNumber numebr exist in algosToDisableOnExchangePriceLimit, if exist theren writerto the cache file. So autmatic disable will not happend
+                if(algosToDisableOnExchangePriceLimit.contains(PortfolioNumber)){
+                  algosToDisableOnExchangePriceLimitExludedList.append(PortfolioNumber);
+                  CacheFileIO->writeFile_ExludedAlgos_ExchangePriceLimit(algosToDisableOnExchangePriceLimitExludedList);
+                }
+            }
+            else{
+                T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::DisabledByUser));
+                QMessageBox::warning(this, "Error", "Failed to disable portfolio, Error: "+msg);
 
             }
+
     } else {
             // Deactivate portfolio in UI and update the database
-            T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::DisabledByUser));
             QString Query = "UPDATE Portfolios SET Status='DisabledByUser' WHERE PortfolioNumber=" + PortfolioNumber;
             QString msg;
             if (db_conn->updateDB_Table(Query, msg)) {
+                T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::DisabledByUser));
                 // Log success and trigger backend communication
-                start_dataLoadingThread();
+                triggerImmediate_refreshTables();
                 reloadSortSettFlg.storeRelaxed(1);
                 db_conn->logToDB(QString("Disabled portfolio [" + PortfolioNumber + "]"));
 
@@ -2432,6 +2480,11 @@ void MainWindow::updatePortFolioStatus(QModelIndex index) {
                 QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
                 QByteArray msg = backend_comm->createPacket(command, data);
                 backend_comm->insertData(msg);
+            }
+            else{
+                T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::Active));
+                QMessageBox::warning(this, "Error", "Failed to enable portfolio, Error: "+msg);
+
             }
     }
 
@@ -2501,7 +2554,7 @@ void MainWindow::stopBG_Threads(){
 */
 void MainWindow::stopBG_Threads(){
 
-    Trade_TableRefreshTimer->stop();
+   // Trade_TableRefreshTimer->stop();
 
     QElapsedTimer timer;
 
@@ -2775,8 +2828,7 @@ void MainWindow::startall_Button_clicked()
             QByteArray msg = backend_comm->createPacket(command, data);
             backend_comm->insertData(msg);
 
-            // Start data loading thread
-            start_dataLoadingThread();
+            triggerImmediate_refreshTables();
         } else {
             QMessageBox::warning(this, "Error", "Failed to activate portfolios.");
         }
@@ -2812,13 +2864,13 @@ void MainWindow::stopall_Button_clicked()
             QByteArray msg = backend_comm->createPacket(command, data);
             backend_comm->insertData(msg);
 
-            start_dataLoadingThread();
+            triggerImmediate_refreshTables();
 
         }
 }
 
 void MainWindow::refresh_Button_clicked(){
-  start_dataLoadingThread();
+  triggerImmediate_refreshTables();
 }
 
 
@@ -2926,7 +2978,7 @@ void MainWindow::onPortfolioAdded(){
     QByteArray msg = backend_comm->createPacket(command, data);
     backend_comm->insertData(msg);
 
-    start_dataLoadingThread();
+    triggerImmediate_refreshTables();
 }
 
 QModelIndexList  MainWindow::getSelectedPortFolioIndexs(){
@@ -3009,7 +3061,7 @@ void MainWindow::Delete_clicked_slot()
         else{
             //delete from model too and refersh the enitre table,
             T_Portfolio_Model->removeRowsByIndices(portFolioIdxToDelete);
-            start_dataLoadingThread();
+            triggerImmediate_refreshTables();
 
 
 
@@ -3609,7 +3661,7 @@ void MainWindow::sorting_Button_clicked(){
            sortWin = new SortSettingPopUp();
            connect(sortWin, &SortSettingPopUp::reloadSortSettingSignal, [this]() {
                reloadSortSettFlg.storeRelaxed(1);
-               start_dataLoadingThread();
+               triggerImmediate_refreshTables();
            });
        }
       else{
@@ -3617,7 +3669,7 @@ void MainWindow::sorting_Button_clicked(){
           sortWin = new SortSettingPopUp();
           connect(sortWin, &SortSettingPopUp::reloadSortSettingSignal, [this]() {
               reloadSortSettFlg.storeRelaxed(1);
-              start_dataLoadingThread();
+              triggerImmediate_refreshTables();
           });
       }
        sortWin->show();
@@ -3627,11 +3679,9 @@ void MainWindow::sorting_Button_clicked(){
 }
 //For Buy
 void MainWindow::F1_clicked_slot(){
-   F1_F2_BuySell *F1F2 = new F1_F2_BuySell(nullptr,devicer,decimal_precision);
+   F1_F2_BuySell *F1F2 = new F1_F2_BuySell(this,devicer,decimal_precision);
    connect(F1F2, &F1_F2_BuySell::portfolioAddedSignal, this, &MainWindow::onPortfolioAdded);
    QObject::connect(slowData, SIGNAL(newSlowDataReceivedSignal(const QHash<QString, MBP_Data_Struct> &)), F1F2, SLOT(slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct> &)));
-
-
    F1F2->setAttribute(Qt::WA_DeleteOnClose);
    F1F2->userData = this->userData;
    F1F2->show();
@@ -3639,7 +3689,7 @@ void MainWindow::F1_clicked_slot(){
 }
 //For Sell
 void MainWindow::F2_clicked_slot(){
-    F1_F2_BuySell *F1F2 = new F1_F2_BuySell(nullptr,devicer,decimal_precision);
+    F1_F2_BuySell *F1F2 = new F1_F2_BuySell(this,devicer,decimal_precision);
     connect(F1F2, &F1_F2_BuySell::portfolioAddedSignal, this, &MainWindow::onPortfolioAdded);
     QObject::connect(slowData, SIGNAL(newSlowDataReceivedSignal(const QHash<QString, MBP_Data_Struct> &)), F1F2, SLOT(slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct> &)));
 

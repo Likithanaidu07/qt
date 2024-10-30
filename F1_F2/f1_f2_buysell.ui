@@ -73,7 +73,7 @@
       </font>
      </property>
      <property name="text">
-      <string>Buy Sell</string>
+      <string>Buy/Sell</string>
      </property>
     </widget>
    </item>
@@ -268,6 +268,9 @@
         </item>
         <item row="1" column="0" colspan="2">
          <layout class="QHBoxLayout" name="horizontalLayout_2">
+          <property name="spacing">
+           <number>12</number>
+          </property>
           <item>
            <widget class="QLabel" name="label_5">
             <property name="font">
@@ -428,6 +431,10 @@
  <tabstops>
   <tabstop>comboBoxBuySell</tabstop>
   <tabstop>lineEdit_Stockname</tabstop>
+  <tabstop>doubleSpinBox_price</tabstop>
+  <tabstop>spinBoxLot</tabstop>
+  <tabstop>pushButtonSubmit</tabstop>
+  <tabstop>tableViewMarkerRate</tabstop>
  </tabstops>
  <resources/>
  <connections/>

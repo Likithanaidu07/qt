@@ -97,18 +97,18 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
 
         QString buy_sell = order_list[OrderBook_Idx::BuyorSell_OB];
 
-        if (c == OrderBook_Idx::Jackpot_OB) {
-            QString jackpotStr = order_list[OrderBook_Idx::Jackpot_OB];
+        if (c == OrderBook_Idx::ExchPrice_OB) {
+            QString ExchPrice = order_list[OrderBook_Idx::ExchPrice_OB];
             QString userPriceStr = order_list[OrderBook_Idx::UserPrice_OB];  // Variable for user price
             bool okJackpot, okUserPrice;
 
-            double jackpotValue = jackpotStr.toDouble(&okJackpot);  // Convert jackpot QString to double
+            double ExchPriceValue = ExchPrice.toDouble(&okJackpot);  // Convert jackpot QString to double
             double userPriceValue = userPriceStr.toDouble(&okUserPrice);  // Convert user price QString to double
 
             // Check if both conversions were successful
             if (okJackpot && okUserPrice) {
                 // Check if jackpot value is less than 20% of user price
-                if (jackpotValue < (userPriceValue * 0.2)) {
+                if (ExchPriceValue < (userPriceValue * 0.2)) {
                     QColor lightReddishPink("#FF9A9A");  // Light reddish pink color
                     op.palette.setColor(QPalette::Highlight, Qt::transparent);
                     op.palette.setColor(QPalette::HighlightedText, Qt::black);
@@ -116,7 +116,7 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
 
                     // Set text color and print the jackpot value inside the cell
                     painter->setPen(Qt::black);  // Set the text color to black
-                    painter->drawText(option.rect, Qt::AlignCenter, jackpotStr);  // Draw the value centered in the cell
+                    painter->drawText(option.rect, Qt::AlignCenter, ExchPrice);  // Draw the value centered in the cell
 
                     double borderWidth = 0.5;
                     QColor myColor(108, 117, 125);
