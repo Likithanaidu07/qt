@@ -120,6 +120,8 @@ void CustomSearchWidget::do_filterItems(const QString &text) {
     if (proxyModel->rowCount() > 0) {
         if (!listView->isVisible()) {
             listView->show();
+            qDebug()<<"ListView->show() called...";
+
         }
         //qDebug() <<"text: "<<text<< "Filter time in seconds:  " << timer.elapsed() / 1000.0;
         //qDebug()<<"ListView->hide(): do_filterItems - 2";

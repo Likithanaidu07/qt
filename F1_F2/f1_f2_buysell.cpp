@@ -20,6 +20,7 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
     this->setStyleSheet("#F1_F2_BuySell { background-color: #D6FCF0; }");
     ui->tableviewBG->setStyleSheet("#tableviewBG { background-color: #FFFFFF; }");
     // Assuming 'ui->tableViewMarkerRate' is your QTableView
+    setWindowFlags(Qt::Window);
 
     setTabOrder(ui->comboBoxBuySell,ui->lineEdit_Stockname);
     setTabOrder(ui->lineEdit_Stockname,ui->doubleSpinBox_price);
@@ -77,7 +78,9 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
     QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     // to make floating window
     stockNameListView = new QListView(this);
-    stockNameListView->setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::Tool);
+
+
+    //stockNameListView->setWindowFlags(Qt::Window | Qt::FramelessWindowHint | Qt::Tool);
 
     connect(stockNameListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedStockName(QModelIndex)));
     stockNameListView->setSizePolicy(sizePolicy);
@@ -167,6 +170,8 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
     });
 
 
+
+
     // initlaize marker rate table view
 
     QStandardItemModel *model = new QStandardItemModel(this);
@@ -222,19 +227,28 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
 void F1_F2_BuySell::showEvent(QShowEvent *event)
 {
    QDialog::showEvent(event);
-    ui->lineEdit_Stockname->updateGeometry();
+
+   /*ui->lineEdit_Stockname->updateGeometry();
     ui->lineEdit_Stockname->repaint();
 
     QPoint globalPos = ui->lineEdit_Stockname->mapToGlobal(QPoint(0, 0));
     QPoint parentPos = this->mapFromGlobal(globalPos);
 
     int x = globalPos.x();
-    int y = globalPos.y() + ui->lineEdit_Stockname->height()+5;
+    int y = globalPos.y() + ui->lineEdit_Stockname->height()+5;*/
 
 
     // Move stockNameListView to the new position
-      stockNameListView->move(x, y);
+   //   stockNameListView->move(x, y);
    // stockNameListView->show();
+   // Get the global position of the bottom-left corner of lineEdit_Stockname
+      QPoint globalPos = ui->lineEdit_Stockname->mapToGlobal(QPoint(10, ui->lineEdit_Stockname->height()+4));
+
+      // Convert the global position to the dialog's coordinate system
+      QPoint posSS = this->mapFromGlobal(globalPos);
+
+      // Move the stockNameListView to be directly below lineEdit_Stockname
+      stockNameListView->move(posSS);
 }
 
 void F1_F2_BuySell::itemSelectedStockName(QModelIndex index)
@@ -506,6 +520,12 @@ void F1_F2_BuySell::keyPressEvent(QKeyEvent *event)
         ui->spinBoxLot->clear();
         ui->doubleSpinBox_price->clear();
         event->accept();                    // Accept the event to indicate it was handled
+    }
+    else if(event->key() == Qt::Key_F1){
+        ui->comboBoxBuySell->setCurrentIndex(0);
+    }
+    else if(event->key() == Qt::Key_F2){
+        ui->comboBoxBuySell->setCurrentIndex(1);
     }
 
     else{
