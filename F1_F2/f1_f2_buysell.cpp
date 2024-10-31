@@ -228,19 +228,6 @@ void F1_F2_BuySell::showEvent(QShowEvent *event)
 {
    QDialog::showEvent(event);
 
-   /*ui->lineEdit_Stockname->updateGeometry();
-    ui->lineEdit_Stockname->repaint();
-
-    QPoint globalPos = ui->lineEdit_Stockname->mapToGlobal(QPoint(0, 0));
-    QPoint parentPos = this->mapFromGlobal(globalPos);
-
-    int x = globalPos.x();
-    int y = globalPos.y() + ui->lineEdit_Stockname->height()+5;*/
-
-
-    // Move stockNameListView to the new position
-   //   stockNameListView->move(x, y);
-   // stockNameListView->show();
    // Get the global position of the bottom-left corner of lineEdit_Stockname
       QPoint globalPos = ui->lineEdit_Stockname->mapToGlobal(QPoint(10, ui->lineEdit_Stockname->height()+4));
 

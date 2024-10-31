@@ -1543,6 +1543,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
         PortfolioObject *P =  T_Portfolio_Model->getPortFolioAt(index.row());//portfolioModal->portfolio_data_list.at(index.row());
         if (!P) {
             qDebug()<<"profolioTableEditFinshedSlot----- portfolio null, need to debug this code.";
+            portfolio_table_updating_db.storeRelaxed(0);
+
             return;
         }
 
