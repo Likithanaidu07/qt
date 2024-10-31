@@ -18,10 +18,10 @@ loginwindow::loginwindow(QWidget *parent) :
     ui->setupUi(this);
 
 #ifdef QT_DEBUG
-    ui->lineEditUsername->setText("JNK81");
+    ui->lineEditUsername->setText("stm102");
     ui->lineEdit_Password->setText("123");
 #endif
-   ui->lineEditUsername->setText("JNK84");
+   ui->lineEditUsername->setText("stm102");
    ui->lineEdit_Password->setText("123");
 
  //   MainWindowObj = (MainWindow*) parent;

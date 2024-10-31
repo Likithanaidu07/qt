@@ -99,7 +99,7 @@ public:
     void getSummaryTableData(int &OrderCount,QString user_id);
     void getLinersTableData(Liners_Model *model,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash);
     QString fixDecimal(double num,int decimal_precision);
-    algo_data_insert_status insertToAlgoTable(algo_data_to_insert data,int MaxPortfolioCount,QString &msg);
+    algo_data_insert_status insertToAlgoTable(algo_data_to_insert data,int MaxPortfolioCount,QString &msg, userInfo userData);
     bool deleteAlgo(QString PortfolioNumber,QString &msg);
     bool deleteAlgos(QStringList PortfolioNumbers,QString &msg);
     bool deleteNonTradedAlgos(QStringList PortfolioNumbers,QString &msg);

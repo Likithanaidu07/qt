@@ -91,7 +91,7 @@ public:
     QStandardItemModel model;
     OrderDetail_Popup *orderPopUpWin;
     TradeDetailsPopup *tradePopUpWin;
-
+ QSqlDatabase db;
     //void updateLabels();
  void resetPassword(const QString &newPassword, const QString &confirmPassword);
    //void resetPassword(const QString &newPassword);
@@ -297,6 +297,7 @@ public slots:
     void startall_Button_clicked();
     void stopall_Button_clicked();
     void refresh_Button_clicked();
+    void duplicate_Button_clicked();
     void updateSummaryLabels();
     void showMessageSlot(QString);
     void sorting_Button_clicked();

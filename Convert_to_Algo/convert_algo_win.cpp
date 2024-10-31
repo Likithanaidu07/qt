@@ -829,7 +829,7 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
 
             int tableRowIDx = selectedrowsIDx[k];
             QString msg = "";
-            algo_data_insert_status status = db_conn->insertToAlgoTable(sharedData->algo_data_list[i],sharedData->MaxPortfolioCount,msg);
+            algo_data_insert_status status = db_conn->insertToAlgoTable(sharedData->algo_data_list[i],sharedData->MaxPortfolioCount,msg, userData);
             //emit insert_algo_data_signal(algo_data_list);
             if(status==algo_data_insert_status::INSERTED){
                 portfolioAdded = true;

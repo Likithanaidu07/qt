@@ -374,6 +374,13 @@ MainWindow::MainWindow(QWidget *parent)
             button6->setIcon(QIcon(":/export.png"));
             button6->setToolTip("Export");
 
+            QToolButton* button7 = new QToolButton();
+            //  button7->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
+            button7->setText("Duplicate");
+            button7->setToolTip("Duplicate");
+             connect(button7, SIGNAL(clicked()), this, SLOT(duplicate_Button_clicked()));
+
+
             // Apply custom stylesheet
 //            QCheckBox *switchBox = new QCheckBox(this);
 //            switchBox->setText("OFF"); // Set the initial text to "OFF"
@@ -441,7 +448,7 @@ MainWindow::MainWindow(QWidget *parent)
 //                "padding: 2px 5px;"
                 "}";
 
-            for (auto w : {button1, button2, button3, button4, button5, button6}) {
+            for (auto w : {button1, button2, button3, button4, button5, button6, button7}) {
         w->setStyleSheet(stylesheet_tb);
         QFont font = w->font();
         font.setFamily("Work Sans");
@@ -460,8 +467,9 @@ MainWindow::MainWindow(QWidget *parent)
                 internalLayout->addWidget(button3);
                 internalLayout->addWidget(button6);
                 internalLayout->addWidget(button4);
-                 internalLayout->addWidget(button5);
-                 internalLayout->addSpacerItem(spc);
+                internalLayout->addWidget(button5);
+                internalLayout->addWidget(button7);
+                internalLayout->addSpacerItem(spc);
                 //internalLayout->addWidget(button5);
                 //internalLayout->addWidget(line_edit_trade_search);
                 lay->addWidget(test, 0, 0);
@@ -844,8 +852,6 @@ MainWindow::MainWindow(QWidget *parent)
     f1f2_order_table->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
     f1f2_order_table->horizontalHeader()->setSectionsMovable(true);
     f1f2_order_table->horizontalHeader()->setStretchLastSection(true);
-
-    // Delay setting to Interactive to ensure initial resize completes
     for (int col = 0; col < f1f2_order_columnCount; ++col) {
         f1f2_order_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Interactive);
     }
@@ -2819,6 +2825,52 @@ void MainWindow::stopall_Button_clicked()
 
 void MainWindow::refresh_Button_clicked(){
   start_dataLoadingThread();
+}
+
+
+void MainWindow::duplicate_Button_clicked() {
+  algo_data_to_insert data;  // Set up data as needed
+  int MaxPortfolioCount = userData.MaxPortfolioCount; // Or retrieve as needed
+  QString msg;
+
+  // Rest of the function's logic using data, MaxPortfolioCount, and msg
+  QModelIndexList selected = getSelectedPortFolioIndexs();
+
+  if (selected.isEmpty()) {
+            QMessageBox::information(this, "Duplicate Portfolio", "Please select a portfolio to duplicate.");
+            return;
+  }
+
+  for (const QModelIndex& index : selected) {
+            PortfolioObject* selectedPortfolio = T_Portfolio_Model->getPortFolioAt(index.row());
+            if (!selectedPortfolio) {
+            qDebug() << "Error: Portfolio object not found at index" << index.row();
+            continue;
+            }
+
+            data.algo_type = selectedPortfolio->PortfolioType;
+            data.Algo_Name = selectedPortfolio->AlgoName;
+            data.Algo_Status = "DisabledByUser";//selectedPortfolio->Status ? "True" : "False";
+            data.Leg1_token_number = QString::number(selectedPortfolio->Leg1TokenNo);
+            data.Leg2_token_number = QString::number(selectedPortfolio->Leg2TokenNo);
+            data.Leg3_token_number = QString::number(selectedPortfolio->Leg3TokenNo);
+            data.Leg4_token_number = QString::number(selectedPortfolio->Leg4TokenNo);
+            data.user_id = QString::number(userData.UserId);
+
+            algo_data_insert_status status = db_conn->insertToAlgoTable(data, MaxPortfolioCount, msg, userData);
+            if(status==algo_data_insert_status::INSERTED){
+
+            }
+            else if(status==algo_data_insert_status::FAILED){
+            }
+            else if(status==algo_data_insert_status::LIMIT_REACHED){
+
+            }
+
+            else if(status==algo_data_insert_status::EXIST){
+
+            }
+  }
 }
 
 

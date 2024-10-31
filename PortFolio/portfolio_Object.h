@@ -116,6 +116,7 @@ public:
     double SellMRWithLeverage();
     double BuyMRWithLeverage();
     QString Price();
+      QString user_id;
 };
 
 
