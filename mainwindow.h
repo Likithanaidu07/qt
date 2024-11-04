@@ -279,6 +279,11 @@ private:
       void updateWatchDataCard(Indices_Data_Struct data);
 
 public slots:
+
+    void addWatchDataCard_TO_UI(Indices_Data_Struct data);
+    void removeWatchDataCard_From_UI(Indices_Data_Struct data);
+    void add_remove_watch_card_slot(bool add,Indices_Data_Struct data);
+
    // void startTableRefreshTimer();
     void openSettingsWindow();
     void onPortfolioAdded();
@@ -329,6 +334,7 @@ public slots:
     void updateHotKeysSlot(QStringList actions);
 
     void exportTableViewToCSV();
+
 
 private slots:
     void on_close_clicked();

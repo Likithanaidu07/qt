@@ -16,6 +16,8 @@ public:
     explicit watch_data_card(QWidget *parent = nullptr);
     ~watch_data_card();
     void setData(Indices_Data_Struct data);
+    QString getIndexName();
+
     Indices_Data_Struct data;
 
 private:

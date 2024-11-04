@@ -15,6 +15,16 @@
   </property>
   <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
+    <widget class="QCheckBox" name="checkBoxShowMainScreen">
+     <property name="toolTip">
+      <string>Check to show on Main page</string>
+     </property>
+     <property name="text">
+      <string/>
+     </property>
+    </widget>
+   </item>
+   <item>
     <widget class="QLabel" name="name">
      <property name="font">
       <font>

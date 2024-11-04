@@ -20,6 +20,7 @@ public:
     explicit Slowdata_Indices_Socket(QObject *parent = nullptr);
     void run() override;
     void sendUDP_TO_Quit();
+    void getIndexFilter();
 
 signals:
     void dataSignal(Indices_Data_Struct data);
@@ -29,6 +30,7 @@ signals:
 private:
     bool run_thread;
     unsigned short mc_port;
+    QStringList indexNameFilter;
 
 };
 

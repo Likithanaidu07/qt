@@ -9,7 +9,7 @@ Watch_cards::Watch_cards(QWidget *parent) :
     ui(new Ui::Watch_cards)
 {
     ui->setupUi(this);
-    this->setFixedSize(330, 325);
+   // this->setFixedSize(330, 325);
 
     ui->widget_15->setVisible(false);
     initWatchWindow();
@@ -57,6 +57,15 @@ void Watch_cards::loadWatch_InstrumentNames(){
             else
                 savedWatchItems = watch.split(";");
         }
+        if(settings.contains("Watch_InstrumentNames_MainWin")){
+            QString watch=  settings.value("Watch_InstrumentNames_MainWin").toString();
+            if(watch=="")
+                savedWatchItemsMainWin.clear();
+            else
+                savedWatchItemsMainWin = watch.split(";");
+        }
+
+
         settings.endGroup();
     }
 
@@ -183,13 +192,29 @@ void Watch_cards::on_lineEditWatchSearch_textChanged(const QString &text)
         auto item = new QListWidgetItem();
         auto widget1 = new watch_Data_List_Item(this);
         Indices_Data_Struct data = indicesDataListTmp[filteredList[i]];
-        widget1->setData(data);
+        widget1->setData(data,&savedWatchItemsMainWin);
         item->setSizeHint(widget1->sizeHint());
 
         ui->listWidgetWatch->addItem(item);
         ui->listWidgetWatch->setItemWidget(item, widget1);
         if(data.indexName==watchItemSelectedindexName)
             selecteIDx = ui->listWidgetWatch->count()-1;
+
+        // Connect the signal to a lambda function
+        connect(widget1, &watch_Data_List_Item::add_watch_item_to_main_win_signal, this, [this](bool checked,Indices_Data_Struct dataSelected) {
+            // Lambda function code to handle the signal
+            if (checked) {
+                // Perform action if checkbox is checked
+               // qDebug() << "Checkbox checked for item" << dataSelected.indexName;
+                addToSavedWatchItems(dataSelected,"Watch_InstrumentNames_MainWin");
+
+            } else {
+                // Perform action if checkbox is unchecked
+                //qDebug() << "Checkbox unchecked for item" << dataSelected.indexName;
+                removeFromSavedWatchItems(dataSelected,"Watch_InstrumentNames_MainWin");
+
+            }
+        });
     }
     if(selecteIDx>-1){
         ui->listWidgetWatch->setCurrentRow(selecteIDx);
@@ -214,12 +239,27 @@ void Watch_cards::showSaveWatchOnListView(){
             auto item = new QListWidgetItem();
             auto widget1 = new watch_Data_List_Item(this);
             Indices_Data_Struct data = indicesDataListTmp[savedWatchItems[i]];
-            widget1->setData(data);
+            widget1->setData(data,&savedWatchItemsMainWin);
             item->setSizeHint(widget1->sizeHint());
             ui->listWidgetWatch->addItem(item);
             ui->listWidgetWatch->setItemWidget(item, widget1);
             if(data.indexName==watchItemSelectedindexName)
                 selecteIDx = ui->listWidgetWatch->count()-1;
+
+            // Connect the signal to a lambda function
+            connect(widget1, &watch_Data_List_Item::add_watch_item_to_main_win_signal, this, [this](bool checked,Indices_Data_Struct dataSelected) {
+                // Lambda function code to handle the signal
+                if (checked) {
+                    // Perform action if checkbox is checked
+                    //qDebug() << "Checkbox checked for item" << dataSelected.indexName;
+                    addToSavedWatchItems(dataSelected,"Watch_InstrumentNames_MainWin");
+
+                } else {
+                    // Perform action if checkbox is unchecked
+                    removeFromSavedWatchItems(dataSelected,"Watch_InstrumentNames_MainWin");
+                   //qDebug() << "Checkbox unchecked for item" << dataSelected.indexName;
+                }
+            });
         }
     }
     if(selecteIDx>-1){
@@ -303,10 +343,10 @@ void Watch_cards::on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item)
 
         //if selected item already in saved item list remove from else or add it
         if(savedWatchItems.contains(widget->data.indexName)){
-            removeFromSavedWatchItems(widget->data);
+            removeFromSavedWatchItems(widget->data,"Watch_InstrumentNames");
         }
         else{
-            addToSavedWatchItems(widget->data);
+            addToSavedWatchItems(widget->data,"Watch_InstrumentNames");
         }
 
         ui->lineEditWatchSearch->clear();
@@ -320,53 +360,105 @@ void Watch_cards::on_listWidgetWatch_itemDoubleClicked(QListWidgetItem *item)
 
 }
 
-void Watch_cards::addToSavedWatchItems(Indices_Data_Struct data)
+void Watch_cards::addToSavedWatchItems(Indices_Data_Struct data,QString key)
 {
-    if(!savedWatchItems.contains(data.indexName)){
-        savedWatchItems.append(data.indexName);
-        QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-        QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
-        settings.beginGroup("GeneralSettings");
-        if(savedWatchItems.length()==1)
-            settings.setValue("Watch_InstrumentNames",savedWatchItems[0]);
-        else
-            settings.setValue("Watch_InstrumentNames",savedWatchItems.join(";"));
-        settings.endGroup();
+    if(key=="Watch_InstrumentNames"){
+        if(!savedWatchItems.contains(data.indexName)){
+            savedWatchItems.append(data.indexName);
+            QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+            QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
+            settings.beginGroup("GeneralSettings");
+            if(savedWatchItems.length()==1)
+                settings.setValue(key,savedWatchItems[0]);
+            else
+                settings.setValue(key,savedWatchItems.join(";"));
+            settings.endGroup();
 
-        if(ui->lineEditWatchSearch->text()=="")
-            showSaveWatchOnListView();
+            if(ui->lineEditWatchSearch->text()=="")
+                showSaveWatchOnListView();
 
+        }
+        else{
+            QMessageBox msgBox;
+            msgBox.setText("IndexName already added.");
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.exec();
+        }
     }
-    else{
-        QMessageBox msgBox;
-        msgBox.setText("IndexName already added.");
-        msgBox.setIcon(QMessageBox::Warning);
-        msgBox.exec();
+
+    else if(key=="Watch_InstrumentNames_MainWin"){
+
+
+
+        if(!savedWatchItemsMainWin.contains(data.indexName)){
+            savedWatchItemsMainWin.append(data.indexName);
+            QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+            QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
+            settings.beginGroup("GeneralSettings");
+            if(savedWatchItemsMainWin.length()==1)
+                settings.setValue(key,savedWatchItemsMainWin[0]);
+            else
+                settings.setValue(key,savedWatchItemsMainWin.join(";"));
+            settings.endGroup();
+
+            emit add_remove_watch_card_signal(true,data);
+
+        }
+        else{
+            QMessageBox msgBox;
+            msgBox.setText("IndexName already added.");
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.exec();
+        }
     }
 }
 
-void Watch_cards::removeFromSavedWatchItems( Indices_Data_Struct data)
+void Watch_cards::removeFromSavedWatchItems( Indices_Data_Struct data,QString key)
 {
-    if(savedWatchItems.contains(data.indexName)){
-        savedWatchItems.removeOne(data.indexName);
-        QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-        QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
-        settings.beginGroup("GeneralSettings");
-        if(savedWatchItems.length()==1)
-            settings.setValue("Watch_InstrumentNames",savedWatchItems[0]);
-        else
-            settings.setValue("Watch_InstrumentNames",savedWatchItems.join(";"));
-        settings.endGroup();
-        if(ui->lineEditWatchSearch->text()=="")
-            showSaveWatchOnListView();
+    if(key=="Watch_InstrumentNames"){
+        if(savedWatchItems.contains(data.indexName)){
+            savedWatchItems.removeOne(data.indexName);
+            QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+            QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
+            settings.beginGroup("GeneralSettings");
+            if(savedWatchItems.length()==1)
+                settings.setValue(key,savedWatchItems[0]);
+            else
+                settings.setValue(key,savedWatchItems.join(";"));
+            settings.endGroup();
+            if(ui->lineEditWatchSearch->text()=="")
+                showSaveWatchOnListView();
 
 
+        }
+        else{
+            QMessageBox msgBox;
+            msgBox.setText("IndexName not exist in Saved List.");
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.exec();
+        }
     }
-    else{
-        QMessageBox msgBox;
-        msgBox.setText("IndexName not exist in Saved List.");
-        msgBox.setIcon(QMessageBox::Warning);
-        msgBox.exec();
+    else if(key=="Watch_InstrumentNames_MainWin"){
+        if(savedWatchItemsMainWin.contains(data.indexName)){
+            savedWatchItemsMainWin.removeOne(data.indexName);
+            QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+            QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
+            settings.beginGroup("GeneralSettings");
+            if(savedWatchItemsMainWin.length()==1)
+                settings.setValue(key,savedWatchItemsMainWin[0]);
+            else
+                settings.setValue(key,savedWatchItemsMainWin.join(";"));
+            settings.endGroup();
+
+            emit add_remove_watch_card_signal(false,data);
+
+        }
+        else{
+            QMessageBox msgBox;
+            msgBox.setText("IndexName not exist in Saved List.");
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.exec();
+        }
     }
 
 }

@@ -40,16 +40,18 @@ private:
     QMutex indicesDataMutex; //list to store indices data for watch
     QString watchItemSelectedindexName;
     QStringList savedWatchItems; // saved watch item to display on watch
+    QStringList savedWatchItemsMainWin; // saved watch item to display on main window also check box on list
     void showSaveWatchOnListView();
     void initWatchWindow();
     void loadWatch_InstrumentNames();
     void updateSelecteWatch_UI( Indices_Data_Struct data);
-    void addToSavedWatchItems(Indices_Data_Struct data);
-    void removeFromSavedWatchItems(Indices_Data_Struct data);
+    void addToSavedWatchItems(Indices_Data_Struct data, QString key);
+    void removeFromSavedWatchItems(Indices_Data_Struct data, QString key);
     void saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList);
     void loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList);
 
-
+signals:
+    void add_remove_watch_card_signal(bool,Indices_Data_Struct);
 };
 
 #endif // WATCH_CARDS_H

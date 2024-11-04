@@ -1426,6 +1426,7 @@ void MainWindow::createINIFileIfNotExist(){
         settings.setValue("market_type","fo"); // or cds
         settings.setValue("InstrumentTypeFilter","");
         settings.setValue("Watch_InstrumentNames","");
+        settings.setValue("Watch_InstrumentNames_MainWin","");
         settings.endGroup();
     }
     else{
@@ -1445,6 +1446,8 @@ void MainWindow::createINIFileIfNotExist(){
             settings.setValue("InstrumentTypeFilter","");
         if (!settings.contains("Watch_InstrumentNames"))
             settings.setValue("Watch_InstrumentNames","");
+        if (!settings.contains("Watch_InstrumentNames_MainWin"))
+            settings.setValue("Watch_InstrumentNames_MainWin","");
         settings.endGroup();
     }
     if(!groups.contains("BackendServerDetails")){
@@ -1645,20 +1648,20 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 switch (columnIdx) {
                 case PortfolioData_Idx::_OrderQuantity:{
                 int lotSize = P->GetLotSize();//T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
-                double val = valStr.toDouble();
-                val=val*lotSize;
-                double vfq = P->VolumeFreezeQty;//T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
+                double OrderQty_val = valStr.toDouble();
+                OrderQty_val=OrderQty_val*lotSize;
+                //double vfq = P->VolumeFreezeQty;//T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
 
-                if(val > vfq){
+                if(OrderQty_val > 10){
                     QMessageBox msgBox;
                     msgBox.setText("Cannot update OrderQuantity");
-                    msgBox.setText("OrderQuantity cannot be greater than VolumeFreezeQty "+QString::number(vfq/lotSize));
+                    msgBox.setText("OrderQuantity cannot be greater than VolumeFreezeQty "+QString::number(10));
                     msgBox.setIcon(QMessageBox::Warning);
                     msgBox.exec();
                 }
                 else{
                     //write
-                    int val1 = valStr.toInt();
+                    int OrderQty = valStr.toInt();
                     int BuyTotalQuantity = P->BuyTotalQuantity;// T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity;
                     int SellTotalQuantity = P->SellTotalQuantity;// T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity;
                     int qty = BuyTotalQuantity;
@@ -1672,7 +1675,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     else
                         qty = SellTotalQuantity;
                     //check the condtion
-                    if(val1 >qty){
+                    if(OrderQty >qty){
                         QMessageBox msgBox;
                         msgBox.setText("Cannot update OrderQuantity");
                         msgBox.setText("OrderQuantity cannot be greater than totalQty "+QString::number(qty));
@@ -1680,8 +1683,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                         msgBox.exec();
                     }
                     else{
-                        updateQueryList.append("OrderQuantity="+QString::number(val));
-                        logMsg = logMsg+"OrderQuantity ["+QString::number(val1)+"], ";
+                        updateQueryList.append("OrderQuantity="+QString::number(OrderQty_val));
+                        logMsg = logMsg+"OrderQuantity ["+QString::number(OrderQty)+"], ";
                     }
                 }
                 }
@@ -3875,6 +3878,9 @@ void MainWindow::onWatchActionTriggered(){
     WC->setAttribute(Qt::WA_DeleteOnClose);
     //connect(this, &MainWindow::indicesDataRecv_Signal_watch_card(Indices_Data_Struct), WC, &Watch_cards::indicesDataRecv_Slot(Indices_Data_Struct));
     connect(this, &MainWindow::indicesDataRecv_Signal_watch_card, WC, &Watch_cards::indicesDataRecv_Slot);
+    connect(WC, &Watch_cards::add_remove_watch_card_signal,this , &MainWindow::add_remove_watch_card_slot);
+
+
     WC->show();
 }
 
@@ -4183,8 +4189,8 @@ void MainWindow::instilizeWatchUIOnTopBar(){
     QString market_type = "fo";
     if(groups.contains("GeneralSettings")){
         settings.beginGroup("GeneralSettings");
-        if(settings.contains("Watch_InstrumentNames")){
-            QString watch=  settings.value("Watch_InstrumentNames").toString();
+        if(settings.contains("Watch_InstrumentNames_MainWin")){
+            QString watch=  settings.value("Watch_InstrumentNames_MainWin").toString();
             if(watch=="")
                 savedWatchItems.clear();
             else
@@ -4209,23 +4215,43 @@ void MainWindow::instilizeWatchUIOnTopBar(){
 
     for(int i=0;i<savedWatchItems.length();i++){
         if(indicesDataList.contains(savedWatchItems[i])){
-            auto widget1 = new watch_data_card();
-            Indices_Data_Struct data = indicesDataList[savedWatchItems[i]];
-            widget1->setData(data);
-            watchCardWidgetList.append(widget1);
-            // Set background color using QPalette
-          /*  QPalette pal = widget1->palette();
-            pal.setColor(QPalette::Window, Qt::lightGray);  // Use QPalette::Window in Qt 6
-            widget1->setAutoFillBackground(true);  // Ensures that the background is painted
-            widget1->setPalette(pal);*/
-
-            // Add the widget to the horizontal layout
-            ui->horizontalLayout_Watch->addWidget(widget1);
+           addWatchDataCard_TO_UI(indicesDataList[savedWatchItems[i]]);
         }
     }
 
 
 }
+
+void MainWindow::add_remove_watch_card_slot(bool add,Indices_Data_Struct data){
+    if(add){
+       addWatchDataCard_TO_UI(data);
+    }
+    else{
+      removeWatchDataCard_From_UI(data);
+    }
+}
+
+void MainWindow::addWatchDataCard_TO_UI(Indices_Data_Struct data){
+    auto widget1 = new watch_data_card();
+    widget1->setData(data);
+    watchCardWidgetList.append(widget1);
+    // Add the widget to the horizontal layout
+    ui->horizontalLayout_Watch->addWidget(widget1);
+}
+
+void MainWindow::removeWatchDataCard_From_UI(Indices_Data_Struct data){
+    for (int i = 0; i < watchCardWidgetList.size(); ++i) {
+          auto widget = watchCardWidgetList[i];
+          if (widget->getIndexName() == data.indexName) {  // Assuming getData() returns Indices_Data_Struct for comparison
+              ui->horizontalLayout_Watch->removeWidget(widget);  // Remove from layout
+              watchCardWidgetList.removeAt(i);                   // Remove from list
+              widget->deleteLater();                             // Schedule widget for deletion
+              break;
+          }
+      }
+}
+
+
 
 void MainWindow::updateWatchDataCard(Indices_Data_Struct data){
    for(int i=0;i<watchCardWidgetList.size();i++){

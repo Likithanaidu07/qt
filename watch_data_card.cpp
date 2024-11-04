@@ -32,6 +32,9 @@ watch_data_card::watch_data_card(QWidget *parent) :
 
 
 }
+QString watch_data_card::getIndexName(){
+    return data.indexName;
+}
 
 void watch_data_card::setData(Indices_Data_Struct data) {
     bool redArrow = true;

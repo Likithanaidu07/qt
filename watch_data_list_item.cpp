@@ -1,5 +1,6 @@
 #include "watch_data_list_item.h"
 #include "ui_watch_data_list_item.h"
+#include "QMessageBox"
 
 watch_Data_List_Item::watch_Data_List_Item(QWidget *parent) :
     QWidget(parent),
@@ -26,7 +27,8 @@ watch_Data_List_Item::watch_Data_List_Item(QWidget *parent) :
                         );
 }
 
-void watch_Data_List_Item::setData(Indices_Data_Struct data) {
+void watch_Data_List_Item::setData(Indices_Data_Struct data, QStringList* savedWatchItemsMainWinPtr_) {
+
     bool redArrow = true;
     //if(data.netChangeIndicator=="+")
     // redArrow = false;
@@ -34,6 +36,7 @@ void watch_Data_List_Item::setData(Indices_Data_Struct data) {
         redArrow = false;
 
     this->data = data;
+    this->savedWatchItemsMainWinPtr = savedWatchItemsMainWinPtr_; // Assign pointer
 
     if(redArrow){
         QPixmap pixmap(":/arrow_red.png");
@@ -64,6 +67,7 @@ void watch_Data_List_Item::setData(Indices_Data_Struct data) {
     ui->value1->setText(data.indexValue);
     ui->value2->setText(percent);
 
+    ui->checkBoxShowMainScreen->setChecked(savedWatchItemsMainWinPtr->contains(data.indexName));
 
 }
 
@@ -72,3 +76,24 @@ watch_Data_List_Item::~watch_Data_List_Item()
 {
     delete ui;
 }
+
+
+
+void watch_Data_List_Item::on_checkBoxShowMainScreen_clicked(bool checked)
+{
+    if(checked){
+        if(savedWatchItemsMainWinPtr->size()==4){
+            QMessageBox msgBox;
+            msgBox.setText("Cannot add more than 4 Index , please remove 1 item and try again.!");
+            msgBox.setIcon(QMessageBox::Warning);
+            msgBox.exec();
+            ui->checkBoxShowMainScreen->setChecked(false);
+
+            return;
+        }
+    }
+
+   emit add_watch_item_to_main_win_signal(checked,data);
+
+}
+

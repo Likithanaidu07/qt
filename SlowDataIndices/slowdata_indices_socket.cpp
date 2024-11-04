@@ -104,6 +104,87 @@ Slowdata_Indices_Socket::Slowdata_Indices_Socket(QObject *parent)
 {
     run_thread = true;
     MBP_Data_Struct  MBP_Data;
+    getIndexFilter();
+
+}
+void Slowdata_Indices_Socket::getIndexFilter(){
+
+    indexNameFilter.append("NIFTY 50");
+    indexNameFilter.append("NIFTY NEXT 50");
+    indexNameFilter.append("NIFTY 100");
+    indexNameFilter.append("NIFTY 200");
+    indexNameFilter.append("NIFTY 500");
+    indexNameFilter.append("NIFTY MIDCAP 50");
+    indexNameFilter.append("NIFTY MIDCAP 100");
+    indexNameFilter.append("NIFTY SMALLCAP 100");
+    indexNameFilter.append("INDIA VIX");
+    indexNameFilter.append("NIFTY MIDCAP 150");
+    indexNameFilter.append("NIFTY SMALLCAP 50");
+    indexNameFilter.append("NIFTY SMALLCAP 250");
+    indexNameFilter.append("NIFTY MIDSMALLCAP 400");
+    indexNameFilter.append("NIFTY500 MULTICAP 50:25:25");
+    indexNameFilter.append("NIFTY LARGEMIDCAP 250");
+    indexNameFilter.append("NIFTY MIDCAP SELECT");
+    indexNameFilter.append("NIFTY TOTAL MARKET");
+    indexNameFilter.append("NIFTY MICROCAP 250");
+    indexNameFilter.append("NIFTY BANK");
+    indexNameFilter.append("NIFTY AUTO");
+    indexNameFilter.append("NIFTY FINANCIAL SERVICES");
+    indexNameFilter.append("NIFTY FINANCIAL SERVICES 25/50");
+    indexNameFilter.append("NIFTY FMCG");
+    indexNameFilter.append("NIFTY IT");
+    indexNameFilter.append("NIFTY MEDIA");
+    indexNameFilter.append("NIFTY METAL");
+    indexNameFilter.append("NIFTY PHARMA");
+    indexNameFilter.append("NIFTY PSU BANK");
+    indexNameFilter.append("NIFTY PRIVATE BANK");
+    indexNameFilter.append("NIFTY REALTY");
+    indexNameFilter.append("NIFTY HEALTHCARE INDEX");
+    indexNameFilter.append("NIFTY CONSUMER DURABLES");
+    indexNameFilter.append("NIFTY OIL & GAS");
+    indexNameFilter.append("NIFTY DIVIDEND OPPORTUNITIES 50");
+    indexNameFilter.append("NIFTY GROWTH SECTORS 15");
+    indexNameFilter.append("NIFTY100 QUALITY 30");
+    indexNameFilter.append("NIFTY50 VALUE 20");
+    indexNameFilter.append("NIFTY50 TR 2X LEVERAGE");
+    indexNameFilter.append("NIFTY50 PR 2X LEVERAGE");
+    indexNameFilter.append("NIFTY50 TR 1X INVERSE");
+    indexNameFilter.append("NIFTY50 PR 1X INVERSE");
+    indexNameFilter.append("NIFTY50 DIVIDEND POINTS");
+    indexNameFilter.append("NIFTY ALPHA 50");
+    indexNameFilter.append("NIFTY50 EQUAL WEIGHT");
+    indexNameFilter.append("NIFTY100 EQUAL WEIGHT");
+    indexNameFilter.append("NIFTY100 LOW VOLATILITY 30");
+    indexNameFilter.append("NIFTY200 QUALITY 30");
+    indexNameFilter.append("NIFTY ALPHA LOW-VOLATILITY 30");
+    indexNameFilter.append("NIFTY200 MOMENTUM 30");
+    indexNameFilter.append("NIFTY MIDCAP150 QUALITY 50");
+    indexNameFilter.append("NIFTY COMMODITIES");
+    indexNameFilter.append("NIFTY INDIA CONSUMPTION");
+    indexNameFilter.append("NIFTY CPSE");
+    indexNameFilter.append("NIFTY ENERGY");
+    indexNameFilter.append("NIFTY INFRASTRUCTURE");
+    indexNameFilter.append("NIFTY100 LIQUID 15");
+    indexNameFilter.append("NIFTY MIDCAP LIQUID 15");
+    indexNameFilter.append("NIFTY MNC");
+    indexNameFilter.append("NIFTY PSE");
+    indexNameFilter.append("NIFTY SERVICES SECTOR");
+    indexNameFilter.append("NIFTY100 ESG SECTOR LEADERS");
+    indexNameFilter.append("NIFTY INDIA DIGITAL");
+    indexNameFilter.append("NIFTY100 ESG");
+    indexNameFilter.append("NIFTY INDIA MANUFACTURING");
+    indexNameFilter.append("NIFTY 8-13 YR G-SEC");
+    indexNameFilter.append("NIFTY 10 YR BENCHMARK G-SEC");
+    indexNameFilter.append("NIFTY 10 YR BENCHMARK G-SEC (CLEAN PRICE)");
+    indexNameFilter.append("NIFTY 4-8 YR G-SEC INDEX");
+    indexNameFilter.append("NIFTY 11-15 YR G-SEC INDEX");
+    indexNameFilter.append("NIFTY 15 YR AND ABOVE G-SEC INDEX");
+    indexNameFilter.append("NIFTY COMPOSITE G-SEC INDEX");
+
+    //capiltalize
+    for (int i = 0; i < indexNameFilter.size(); ++i) {
+        indexNameFilter[i] = indexNameFilter[i].toUpper();
+    }
 
 }
 
@@ -330,9 +411,10 @@ void Slowdata_Indices_Socket::run()
 
                 emit socket_conn_info_Signal("MS_BCAST_INDICES Data: \n================\n"+dataStr+"\n\n");
                 indexName = indexName.trimmed();
-                // qDebug()<<"indexName:  "<<indexName;
+             //   qDebug()<<"indexName:  "<<indexName;
                 double indexValueD = indexValue/100.0; //"N", "BN", "FN","VIX"
-                if(indexName =="Nifty 50"){
+
+                if(indexNameFilter.contains(indexName.toUpper())){
                     Indices_Data_Struct data;
                     data.indexName =indexName;
                     data.indexValue = QString::number(indexValueD,'f',2);
@@ -344,7 +426,23 @@ void Slowdata_Indices_Socket::run()
                     data.openingIdx = QString::number(openingIdx);
                     data.closingIdx = QString::number(closingIDx);
                     data.marketCapitialisation = QString::number(marketCapitialisation);
-                    data.display_widget_idx = IndicesDataWidgetID::WIDGET_NIFTY_50;
+                    data.display_widget_idx = IndicesDataWidgetID::NA;
+                    emit dataSignal(data);
+                }
+
+                /*if(indexName =="Nifty 50"){
+                    Indices_Data_Struct data;
+                    data.indexName =indexName;
+                    data.indexValue = QString::number(indexValueD,'f',2);
+                    data.change = QString::number(((indexValue-closingIDx)/100.0),'f',2);
+                    data.percentagechange = QString::number(((percentChange)/100.0),'f',2);
+                    data.netChangeIndicator = netChangeIndicator;
+                    data.highIndexValue = QString::number(highIndexValue);
+                    data.lowIndexValue = QString::number(lowIndexValue);
+                    data.openingIdx = QString::number(openingIdx);
+                    data.closingIdx = QString::number(closingIDx);
+                    data.marketCapitialisation = QString::number(marketCapitialisation);
+                    data.display_widget_idx = IndicesDataWidgetID::NA;
                     emit dataSignal(data);
                 }
                 else if(indexName == "Nifty Bank"){
@@ -359,7 +457,7 @@ void Slowdata_Indices_Socket::run()
                     data.openingIdx = QString::number(openingIdx);
                     data.closingIdx = QString::number(closingIDx);
                     data.marketCapitialisation = QString::number(marketCapitialisation);
-                    data.display_widget_idx = IndicesDataWidgetID::WIDGET_NIFTY_BANK;
+                    data.display_widget_idx = IndicesDataWidgetID::NA;
                     emit dataSignal(data);
                 }
                 else if(indexName == "India VIX"){
@@ -375,7 +473,7 @@ void Slowdata_Indices_Socket::run()
                     data.openingIdx = QString::number(openingIdx);
                     data.closingIdx = QString::number(closingIDx);
                     data.marketCapitialisation = QString::number(marketCapitialisation);
-                    data.display_widget_idx = IndicesDataWidgetID::WIDGET_INDIA_VIX;
+                    data.display_widget_idx = IndicesDataWidgetID::NA;
                     emit dataSignal(data);
                 }
                 else if(indexName == "Nifty Fin Service"){
@@ -390,9 +488,26 @@ void Slowdata_Indices_Socket::run()
                     data.openingIdx = QString::number(openingIdx);
                     data.closingIdx = QString::number(closingIDx);
                     data.marketCapitialisation = QString::number(marketCapitialisation);
-                    data.display_widget_idx = IndicesDataWidgetID::WIDGET_NIFTY_FINANCIAL_SERVICES;
+                    data.display_widget_idx = IndicesDataWidgetID::NA;
                     emit dataSignal(data);
                 }
+                else if(indexName == "Nifty Midcap 50"){
+                    Indices_Data_Struct data;
+                    data.indexName =indexName;
+                    data.indexValue = QString::number(indexValueD,'f',2);
+                    data.change = QString::number(((indexValue-closingIDx)/100.0),'f',2);
+                    data.percentagechange = QString::number(((percentChange)/100.0),'f',2);
+                    data.netChangeIndicator = netChangeIndicator;
+                    data.highIndexValue = QString::number(highIndexValue);
+                    data.lowIndexValue = QString::number(lowIndexValue);
+                    data.openingIdx = QString::number(openingIdx);
+                    data.closingIdx = QString::number(closingIDx);
+                    data.marketCapitialisation = QString::number(marketCapitialisation);
+                    data.display_widget_idx = IndicesDataWidgetID::NA;
+                    emit dataSignal(data);
+                }*/
+
+
 
 
 
