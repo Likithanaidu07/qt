@@ -27,6 +27,8 @@ public:
 
 private:
     int findNextEditableCell(int currentColIdx,nav_direction direction);
+    void reorderEditableIndicesBasedOnVisualIndex( QList<int>& editableIDx);
+
 protected:
     void keyPressEvent(QKeyEvent *event) Q_DECL_OVERRIDE;
     void selectionChanged(const QItemSelection &selected, const QItemSelection &deselected) override;

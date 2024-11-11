@@ -16,6 +16,9 @@
   <property name="windowTitle">
    <string>Summary</string>
   </property>
+  <property name="windowIcon">
+   <iconset theme="dialog-error"/>
+  </property>
   <property name="modal">
    <bool>false</bool>
   </property>
@@ -183,6 +186,11 @@ line-height: normal;
            </property>
            <item>
             <widget class="QLabel" name="label_2">
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Algo Count </string>
              </property>
@@ -205,7 +213,7 @@ line-height: normal;
 &lt;head/&gt;
 &lt;body&gt;
     &lt;p style=&quot;text-align: center;&quot;&gt;
-        &lt;span style=&quot;font-size: 11pt; font-weight: 700;&quot;&gt;
+        &lt;span style=&quot;font-size: 12pt; font-weight: 700;&quot;&gt;
             -
         &lt;/span&gt;
     &lt;/p&gt;
@@ -232,6 +240,11 @@ line-height: normal;
            </property>
            <item>
             <widget class="QLabel" name="label_6">
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Buy value</string>
              </property>
@@ -247,7 +260,7 @@ line-height: normal;
 &lt;head/&gt;
 &lt;body&gt;
     &lt;p style=&quot;text-align: center;&quot;&gt;
-        &lt;span style=&quot;font-size: 11pt; font-weight: 700;&quot;&gt;
+        &lt;span style=&quot;font-size: 12pt; font-weight: 700;&quot;&gt;
             -
         &lt;/span&gt;
     &lt;/p&gt;
@@ -274,6 +287,11 @@ line-height: normal;
            </property>
            <item>
             <widget class="QLabel" name="label_20">
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Buy Lot</string>
              </property>
@@ -289,7 +307,7 @@ line-height: normal;
 &lt;head/&gt;
 &lt;body&gt;
     &lt;p style=&quot;text-align: center;&quot;&gt;
-        &lt;span style=&quot;font-size: 11pt; font-weight: 700;&quot;&gt;
+        &lt;span style=&quot;font-size: 12pt; font-weight: 700;&quot;&gt;
             -
         &lt;/span&gt;
     &lt;/p&gt;
@@ -328,6 +346,11 @@ line-height: normal;
                <height>0</height>
               </size>
              </property>
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>M2M</string>
              </property>
@@ -343,7 +366,7 @@ line-height: normal;
 &lt;head/&gt;
 &lt;body&gt;
     &lt;p style=&quot;text-align: center;&quot;&gt;
-        &lt;span style=&quot;font-size: 11pt; font-weight: 700;&quot;&gt;
+        &lt;span style=&quot;font-size: 12pt; font-weight: 700;&quot;&gt;
             -
         &lt;/span&gt;
     &lt;/p&gt;
@@ -374,6 +397,11 @@ line-height: normal;
            </property>
            <item>
             <widget class="QLabel" name="label_7">
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Order Count</string>
              </property>
@@ -389,7 +417,7 @@ line-height: normal;
 &lt;head/&gt;
 &lt;body&gt;
     &lt;p style=&quot;text-align: center;&quot;&gt;
-        &lt;span style=&quot;font-size: 11pt; font-weight: 700;&quot;&gt;
+        &lt;span style=&quot;font-size: 12pt; font-weight: 700;&quot;&gt;
             -
         &lt;/span&gt;
     &lt;/p&gt;
@@ -416,6 +444,11 @@ line-height: normal;
            </property>
            <item>
             <widget class="QLabel" name="label_8">
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Sell Value</string>
              </property>
@@ -431,7 +464,7 @@ line-height: normal;
 &lt;head/&gt;
 &lt;body&gt;
     &lt;p style=&quot;text-align: center;&quot;&gt;
-        &lt;span style=&quot;font-size: 11pt; font-weight: 700;&quot;&gt;
+        &lt;span style=&quot;font-size: 12pt; font-weight: 700;&quot;&gt;
             -
         &lt;/span&gt;
     &lt;/p&gt;
@@ -476,6 +509,11 @@ line-height: normal;
                <height>0</height>
               </size>
              </property>
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Sell Lot</string>
              </property>
@@ -494,7 +532,7 @@ line-height: normal;
 &lt;head/&gt;
 &lt;body&gt;
     &lt;p style=&quot;text-align: center;&quot;&gt;
-        &lt;span style=&quot;font-size: 11pt; font-weight: 700;&quot;&gt;
+        &lt;span style=&quot;font-size: 12pt; font-weight: 700;&quot;&gt;
             -
         &lt;/span&gt;
     &lt;/p&gt;
@@ -527,6 +565,11 @@ line-height: normal;
            </property>
            <item>
             <widget class="QLabel" name="label_10">
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Avl Margin</string>
              </property>
@@ -542,7 +585,7 @@ line-height: normal;
 &lt;head/&gt;
 &lt;body&gt;
     &lt;p style=&quot;text-align: center;&quot;&gt;
-        &lt;span style=&quot;font-size: 11pt; font-weight: 700;&quot;&gt;
+        &lt;span style=&quot;font-size: 12pt; font-weight: 700;&quot;&gt;
             -
         &lt;/span&gt;
     &lt;/p&gt;
@@ -573,6 +616,11 @@ line-height: normal;
            </property>
            <item>
             <widget class="QLabel" name="m2mlabel">
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Trade Count</string>
              </property>
@@ -588,7 +636,7 @@ line-height: normal;
 &lt;head/&gt;
 &lt;body&gt;
     &lt;p style=&quot;text-align: center;&quot;&gt;
-        &lt;span style=&quot;font-size: 11pt; font-weight: 700;&quot;&gt;
+        &lt;span style=&quot;font-size: 12pt; font-weight: 700;&quot;&gt;
             -
         &lt;/span&gt;
     &lt;/p&gt;
@@ -615,6 +663,11 @@ line-height: normal;
            </property>
            <item>
             <widget class="QLabel" name="label_13">
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Profit</string>
              </property>
@@ -630,7 +683,7 @@ line-height: normal;
 &lt;head/&gt;
 &lt;body&gt;
     &lt;p style=&quot;text-align: center;&quot;&gt;
-        &lt;span style=&quot;font-size: 11pt; font-weight: 700;&quot;&gt;
+        &lt;span style=&quot;font-size: 12pt; font-weight: 700;&quot;&gt;
             -
         &lt;/span&gt;
     &lt;/p&gt;
@@ -663,6 +716,11 @@ line-height: normal;
            </property>
            <item>
             <widget class="QLabel" name="label_14">
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Net Lot</string>
              </property>
@@ -681,7 +739,7 @@ line-height: normal;
 &lt;head/&gt;
 &lt;body&gt;
     &lt;p style=&quot;text-align: center;&quot;&gt;
-        &lt;span style=&quot;font-size: 11pt; font-weight: 700;&quot;&gt;
+        &lt;span style=&quot;font-size: 12pt; font-weight: 700;&quot;&gt;
             -
         &lt;/span&gt;
     &lt;/p&gt;
@@ -708,6 +766,11 @@ line-height: normal;
            </property>
            <item>
             <widget class="QLabel" name="label_16">
+             <property name="font">
+              <font>
+               <bold>true</bold>
+              </font>
+             </property>
              <property name="text">
               <string>Used Margin</string>
              </property>
@@ -723,7 +786,7 @@ line-height: normal;
 &lt;head/&gt;
 &lt;body&gt;
     &lt;p style=&quot;text-align: center;&quot;&gt;
-        &lt;span style=&quot;font-size: 11pt; font-weight: 700;&quot;&gt;
+        &lt;span style=&quot;font-size: 12pt; font-weight: 700;&quot;&gt;
             -
         &lt;/span&gt;
     &lt;/p&gt;

@@ -1,5 +1,7 @@
 #include "table_portfolios_custom.h"
+#include "qheaderview.h"
 #include "qpainter.h"
+#include <QHeaderView>
 
 #include <algorithm>
 
@@ -111,6 +113,27 @@ void table_portfolios_custom::mousePressEvent(QMouseEvent *event)
     }
 }
 
+void table_portfolios_custom::reorderEditableIndicesBasedOnVisualIndex( QList<int>& editableIDx) {
+    QList<QPair<int, int>> indexPairs;
+
+    // Map each logical index in 'editableIDx' to its visual index
+    for (int logicalIndex : editableIDx) {
+        int visualIndex = this->horizontalHeader()->visualIndex(logicalIndex);
+        indexPairs.append(qMakePair(visualIndex, logicalIndex));
+    }
+
+    // Sort the list based on visual indices
+    std::sort(indexPairs.begin(), indexPairs.end(), [](const QPair<int, int>& a, const QPair<int, int>& b) {
+        return a.first < b.first;
+    });
+
+    // Update 'editableIDx' with the reordered logical indices
+    editableIDx.clear();
+    for (const QPair<int, int>& pair : indexPairs) {
+        editableIDx.append(pair.second);
+    }
+}
+
 int table_portfolios_custom::findNextEditableCell(int currentColIdx, nav_direction direction)
 {
     QList<int> editableIDx = {
@@ -124,6 +147,10 @@ int table_portfolios_custom::findNextEditableCell(int currentColIdx, nav_directi
 
     }; // These are the editable table cells in algo table
     std::sort(editableIDx.begin(), editableIDx.end());
+    qDebug()<<"before sort"<<editableIDx;
+
+   // reorderEditableIndicesBasedOnVisualIndex(editableIDx);
+    qDebug()<<"after sort"<<editableIDx;
 
     int idx = currentColIdx;
 

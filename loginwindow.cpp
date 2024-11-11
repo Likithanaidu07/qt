@@ -21,7 +21,7 @@ loginwindow::loginwindow(QWidget *parent) :
     ui->lineEditUsername->setText("JNK82");
     ui->lineEdit_Password->setText("123");
 #endif
-   ui->lineEditUsername->setText("JNK82");
+   ui->lineEditUsername->setText("STM102");
    ui->lineEdit_Password->setText("123");
 
  //   MainWindowObj = (MainWindow*) parent;
@@ -84,6 +84,7 @@ loginwindow::loginwindow(QWidget *parent) :
         }
         settings.endGroup();
     }
+
 }
 
 QString loginwindow::base64_encode(QString str){
