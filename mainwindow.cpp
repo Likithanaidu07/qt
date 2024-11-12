@@ -43,7 +43,11 @@ MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow),
      sortWin(nullptr), // Initialize the pointer to nullptr,
-     convertalgo(nullptr)
+     convertalgo(nullptr),
+     summary(nullptr),
+     watch(nullptr),
+     logs(nullptr)
+
 
 {
 
@@ -99,7 +103,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     /********************************************************************************/
-
 
 
     //    // Create the Card menu
@@ -435,6 +438,7 @@ MainWindow::MainWindow(QWidget *parent)
                 "border-radius: 4px;"
                 "border: 1px solid #4F5D75;"
                 "background: #106B9A;"
+                "color: white;"
 //                "color: #4F5D75;"
 //                "font-style: normal;"
 //                "font-size: 12px;"
@@ -448,6 +452,7 @@ MainWindow::MainWindow(QWidget *parent)
                 "background: #495057;"
                 "color: #FFF;"
                 "font-family: Work Sans;"
+                "color: white;"
 //                "font-size: 12px;"
 //                "font-style: normal;"
 //                "font-weight: 500;"
@@ -509,7 +514,7 @@ MainWindow::MainWindow(QWidget *parent)
     T_Portfolio_Table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 
     //T_Portfolio_Table->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
-    T_Portfolio_Table->horizontalHeader()->setStretchLastSection(true);
+    T_Portfolio_Table->horizontalHeader()->setStretchLastSection(false);
     T_Portfolio_Table->setShowGrid(false);
     T_Portfolio_Table->verticalHeader()->setVisible(false);
     T_Portfolio_Table->setAlternatingRowColors(true);
@@ -702,7 +707,7 @@ MainWindow::MainWindow(QWidget *parent)
     //trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
    // trade_table->setColumnWidth(1,300);
 
-    trade_table->horizontalHeader()->setStretchLastSection(true);
+    trade_table->horizontalHeader()->setStretchLastSection(false);
     trade_table->verticalHeader()->setVisible(false);
     // trade_table->setStyleSheet("QHeaderView { background-color: #111111;} QHeaderView::section { background-color:#555555;color:#eeeeee;font-weight: 400; }");
     trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
@@ -724,7 +729,7 @@ MainWindow::MainWindow(QWidget *parent)
     }
 
     trade_table->horizontalHeader()->setSectionsMovable(true);
-    trade_table->horizontalHeader()->setStretchLastSection(true);
+    trade_table->horizontalHeader()->setStretchLastSection(false);
 
     // Now change the mode to allow interactive resizing
     for (int col = 0; col < Trade_columnCount; ++col) {
@@ -740,7 +745,7 @@ MainWindow::MainWindow(QWidget *parent)
     /***********Init F1F2 Order  Window**************************/
     QPixmap pixmapdock_order_f1f2_close(":/dock_close.png");
 
-    dock_win_f1f2_order =  new CDockWidget(tr("Manual Trades"));
+    dock_win_f1f2_order =  new CDockWidget(tr("Liners"));
 
     connect(dock_win_f1f2_order, SIGNAL(visibilityChanged(bool)), this, SLOT(OnF1F2OrderDockWidgetVisiblityChanged(bool)));
    // subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_f1f2_order);
@@ -757,7 +762,7 @@ MainWindow::MainWindow(QWidget *parent)
     QHBoxLayout *f1f2_order_title_layout=new QHBoxLayout(f1f2_order_titlebar);
     f1f2_order_title_layout->setSpacing(10);
     f1f2_order_title_layout->setContentsMargins(17,8,10,6);
-    QLabel *f1f2_order_label=new QLabel("Manual Trades");
+    QLabel *f1f2_order_label=new QLabel("Liners");
     QFont font_f1f2_order_label=f1f2_order_label->font();
     font_f1f2_order_label.setFamily("Work Sans");
     f1f2_order_label->setFont(font_f1f2_order_label);
@@ -840,7 +845,7 @@ MainWindow::MainWindow(QWidget *parent)
     //f1f2_order_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
    // f1f2_order_table->setColumnWidth(1,300);
 
-    f1f2_order_table->horizontalHeader()->setStretchLastSection(true);
+    f1f2_order_table->horizontalHeader()->setStretchLastSection(false);
     f1f2_order_table->verticalHeader()->setVisible(false);
     // f1f2_order_table->setStyleSheet("QHeaderView { background-color: #111111;} QHeaderView::section { background-color:#555555;color:#eeeeee;font-weight: 400; }");
     f1f2_order_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
@@ -861,7 +866,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     f1f2_order_table->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
     f1f2_order_table->horizontalHeader()->setSectionsMovable(true);
-    f1f2_order_table->horizontalHeader()->setStretchLastSection(true);
+    f1f2_order_table->horizontalHeader()->setStretchLastSection(false);
     for (int col = 0; col < f1f2_order_columnCount; ++col) {
         f1f2_order_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Interactive);
     }
@@ -875,7 +880,7 @@ MainWindow::MainWindow(QWidget *parent)
     /************Positions Window********************************/
     QPixmap pixmapdock_position_close(":/dock_close.png");
 
-    dock_win_net_pos =  new CDockWidget(tr("Positions"));
+    dock_win_net_pos =  new CDockWidget(tr("Net Positions"));
     connect(dock_win_net_pos, SIGNAL(visibilityChanged(bool)), this, SLOT(OnPositionsDockWidgetVisiblityChanged(bool)));
     //dock_win_net_pos->setAllowedAreas(Qt::AllDockWidgetAreas );
    // subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_net_pos);
@@ -944,7 +949,7 @@ MainWindow::MainWindow(QWidget *parent)
     net_pos_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Make all columns resizable by default
     //net_pos_table->setColumnWidth(1,250);
 
-    net_pos_table->horizontalHeader()->setStretchLastSection(true);
+    net_pos_table->horizontalHeader()->setStretchLastSection(false);
     net_pos_table->verticalHeader()->setVisible(false);
     /*  net_pos_table->setStyleSheet("QTableView {selection-background-color: #EFB37F;"
                                         "selection-color: #4D4D4D;"
@@ -956,7 +961,7 @@ MainWindow::MainWindow(QWidget *parent)
     net_pos_table->setSelectionMode(QAbstractItemView::SingleSelection);
     net_position_table_delegate* netpos_delegate=new net_position_table_delegate;
     net_pos_table->setItemDelegate(netpos_delegate);
-   net_pos_table->horizontalHeader()->setStretchLastSection(true);
+   net_pos_table->horizontalHeader()->setStretchLastSection(false);
     dock_win_net_pos->setWidget(net_pos_table);
     net_pos_table->show();
     restoreTableViewColumnState(net_pos_table);
@@ -977,7 +982,7 @@ MainWindow::MainWindow(QWidget *parent)
     /************Liners Window********************************/
     QPixmap pixmapdock_Liners_close(":/dock_close.png");
 
-    dock_win_liners =  new CDockWidget(tr("Liners"));
+    dock_win_liners =  new CDockWidget(tr("Algo Position"));
     connect(dock_win_liners, SIGNAL(visibilityChanged(bool)), this, SLOT(OnLinersDockWidgetVisiblityChanged(bool)));
     //dock_win_liners->setAllowedAreas(Qt::AllDockWidgetAreas );
    // subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_liners);
@@ -1045,7 +1050,7 @@ MainWindow::MainWindow(QWidget *parent)
     // Disable the global Interactive setting for now
     // liners_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive); // Comment this out
 
-    liners_table->horizontalHeader()->setStretchLastSection(true);
+    liners_table->horizontalHeader()->setStretchLastSection(false);
     liners_table->verticalHeader()->setVisible(false);
 
     // Set up selection behavior
@@ -1125,7 +1130,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     combined_tracker_model = new Combined_Tracker_Table_Model();
     combined_tracker_table->setModel(combined_tracker_model);
-    combined_tracker_table->horizontalHeader()->setStretchLastSection(true);
+    combined_tracker_table->horizontalHeader()->setStretchLastSection(false);
     combined_tracker_table->verticalHeader()->setVisible(false);
     combined_tracker_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     combined_tracker_table->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -1188,7 +1193,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     missed_trade_model = new Missed_Trade_Table_Model();
     missed_trade_table->setModel(missed_trade_model);
-    missed_trade_table->horizontalHeader()->setStretchLastSection(true);
+    missed_trade_table->horizontalHeader()->setStretchLastSection(false);
     missed_trade_table->verticalHeader()->setVisible(false);
     missed_trade_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     missed_trade_table->setSelectionMode(QAbstractItemView::SingleSelection);
@@ -1995,11 +2000,10 @@ void MainWindow::loadContract(){
 
         if(loggedInFlg.loadRelaxed()==1){
             start_dataLoadingThread();
-          /*  QMetaObject::invokeMethod(this, [this]() {
-                Trade_TableRefreshTimer->start(1000); // Start the timer on the main thread
-            }, Qt::QueuedConnection);*/
-
-        }
+            QMetaObject::invokeMethod(this, [this]() {
+               onSummaryActionTriggered();
+            }, Qt::QueuedConnection);
+                    }
     };
     emit update_ui_signal(LOADED_MODEL);
     QFuture<void> future = QtConcurrent::run(loadContract_BackgroundTask);
@@ -2349,6 +2353,11 @@ void MainWindow::updateSummaryLabels()
     summarydatList.append(QString::number(SellQty_summary));
     summarydatList.append(QString::number(NetQty));
 
+    if (summary) {
+        if (summary->isVisible()) {
+            summary->updateSummaryData(summarydatList);
+        }
+    }
 
    // emit data_summary_update_signal(summarydatList);
 
@@ -2663,17 +2672,12 @@ void MainWindow::stopBG_Threads(){
     stop_backend_comm_socket_worker();
     qint64 time4 = timer.elapsed();
     qDebug() << "Time taken for stop_backend_comm_socket_worker: " << time4 << "ms";
-
 }
 
 void MainWindow::loggedOut(){
-
-
-
     loggedInFlg.storeRelaxed(0);
     stopBG_Threads();
     emit logoutRequested();
-
 
 }
 
@@ -2681,8 +2685,7 @@ void MainWindow::add_logs(QString str){
    // ui->textEdit->append(str);
     logsdata.append(str);
     emit logDataSignal(logsdata);
-     ui->label_5->setText("&nbsp;UserMessage : "+ str);
-
+     ui->label_5->setText("&nbsp;UserMessage:"+ str);
 }
 
 void MainWindow::on_OrderBook_Button_clicked()
@@ -2954,6 +2957,12 @@ void MainWindow::stopall_Button_clicked()
 void MainWindow::refresh_Button_clicked(){
 
   triggerImmediate_refreshTables();
+  //updateSummaryData(summarydatList);
+
+
+
+
+
 }
 
 
@@ -2966,7 +2975,11 @@ void MainWindow::duplicate_Button_clicked() {
   QModelIndexList selected = getSelectedPortFolioIndexs();
 
   if (selected.isEmpty()) {
-            QMessageBox::information(this, "Duplicate Portfolio", "Please select a portfolio to duplicate.");
+            QMessageBox::information(this, "Duplicate Portfolio", "select a portfolio to duplicate.");
+            return;
+  }
+  if (selected.size() > 1) {
+            QMessageBox::information(this, "Duplicate Portfolio", "select only one portfolio to duplicate.");
             return;
   }
 
@@ -3000,6 +3013,8 @@ void MainWindow::duplicate_Button_clicked() {
 
             }
   }
+
+  T_Portfolio_Table->clearSelection();
 }
 
 
@@ -3093,7 +3108,7 @@ void MainWindow::ConvertAlgo_button_clicked(){
     }
 
 
-   convertalgo->update_contract_tableData(QString::number(userData.UserId),userData.MaxPortfolioCount);
+    convertalgo->update_contract_tableData(QString::number(userData.UserId),userData.MaxPortfolioCount);
     if(!convertalgo->isVisible())
     convertalgo->show();
 }
@@ -3173,68 +3188,51 @@ void MainWindow::Delete_clicked_slot()
 
    }
 
-   // Now that we know rows are selected, ask for delete confirmation
    QMessageBox::StandardButton reply;
-   reply = QMessageBox::question(this, "Delete Portfolio From Database?", "Delete following  portfolios ["+portFoliosToDelete.join(",")+"] from DB?",  QMessageBox::Yes|QMessageBox::No);
+   reply = QMessageBox::question(this, "Delete Portfolio From Database?", "Delete  portfolios ["+portFoliosToDelete.join(",")+"] from DB?",  QMessageBox::Yes|QMessageBox::No);
 
-   if (reply == QMessageBox::Yes)
-   {
+   //if (reply == QMessageBox::Yes) {
+       if (!activeAlgoList.empty()) {
+           db_conn->logToDB("Portfolios [" + activeAlgoList.join(",") + "] are Active, cannot delete from DB");
 
+           QMessageBox msgBox;
+           msgBox.setText("Active algo cannot be deleted.\nDisable the algo No. " + activeAlgoList.join(",") + " and then try again.");
+           msgBox.setIcon(QMessageBox::Information);
+           msgBox.exec();
 
-        deletingPortFolioFlg.storeRelaxed(1);
-        QString msg; // You can define msg as per your requirement
-        bool ret = db_conn->deleteNonTradedAlgos(portFoliosToDelete, msg);
-        if (!ret) {
-            QMessageBox::warning(this, "Error", "Executed Trades cannot be deleted: " + portFoliosToDelete.join(","));
-        }
-        else{
-            //delete from model too and refersh the enitre table,
-            T_Portfolio_Model->removeRowsByIndices(portFolioIdxToDelete);
-            triggerImmediate_refreshTables();
+           return;  // Exit early, as no further processing is needed
+       }
+       deletingPortFolioFlg.storeRelaxed(1);
+       QString msg;
+       bool ret = db_conn->deleteNonTradedAlgos(portFoliosToDelete, msg);
 
+       if (!ret) {
+           QMessageBox::warning(this, "Error", "Executed Trades cannot be deleted: " + portFoliosToDelete.join(","));
+       } else {
+           // Delete from model and refresh the entire table
+           T_Portfolio_Model->removeRowsByIndices(portFolioIdxToDelete);
+           triggerImmediate_refreshTables();
 
+           // Send notification to backend server
+           quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+           const unsigned char dataBytes[] = { 0xFF, 0xFF };
+           QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
+           QByteArray bckend_msg = backend_comm->createPacket(command, data);
+           backend_comm->insertData(bckend_msg);
 
+           db_conn->logToDB("Deleted portfolios [" + portFoliosToDelete.join(",") + "] from DB");
 
-            //send notifcation to backend server
-            quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
-            const unsigned char dataBytes[] = { 0xFF, 0xFF };
-            QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
-            QByteArray bckend_msg = backend_comm->createPacket(command, data);
-            backend_comm->insertData(bckend_msg);
+           QMessageBox msgBox(this);
+           msgBox.setWindowTitle("Algo Delete");
+           msgBox.setText(msg);
+           msgBox.setIcon(QMessageBox::Information);
+           msgBox.exec();
+       }
 
-            db_conn->logToDB("Deleted  portfolios ["+portFoliosToDelete.join(",")+" from DB");
+       deletingPortFolioFlg.storeRelaxed(0);
+   }
+//}
 
-            QMessageBox msgBox(this);
-            msgBox.setWindowTitle("Algo Delete");
-            msgBox.setText(msg);
-            msgBox.setIcon(QMessageBox::Information);
-            msgBox.exec();
-
-
-        }
-
-
-        deletingPortFolioFlg.storeRelaxed(0);
-
-        if (!activeAlgoList.empty())
-        {
-            db_conn->logToDB("Portfolios ["+activeAlgoList.join(",")+" are Active, cannot delete. from DB");
-
-            QMessageBox msgBox;
-            msgBox.setText("Active algo cannot be deleted,\n disable the algo No. " + activeAlgoList.join(",") + " and then try again.\n");
-            msgBox.setIcon(QMessageBox::Information);
-            msgBox.exec();
-        }
-        /*if(!notDeletedList.empty())
-        {
-            QMessageBox msgBox;
-            msgBox.setText(notDeletedMSg +" ["+ notDeletedList.join(",") +"]\n");
-            msgBox.setIcon(QMessageBox::Information);
-            msgBox.exec();
-        }*/
-
-    }
-}
 
 
 void MainWindow::T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index){
@@ -3931,42 +3929,85 @@ void MainWindow::resetPassword(const QString &newPassword, const QString &confir
 }
 
 
-void MainWindow::onSummaryActionTriggered(){
+//void MainWindow::onSummaryActionTriggered(){
+//    Summary_cards *SC = new Summary_cards(this);
+//    Qt::WindowFlags flags = SC->windowFlags();
+//    SC->setWindowFlags(flags | Qt::Dialog );
+//    SC->setAttribute(Qt::WA_DeleteOnClose);
+//    //connect(this, &MainWindow::data_summary_update_signal, SC, &Summary_cards::updateSummaryData);
+//    SC->updateSummaryData(summarydatList);
+//    SC->show();
+//}
+void MainWindow::onSummaryActionTriggered() {
 
-    Summary_cards *SC = new Summary_cards(this);
-    Qt::WindowFlags flags = SC->windowFlags();
-    SC->setWindowFlags(flags | Qt::Tool);
-    SC->setAttribute(Qt::WA_DeleteOnClose);
-    //connect(this, &MainWindow::data_summary_update_signal, SC, &Summary_cards::updateSummaryData);
-    SC->updateSummaryData(summarydatList);
-    SC->show();
+    if (!summary) {
+          summary = new Summary_cards(this);
+          Qt::WindowFlags flags = summary->windowFlags();
+          summary->setWindowFlags(flags | Qt::Dialog);
+         // summary->setAttribute(Qt::WA_DeleteOnClose);
+    }
+
+    if (!summary->isVisible()) {
+          summary->show();
+          summary->updateSummaryData(summarydatList);
+    }
+
 }
 
-void MainWindow::onWatchActionTriggered(){
-    Watch_cards *WC = new Watch_cards(this);
-    Qt::WindowFlags flags = WC->windowFlags();
-    WC->setWindowFlags(flags | Qt::Tool);
+//void MainWindow::onWatchActionTriggered(){
+//    Watch_cards *WC = new Watch_cards(this);
+//    Qt::WindowFlags flags = WC->windowFlags();
+//    WC->setWindowFlags(flags | Qt::Dialog);
+//    WC->setAttribute(Qt::WA_DeleteOnClose);
+//    //connect(this, &MainWindow::indicesDataRecv_Signal_watch_card(Indices_Data_Struct), WC, &Watch_cards::indicesDataRecv_Slot(Indices_Data_Struct));
+//    connect(this, &MainWindow::indicesDataRecv_Signal_watch_card, WC, &Watch_cards::indicesDataRecv_Slot);
+//    connect(WC, &Watch_cards::add_remove_watch_card_signal,this , &MainWindow::add_remove_watch_card_slot);
+//    WC->show();
+//}
+void MainWindow::onWatchActionTriggered() {
 
-    WC->setAttribute(Qt::WA_DeleteOnClose);
-    //connect(this, &MainWindow::indicesDataRecv_Signal_watch_card(Indices_Data_Struct), WC, &Watch_cards::indicesDataRecv_Slot(Indices_Data_Struct));
-    connect(this, &MainWindow::indicesDataRecv_Signal_watch_card, WC, &Watch_cards::indicesDataRecv_Slot);
-    connect(WC, &Watch_cards::add_remove_watch_card_signal,this , &MainWindow::add_remove_watch_card_slot);
+    if (!watch) {
+          watch = new Watch_cards(this);
+          Qt::WindowFlags flags = watch->windowFlags();
+          watch->setWindowFlags(flags | Qt::Dialog);
+          // Uncomment if you want the Watch_cards to be deleted when it's closed
+          // watch->setAttribute(Qt::WA_DeleteOnClose);
+    }
 
+    // Make sure the connections are made after the object is created
+    connect(this, &MainWindow::indicesDataRecv_Signal_watch_card, watch, &Watch_cards::indicesDataRecv_Slot);
+    connect(watch, &Watch_cards::add_remove_watch_card_signal, this, &MainWindow::add_remove_watch_card_slot);
 
-    WC->show();
+    if (!watch->isVisible()) {
+          watch->show();
+    }
 }
 
-void MainWindow::onLogActionTriggered(){
-    Logs_cards *LC = new Logs_cards(this);
-    Qt::WindowFlags flags = LC->windowFlags();
-    LC->setWindowFlags(flags | Qt::Tool);
-    LC->setAttribute(Qt::WA_DeleteOnClose);
-    LC->logDataSignal_Slot(logsdata);
-    connect(this, &MainWindow::logDataSignal, LC, &Logs_cards::logDataSignal_Slot);
 
-    LC->show();
+//void MainWindow::onLogActionTriggered(){
+//    Logs_cards *LC = new Logs_cards(this);
+//    Qt::WindowFlags flags = LC->windowFlags();
+//    LC->setWindowFlags(flags | Qt::Dialog);
+//    LC->setAttribute(Qt::WA_DeleteOnClose);
+//    LC->logDataSignal_Slot(logsdata);
+//    connect(this, &MainWindow::logDataSignal, LC, &Logs_cards::logDataSignal_Slot);
+//    LC->show();
+//}
+void MainWindow::onLogActionTriggered() {
+    // Check if Logs_cards instance already exists
+    if (!logs) {
+          logs = new Logs_cards(this);
+          Qt::WindowFlags flags = logs->windowFlags();
+          logs->setWindowFlags(flags | Qt::Dialog);
+          //logsCards->setAttribute(Qt::WA_DeleteOnClose);
+
+    }
+    if (!logs->isVisible()) {
+          logs->show();
+            logs->logDataSignal_Slot(logsdata);
+          connect(this, &MainWindow::logDataSignal, logs, &Logs_cards::logDataSignal_Slot);
+    }
 }
-
 
 
 /*********Setting Window Section***************/

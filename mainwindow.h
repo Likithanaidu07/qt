@@ -254,6 +254,9 @@ private:
     void stop_backend_comm_socket_worker();
 
     class ConvertAlgo_Win *convertalgo;
+    class Summary_cards *summary;
+    class Watch_cards *watch;
+    class Logs_cards *logs;
 
     QHash<QString, Indices_Data_Struct> indicesDataList;//hash to store indices data for watch
 

@@ -84,6 +84,7 @@ loginwindow::loginwindow(QWidget *parent) :
         }
         settings.endGroup();
     }
+
 }
 
 QString loginwindow::base64_encode(QString str){

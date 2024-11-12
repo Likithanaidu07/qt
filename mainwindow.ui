@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>980</width>
+    <width>1087</width>
     <height>912</height>
    </rect>
   </property>
@@ -50,7 +50,7 @@ background: #9DB4C0;
      <widget class="QLabel" name="label_5">
       <property name="maximumSize">
        <size>
-        <width>300</width>
+        <width>500</width>
         <height>16777215</height>
        </size>
       </property>
@@ -211,12 +211,12 @@ background: #46454d;
               <widget class="QPushButton" name="OrderBook_Button">
                <property name="maximumSize">
                 <size>
-                 <width>67</width>
+                 <width>80</width>
                  <height>14</height>
                 </size>
                </property>
                <property name="text">
-                <string>Trades</string>
+                <string>Algo Position</string>
                </property>
               </widget>
              </item>
@@ -282,7 +282,7 @@ background: #46454d;
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>70</width>
+                 <width>80</width>
                  <height>14</height>
                 </size>
                </property>
@@ -500,12 +500,12 @@ background: #46454d;
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>55</width>
+                 <width>80</width>
                  <height>14</height>
                 </size>
                </property>
                <property name="text">
-                <string>Positions</string>
+                <string>Net Positions</string>
                </property>
               </widget>
              </item>
@@ -722,7 +722,7 @@ background: #46454d;
                 </size>
                </property>
                <property name="text">
-                <string>Missed Trades</string>
+                <string>Liners</string>
                </property>
               </widget>
              </item>
@@ -992,7 +992,7 @@ background: transperent;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>980</width>
+     <width>1087</width>
      <height>21</height>
     </rect>
    </property>
