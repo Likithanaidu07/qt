@@ -29,6 +29,7 @@
 #include "QMenu"
 #include "PortFolio/portfolio_searchfilterproxymodel.h"
 #include "TradePosition/tradetable_searchfilterproxymodel.h"
+#include <algorithm>
 
 //#define ENABLE_BACKEND_DEBUG_MSG
 
@@ -50,7 +51,12 @@ MainWindow::MainWindow(QWidget *parent)
     QFontDatabase::addApplicationFont(":/WorkSans-ExtraBold.ttf");
 
     ui->setupUi(this);
-    setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
+
+    this->setMinimumSize(1280 ,1024);
+
+  //  setWindowFlags(Qt::Window | Qt::FramelessWindowHint);-
+    setWindowFlags(Qt::Window | Qt::CustomizeWindowHint);
+
     //ui->sidePanel->setVisible(false);
     ui->Algorithms_Close->setVisible(false);
 
@@ -518,6 +524,9 @@ MainWindow::MainWindow(QWidget *parent)
     QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::editFinished, this, &MainWindow::profolioTableEditFinshedSlot);
     QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::editCompleted, this, &MainWindow::profolioTableEditFinshedSlot);
     QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::tabKeyPressed, T_Portfolio_Table, &table_portfolios_custom::handleTabKeyPressFromEditableCell);
+    QObject::connect(T_Portfolio_Delegate, &Table_Portfolios_Delegate::escapeKeyPressed, T_Portfolio_Model, &Table_Portfolios_Model::editCancelled);
+
+
     //QObject::connect(T_Portfolio_Table, &table_portfolios_custom::spaceKeySignal, this, &MainWindow::updatePortFolioStatus);
     QObject::connect(T_Portfolio_Table, &table_portfolios_custom::portFolioDeleteKeyPressed, this, &MainWindow::Delete_clicked_slot);
 
@@ -1637,213 +1646,237 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 
         //Get edited cell data from portfolio table and update DB
        // else{
-            QHash<int, QString> editedCellData(T_Portfolio_Model->editingDataHash);
-            QHash<int, QString>::const_iterator i;
+            QHash<int, Cell_Cache> editedCellData(T_Portfolio_Model->editingDataHash);
+            QHash<int, Cell_Cache>::const_iterator i;
             QStringList updateQueryList;
             QStringList oq_btq_stq_msg;
             QString logMsg = "";
             QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(P->Leg1TokenNo,P->PortfolioType.toInt());
             int OpenLimit = userData.IDXOpenLimit;
-            if (InstrumentType == "OPTSTK" || InstrumentType == "FUTSTK")
+            QString openLimitType = "IDXOpenLimit";
+            if (InstrumentType == "OPTSTK" || InstrumentType == "FUTSTK"){
                  OpenLimit =  userData.STKOpenLimit;
+                 openLimitType = "STKOpenLimit";
+            }
+
+            int order_qty_limit = 10;
+            int lotSize = P->GetLotSize();//T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
+            int OpenLimitThrBuy = OpenLimit+P->BuyTradedQuantity;
+            int OpenLimitThrSell = OpenLimit+P->SellTradedQuantity;
+
+
+            ///----------------_OrderQuantity and _BuyTotalQuantity and _SellTotalQuantity edited-------------
+            if(editedCellData.contains(PortfolioData_Idx::_OrderQuantity)&&
+                    editedCellData.contains(PortfolioData_Idx::_BuyTotalQuantity)&&
+                    editedCellData.contains(PortfolioData_Idx::_SellTotalQuantity)){
+
+                double OQ = editedCellData[_OrderQuantity].newVal.toDouble();
+                double BTQ = editedCellData[_BuyTotalQuantity].newVal.toDouble();
+                double STQ = editedCellData[_SellTotalQuantity].newVal.toDouble();
+
+                //if BTQ and STQ greater than OpenLimitThr, do not update BTQ STQ and OQ
+                if(BTQ>OpenLimitThrBuy&&STQ>OpenLimitThrSell){
+                    oq_btq_stq_msg.append("BTQ/STQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
+                }
+                // BTQ do not satifsy condtion  STQ statisfy, so update STQ
+                else if(BTQ>OpenLimitThrBuy&&STQ<=OpenLimitThrSell){
+                    oq_btq_stq_msg.append("BTQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
+                    updateQueryList.append("SellTotalQuantity="+QString::number(STQ*lotSize));
+                    logMsg = logMsg+"SellTotalQuantity ["+QString::number(STQ)+"], ";
+
+                    if(OQ > order_qty_limit)
+                       OQ = 1;
+                    updateQueryList.append("OrderQuantity="+QString::number(OQ*lotSize));
+                    logMsg = logMsg+"OrderQuantity ["+QString::number(OQ)+"], ";
+
+
+                }
+                // STQ do not satifsy condtion  BTQ statisfy, so update STQ
+                else if(BTQ<=OpenLimitThrBuy&&STQ>OpenLimitThrSell){
+                    oq_btq_stq_msg.append("STQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
+                    updateQueryList.append("BuyTotalQuantity="+QString::number(BTQ*lotSize));
+                    logMsg = logMsg+"BuyTotalQuantity ["+QString::number(BTQ)+"], ";
+                    if(OQ > order_qty_limit)
+                       OQ = 1;
+                    updateQueryList.append("OrderQuantity="+QString::number(OQ*lotSize));
+                    logMsg = logMsg+"OrderQuantity ["+QString::number(OQ)+"], ";
+
+
+                }
+                else{
+                    updateQueryList.append("BuyTotalQuantity="+QString::number(BTQ*lotSize));
+                    updateQueryList.append("SellTotalQuantity="+QString::number(STQ*lotSize));
+                    logMsg = logMsg+"BuyTotalQuantity ["+QString::number(BTQ)+"], ";
+                    logMsg = logMsg+"SellTotalQuantity ["+QString::number(STQ)+"], ";
+
+                    if(OQ > order_qty_limit)
+                       OQ = 1;
+                    updateQueryList.append("OrderQuantity="+QString::number(OQ*lotSize));
+                    logMsg = logMsg+"OrderQuantity ["+QString::number(OQ)+"], ";
+
+                    //else{
+                      //  oq_btq_stq_msg.append("OrderQuantity cannot be greater than "+ QString::number(order_qty_limit));
+                  //  }
+                }
+
+            }
+            ///----------------------------------------------------------------------
+
+            ///------only _OrderQuantity and _BuyTotalQuantity edited-------------
+            else if(editedCellData.contains(PortfolioData_Idx::_OrderQuantity)&&
+                                  editedCellData.contains(PortfolioData_Idx::_BuyTotalQuantity)){
+                double OQ = editedCellData[_OrderQuantity].newVal.toDouble();
+                double BTQ = editedCellData[_BuyTotalQuantity].newVal.toDouble();
+
+                if(BTQ>OpenLimitThrBuy){
+                    oq_btq_stq_msg.append("BTQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
+                    if(OQ <= order_qty_limit){
+                       updateQueryList.append("OrderQuantity="+QString::number(OQ*lotSize));
+                       logMsg = logMsg+"OrderQuantity ["+QString::number(OQ)+"], ";
+                    }
+                }
+                else{
+                    updateQueryList.append("BuyTotalQuantity="+QString::number(BTQ*lotSize));
+                    logMsg = logMsg+"BuyTotalQuantity ["+QString::number(BTQ)+"], ";
+                    if(OQ > order_qty_limit)
+                       OQ = 1;
+                    updateQueryList.append("OrderQuantity="+QString::number(OQ*lotSize));
+                    logMsg = logMsg+"OrderQuantity ["+QString::number(OQ)+"], ";
+
+                }
+            }
+            ///----------------------------------------------------------------------
+
+            ///------only _OrderQuantity and _SellTotalQuantity edited-------------
+            else if(editedCellData.contains(PortfolioData_Idx::_OrderQuantity)&&
+                                  editedCellData.contains(PortfolioData_Idx::_SellTotalQuantity)){
+                double OQ = editedCellData[_OrderQuantity].newVal.toDouble();
+                double STQ = editedCellData[_SellTotalQuantity].newVal.toDouble();
+
+                if(STQ>OpenLimitThrSell){
+                    oq_btq_stq_msg.append("STQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
+                    if(OQ <= order_qty_limit){
+                       updateQueryList.append("OrderQuantity="+QString::number(OQ*lotSize));
+                       logMsg = logMsg+"OrderQuantity ["+QString::number(OQ)+"], ";
+                    }
+                }
+                else{
+                    updateQueryList.append("SellTotalQuantity="+QString::number(STQ*lotSize));
+                    logMsg = logMsg+"SellTotalQuantity ["+QString::number(STQ)+"], ";
+                    if(OQ > order_qty_limit)
+                       OQ = 1;
+                    updateQueryList.append("OrderQuantity="+QString::number(OQ*lotSize));
+                    logMsg = logMsg+"OrderQuantity ["+QString::number(OQ)+"], ";
+
+
+                }
+            }
+            ///----------------------------------------------------------------------
+
+
+            ///------only _BuyTotalQuantity and _SellTotalQuantity edited-------------
+            else if(editedCellData.contains(PortfolioData_Idx::_BuyTotalQuantity)&&
+                                  editedCellData.contains(PortfolioData_Idx::_SellTotalQuantity)){
+                double BTQ = editedCellData[_BuyTotalQuantity].newVal.toDouble();
+                double STQ = editedCellData[_SellTotalQuantity].newVal.toDouble();
+
+                if(BTQ>OpenLimitThrBuy&&STQ>OpenLimitThrSell){
+                    oq_btq_stq_msg.append("BTQ/STQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
+                }
+                else if(BTQ>OpenLimitThrBuy&&STQ<=OpenLimitThrSell){
+                    oq_btq_stq_msg.append("BTQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
+                    updateQueryList.append("SellTotalQuantity="+QString::number(STQ*lotSize));
+                    logMsg = logMsg+"SellTotalQuantity ["+QString::number(STQ)+"], ";
+
+                    if(P->OrderQuantity==0){
+                        updateQueryList.append("OrderQuantity="+QString::number(lotSize));
+                        logMsg = logMsg+"OrderQuantity ["+QString::number(1)+"], ";
+                    }
+                }
+                else if(BTQ<=OpenLimitThrBuy&&STQ>OpenLimitThrSell){
+                    oq_btq_stq_msg.append("STQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
+                    updateQueryList.append("BuyTotalQuantity="+QString::number(BTQ*lotSize));
+                    logMsg = logMsg+"BuyTotalQuantity ["+QString::number(BTQ)+"], ";
+                    if(P->OrderQuantity==0){
+                        updateQueryList.append("OrderQuantity="+QString::number(lotSize));
+                        logMsg = logMsg+"OrderQuantity ["+QString::number(1)+"], ";
+                    }
+                }
+                //both BTQ and STQ statisy
+                else{
+                    updateQueryList.append("BuyTotalQuantity="+QString::number(BTQ*lotSize));
+                    logMsg = logMsg+"BuyTotalQuantity ["+QString::number(BTQ)+"], ";
+                    updateQueryList.append("SellTotalQuantity="+QString::number(STQ*lotSize));
+                    logMsg = logMsg+"SellTotalQuantity ["+QString::number(STQ)+"], ";
+                    if(P->OrderQuantity==0){
+                        updateQueryList.append("OrderQuantity="+QString::number(lotSize));
+                        logMsg = logMsg+"OrderQuantity ["+QString::number(1)+"], ";
+                    }
+                }
+
+
+            }
+            ///----------------------------------------------------------------------
+
+            ///----------------_OrderQuantity  only edited-------------
+            else if(editedCellData.contains(PortfolioData_Idx::_OrderQuantity)){
+
+                double OQ = editedCellData[_OrderQuantity].newVal.toDouble();
+                if(OQ <= order_qty_limit){
+                   if(OQ==0)
+                       OQ = 1;
+                   updateQueryList.append("OrderQuantity="+QString::number(OQ*lotSize));
+                   logMsg = logMsg+"OrderQuantity ["+QString::number(OQ)+"], ";
+                }
+                else{
+                    oq_btq_stq_msg.append("OrderQuantity cannot be greater than "+ QString::number(order_qty_limit));
+                }
+            }
+            ///----------------------------------------------------------------------
+
+            ///------only _BuyTotalQuantity edited-------------
+            else if(editedCellData.contains(PortfolioData_Idx::_BuyTotalQuantity)){
+                double BTQ = editedCellData[_BuyTotalQuantity].newVal.toDouble();
+
+                if(BTQ>OpenLimitThrBuy){
+                    oq_btq_stq_msg.append("BTQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
+                }
+                else{
+                    updateQueryList.append("BuyTotalQuantity="+QString::number(BTQ*lotSize));
+                    logMsg = logMsg+"BuyTotalQuantity ["+QString::number(BTQ)+"], ";
+                    if(P->OrderQuantity==0){
+                        updateQueryList.append("OrderQuantity="+QString::number(lotSize));
+                        logMsg = logMsg+"OrderQuantity ["+QString::number(1)+"], ";
+                    }
+                }
+            }
+            ///----------------------------------------------------------------------
+
+            ///------only _SellTotalQuantity edited-------------
+            else if(editedCellData.contains(PortfolioData_Idx::_SellTotalQuantity)){
+                double STQ = editedCellData[_SellTotalQuantity].newVal.toDouble();
+                if(STQ>OpenLimitThrSell){
+                    oq_btq_stq_msg.append("STQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
+                }
+                else{
+                    updateQueryList.append("SellTotalQuantity="+QString::number(STQ*lotSize));
+                    logMsg = logMsg+"SellTotalQuantity ["+QString::number(STQ)+"], ";
+                    if(P->OrderQuantity==0){
+                        updateQueryList.append("OrderQuantity="+QString::number(lotSize));
+                        logMsg = logMsg+"OrderQuantity ["+QString::number(1)+"], ";
+                    }
+                }
+
+
+            }
+            ///----------------------------------------------------------------------
 
 
 
             for (i = editedCellData.constBegin(); i != editedCellData.constEnd(); ++i) {
                 int columnIdx = i.key();
-                QString valStr = i.value();
+                QString valStr = i.value().newVal;
                 switch (columnIdx) {
-                case PortfolioData_Idx::_OrderQuantity:{
-                int lotSize = P->GetLotSize();//T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
-                double OrderQty_val = valStr.toDouble();
-                OrderQty_val=OrderQty_val*lotSize;
-                //double vfq = P->VolumeFreezeQty;//T_Portfolio_Model->portfolio_data_list[index.row()]->VolumeFreezeQty;
-
-                int order_qty_limit = 10;
-                if(OrderQty_val > order_qty_limit*lotSize){
-                    /*QMessageBox msgBox;
-                    msgBox.setText("Cannot update OrderQuantity");
-                    msgBox.setText("OrderQuantity cannot be greater than  "+QString::number(order_qty_limit));
-                    msgBox.setIcon(QMessageBox::Warning);
-                    msgBox.exec();*/
-                    oq_btq_stq_msg.append("OrderQuantity cannot be greater than  "+QString::number(order_qty_limit));
-                }
-                else if(P->BuyTotalQuantity>OpenLimit && P->SellTotalQuantity>OpenLimit){
-                    updateQueryList.append("OrderQuantity="+QString::number(0));
-                    oq_btq_stq_msg.append("BuyTotalQuantity and   SellTotalQuantity is greater than OpenLimit value "+QString::number(OpenLimit)+", setting OrderQuantity to 0");
-                    logMsg = logMsg+"OrderQuantity ["+QString::number(0)+"], ";
-                }
-                else{
-                    //write
-                    int OrderQty = valStr.toInt();
-                    int BuyTotalQuantity = P->BuyTotalQuantity;// T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTotalQuantity;
-                    int SellTotalQuantity = P->SellTotalQuantity;// T_Portfolio_Model->portfolio_data_list[index.row()]->SellTotalQuantity;
-                    int qty = BuyTotalQuantity;
-                    if(BuyTotalQuantity==0)
-                        qty = SellTotalQuantity;
-                    else if(SellTotalQuantity==0)
-                        qty = BuyTotalQuantity;
-
-                    else if(BuyTotalQuantity>SellTotalQuantity)
-                        qty = BuyTotalQuantity;
-                    else
-                        qty = SellTotalQuantity;
-                    //check the condtion
-                    if(OrderQty >qty){
-                        /*QMessageBox msgBox;
-                        msgBox.setText("Cannot update OrderQuantity");
-                        msgBox.setText("OrderQuantity cannot be greater than totalQty "+QString::number(qty));
-                        msgBox.setIcon(QMessageBox::Warning);
-                        msgBox.exec();*/
-                        oq_btq_stq_msg.append("OrderQuantity cannot be greater than totalQty "+QString::number(qty));
-
-                    }
-                    else{
-                        updateQueryList.append("OrderQuantity="+QString::number(OrderQty_val));
-                        logMsg = logMsg+"OrderQuantity ["+QString::number(OrderQty)+"], ";
-                    }
-                }
-                }
-
-                break;
-
-                case PortfolioData_Idx::_BuyTotalQuantity:{
-                double TQ = valStr.toDouble();
-                int bTTQ= P->BuyTradedQuantity;//T_Portfolio_Model->portfolio_data_list[index.row()]->BuyTradedQuantity;
-
-
-
-                if (InstrumentType == "OPTIDX" || InstrumentType == "FUTIDX") {
-
-                    if (TQ > userData.IDXOpenLimit+bTTQ) {
-                        /*QMessageBox msgBox;
-                        msgBox.setText("BTQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
-                        msgBox.setIcon(QMessageBox::Warning);
-                        msgBox.exec();*/
-                        oq_btq_stq_msg.append("BTQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
-
-                        break;
-                    }
-                }
-                else if (InstrumentType == "OPTSTK" || InstrumentType == "FUTSTK") {
-
-                    if (TQ > userData.STKOpenLimit+bTTQ) {
-                        /*QMessageBox msgBox;
-                        msgBox.setText("BTQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
-                        msgBox.setIcon(QMessageBox::Warning);
-                        msgBox.exec();*/
-                        oq_btq_stq_msg.append("BTQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
-
-                        break;
-                    }
-                }
-
-                double TTQ = P->BuyTradedQuantity;
-
-                if (TQ < TTQ) {
-                    /*QMessageBox msgBox;
-                    msgBox.setText("BTQ cannot be less than Traded Quantity is " + QString::number(TTQ));
-                    msgBox.setIcon(QMessageBox::Warning);
-                    msgBox.exec();*/
-                    oq_btq_stq_msg.append("BTQ cannot be less than Traded Quantity is " + QString::number(TTQ));
-
-
-                }
-                else {
-
-                    double OrderQty = P->OrderQuantity;
-                    if(TQ<OrderQty){
-                        // show the error mesg here
-                        /*QMessageBox msgBox;
-                        msgBox.setText("BTQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
-                        msgBox.setIcon(QMessageBox::Warning);
-                        msgBox.exec();*/
-                        oq_btq_stq_msg.append("BTQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
-
-                    }
-                    else{
-                        int lotSize = P->GetLotSize();
-                        double val = valStr.toDouble();
-                        val=val*lotSize;
-                        if(P->OrderQuantity==0){
-                            updateQueryList.append("OrderQuantity="+QString::number(lotSize));
-                        }
-                        updateQueryList.append("BuyTotalQuantity="+QString::number(val));
-                        logMsg = logMsg+"BuyTotalQuantity ["+QString::number(val)+"], ";
-                    }
-
-                }
-
-
-                }
-                break;
-
-                case PortfolioData_Idx::_SellTotalQuantity:{
-                double TQ = valStr.toDouble();
-                int sTTQ= P->SellTradedQuantity;
-                QString InstrumentType  = ContractDetail::getInstance().GetInstrumentType(P->Leg1TokenNo,P->PortfolioType.toInt());
-
-
-                if (InstrumentType == "OPTIDX" || InstrumentType == "FUTIDX") {
-
-                    if (TQ > userData.IDXOpenLimit + sTTQ) {
-                        /*QMessageBox msgBox;
-                        msgBox.setText("STQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
-                        msgBox.setIcon(QMessageBox::Warning);
-                        msgBox.exec();*/
-                        oq_btq_stq_msg.append("STQ should not be greater than IDXOpenLimit " + QString::number(userData.IDXOpenLimit));
-
-                        break;
-                    }
-                }
-                else if (InstrumentType == "OPTSTK" || InstrumentType == "FUTSTK") {
-
-                    if (TQ > userData.STKOpenLimit + sTTQ) {
-                        /*QMessageBox msgBox;
-                        msgBox.setText("STQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
-                        msgBox.setIcon(QMessageBox::Warning);
-                        msgBox.exec();*/
-                        oq_btq_stq_msg.append("STQ should not be greater than STXOpenLimit " + QString::number(userData.STKOpenLimit));
-                        break;
-                    }
-                }
-                double TTQ = P->SellTradedQuantity;
-
-                if (TQ < TTQ) {
-                   /* QMessageBox msgBox;
-                    msgBox.setText("STQ cannot be less than Traded Quantity is " + QString::number(TTQ));
-                    msgBox.setIcon(QMessageBox::Warning);
-                    msgBox.exec();*/
-                    oq_btq_stq_msg.append("STQ cannot be less than Traded Quantity is " + QString::number(TTQ));
-
-                }
-                else {
-                    double OrderQty = P->OrderQuantity;
-                    if(TQ<OrderQty){
-                        // show the error mesg here
-                        /*QMessageBox msgBox;
-                        msgBox.setText("STQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
-                        msgBox.setIcon(QMessageBox::Warning);
-                        msgBox.exec();*/
-                        oq_btq_stq_msg.append("STQ Should not be less than OrderQuantity is"+ QString::number(OrderQty));
-                    }
-                    else{
-                        int lotSize = P->GetLotSize();
-                        double val = valStr.toDouble();
-                        val=val*lotSize;
-                        if(P->OrderQuantity==0){
-                            updateQueryList.append("OrderQuantity="+QString::number(lotSize));
-                        }
-                        updateQueryList.append("SellTotalQuantity="+QString::number(val));
-                        logMsg = logMsg+"SellTotalQuantity ["+QString::number(val)+"], ";
-                    }
-
-                }
-                }
-                break;
-
-
-
 
                     case PortfolioData_Idx::_BuyPriceDifference:{
                         QString BuyPriceDifference = QString::number(P->BuyPriceDifference*devicer,'f',decimal_precision);
@@ -2198,7 +2231,7 @@ void MainWindow::loadDataAndUpdateTable(int table){
         updateSummaryLabels();
 
 
-
+#ifdef DISABLE_ALGO_ON_EXCHANGE_PRICE_LIMIT
         //check algosToDisableOnExchangePriceLimit included in algosExludeListFromExchangePriceDisable, if so remove
         for (auto it = algosToDisableOnExchangePriceLimit.begin(); it != algosToDisableOnExchangePriceLimit.end(); ) {
             if (algosToDisableOnExchangePriceLimitExludedList.contains(*it)) {
@@ -2217,7 +2250,7 @@ void MainWindow::loadDataAndUpdateTable(int table){
                 portfoliosToDisable.append(algo);
             }
         }
-        //Disable code for now
+
         if(portfoliosToDisable.length()>0){
 
 
@@ -2238,6 +2271,7 @@ void MainWindow::loadDataAndUpdateTable(int table){
               qDebug()<<QString("Disable failed for portfolios (%1), Exchange Price  greater than 20% check. Error: "+msg).arg(portfolioNumberStr);
           }
         }
+        #endif
 
         break;
     }
@@ -2552,6 +2586,7 @@ void MainWindow::updatePortFolioStatus(QModelIndex index) {
 //}
 
 void MainWindow::loggedIn(){
+
     loggedInFlg.storeRelaxed(1);
 
     //make sure the start_slowdata_worker in main thread
@@ -2588,6 +2623,7 @@ void MainWindow::loggedInSucessful(userInfo userData)
     //loading data
     loadCurrentDayLogs();
     loadContract();
+
 
 }
 /*
@@ -2916,6 +2952,7 @@ void MainWindow::stopall_Button_clicked()
 }
 
 void MainWindow::refresh_Button_clicked(){
+
   triggerImmediate_refreshTables();
 }
 
@@ -4361,6 +4398,36 @@ void MainWindow::exportTableViewToCSV(){
 
 }
 
+void MainWindow::resizeEvent(QResizeEvent *event) {
+    QMainWindow::resizeEvent(event);
+
+    int thresholdWidth = 1300;  // Set your width threshold
+
+    // Cast the layout to QGridLayout
+    QGridLayout *gridLayout = qobject_cast<QGridLayout*>(ui->widget_5->layout());
+    qWarning() << "window width="<<event->size().width();
+
+    if (gridLayout) {  // Ensure the layout is a QGridLayout
+        if (event->size().width() < thresholdWidth) {
+
+            ui->widget_5->setMinimumHeight(90);
+            ui->widget_5->setMaximumHeight(90);
+
+            // Move widget to the second row if width is below threshold
+            gridLayout->removeWidget(ui->widgetButtonParent);
+            gridLayout->addWidget(ui->widgetButtonParent, 1, 0);
+        } else {
+            ui->widget_5->setMinimumHeight(50);
+            ui->widget_5->setMaximumHeight(50);
+
+            // Restore to the original position if width is above threshold
+            gridLayout->removeWidget(ui->widgetButtonParent);
+            gridLayout->addWidget(ui->widgetButtonParent, 0, 2);
+        }
+    } else {
+        qWarning() << "widget_5 layout is not a QGridLayout";
+    }
+}
 
 
 

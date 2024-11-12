@@ -18,7 +18,7 @@ class add_algo_btfly_bid : public QObject
 public:
     explicit add_algo_btfly_bid(QObject *parent = nullptr);
 
-    void copyUIElement(QDialog *parentWidget_,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_);
+    void copyUIElement(QDialog *parentWidget_,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_,QPushButton *addButton_);
     QStringList BFLY_BID_Tokens;
     void selectedAction();
     QString foo_token_number_start_strike;// this for start strike input of btfly
@@ -50,6 +50,7 @@ private:
     QTableWidget *tableWidget;
     QListView *startStrikeListView;
     QListView *endStrikeListView;
+    QPushButton *addButton;
 
     QStringList expiry_dateList;
     AddAlgoSharedVar *sharedData;

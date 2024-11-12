@@ -226,19 +226,19 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
 
 
         QList<QString> sorted_keys = filtered.keys();
-        // std::sort(sorted_keys.begin(), sorted_keys.end(), [&](const QString& key1, const QString& key2) {
-        //     const contract_table& value1 = filtered.value(key1);
-        //     const contract_table& value2 = filtered.value(key2);
+         std::sort(sorted_keys.begin(), sorted_keys.end(), [&](const QString& key1, const QString& key2) {
+             const contract_table& value1 = filtered.value(key1);
+             const contract_table& value2 = filtered.value(key2);
 
-        //     return value1.Expiry < value2.Expiry;
-        // });
+            return value1.Expiry < value2.Expiry;
+         });
 
 
 
         if (!filtered.empty())
         {
             obj.FutToken = filtered[sorted_keys.at(0)].TokenNumber;
-            obj.FuturePrice = QString::number(INT_MIN);
+            obj.FuturePrice = "-";
             // SlowDataReader::GetInstance().RegisterContract(static_cast<uint>(obj.FutToken));
         }
         switch (type)
@@ -1476,7 +1476,8 @@ void PortfolioParser::CalculatePriceDifference(PortfolioObject &portfolio, QHash
 
         if(MBP_Data_Hash.contains(QString::number(portfolio.FutToken))){
             MBP_Data_Struct mbpData = MBP_Data_Hash[QString::number(portfolio.FutToken)];
-            portfolio.FuturePrice = QString::number(mbpData.lastTradedPrice.toDouble() * 1.0 / devicer);
+            portfolio.FuturePrice = QString::number(mbpData.lastTradedPrice.toDouble() * 1.0 / devicer, 'f', decimal_precision);
+
         }
 
 

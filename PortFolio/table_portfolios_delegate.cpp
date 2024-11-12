@@ -404,6 +404,15 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
             } else if (keyEvent->key() == Qt::Key_Tab) {
                 emit tabKeyPressed(nav_direction::nav_forward);
             }
+            else if (keyEvent->key() == Qt::Key_Escape) {
+                const Portfolio_SearchFilterProxyModel *proxyModel = qobject_cast<const Portfolio_SearchFilterProxyModel *>(currentIndex.model());
+                QModelIndex sourceIndex = currentIndex;
+                if (proxyModel) {
+                    sourceIndex = proxyModel->mapToSource(currentIndex);
+                }
+                emit escapeKeyPressed(sourceIndex.row());
+             }
+
         }
         else if (currentColIdx == PortfolioData_Idx::_Alias) {
             QKeyEvent *keyEvent = static_cast<QKeyEvent *>(event);
@@ -433,11 +442,22 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                         return true;
                     }
                 }
-            } else if (keyEvent->key() == Qt::Key_Backtab) {
+            }
+            else if (keyEvent->key() == Qt::Key_Backtab) {
                 emit tabKeyPressed(nav_direction::nav_backward);
-            } else if (keyEvent->key() == Qt::Key_Tab) {
+            }
+            else if (keyEvent->key() == Qt::Key_Tab) {
                 emit tabKeyPressed(nav_direction::nav_forward);
             }
+            else if (keyEvent->key() == Qt::Key_Escape) {
+                const Portfolio_SearchFilterProxyModel *proxyModel = qobject_cast<const Portfolio_SearchFilterProxyModel *>(currentIndex.model());
+                QModelIndex sourceIndex = currentIndex;
+                if (proxyModel) {
+                    sourceIndex = proxyModel->mapToSource(currentIndex);
+                }
+                emit escapeKeyPressed(sourceIndex.row());
+             }
+
         }
     }
     return QStyledItemDelegate::eventFilter(obj, event);

@@ -1,21 +1,37 @@
 #include "customtablewidget.h"
 
-#include <QKeyEvent>
 
-CustomTableWidget::CustomTableWidget(QPushButton *button2, QWidget *parent)
-    : QTableWidget(parent), button2(button2) {}
 
-void CustomTableWidget::keyPressEvent(QKeyEvent *event) {
+CustomTableWidget::CustomTableWidget(QWidget *parent)
+    : QTableWidget(parent)
+{
+
+
+}
+
+void CustomTableWidget::setNextFocusButton(QPushButton *button)
+{
+    nextButton = button;
+}
+
+void CustomTableWidget::keyPressEvent(QKeyEvent *event)
+{
     if (event->key() == Qt::Key_Tab) {
-        int row = currentRow();
-        int column = currentColumn();
-        if (row == rowCount() - 1 && column == columnCount() - 1) {
-            // Move focus to button2 and reset the focus to the first cell
-            button2->setFocus();
-            setCurrentCell(0, 0);
+        // Move focus to the button when Tab is pressed
+        if (nextButton) {
+            nextButton->setFocus();
             return;
         }
     }
     QTableWidget::keyPressEvent(event);
 }
 
+void CustomTableWidget::focusInEvent(QFocusEvent *event)
+{
+    QTableWidget::focusInEvent(event);
+
+    // Select the first row when the table receives focus
+    if (rowCount() > 0 && selectedItems().isEmpty()) {
+        selectRow(0);          // Select the first row
+    }
+}

@@ -22,10 +22,10 @@ public:
     Qt::ItemFlags flags(const QModelIndex &index) const override;
     QVariant headerData(int section, Qt::Orientation , int role)const override;
     QList <PortfolioObject*> portfolio_data_list;
-    QList<int>  portfolio_tokens; //leg1,leg2,leg3,leg4,leg5,leg6
+    QList<int>  portfolio_tokens; //leg1,leg2,leg3,leg4,leg5,leg6 and fut
    // QHash<QString,PortFolioData_Less> getPortFolioDataLess();
    // QHash<QString,int> getPortFoliosLotSize();
-    QHash<int,QString> editingDataHash; //data to store editing cell
+    QHash<int,Cell_Cache> editingDataHash; //data to store editing cell
     //void clearTable();
     void setEditingFlg(int row,int val);
     void updatePortFolioStatusValue(int row,QString statusVal);
@@ -73,6 +73,7 @@ public slots:
     void onItemChanged(const QModelIndex &index);
     void selectionChangedSlot(int currentIdx);
     void updateModelDataList(QList <PortfolioObject*> portfolio_data_list,bool clearTableFlg);
+    void editCancelled(int row);
 
 signals:
     void editCompleted(QString text, QModelIndex idx) const;

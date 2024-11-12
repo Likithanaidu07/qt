@@ -83,7 +83,8 @@ public:
     userInfo login( QString user_name,  QString password);
     QHash<QString,PortFolioData_Less>  getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount,Combined_Tracker_Table_Model *comb_tracker_model,QHash<QString, PortfolioAvgPrice> &averagePriceList,QString user_id, QStringList TradedPortFolioList, QStringList &PortFoliosToDelete );
 
-    QHash<QString, contract_table>  getContractTable( QHash<int , QStringList> &m_ContractDetails_Grouped_,userInfo userData);
+    //QHash<QString, contract_table>  getContractTable( QHash<int , QStringList> &m_ContractDetails_Grouped_,userInfo userData);
+    QHash<QString, contract_table>  getContractTable( QHash<int , QStringList> &m_ContractDetails_Grouped_,QHash<QString, QStringList> &_m_ContractDetailsFiltered,userInfo userData);
 
     QSqlQuery runQuery(QString qry_str);
     bool updateDB_Table(QString query_str,QString &msg);

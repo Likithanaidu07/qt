@@ -129,6 +129,7 @@ public:
 signals:
     void editFinished(QString text, QModelIndex idx) const;
     void tabKeyPressed(nav_direction);
+    void escapeKeyPressed(int);
 
 private:
 

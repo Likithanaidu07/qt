@@ -169,7 +169,7 @@ void Watch_cards::on_lineEditWatchSearch_textChanged(const QString &text)
     nameList.append("fg");*/
 
 
-    QRegularExpression regex(text, QRegularExpression::CaseInsensitiveOption);
+    /*QRegularExpression regex(text, QRegularExpression::CaseInsensitiveOption);
     QStringList filteredList;
 
     for (auto it = indicesDataListTmp.constBegin(); it != indicesDataListTmp.constEnd(); ++it) {
@@ -178,7 +178,29 @@ void Watch_cards::on_lineEditWatchSearch_textChanged(const QString &text)
             filteredList.append(key);
         }
         // const Indices_Data_Struct &value = it.value();
+    }*/
+
+
+    QRegularExpression regex(text, QRegularExpression::CaseInsensitiveOption);
+    QStringList filteredList;
+    QStringList prioritizedList;
+
+    for (auto it = indicesDataListTmp.constBegin(); it != indicesDataListTmp.constEnd(); ++it) {
+        const QString &key = it.key();
+        if (regex.match(key).hasMatch()) {
+            // Check if the key exists in savedWatchItemsMainWin
+            if (savedWatchItemsMainWin.contains(key)) {
+                prioritizedList.append(key); // Add to prioritized list
+            } else {
+                filteredList.append(key); // Add to regular filtered list
+            }
+        }
     }
+
+    // Combine prioritized items and remaining filtered items
+    filteredList = prioritizedList + filteredList;
+
+
 
     /*for(const QString &name : nameList) {
         if (regex.match(name).hasMatch()) {
@@ -230,9 +252,27 @@ void Watch_cards::showSaveWatchOnListView(){
         return;
     }
     indicesDataMutex.lock();
+
     QHash<QString, Indices_Data_Struct> indicesDataListTmp = indicesDataList;
     indicesDataListTmp.detach();
     indicesDataMutex.unlock();
+
+    QStringList prioritizedList;
+    QStringList nonPrioritizedList;
+
+    for (const QString &item : savedWatchItems) {
+        // Check if the item exists in savedWatchItemsMainWin
+        if (savedWatchItemsMainWin.contains(item)) {
+            prioritizedList.append(item); // Add to prioritized list
+        } else {
+            nonPrioritizedList.append(item); // Add to non-prioritized list
+        }
+    }
+
+    // Combine prioritized and non-prioritized lists
+    savedWatchItems = prioritizedList + nonPrioritizedList;
+
+
     int selecteIDx = -1;
     for(int i=0;i<savedWatchItems.length();i++){
         if(indicesDataListTmp.contains(savedWatchItems[i])){

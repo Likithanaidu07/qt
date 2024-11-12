@@ -20,6 +20,9 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
     setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Start_strike_BtfyBid);
     setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Start_strike_f2f);
     setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Fut_ConvRev);
+    setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Start_strike_BoxBid);
+    setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Start_strike_Bs1221_1331);
+    setTabOrder(ui->comboBox_AlgoType, ui->lineEdit_Fut_CRJellyBid);
 
 
     setTabOrder(ui->lineEdit_Start_strike_Btfy,ui->lineEdit_EndStrike_Btfy);
@@ -41,6 +44,20 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
     setTabOrder(ui->lineEdit_Start_strike_CRJellyBid,ui->lineEdit_EndStrike_CRJellyBid);
     setTabOrder(ui->lineEdit_EndStrike_CRJellyBid,ui->pushButtonAdd);
 
+    setTabOrder(ui->lineEdit_Start_strike_BoxBid,ui->lineEdit_EndStrike_BoxBid);
+    setTabOrder(ui->lineEdit_EndStrike_BoxBid,ui->lineEdit_StrikeDifference_BoxBid);
+    setTabOrder(ui->lineEdit_StrikeDifference_BoxBid,ui->pushButtonAdd);
+
+
+    setTabOrder(ui->lineEdit_Start_strike_Bs1221_1331,ui->lineEdit_EndStrike_Bs1221_1331);
+    setTabOrder(ui->lineEdit_EndStrike_Bs1221_1331,ui->lineEdit_StrikeDifference_Bs1221_1331);
+    setTabOrder(ui->lineEdit_StrikeDifference_Bs1221_1331,ui->pushButtonAdd);
+
+    setTabOrder(ui->lineEdit_Fut_CRJellyBid,ui->lineEdit_Start_strike_CRJellyBid);
+    setTabOrder(ui->lineEdit_Start_strike_CRJellyBid,ui->lineEdit_EndStrike_CRJellyBid);
+    setTabOrder(ui->lineEdit_EndStrike_CRJellyBid,ui->pushButtonAdd);
+
+
     setTabOrder(ui->pushButtonAdd, ui->pushButtonSelectAll);
     setTabOrder(ui->pushButtonSelectAll, ui->pushButton_Reset);
     setTabOrder(ui->pushButton_Reset, ui->pushButtonDelete);
@@ -55,7 +72,25 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
     QPixmap pixmapclose(":/dock_close.png");
     ui->Close->setIcon(pixmapclose);
 
-    const char LineEdit_SS[]="border-radius: 6px;""border: 0.5px solid #343A40;""background: #FFF;""color: #6C757D;""font-size: 12px;""font-style: normal;""font-weight: 400;""line-height: normal;" "padding: 4px 10px 4px 10px;";
+    //const char LineEdit_SS[]="border-radius: 6px;""border: 0.5px solid #343A40;""background: #FFF;""color: #6C757D;""font-size: 12px;""font-style: normal;""font-weight: 400;""line-height: normal;" "padding: 4px 10px 4px 10px;";
+    const char LineEdit_SS[] =
+        "QLineEdit {"
+        "    border-radius: 6px;"
+        "    border: 0.5px solid #343A40;"
+        "    background: #FFF;"
+        "    color: #6C757D;"
+        "    font-size: 12px;"
+        "    font-style: normal;"
+        "    font-weight: 400;"
+        "    line-height: normal;"
+        "    padding: 4px 10px 4px 10px;"
+        "}"
+        "QLineEdit:focus {"
+        "    border: 2px solid #EF7153;"
+        "}";
+
+
+
     for(auto w: {ui->lineEdit_StrikeDifference_Btfy,
         ui->lineEdit_StrikeDifference_BtfyBid,
         ui->lineEdit_Start_strike_Btfy,
@@ -83,7 +118,24 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
     }
 
 
-    const char pushButton_SS[]="border-radius: 8px;""border: 1px solid #485F6B;""background: #485F6B;""color: #FFF;""    text-align: center;""    font-size: 14px;""    font-style: normal;""    font-weight: 500;""    line-height: normal;";
+    //const char pushButton_SS[]="border-radius: 8px;""border: 1px solid #485F6B;""background: #485F6B;""color: #FFF;""    text-align: center;""    font-size: 14px;""    font-style: normal;""    font-weight: 500;""    line-height: normal;";
+    const char pushButton_SS[] =
+        "QPushButton {"
+        "    border-radius: 8px;"
+        "    border: 1px solid #485F6B;"
+        "    background: #485F6B;"
+        "    color: #FFF;"
+        "    text-align: center;"
+        "    font-size: 14px;"
+        "    font-style: normal;"
+        "    font-weight: 500;"
+        "    line-height: normal;"
+        "}"
+        "QPushButton:focus {"
+        "    border: 2px solid #EF7153;"  // Customize focus border
+        "}";
+
+
     ui->pushButtonAdd->setStyleSheet(pushButton_SS);
     QFont font=ui->pushButtonAdd->font();
     font.setFamily("Work Sans");
@@ -95,21 +147,63 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
     font_label.setFamily("Work Sans");
     ui->label->setFont(font_label);
 
-    const char toolButton_SS[]="border-radius: 4px; "
-                               "border: 0.5px solid #465460; "
-                               "background: #FFF; "
-                               "color: #465460; "
-                               "text-align: center; "
-                               "font-size: 10px; "
-                               "font-style: normal; "
-                               "font-weight: 500; "
-                               "line-height: normal;";
+//    const char toolButton_SS[]="border-radius: 4px; "
+//                               "border: 0.5px solid #465460; "
+//                               "background: #FFF; "
+//                               "color: #465460; "
+//                               "text-align: center; "
+//                               "font-size: 10px; "
+//                               "font-style: normal; "
+//                               "font-weight: 500; "
+//                               "line-height: normal;";
+    const char toolButton_SS[] =
+        "QPushButton {"
+        "    border-radius: 4px;"
+        "    border: 0.5px solid #465460;"
+        "    background: #FFF;"
+        "    color: #465460;"
+        "    text-align: center;"
+        "    font-size: 10px;"
+        "    font-style: normal;"
+        "    font-weight: 500;"
+        "    line-height: normal;"
+        "}"
+        "QPushButton:focus {"
+        "    border: 2px solid #EF7153;"  // Custom border on focus
+        "}";
+
+    ui->pushButtonAdd->setStyleSheet(pushButton_SS);
+
     for(auto w:{ui->pushButtonDelete,ui->pushButtonSelectAll,ui->pushButton_Reset}){
         w->setStyleSheet(toolButton_SS);
         QFont font=w->font();
         font.setFamily("Work Sans");
         w->setFont(font);
     }
+
+
+    const char pushButton_upload_cancel_ss[] =
+        "QPushButton {"
+        "    border-radius: 7px;"
+        "    background: #1585C0;"
+        "    color: #FFF;"
+        "    font-family: Work Sans;"
+        "    font-size: 14px;"
+        "    font-style: normal;"
+        "    font-weight: 600;"
+        "    line-height: normal;"
+        "}"
+        "QPushButton:focus {"
+        "    border: 2px solid #EF7153;"  // Custom border on focus
+        "}";
+    for(auto w:{ui->pushButtonUpload,ui->pushButton_Cancel}){
+        w->setStyleSheet(pushButton_upload_cancel_ss);
+        QFont font=w->font();
+        font.setFamily("Work Sans");
+        w->setFont(font);
+    }
+
+
 
     //initialize shared variable class
     sharedData = &AddAlgoSharedVar::getInstance();
@@ -121,34 +215,36 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
     connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
     connect(this,SIGNAL(display_log_text_signal(QString)),MainWindowObj,SLOT(slotAddLogForAddAlgoRecord(QString)));
 
+    ui->tableWidget->setNextFocusButton(ui->pushButtonUpload);
+
     ui->tableWidget->setShowGrid(false);
     ui->tableWidget->setAlternatingRowColors(true);
     ui->tableWidget->verticalHeader()->setVisible(false);
 
     /*******Class to generate F2F algos************/
    algoF2F = new add_algo_f2f();
-   algoF2F->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_f2f,ui->lineEdit_EndStrike_f2f);
+   algoF2F->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_f2f,ui->lineEdit_EndStrike_f2f,ui->pushButtonAdd);
    connect(algoF2F,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
 
     // /*******Class to generate F2F algos************/
 
     /*******Class to generate BtFly algos************/
     algoBtFly= new add_algo_btfly();
-    algoBtFly->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_Btfy,ui->lineEdit_EndStrike_Btfy,ui->lineEdit_StrikeDifference_Btfy);
+    algoBtFly->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_Btfy,ui->lineEdit_EndStrike_Btfy,ui->lineEdit_StrikeDifference_Btfy,ui->pushButtonAdd);
     connect(algoBtFly,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
 
     /*******Class to generate BtFly algos************/
 
     /*******Class to generate con_rev algos************/
     algoConRev= new add_algo_con_rev();
-    algoConRev->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_ConvRev,ui->lineEdit_EndStrike_ConvRev,ui->lineEdit_Fut_ConvRev);
+    algoConRev->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_ConvRev,ui->lineEdit_EndStrike_ConvRev,ui->lineEdit_Fut_ConvRev,ui->pushButtonAdd);
     connect(algoConRev,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
 
     /*******Class to generate con_rev algos************/
 
     /*******Class to generate BtFly-bid algos************/
     algoBtFlyBid= new add_algo_btfly_bid();
-    algoBtFlyBid->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_BtfyBid,ui->lineEdit_EndStrike_BtfyBid,ui->lineEdit_StrikeDifference_BtfyBid);
+    algoBtFlyBid->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_BtfyBid,ui->lineEdit_EndStrike_BtfyBid,ui->lineEdit_StrikeDifference_BtfyBid,ui->pushButtonAdd);
     connect(algoBtFlyBid,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
 
     /*******Class to generate BtFly-bid algos************/
@@ -157,14 +253,14 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
 
     /*******Class to generate algoCRJellyBid algos************/
     algoCRJellyBid= new add_algo_cr_jelly_bid();
-    algoCRJellyBid->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_CRJellyBid,ui->lineEdit_EndStrike_CRJellyBid,ui->lineEdit_Fut_CRJellyBid);
+    algoCRJellyBid->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_CRJellyBid,ui->lineEdit_EndStrike_CRJellyBid,ui->lineEdit_Fut_CRJellyBid,ui->pushButtonAdd);
     connect(algoCRJellyBid,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
 
     /*******Class to generate algoCRJellyBid algos************/
 
     /*******Class to generate BtFly-bid algos************/
     algoBoxBid= new convert_to_algo_box_bid();
-    algoBoxBid->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_BoxBid,ui->lineEdit_EndStrike_BoxBid,ui->lineEdit_StrikeDifference_BoxBid);
+    algoBoxBid->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_BoxBid,ui->lineEdit_EndStrike_BoxBid,ui->lineEdit_StrikeDifference_BoxBid,ui->pushButtonAdd);
     connect(algoBoxBid,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
 
     /*******Class to generate BtFly-bid algos************/
@@ -173,7 +269,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
 
     /*******Class to generate bs1221 algos************/
     algoBS_1221_1331= new convert_to_algo_bs1221_1331();
-    algoBS_1221_1331->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_Bs1221_1331,ui->lineEdit_EndStrike_Bs1221_1331,ui->lineEdit_StrikeDifference_Bs1221_1331);
+    algoBS_1221_1331->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_Bs1221_1331,ui->lineEdit_EndStrike_Bs1221_1331,ui->lineEdit_StrikeDifference_Bs1221_1331,ui->pushButtonAdd);
     connect(algoBS_1221_1331,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
     /*******Class to generate BtFly-bid algos************/
 
@@ -264,6 +360,9 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
             "    font-weight: bold;"
             "    text-align: center;"
             "}"
+            "QComboBox::focus  {"
+            "    border: 2px solid #EF7153;"
+            "}"
 //            "QComboBox::drop-down {"
 //            "    subcontrol-origin: padding;"
 //            "    subcontrol-position: top right;"
@@ -294,6 +393,52 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
     ui->comboBox_AlgoType->setFocus();
 
   //  ui->tableWidget->installEventFilter(this);
+
+//    ui->tableWidget->setStyleSheet(
+//        "QTableWidget::item:selected:focus {"
+//        "    border: 5px solid #349800;"    // Border around the selected row
+//        "    background-color: #e8f4fc;"    // Light background color for the selected row
+//        "}"
+//        "QTableWidget::item:selected {"
+//        "    background-color: #d000f5;"    // Background color for selected row when table is not in focus
+//        "    border: none;"                 // Remove border when table is not in focus
+//        "}"
+//    );
+
+
+
+//    ui->tableWidget->setStyleSheet(
+//        " QTableWidget:focus {"
+//        "    border: 2px solid #EF7153;"
+//        "    border-radius: 4px;"
+//        "}"
+//    );
+
+    const char TableWidget_SS[] =
+        "QTableWidget::item {"
+        "    background-color: #FFF;"
+        "    border: none;"
+        "    color: #495057;"
+        "    font-family: Work Sans;"
+        "    font-size: 8px;"
+        "    font-style: normal;"
+        "    font-weight: 600;"
+        "    line-height: normal;"
+        "}"
+        "QTableWidget::item:alternate {"
+        "    border: none;"
+        "    background-color: #F5FAFD;"
+        "}"
+        "QTableWidget::item:selected {"
+        "    background-color: #42A5F5;"
+        "    color: white;"
+        "}"
+        "QTableWidget::focus {"
+        "    border: 2px solid #EF7153;"  // Custom border on focus
+        "}";
+
+    ui->tableWidget->setStyleSheet(TableWidget_SS);
+
 
 }
 bool ConvertAlgo_Win::eventFilter(QObject *watched, QEvent *event) {

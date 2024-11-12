@@ -2152,7 +2152,7 @@ QList<int> mysql_conn::getPortfolioTypesForInstrumentType(const QString& data, c
     return matchingPortfolios;
 }
 
-QHash<QString, contract_table>  mysql_conn::getContractTable( QHash<int , QStringList> &m_ContractDetails_Grouped_,userInfo userData)
+QHash<QString, contract_table>  mysql_conn::getContractTable( QHash<int , QStringList> &m_ContractDetails_Grouped_,QHash<QString, QStringList> &_m_ContractDetailsFiltered,userInfo userData)
 {
 
     QMutexLocker lock(&mutex);
@@ -2210,6 +2210,8 @@ QHash<QString, contract_table>  mysql_conn::getContractTable( QHash<int , QStrin
                 contractTableTmp.OperatingRangeshighPriceRange = query.value(rec.indexOf("OperatingRangeshighPriceRange")).toInt();
 
                 contractTableData.insert( query.value(rec.indexOf("Token")).toString(), contractTableTmp);
+
+                _m_ContractDetailsFiltered[contractTableTmp.InstrumentType].append(QString::number(contractTableTmp.TokenNumber));
 
                 QStringList PortfolioAll;
                 QList<int>  portfolio_types = getPortfolioTypesForInstrumentType(contractTableTmp.InstrumentType,userData.algoFilterMap);

@@ -18,7 +18,7 @@ class add_algo_f2f : public QObject
     Q_OBJECT
 public:
     explicit add_algo_f2f(QObject *parent = nullptr);
-    void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_searchInstrument_leg1_,QLineEdit *lineEdit_searchInstrument_leg2_);
+    void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_searchInstrument_leg1_,QLineEdit *lineEdit_searchInstrument_leg2_,QPushButton *addButton_);
     QStringList F2F_Tokens;
     void create_AutoFillModel_SearchInstrument();
     void selectedAction();
@@ -36,6 +36,7 @@ private:
     QTableWidget *tableWidget;
     QListView *startStrikeListView;
     QListView *endStrikeListView;
+    QPushButton *addButton;
     QStandardItemModel *model_searchInstrument_F2F_Leg2;
 
     QStringList expiry_dateList;

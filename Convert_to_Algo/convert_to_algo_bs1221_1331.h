@@ -18,7 +18,7 @@
 
     public:
         explicit convert_to_algo_bs1221_1331(QObject *parent = nullptr);
-        void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_);
+        void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_,QPushButton *addButton_);
         QStringList BS1XX1_Tokens; // filtered token for BS1221 or BS1331
         void selectedAction(PortfolioType _Portfolio_Type);
         QString foo_token_number_start_strike;// this for start strike input of btfly
@@ -51,6 +51,7 @@
         QTableWidget *tableWidget;
         QListView *startStrikeListView;
         QListView *endStrikeListView;
+        QPushButton *addButton;
 
         QStringList expiry_dateList;
         QStringList token_numebrList;

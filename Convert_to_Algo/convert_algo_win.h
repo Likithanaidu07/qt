@@ -16,9 +16,17 @@
 #include "add_algo_cr_jelly_bid.h"
 #include "add_algo_f2f.h"
 #include "convert_to_algo_bs1221_1331.h"
+
+#include <QTableWidget>
+#include <QKeyEvent>
+
+
+
 enum UI_UPDATE_TYPE{
     LOADED_MODEL=0
 };
+
+
 
 namespace Ui {
 class ConvertAlgo_Win;
@@ -83,8 +91,8 @@ private:
     add_algo_btfly_bid *algoBtFlyBid;
     convert_to_algo_box_bid *algoBoxBid;
 
-     convert_to_algo_bs1221_1331 *algoBS_1221_1331;
-      QStringList ExFilterPF;
+    convert_to_algo_bs1221_1331 *algoBS_1221_1331;
+    QStringList ExFilterPF;
 
 
     void sort_data_and_populate_model(QHash<QString, contract_table> contract_table_/*,QHash<QString, contract_table> cd_contract_table_*/);

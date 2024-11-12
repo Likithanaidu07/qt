@@ -71,11 +71,11 @@ void Table_Portfolios_Model::onItemChanged(const QModelIndex &index)
 
 void Table_Portfolios_Model::selectionChangedSlot(int currentIdx){
 #ifdef MUTEX_DEBUG_LOG
-    qDebug()<<"Entering---selectionChangedSlot";
+   // qDebug()<<"Entering---selectionChangedSlot";
 #endif
-    QMutexLocker locker(&mutex); // Lock the mutex automatically
+    //QMutexLocker locker(&mutex); // Lock the mutex automatically
 #ifdef MUTEX_DEBUG_LOG
-    qDebug()<<"Setting Mutex---selectionChangedSlot";
+   // qDebug()<<"Setting Mutex---selectionChangedSlot";
 #endif
     if(currentIdx!=-1){
         if(portfolio_data_list[currentIdx]->TradedHighlight == true){
@@ -90,15 +90,17 @@ void Table_Portfolios_Model::selectionChangedSlot(int currentIdx){
     }
     //editing row swithced, make previous row flg not editing
     if(current_editingRow!=currentIdx){
-        if(current_editingRow!=-1&& current_editingRow < portfolio_data_list.size())
-            portfolio_data_list[current_editingRow]->edting.storeRelaxed(0);
+        if(current_editingRow!=-1&& current_editingRow < portfolio_data_list.size()){
+           // portfolio_data_list[current_editingRow]->edting.storeRelaxed(0);
+            editCancelled(current_editingRow);
+        }
         else if(currentIdx == -1)
             current_editingRow = -1;
         editingDataHash.clear();
 
     }
 #ifdef MUTEX_DEBUG_LOG
-    qDebug()<<"Exiting---selectionChangedSlot";
+    //qDebug()<<"Exiting---selectionChangedSlot";
 #endif
 
 }
@@ -488,8 +490,11 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
         }
         if(c==PortfolioData_Idx::_SellPriceDifference){
             //store data to editing hash if it not equal to previous value
-            if(P_Obj->SellPriceDifference != value.toDouble())
-                editingDataHash[c] = value.toString();
+
+            if(P_Obj->SellPriceDifference != value.toDouble()){
+                editingDataHash[c].prevVal = QString::number(P_Obj->SellPriceDifference);
+                editingDataHash[c].newVal = value.toString();
+            }
             portfolio_data_list[index.row()]->SellPriceDifference = value.toDouble();
             emit dataChanged(index, index);
 #ifdef MUTEX_DEBUG_LOG
@@ -500,8 +505,10 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
         }
         else if(c==PortfolioData_Idx::_BuyPriceDifference){
             //store data to editing hash if it not equal to previous value
-            if(P_Obj->BuyPriceDifference != value.toDouble())
-                editingDataHash[c] = value.toString();
+            if(P_Obj->BuyPriceDifference != value.toDouble()){
+                editingDataHash[c].prevVal = QString::number(P_Obj->BuyPriceDifference);
+                editingDataHash[c].newVal = value.toString();
+            }
 
             portfolio_data_list[index.row()]->BuyPriceDifference = value.toDouble();
             emit dataChanged(index, index);
@@ -515,8 +522,10 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
         }
         else if(c==PortfolioData_Idx::_SellTotalQuantity){
             //store data to editing hash if it not equal to previous value
-            if(P_Obj->SellTotalQuantity != value.toDouble())
-                editingDataHash[c] = value.toString();
+            if(P_Obj->SellTotalQuantity != value.toDouble()){
+                editingDataHash[c].prevVal = QString::number(P_Obj->SellTotalQuantity);{}
+                editingDataHash[c].newVal = value.toString();
+            }
             portfolio_data_list[index.row()]->SellTotalQuantity = value.toDouble();
             emit dataChanged(index, index);
 #ifdef MUTEX_DEBUG_LOG
@@ -529,9 +538,11 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
         }
         else if(c==PortfolioData_Idx::_BuyTotalQuantity){
             //store data to editing hash if it not equal to previous value
-            if(P_Obj->BuyTotalQuantity != value.toDouble())
-                editingDataHash[c] = value.toString();
 
+            if(P_Obj->BuyTotalQuantity != value.toDouble()){
+                editingDataHash[c].prevVal = QString::number(P_Obj->BuyTotalQuantity);
+                editingDataHash[c].newVal = value.toString();
+            }
             portfolio_data_list[index.row()]->BuyTotalQuantity = value.toDouble();
             emit dataChanged(index, index);
 #ifdef MUTEX_DEBUG_LOG
@@ -544,8 +555,10 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
         }
         else if(c==PortfolioData_Idx::_OrderQuantity){
             //store data to editing hash if it not equal to previous value
-            if(P_Obj->OrderQuantity != value.toDouble())
-                editingDataHash[c] = value.toString();
+            if(P_Obj->OrderQuantity != value.toDouble()){
+                editingDataHash[c].prevVal = QString::number(P_Obj->OrderQuantity);
+                editingDataHash[c].newVal = value.toString();
+            }
 
             portfolio_data_list[index.row()]->OrderQuantity = value.toDouble();
             emit dataChanged(index, index);
@@ -558,8 +571,12 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
         }
         else if(c==PortfolioData_Idx::_Alias){
             //store data to editing hash if it not equal to previous value
-            if(P_Obj->Alias != value.toString())
-                editingDataHash[c] = value.toString();
+
+
+            if(P_Obj->Alias != value.toString()){
+                editingDataHash[c].prevVal = P_Obj->Alias;
+                editingDataHash[c].newVal = value.toString();
+            }
             portfolio_data_list[index.row()]->Alias = value.toString();
             emit dataChanged(index, index);
 #ifdef MUTEX_DEBUG_LOG
@@ -572,8 +589,10 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
 
         else if(c==PortfolioData_Idx::_MaxLoss){
             //store data to editing hash if it not equal to previous value
-            if(P_Obj->MaxLoss != value.toDouble())
-                editingDataHash[c] = value.toString();
+            if(P_Obj->MaxLoss != value.toDouble()){
+                editingDataHash[c].prevVal = QString::number(P_Obj->MaxLoss);
+                editingDataHash[c].newVal = value.toString();
+            }
 
             portfolio_data_list[index.row()]->MaxLoss = value.toDouble();
             emit dataChanged(index, index);
@@ -625,6 +644,10 @@ bool Table_Portfolios_Model::storeToken(PortfolioObject* p){
     }
     if(!portfolio_tokens.contains(p->Leg6TokenNo)){
         portfolio_tokens.append(p->Leg6TokenNo);
+        newTokenFound = true;
+    }
+    if(!portfolio_tokens.contains(p->FutToken)){
+        portfolio_tokens.append(p->FutToken);
         newTokenFound = true;
     }
 
@@ -828,6 +851,8 @@ void Table_Portfolios_Model::updateModelDataList(QList <PortfolioObject*> portfo
         QStringList list;
         for(int i=0;i<portfolio_tokens.length();i++)
             list.append(QString::number(portfolio_tokens[i]));
+
+
         SlowData slowData;
         slowData.setLeg_n_token(list);
     }
@@ -1052,6 +1077,8 @@ void Table_Portfolios_Model::updateMarketRate(const QHash<QString, MBP_Data_Stru
                      QModelIndex topLeft = index(i, PortfolioData_Idx::_BuyMarketRate);
                      QModelIndex bottomRight = index(i, PortfolioData_Idx::_SellMarketRate);
                      emit dataChanged(topLeft, bottomRight);
+                     emit dataChanged(index(i, PortfolioData_Idx::_FuturePrice), index(i, PortfolioData_Idx::_FuturePrice));
+
 
                  }
              }
@@ -1102,6 +1129,8 @@ void Table_Portfolios_Model::updatePortFolioStatusValue(int row,QString statusVa
 }
 
 void Table_Portfolios_Model::setEditingFlg(int row,int val) {
+
+
 #ifdef MUTEX_DEBUG_LOG
     qDebug()<<"Entering---setEditingFlg";
 #endif
@@ -1200,4 +1229,91 @@ QStringList Table_Portfolios_Model::getActivatedPortfolios() {
 #endif
    return portfolioNumbers;
 }
+
+
+void Table_Portfolios_Model::editCancelled(int row) {
+    qDebug()<<"editCancelled---"<<row;
+  #ifdef MUTEX_DEBUG_LOG
+     qDebug()<<"Entering---editCancelled";
+  #endif
+     QMutexLocker locker(&mutex); // Lock the mutex automatically
+  #ifdef MUTEX_DEBUG_LOG
+     qDebug()<<"Setting Mutex---editCancelled";
+  #endif
+     if (!editingDataHash.isEmpty()) {
+         // Initialize min and max with the first key in the hash
+         int minKey = editingDataHash.constBegin().key();
+         int maxKey = minKey;
+         QHash<int, Cell_Cache>::const_iterator i;
+         for (i = editingDataHash.constBegin(); i != editingDataHash.constEnd(); ++i) {
+             int columnIdx = i.key();
+             QString valStr = i.value().newVal;
+             // Update minKey and maxKey
+             if (columnIdx < minKey) {
+                minKey = columnIdx;
+             }
+             if (columnIdx > maxKey) {
+                maxKey = columnIdx;
+             }
+             switch (columnIdx) {
+
+                 case PortfolioData_Idx::_SellTotalQuantity:{
+                    portfolio_data_list[row]->SellTotalQuantity = editingDataHash[PortfolioData_Idx::_SellTotalQuantity].prevVal.toInt();
+                 }
+                 break;
+                 case PortfolioData_Idx::_BuyTotalQuantity:{
+                    portfolio_data_list[row]->BuyTotalQuantity = editingDataHash[PortfolioData_Idx::_BuyTotalQuantity].prevVal.toInt();
+                 }
+                 break;
+                 case PortfolioData_Idx::_OrderQuantity:{
+                    portfolio_data_list[row]->OrderQuantity = editingDataHash[PortfolioData_Idx::_OrderQuantity].prevVal.toInt();
+                 }
+                 break;
+                 case PortfolioData_Idx::_BuyPriceDifference:{
+                    portfolio_data_list[row]->BuyPriceDifference = editingDataHash[PortfolioData_Idx::_BuyPriceDifference].prevVal.toDouble();
+                 }
+                 break;
+
+                 case PortfolioData_Idx::_SellPriceDifference:{
+                    portfolio_data_list[row]->SellPriceDifference = editingDataHash[PortfolioData_Idx::_SellPriceDifference].prevVal.toDouble();
+                 }
+                 break;
+
+                 case PortfolioData_Idx::_Alias:{
+                    portfolio_data_list[row]->Alias = editingDataHash[PortfolioData_Idx::_Alias].prevVal;
+                 }
+                 break;
+
+                 case PortfolioData_Idx::_MaxLoss:{
+                    portfolio_data_list[row]->MaxLoss = editingDataHash[PortfolioData_Idx::_MaxLoss].prevVal.toDouble();
+                 }
+                 break;
+
+
+
+
+                 default:{
+
+                 }
+                 break;
+
+           }
+       }
+
+      emit dataChanged(index(row, minKey), index(row, maxKey));
+
+     }
+
+
+     portfolio_data_list[row]->edting.storeRelaxed(0);
+     editingDataHash.clear();
+
+  #ifdef MUTEX_DEBUG_LOG
+     qDebug()<<"Exiting---editCancelled";
+  #endif
+
+
+
+}
+
 

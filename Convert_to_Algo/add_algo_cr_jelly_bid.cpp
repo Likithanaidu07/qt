@@ -26,11 +26,12 @@ void add_algo_cr_jelly_bid::clearAllModel(){
     model_Fut_CR_JELLY_BID->clear();
 }
 
-void add_algo_cr_jelly_bid::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_){
+void add_algo_cr_jelly_bid::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_,QPushButton *addButton_){
     lineEdit_Start_strike = lineEdit_Start_strike_;
     lineEdit_EndStrike = lineEdit_EndStrike_;
     lineEdit_Fut = lineEdit_Fut_;
     tableWidget = tableWidget_;
+    addButton = addButton_;
 //    startStrikeListView = sView;
 //    endStrikeListView = eView;
 //    futListView = fView;
@@ -685,6 +686,7 @@ void add_algo_cr_jelly_bid::itemSelectedFut(QModelIndex index)
                         lineEdit_Fut->setCursorPosition(0);
                         create_AutoFillModel_StartStrike();
                         futListView->hide();
+                        lineEdit_Start_strike->setFocus();
                         break;
                     }
                 }
@@ -720,6 +722,8 @@ void add_algo_cr_jelly_bid::itemSelectedStartStrike(QModelIndex index)
                         lineEdit_Start_strike->setCursorPosition(0);
                         startStrikeEditFinishedAction();
                         startStrikeListView->hide();
+                        lineEdit_EndStrike->setFocus();
+
                         break;
                     }
                 }
@@ -755,6 +759,7 @@ void add_algo_cr_jelly_bid::itemSelectedEndStrike(QModelIndex index)
                         lineEdit_EndStrike->setCursorPosition(0);
                         startStrikeListView->hide();
                         endStrikeListView->hide();
+                        addButton->setFocus();
                         break;
                     }
                 }

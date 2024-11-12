@@ -19,10 +19,11 @@ void add_algo_f2f::clearAllModel(){
     model_searchInstrument_F2F_Leg1->clear();
 }
 
-void add_algo_f2f::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_searchInstrument_leg1_,QLineEdit *lineEdit_searchInstrument_leg2_){
+void add_algo_f2f::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_searchInstrument_leg1_,QLineEdit *lineEdit_searchInstrument_leg2_,QPushButton *addButton_){
     lineEdit_searchInstrument_leg1 = lineEdit_searchInstrument_leg1_;
     lineEdit_searchInstrument_leg2 = lineEdit_searchInstrument_leg2_;
     tableWidget = tableWidget_;
+    addButton = addButton_;
 
     //startStrikeListView = sView;
    // endStrikeListView = eView;
@@ -524,6 +525,8 @@ void add_algo_f2f::itemSelectedStartStrike(QModelIndex index)
                         lineEdit_searchInstrument_leg1->setCursorPosition(0);
                         instrumentEditFinishedAction();
                         startStrikeListView->hide();
+                        lineEdit_searchInstrument_leg2->setFocus();
+
                         break;
                     }
                 }
@@ -558,6 +561,8 @@ void add_algo_f2f::itemSelectedEndStrike(QModelIndex index)
                         lineEdit_searchInstrument_leg2->setCursorPosition(0);
                         startStrikeListView->hide();
                         endStrikeListView->hide();
+                        addButton->setFocus();
+
                         break;
                     }
                 }

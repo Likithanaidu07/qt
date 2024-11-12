@@ -21,13 +21,13 @@ void convert_to_algo_box_bid::clearAllModel(){
     model_end_strike->clear();
     model_start_strike_BOX_BID->clear();
 }
-void convert_to_algo_box_bid::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_){
+void convert_to_algo_box_bid::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_,QPushButton *addButton_){
 
     lineEdit_Start_strike = lineEdit_Start_strike_;
     lineEdit_EndStrike = lineEdit_EndStrike_;
     lineEdit_StrikeDifference = lineEdit_StrikeDifference_;
     tableWidget = tableWidget_;
-
+    addButton = addButton_;
     QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
     // to make floating window
     startStrikeListView = new QListView(parentWidget);
@@ -542,6 +542,8 @@ void convert_to_algo_box_bid::itemSelectedStartStrike(QModelIndex index)
                         lineEdit_Start_strike->setCursorPosition(0);
                         createEndStrikeModelAndPopulateListView();
                         startStrikeListView->hide();
+                        lineEdit_EndStrike->setFocus();
+
                         break;
                     }
                 }
@@ -577,6 +579,8 @@ void convert_to_algo_box_bid::itemSelectedEndStrike(QModelIndex index)
                         lineEdit_EndStrike->setCursorPosition(0);
                         startStrikeListView->hide();
                         endStrikeListView->hide();
+                        addButton->setFocus();
+
                         break;
                     }
                 }

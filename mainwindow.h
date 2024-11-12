@@ -394,7 +394,7 @@ private slots:
 
 protected:
     virtual void closeEvent(QCloseEvent* event) override;
-
+    virtual void resizeEvent(QResizeEvent *event) override;
 
 };
 #endif // MAINWINDOW_H

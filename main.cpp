@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+ #include "mainwindow.h"
 #include "loginwindow.h"
 #include <QFontDatabase>
 #include <QApplication>
@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     QCoreApplication::setOrganizationName("New_AlgoMethods");
 
  #ifndef QT_DEBUG
-    logger::initLogging("SpeedTradeLog_");
+    //logger::initLogging("SpeedTradeLog_");
  #endif
     QFontDatabase::addApplicationFont(":/RacingSansOne-Regular.ttf");
     QTranslator translator;
@@ -39,6 +39,7 @@ int main(int argc, char *argv[])
     MainWindow mainWindow;
     MainWindowObj = &mainWindow;
 
+
    // UiUtils::SetMainWindow(&mainWindow);
     //loginwindow loginWindow(MainWindowObj);
     loginwindow loginWindow;
@@ -47,9 +48,10 @@ int main(int argc, char *argv[])
     QObject::connect(&loginWindow, &loginwindow::loginStatus, [&](const userInfo& userInfo) {
         if (userInfo.loggedIn) {
             MainWindowObj->userData = userInfo;
-            QMetaObject::invokeMethod(MainWindowObj, "showMaximized", Qt::QueuedConnection);
             QMetaObject::invokeMethod(&loginWindow, "close", Qt::QueuedConnection);
             QMetaObject::invokeMethod(MainWindowObj, "loggedIn", Qt::QueuedConnection);
+            QMetaObject::invokeMethod(MainWindowObj, "showMaximized", Qt::QueuedConnection);
+
         }
         else if (userInfo.dbError){
             QMetaObject::invokeMethod(qApp, [userInfo]() {

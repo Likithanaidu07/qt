@@ -20,7 +20,7 @@ class add_algo_con_rev : public QObject
 
 public:
     explicit add_algo_con_rev(QObject *parent = nullptr);
-    void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_);
+    void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_,QLineEdit *lineEdit_Start_strike_,QLineEdit *lineEdit_EndStrike_,QLineEdit *lineEdit_Fut_,QPushButton *addButton_);
     QStringList CON_REV_Tokens; // sorted keys for contract_table hash table     // this used for start strike and endstrike
     QStringList Fut_Tokens;
     void create_AutoFillModel_StartStrike();
@@ -49,7 +49,7 @@ private:
     QListView *startStrikeListView;
     QListView *endStrikeListView;
     QListView *futListView;
-
+    QPushButton *addButton;
 
     QStringList expiry_dateList;
     QStringList token_numebrList;

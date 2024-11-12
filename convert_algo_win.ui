@@ -194,7 +194,7 @@ line-height: normal;
          </size>
         </property>
         <property name="currentIndex">
-         <number>3</number>
+         <number>0</number>
         </property>
         <widget class="QWidget" name="pageBtfyBid">
          <layout class="QHBoxLayout" name="horizontalLayout">
@@ -950,16 +950,7 @@ line-height: normal;
            </size>
           </property>
           <property name="styleSheet">
-           <string notr="true">QPushButton{
-border-radius: 7px;
-background: #1585C0;
-color: #FFF;
-font-family: Work Sans;
-font-size: 14px;
-font-style: normal;
-font-weight: 600;
-line-height: normal;
-}</string>
+           <string notr="true"/>
           </property>
           <property name="text">
            <string>Add</string>
@@ -995,18 +986,6 @@ line-height: normal;
             <width>95</width>
             <height>16777215</height>
            </size>
-          </property>
-          <property name="styleSheet">
-           <string notr="true">QPushButton{
-border-radius: 7px;
-background: #1585C0;
-color: #FFF;
-font-family: Work Sans;
-font-size: 14px;
-font-style: normal;
-font-weight: 600;
-line-height: normal;
-}</string>
           </property>
           <property name="text">
            <string>Cancel</string>
@@ -1166,49 +1145,6 @@ background: #E0E8EE;
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="label">
-           <property name="styleSheet">
-            <string notr="true"/>
-           </property>
-           <property name="text">
-            <string>Algo List</string>
-           </property>
-          </widget>
-         </item>
-         <item row="3" column="0" colspan="4">
-          <widget class="QTableWidget" name="tableWidget">
-           <property name="focusPolicy">
-            <enum>Qt::TabFocus</enum>
-           </property>
-           <property name="styleSheet">
-            <string notr="true">QTableView::item {
-    background-color: #FFF;
-    border: none; 
-    color: #495057;
-    font-family: Work Sans;
-    font-size: 8px;
-    font-style: normal;
-    font-weight: 600;
-    line-height: normal;
-}
-
-QTableView::item:alternate {
-    border: none; 
-    background-color: #F5FAFD; 
-}
-
-QTableView::item:selected {
-    background-color: #42A5F5;
-    color: white; /* Optionally, set the text color for selected items */
-}
-</string>
-           </property>
-           <attribute name="horizontalHeaderCascadingSectionResizes">
-            <bool>true</bool>
-           </attribute>
-          </widget>
-         </item>
          <item row="0" column="1">
           <widget class="QPushButton" name="pushButtonSelectAll">
            <property name="minimumSize">
@@ -1241,6 +1177,32 @@ QTableView::item:selected {
            <property name="flat">
             <bool>true</bool>
            </property>
+          </widget>
+         </item>
+         <item row="0" column="0">
+          <widget class="QLabel" name="label">
+           <property name="styleSheet">
+            <string notr="true"/>
+           </property>
+           <property name="text">
+            <string>Algo List</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="0" colspan="4">
+          <widget class="CustomTableWidget" name="tableWidget">
+           <property name="focusPolicy">
+            <enum>Qt::TabFocus</enum>
+           </property>
+           <property name="tabKeyNavigation">
+            <bool>true</bool>
+           </property>
+           <property name="selectionBehavior">
+            <enum>QAbstractItemView::SelectItems</enum>
+           </property>
+           <attribute name="horizontalHeaderCascadingSectionResizes">
+            <bool>true</bool>
+           </attribute>
           </widget>
          </item>
          <item row="0" column="2">
@@ -1276,6 +1238,13 @@ QTableView::item:selected {
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomTableWidget</class>
+   <extends>QTableWidget</extends>
+   <header location="global">Convert_to_Algo/customtablewidget.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>comboBox_AlgoType</tabstop>
   <tabstop>pushButtonAdd</tabstop>

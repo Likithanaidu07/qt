@@ -18,7 +18,7 @@ class convert_to_algo_box_bid : public QObject
 
 public:
     explicit convert_to_algo_box_bid(QObject *parent = nullptr);
-    void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_);
+    void copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_,QPushButton *addButton_);
     QStringList BX_BID_Tokens; // filtered token for BOX_BID
     void selectedAction();
     QString foo_token_number_start_strike;// this for start strike input of btfly
@@ -51,7 +51,7 @@ private:
     QTableWidget *tableWidget;
     QListView *startStrikeListView;
     QListView *endStrikeListView;
-
+    QPushButton *addButton;
     QStringList expiry_dateList;
     QStringList token_numebrList;
     AddAlgoSharedVar *sharedData;

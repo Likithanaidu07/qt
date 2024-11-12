@@ -130,7 +130,7 @@ void ContractDetail::ReloadContractDetails(userInfo uData)
 #endif
 
     mysql_conn con(0,"contract_conn");
-    m_ContractDetails_Hash = con.getContractTable(m_ContractDetails_Grouped,uData);
+    m_ContractDetails_Hash = con.getContractTable(m_ContractDetails_Grouped,m_ContractDetailsFiltered,uData);
 
 
     qDebug()<<"Loaded ContractDetails from DB size="<<m_ContractDetails_Hash.size();
@@ -528,7 +528,23 @@ QHash<QString, contract_table> ContractDetail::GetContracts(QString type)
     }
 
     QHash<QString, contract_table> Contracts;
-    if(m_ContractDetailsFiltered.contains(type)){
+
+    //m_ContractDetailsFiltered will be like OPTIDX OPTSTK FUTIDX FUTSTK
+    if(type=="FUT"){
+        if(m_ContractDetailsFiltered.contains("FUTIDX")){
+            QStringList Toks = m_ContractDetailsFiltered["FUTIDX"];
+            for(int i=0;i<Toks.length();i++){
+                Contracts.insert(Toks[i],m_ContractDetails_Hash[Toks[i]]);
+            }
+        }
+        if(m_ContractDetailsFiltered.contains("FUTSTK")){
+            QStringList Toks = m_ContractDetailsFiltered["FUTSTK"];
+            for(int i=0;i<Toks.length();i++){
+                Contracts.insert(Toks[i],m_ContractDetails_Hash[Toks[i]]);
+            }
+        }
+    }
+    else if(m_ContractDetailsFiltered.contains(type)){
         QStringList Toks = m_ContractDetailsFiltered[type];
         for(int i=0;i<Toks.length();i++){
             Contracts.insert(Toks[i],m_ContractDetails_Hash[Toks[i]]);
