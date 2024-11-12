@@ -129,6 +129,7 @@ private:
 
     loadingdatawindow *loadingDataWinodw;
     SortSettingPopUp *sortWin; // Add this line
+    QAction *summaryAction;
 
     bool showMessagOnceFlg;
     int AlgoCount;

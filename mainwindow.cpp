@@ -109,7 +109,7 @@ MainWindow::MainWindow(QWidget *parent)
     QMenu *cardMenu = new QMenu("Card", this);
 
     // Create actions
-    QAction *summaryAction = new QAction("Summary", this);
+    summaryAction = new QAction("Summary", this);
     QAction *watchAction = new QAction("Watch", this);
     QAction *LogAction = new QAction("Logs", this);
 
@@ -2000,9 +2000,10 @@ void MainWindow::loadContract(){
 
         if(loggedInFlg.loadRelaxed()==1){
             start_dataLoadingThread();
-            QMetaObject::invokeMethod(this, [this]() {
-               onSummaryActionTriggered();
-            }, Qt::QueuedConnection);
+           // QMetaObject::invokeMethod(this, [this]() { //onSummaryActionTriggered();}, Qt::QueuedConnection);
+
+            QMetaObject::invokeMethod(summaryAction, "trigger", Qt::QueuedConnection);
+
                     }
     };
     emit update_ui_signal(LOADED_MODEL);
@@ -2355,11 +2356,12 @@ void MainWindow::updateSummaryLabels()
 
     if (summary) {
         if (summary->isVisible()) {
-            summary->updateSummaryData(summarydatList);
+            //summary->updateSummaryData(summarydatList);
+            emit data_summary_update_signal(summarydatList);
         }
     }
 
-   // emit data_summary_update_signal(summarydatList);
+
 
 
 
@@ -2966,20 +2968,20 @@ void MainWindow::refresh_Button_clicked(){
 }
 
 
-void MainWindow::duplicate_Button_clicked() {
-  algo_data_to_insert data;  // Set up data as needed
-  int MaxPortfolioCount = userData.MaxPortfolioCount; // Or retrieve as needed
+void MainWindow::duplicate_Button_clicked(){
+  algo_data_to_insert data;
+  int MaxPortfolioCount = userData.MaxPortfolioCount;
   QString msg;
 
-  // Rest of the function's logic using data, MaxPortfolioCount, and msg
   QModelIndexList selected = getSelectedPortFolioIndexs();
 
   if (selected.isEmpty()) {
-            QMessageBox::information(this, "Duplicate Portfolio", "select a portfolio to duplicate.");
+            QMessageBox::information(this, "Duplicate Portfolio", "Select a portfolio to duplicate.");
             return;
   }
+
   if (selected.size() > 1) {
-            QMessageBox::information(this, "Duplicate Portfolio", "select only one portfolio to duplicate.");
+            QMessageBox::information(this, "Duplicate Portfolio", "Select only one portfolio to duplicate.");
             return;
   }
 
@@ -2992,7 +2994,7 @@ void MainWindow::duplicate_Button_clicked() {
 
             data.algo_type = selectedPortfolio->PortfolioType;
             data.Algo_Name = selectedPortfolio->AlgoName;
-            data.Algo_Status = "DisabledByUser";//selectedPortfolio->Status ? "True" : "False";
+            data.Algo_Status = "DisabledByUser";
             data.Leg1_token_number = QString::number(selectedPortfolio->Leg1TokenNo);
             data.Leg2_token_number = QString::number(selectedPortfolio->Leg2TokenNo);
             data.Leg3_token_number = QString::number(selectedPortfolio->Leg3TokenNo);
@@ -3000,22 +3002,16 @@ void MainWindow::duplicate_Button_clicked() {
             data.user_id = QString::number(userData.UserId);
 
             algo_data_insert_status status = db_conn->insertToAlgoTable(data, MaxPortfolioCount, msg);
-            if(status==algo_data_insert_status::INSERTED){
-                triggerImmediate_refreshTables();
-            }
-            else if(status==algo_data_insert_status::FAILED){
-            }
-            else if(status==algo_data_insert_status::LIMIT_REACHED){
-
-            }
-
-            else if(status==algo_data_insert_status::EXIST){
-
+            if (status == algo_data_insert_status::INSERTED) {
+            triggerImmediate_refreshTables();
             }
   }
 
+  // Clear selection and focus
   T_Portfolio_Table->clearSelection();
+  T_Portfolio_Table->clearFocus();
 }
+
 
 
 void MainWindow::OnAlgorithmDockWidgetVisiblityChanged(bool p_Visible)
@@ -3942,6 +3938,8 @@ void MainWindow::onSummaryActionTriggered() {
 
     if (!summary) {
           summary = new Summary_cards(this);
+          connect(this, SIGNAL(data_summary_update_signal(const QStringList&)), summary, SLOT(updateSummaryData(const QStringList&)));
+
           Qt::WindowFlags flags = summary->windowFlags();
           summary->setWindowFlags(flags | Qt::Dialog);
          // summary->setAttribute(Qt::WA_DeleteOnClose);
@@ -3949,7 +3947,8 @@ void MainWindow::onSummaryActionTriggered() {
 
     if (!summary->isVisible()) {
           summary->show();
-          summary->updateSummaryData(summarydatList);
+          //summary->updateSummaryData(summarydatList);
+          emit data_summary_update_signal(summarydatList);
     }
 
 }

@@ -1135,6 +1135,17 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
        // QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and (Leg1_OrderState=7 and Leg2_OrderState=7 and Leg3_OrderState=7) ORDER BY Trader_Data DESC";
        // QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and  Leg1_OrderState=7 or Leg2_OrderState=7 or Leg3_OrderState=7 or Leg4_OrderState = 7  ORDER BY Trader_Data DESC";
         //QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' AND (Leg1_OrderState=7 OR Leg2_OrderState=7 OR Leg3_OrderState=7 OR Leg4_OrderState=7) ORDER BY Trader_Data DESC";
+//        QString query_str =
+//            "SELECT O.*, P.PortfolioType "
+//            "FROM Order_Table_Bid O "
+//            "INNER JOIN Portfolios P "
+//            "ON CASE "
+//            "    WHEN O.PortfolioNumber > 1500000 THEN O.PortfolioNumber - 1500000 "
+//            "    ELSE O.PortfolioNumber "
+//            "END = P.PortfolioNumber "
+//            "WHERE O.Trader_ID='" + user_id + "' "
+//            "AND (O.Leg1_OrderState=7 OR O.Leg2_OrderState=7 OR O.Leg3_OrderState=7 OR O.Leg4_OrderState=7) "
+//            "ORDER BY O.Trader_Data DESC";
         QString query_str =
             "SELECT O.*, P.PortfolioType "
             "FROM Order_Table_Bid O "
@@ -1144,8 +1155,12 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
             "    ELSE O.PortfolioNumber "
             "END = P.PortfolioNumber "
             "WHERE O.Trader_ID='" + user_id + "' "
-            "AND (O.Leg1_OrderState=7 OR O.Leg2_OrderState=7 OR O.Leg3_OrderState=7 OR O.Leg4_OrderState=7) "
-            "ORDER BY O.Trader_Data DESC";
+                        "AND (O.Leg1_OrderState IN (7, 8) OR "
+                        "     O.Leg2_OrderState IN (7, 8) OR "
+                        "     O.Leg3_OrderState IN (7, 8) OR "
+                        "     O.Leg4_OrderState IN (7, 8)) "
+                        "ORDER BY O.Trader_Data DESC";
+
 
 
         //QString sqlquery ="SELECT COUNT(*) FROM Order_Table_Bid WHERE Order_Table_Bid.Trader_ID='"+user_id+"'";
@@ -2828,11 +2843,11 @@ algo_data_insert_status mysql_conn::place_F1F2_Order(QString userID,QString Leg1
 
             PortfoliosCount = query.size();
             //if portfolio limit reaches do not insert
-            if(PortfoliosCount>=MaxPortfolioCount){
-                    ret = algo_data_insert_status::LIMIT_REACHED;
-                    msg = "Maximum Portfolio Limit Reached";
-                    return ret;
-            }
+//            if(PortfoliosCount>=MaxPortfolioCount){
+//                    ret = algo_data_insert_status::LIMIT_REACHED;
+//                    msg = "Maximum Portfolio Limit Reached";
+//                    return ret;
+//            }
 
             if(checkDuplicateExist){
                 QString str = "SELECT COUNT(*) FROM Portfolios WHERE Leg1TokenNo="+Leg1TokenNumber+" and TraderID="+userID+" and PortfolioType="+QString::number(PortfolioType::F1_F2);

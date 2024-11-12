@@ -211,12 +211,12 @@ background: #46454d;
               <widget class="QPushButton" name="OrderBook_Button">
                <property name="maximumSize">
                 <size>
-                 <width>80</width>
+                 <width>55</width>
                  <height>14</height>
                 </size>
                </property>
                <property name="text">
-                <string>Algo Position</string>
+                <string>Trades</string>
                </property>
               </widget>
              </item>
@@ -356,12 +356,12 @@ background: #46454d;
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>55</width>
+                 <width>80</width>
                  <height>14</height>
                 </size>
                </property>
                <property name="text">
-                <string>Liners</string>
+                <string>Algo Position</string>
                </property>
               </widget>
              </item>
@@ -568,12 +568,12 @@ background: #46454d;
                </property>
                <property name="maximumSize">
                 <size>
-                 <width>16777215</width>
+                 <width>55</width>
                  <height>14</height>
                 </size>
                </property>
                <property name="text">
-                <string>Manual Trades</string>
+                <string>Liners</string>
                </property>
               </widget>
              </item>
@@ -722,7 +722,7 @@ background: #46454d;
                 </size>
                </property>
                <property name="text">
-                <string>Liners</string>
+                <string>Missed Trades</string>
                </property>
               </widget>
              </item>
