@@ -35,6 +35,7 @@ public:
         if (watch_data_card->objectName().isEmpty())
             watch_data_card->setObjectName("watch_data_card");
         watch_data_card->resize(210, 48);
+        watch_data_card->setMaximumSize(QSize(210, 16777215));
         gridLayout = new QGridLayout(watch_data_card);
         gridLayout->setSpacing(0);
         gridLayout->setObjectName("gridLayout");

@@ -3778,7 +3778,6 @@ void MainWindow::restoreTableViewColumnState(QTableView *tableView){
      {
        tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
        qDebug()<<"Restoring table state  for "<<tableView->objectName();
-
      }
 }
 
@@ -4439,6 +4438,36 @@ void MainWindow::exportTableViewToCSV(){
 
 }
 
+//void MainWindow::resizeEvent(QResizeEvent *event) {
+//    QMainWindow::resizeEvent(event);
+
+//    int thresholdWidth = 1300;  // Set your width threshold
+
+//    // Cast the layout to QGridLayout
+//    QGridLayout *gridLayout = qobject_cast<QGridLayout*>(ui->widget_5->layout());
+//   // qWarning() << "window width="<<event->size().width();
+
+//    if (gridLayout) {  // Ensure the layout is a QGridLayout
+//        if (event->size().width() < thresholdWidth) {
+
+//            ui->widget_5->setMinimumHeight(90);
+//            ui->widget_5->setMaximumHeight(90);
+
+//            // Move widget to the second row if width is below threshold
+//            gridLayout->removeWidget(ui->widgetButtonParent);
+//            gridLayout->addWidget(ui->widgetButtonParent, 1, 0);
+//        } else {
+//            ui->widget_5->setMinimumHeight(50);
+//            ui->widget_5->setMaximumHeight(50);
+
+//            // Restore to the original position if width is above threshold
+//            gridLayout->removeWidget(ui->widgetButtonParent);
+//            gridLayout->addWidget(ui->widgetButtonParent, 0, 2);
+//        }
+//    } else {
+//        qWarning() << "widget_5 layout is not a QGridLayout";
+//    }
+//}
 void MainWindow::resizeEvent(QResizeEvent *event) {
     QMainWindow::resizeEvent(event);
 
@@ -4446,29 +4475,41 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
 
     // Cast the layout to QGridLayout
     QGridLayout *gridLayout = qobject_cast<QGridLayout*>(ui->widget_5->layout());
-    qWarning() << "window width="<<event->size().width();
-
     if (gridLayout) {  // Ensure the layout is a QGridLayout
         if (event->size().width() < thresholdWidth) {
-
+            // Adjust widget_5 height
             ui->widget_5->setMinimumHeight(90);
             ui->widget_5->setMaximumHeight(90);
 
-            // Move widget to the second row if width is below threshold
-            gridLayout->removeWidget(ui->widgetButtonParent);
-            gridLayout->addWidget(ui->widgetButtonParent, 1, 0);
+            // Clear existing layout items
+            while (QLayoutItem *item = gridLayout->takeAt(0)) {
+                gridLayout->removeItem(item);
+            }
+
+            // Add widgets for smaller width - two rows
+            gridLayout->addLayout(ui->horizontalLayout_Watch, 0, 0);
+            gridLayout->addItem(ui->horizontalSpacer_3, 0, 1);
+            gridLayout->addWidget(ui->widget, 0, 2);
+            gridLayout->addWidget(ui->widgetButtonParent, 1, 0, 1, 3); // Span across columns
         } else {
+            // Adjust widget_5 height for larger width
             ui->widget_5->setMinimumHeight(50);
             ui->widget_5->setMaximumHeight(50);
 
-            // Restore to the original position if width is above threshold
-            gridLayout->removeWidget(ui->widgetButtonParent);
+            // Clear existing layout items
+            while (QLayoutItem *item = gridLayout->takeAt(0)) {
+                gridLayout->removeItem(item);
+            }
+
+            // Add widgets for larger width - single row
+            gridLayout->addLayout(ui->horizontalLayout_Watch, 0, 0);
+            gridLayout->addItem(ui->horizontalSpacer_3, 0, 1);
             gridLayout->addWidget(ui->widgetButtonParent, 0, 2);
+            gridLayout->addWidget(ui->widget, 0, 3);
         }
     } else {
         qWarning() << "widget_5 layout is not a QGridLayout";
     }
 }
-
 
 
