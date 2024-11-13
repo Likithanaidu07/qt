@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'settings_window.ui'
 **
-** Created by: Qt User Interface Compiler version 6.5.3
+** Created by: Qt User Interface Compiler version 6.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -37,18 +37,18 @@ public:
     void setupUi(QDialog *Settings_Window)
     {
         if (Settings_Window->objectName().isEmpty())
-            Settings_Window->setObjectName("Settings_Window");
+            Settings_Window->setObjectName(QString::fromUtf8("Settings_Window"));
         Settings_Window->resize(722, 553);
         gridLayout = new QGridLayout(Settings_Window);
-        gridLayout->setObjectName("gridLayout");
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
         tabWidget = new QTabWidget(Settings_Window);
-        tabWidget->setObjectName("tabWidget");
+        tabWidget->setObjectName(QString::fromUtf8("tabWidget"));
         tabWidget->setTabPosition(QTabWidget::West);
         tabWidget->setTabShape(QTabWidget::Triangular);
         tabWidget->setElideMode(Qt::ElideNone);
         tabGeneral = new QWidget();
-        tabGeneral->setObjectName("tabGeneral");
+        tabGeneral->setObjectName(QString::fromUtf8("tabGeneral"));
         QIcon icon;
         QString iconThemeName = QString::fromUtf8("folder");
         if (QIcon::hasThemeIcon(iconThemeName)) {
@@ -58,11 +58,11 @@ public:
         }
         tabWidget->addTab(tabGeneral, icon, QString());
         tabHotkeys = new QWidget();
-        tabHotkeys->setObjectName("tabHotkeys");
+        tabHotkeys->setObjectName(QString::fromUtf8("tabHotkeys"));
         gridLayout_2 = new QGridLayout(tabHotkeys);
-        gridLayout_2->setObjectName("gridLayout_2");
+        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         pushButtonSaveHotKeys = new QPushButton(tabHotkeys);
-        pushButtonSaveHotKeys->setObjectName("pushButtonSaveHotKeys");
+        pushButtonSaveHotKeys->setObjectName(QString::fromUtf8("pushButtonSaveHotKeys"));
 
         gridLayout_2->addWidget(pushButtonSaveHotKeys, 1, 1, 1, 1);
 
@@ -71,7 +71,7 @@ public:
         gridLayout_2->addItem(horizontalSpacer, 1, 0, 1, 1);
 
         treeView = new QTreeView(tabHotkeys);
-        treeView->setObjectName("treeView");
+        treeView->setObjectName(QString::fromUtf8("treeView"));
 
         gridLayout_2->addWidget(treeView, 0, 0, 1, 2);
 
