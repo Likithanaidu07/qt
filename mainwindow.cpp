@@ -4467,15 +4467,49 @@ void MainWindow::exportTableViewToCSV(){
 //        qWarning() << "widget_5 layout is not a QGridLayout";
 //    }
 //}
+
+bool MainWindow::checkChildOverlapLayout(QHBoxLayout* layout) {
+    int layoutWidth = layout->geometry().width();  // Width of the layout
+    int totalChildWidth = 0;
+
+    // Iterate over each item in the layout
+    for (int i = 0; i < layout->count(); ++i) {
+        QLayoutItem* item = layout->itemAt(i);
+        if (item->widget()) {
+            totalChildWidth += item->widget()->width();  // Sum the widths of each child widget
+        }
+    }
+
+    // Check if child widgets are overlapping the layout width
+    if (totalChildWidth > layoutWidth) {
+        qDebug() << "Warning: Child widgets are overlapping in the layout.";
+        return true;
+    } else {
+        qDebug() << "All child widgets fit within the layout.";
+        return false;
+    }
+}
 void MainWindow::resizeEvent(QResizeEvent *event) {
     QMainWindow::resizeEvent(event);
 
-    int thresholdWidth = 1300;  // Set your width threshold
+    static int thresholdWidth = 1300;  // Set your width threshold
+    static bool one_row = false;
+
+    bool smallScreen = false;
+    if(one_row){
+        if(checkChildOverlapLayout(ui->horizontalLayout_Watch)){
+           thresholdWidth = event->size().width();
+        }
+    }
+
+    if(event->size().width() <= thresholdWidth)
+        smallScreen = true;
+
 
     // Cast the layout to QGridLayout
     QGridLayout *gridLayout = qobject_cast<QGridLayout*>(ui->widget_5->layout());
     if (gridLayout) {  // Ensure the layout is a QGridLayout
-        if (event->size().width() < thresholdWidth) {
+        if (smallScreen) {
             // Adjust widget_5 height
             ui->widget_5->setMinimumHeight(90);
             ui->widget_5->setMaximumHeight(90);
@@ -4490,6 +4524,7 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
             gridLayout->addItem(ui->horizontalSpacer_3, 0, 1);
             gridLayout->addWidget(ui->widget, 0, 2);
             gridLayout->addWidget(ui->widgetButtonParent, 1, 0, 1, 3); // Span across columns
+            one_row = false;
         } else {
             // Adjust widget_5 height for larger width
             ui->widget_5->setMinimumHeight(50);
@@ -4505,6 +4540,8 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
             gridLayout->addItem(ui->horizontalSpacer_3, 0, 1);
             gridLayout->addWidget(ui->widgetButtonParent, 0, 2);
             gridLayout->addWidget(ui->widget, 0, 3);
+            one_row = true;
+
         }
     } else {
         qWarning() << "widget_5 layout is not a QGridLayout";

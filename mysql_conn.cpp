@@ -2832,16 +2832,16 @@ algo_data_insert_status mysql_conn::place_F1F2_Order(QString userID,QString Leg1
         bool ok = checkDBOpened(msg);
         if(ok){
             QSqlQuery query(db);
-            int PortfoliosCount = -1;
-            query.prepare("SELECT * FROM Portfolios");
-            if( !query.exec() )
-            {
-                msg = query.lastError().text();
-                qDebug()<<query.lastError().text();
-                return ret;
-            }
+//            int PortfoliosCount = -1;
+//            query.prepare("SELECT * FROM Portfolios");
+//            if( !query.exec() )
+//            {
+//                msg = query.lastError().text();
+//                qDebug()<<query.lastError().text();
+//                return ret;
+//            }
 
-            PortfoliosCount = query.size();
+            //ortfoliosCount = query.size();
             //if portfolio limit reaches do not insert
 //            if(PortfoliosCount>=MaxPortfolioCount){
 //                    ret = algo_data_insert_status::LIMIT_REACHED;
