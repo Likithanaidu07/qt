@@ -1070,7 +1070,7 @@ void Table_Portfolios_Model::updateMarketRate(const QHash<QString, MBP_Data_Stru
 
              for(int i=0;i<portfolio_data_list.length();i++){
                  // update only if the current row is not editing
-                 if(portfolio_data_list[i]->edting.loadRelaxed()==0){
+                 //if(portfolio_data_list[i]->edting.loadRelaxed()==0){
                      portfolioPareser.CalculatePriceDifference(*portfolio_data_list[i],MBP_Data_Hash,devicer,decimal_precision);
                     // portfolio_data_list[i]->BuyMarketRate = 1000;
                     // portfolio_data_list[i]->SellMarketRate = 1000;
@@ -1080,7 +1080,7 @@ void Table_Portfolios_Model::updateMarketRate(const QHash<QString, MBP_Data_Stru
                      emit dataChanged(index(i, PortfolioData_Idx::_FuturePrice), index(i, PortfolioData_Idx::_FuturePrice));
 
 
-                 }
+                // }
              }
             // Reset the timer
             slowDataPriceUpdateTimer.restart();
