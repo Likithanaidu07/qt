@@ -2687,7 +2687,9 @@ void MainWindow::add_logs(QString str){
    // ui->textEdit->append(str);
     logsdata.append(str);
     emit logDataSignal(logsdata);
-     ui->label_5->setText("&nbsp;UserMessage:"+ str);
+    ui->label_5->setWordWrap(true);
+    ui->label_5->setText("UserMessage: " + str);
+
 }
 
 void MainWindow::on_OrderBook_Button_clicked()
@@ -3184,8 +3186,6 @@ void MainWindow::Delete_clicked_slot()
 
    }
 
-   QMessageBox::StandardButton reply;
-   reply = QMessageBox::question(this, "Delete Portfolio From Database?", "Delete  portfolios ["+portFoliosToDelete.join(",")+"] from DB?",  QMessageBox::Yes|QMessageBox::No);
 
    //if (reply == QMessageBox::Yes) {
        if (!activeAlgoList.empty()) {
@@ -3202,9 +3202,12 @@ void MainWindow::Delete_clicked_slot()
        QString msg;
        bool ret = db_conn->deleteNonTradedAlgos(portFoliosToDelete, msg);
 
-       if (!ret) {
+        if (!ret) {
            QMessageBox::warning(this, "Error", "Executed Trades cannot be deleted: " + portFoliosToDelete.join(","));
        } else {
+           QMessageBox::StandardButton reply;
+           reply = QMessageBox::question(this, "Delete Portfolio From Database?", "Delete  portfolios ["+portFoliosToDelete.join(",")+"] from DB?",  QMessageBox::Yes|QMessageBox::No);
+
            // Delete from model and refresh the entire table
            T_Portfolio_Model->removeRowsByIndices(portFolioIdxToDelete);
            triggerImmediate_refreshTables();
@@ -3322,7 +3325,9 @@ void MainWindow::slotAddLogForAddAlgoRecord(QString str)
    //  emit logDataSignal(str);
     logsdata.append(str);
     emit logDataSignal(logsdata);
-    ui->label_5->setText("&nbsp;UserMessage : "+str);
+    ui->label_5->setWordWrap(true);
+    ui->label_5->setText("UserMessage: " + str);
+
 }
 
 void MainWindow::slotHideProgressBar()
