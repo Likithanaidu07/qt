@@ -281,6 +281,7 @@ private:
       QModelIndexList  getSelectedPortFolioIndexs();
       void instilizeWatchUIOnTopBar();
       void updateWatchDataCard(Indices_Data_Struct data);
+      bool checkChildOverlapLayout(QHBoxLayout* layout);
 
 public slots:
 

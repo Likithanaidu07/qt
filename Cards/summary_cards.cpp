@@ -19,7 +19,7 @@ QString Summary_cards::fixDecimal(double num, int decimal_precision) {
 
 
 void Summary_cards::updateSummaryData(const QStringList &data) {
-    qDebug()<<"updateSummaryData...."<<data.size();
+  //  qDebug()<<"updateSummaryData...."<<data.size();
     if (data.size() >= 8) {
         QFont boldFont;
         boldFont.setBold(true);

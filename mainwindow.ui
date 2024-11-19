@@ -150,6 +150,29 @@ background: #46454d;
          </layout>
         </widget>
        </item>
+       <item row="0" column="0">
+        <layout class="QHBoxLayout" name="horizontalLayout_Watch">
+         <property name="spacing">
+          <number>2</number>
+         </property>
+         <property name="sizeConstraint">
+          <enum>QLayout::SetMinimumSize</enum>
+         </property>
+        </layout>
+       </item>
+       <item row="0" column="1">
+        <spacer name="horizontalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>40</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
        <item row="0" column="2">
         <widget class="QWidget" name="widgetButtonParent" native="true">
          <property name="sizePolicy">
@@ -760,26 +783,6 @@ background: #46454d;
           </item>
          </layout>
         </widget>
-       </item>
-       <item row="0" column="0">
-        <layout class="QHBoxLayout" name="horizontalLayout_Watch">
-         <property name="spacing">
-          <number>2</number>
-         </property>
-        </layout>
-       </item>
-       <item row="0" column="1">
-        <spacer name="horizontalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>40</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
        </item>
       </layout>
      </widget>
