@@ -21,6 +21,7 @@ extern QString userNameLogged;
 #define FO_PRICE_DIFF_INCREMENTER 0.01
 
 
+
 enum nav_direction{
     nav_forward=1,
     nav_backward=2

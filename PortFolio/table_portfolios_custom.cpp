@@ -134,6 +134,63 @@ void table_portfolios_custom::reorderEditableIndicesBasedOnVisualIndex( QList<in
     }
 }
 
+//int table_portfolios_custom::findNextEditableCell(int currentColIdx, nav_direction direction)
+//{
+//    QList<int> editableIDx = {
+//        PortfolioData_Idx::_Alias,
+//        PortfolioData_Idx::_SellPriceDifference,
+//        PortfolioData_Idx::_BuyPriceDifference,
+//        PortfolioData_Idx::_SellTotalQuantity,
+//        PortfolioData_Idx::_BuyTotalQuantity,
+//        PortfolioData_Idx::_OrderQuantity,
+//        PortfolioData_Idx::_MaxLoss,
+
+//    }; // These are the editable table cells in algo table
+//    std::sort(editableIDx.begin(), editableIDx.end());
+//    qDebug()<<"before sort"<<editableIDx;
+
+//   // reorderEditableIndicesBasedOnVisualIndex(editableIDx);
+//    qDebug()<<"after sort"<<editableIDx;
+
+//    int idx = currentColIdx;
+
+//    if (direction == nav_direction::nav_forward)
+//    {
+//        if (currentColIdx < editableIDx[0])
+//            idx = editableIDx[0];
+//        else if (currentColIdx >= editableIDx[editableIDx.size() - 1])
+//            idx = editableIDx[0];
+//        else
+//        {
+//            while (1)
+//            {
+//                idx++;
+//                if (editableIDx.contains(idx))
+//                    break;
+//            }
+//        }
+//    }
+//    else if (direction == nav_direction::nav_backward)
+//    {
+//        if (currentColIdx > editableIDx[editableIDx.size() - 1])
+//            idx = editableIDx[editableIDx.size() - 1];
+//        else if (currentColIdx <= editableIDx[0])
+//            idx = editableIDx[editableIDx.size() - 1];
+//        else
+//        {
+//            while (1)
+//            {
+//                idx--;
+//                if (editableIDx.contains(idx))
+//                    break;
+//            }
+//        }
+//    }
+
+//    qDebug() << "currentColIdx=" << currentColIdx << "  Next idx=" << idx;
+
+//    return idx;
+//}
 int table_portfolios_custom::findNextEditableCell(int currentColIdx, nav_direction direction)
 {
     QList<int> editableIDx = {
@@ -144,53 +201,70 @@ int table_portfolios_custom::findNextEditableCell(int currentColIdx, nav_directi
         PortfolioData_Idx::_BuyTotalQuantity,
         PortfolioData_Idx::_OrderQuantity,
         PortfolioData_Idx::_MaxLoss,
+    };
 
-    }; // These are the editable table cells in algo table
-    std::sort(editableIDx.begin(), editableIDx.end());
-    qDebug()<<"before sort"<<editableIDx;
+    QHeaderView *headerView = this->horizontalHeader();
+    if (!headerView) {
+        qDebug() << "Header view is not accessible!";
+        return -1;
+    }
 
-   // reorderEditableIndicesBasedOnVisualIndex(editableIDx);
-    qDebug()<<"after sort"<<editableIDx;
+    // Map logical indices to visual indices
+    QList<QPair<int, int>> visualToLogical;
+    for (int logicalIdx : editableIDx) {
+        int visualIdx = headerView->visualIndex(logicalIdx);
+        visualToLogical.append({visualIdx, logicalIdx});
+    }
 
+    // Sort by visual index
+    std::sort(visualToLogical.begin(), visualToLogical.end(),
+              [](const QPair<int, int> &a, const QPair<int, int> &b) {
+                  return a.first < b.first;
+              });
+
+    // Extract sorted logical indices based on visual order
+    QList<int> sortedEditableByVisual;
+    for (const auto &pair : visualToLogical) {
+        sortedEditableByVisual.append(pair.second);
+    }
+
+    //qDebug() << "Logical indices sorted by visual order:" << sortedEditableByVisual;
+
+    // Find the visual index of the current column
+    int currentVisualIdx = headerView->visualIndex(currentColIdx);
     int idx = currentColIdx;
 
-    if (direction == nav_direction::nav_forward)
-    {
-        if (currentColIdx < editableIDx[0])
-            idx = editableIDx[0];
-        else if (currentColIdx >= editableIDx[editableIDx.size() - 1])
-            idx = editableIDx[0];
-        else
-        {
-            while (1)
-            {
-                idx++;
-                if (editableIDx.contains(idx))
-                    break;
+    if (direction == nav_direction::nav_forward) {
+        for (int logicalIdx : sortedEditableByVisual) {
+            if (headerView->visualIndex(logicalIdx) > currentVisualIdx) {
+                idx = logicalIdx;
+                break;
             }
         }
-    }
-    else if (direction == nav_direction::nav_backward)
-    {
-        if (currentColIdx > editableIDx[editableIDx.size() - 1])
-            idx = editableIDx[editableIDx.size() - 1];
-        else if (currentColIdx <= editableIDx[0])
-            idx = editableIDx[editableIDx.size() - 1];
-        else
-        {
-            while (1)
-            {
-                idx--;
-                if (editableIDx.contains(idx))
-                    break;
+        // Wrap around to the first cell if no suitable one is found
+        if (idx == currentColIdx) {
+            idx = sortedEditableByVisual[0];
+        }
+    } else if (direction == nav_direction::nav_backward) {
+        for (int i = sortedEditableByVisual.size() - 1; i >= 0; --i) {
+            int logicalIdx = sortedEditableByVisual[i];
+            if (headerView->visualIndex(logicalIdx) < currentVisualIdx) {
+                idx = logicalIdx;
+                break;
             }
+        }
+        // Wrap around to the last cell if no suitable one is found
+        if (idx == currentColIdx) {
+            idx = sortedEditableByVisual[sortedEditableByVisual.size() - 1];
         }
     }
 
     qDebug() << "currentColIdx=" << currentColIdx << "  Next idx=" << idx;
-
     return idx;
 }
+
+
+
 //To disable the automatic scrolling to the current editing cell in a Qt QTableView,
 //you can override the scrollTo function in a custom QTableView subclass.
 //This way, you can prevent the default behavior of scrolling to the current editing cell.

@@ -17,7 +17,6 @@
 #include "contractdetail.h"
 #include "OrderBook/table_orderbook_delegate.h"
 #include "mysql_conn.h"
-#include "watch_data_list_item.h"
 #include "style_sheet.h"
 #include "sortsettingpopup.h"
 #include "Liners/liners_delegate.h"
@@ -48,7 +47,6 @@ MainWindow::MainWindow(QWidget *parent)
      watch(nullptr),
      logs(nullptr)
 
-
 {
 
     QFontDatabase::addApplicationFont(":/WorkSans-Bold.ttf");
@@ -56,13 +54,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     ui->setupUi(this);
 
-    this->setMinimumSize(1280 ,1024);
+    this->setMinimumSize(800 ,500);
 
   //  setWindowFlags(Qt::Window | Qt::FramelessWindowHint);-
     setWindowFlags(Qt::Window | Qt::CustomizeWindowHint);
 
     //ui->sidePanel->setVisible(false);
     ui->Algorithms_Close->setVisible(false);
+    newIndicesData = false;
 
     showMessagOnceFlg = true;
    // connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
@@ -151,8 +150,8 @@ MainWindow::MainWindow(QWidget *parent)
         "    font-size: 10pt;"
         "}"
         );
-    ui->lineEditSearch->setMaximumWidth(360);
-    ui->lineEditSearch->setMaximumHeight(1500);
+   // ui->lineEditSearch->setMaximumWidth(360);
+   // ui->lineEditSearch->setMaximumHeight(1500);
     ui->lineEditSearch->setPlaceholderText("Search Algo");
     QAction* search_action = new QAction(QIcon(":/search.png"), "", ui->lineEditSearch);
 
@@ -1413,6 +1412,7 @@ void MainWindow::createINIFileIfNotExist(){
     }
     if(!groups.contains("ExchangeServerDetails")){
         settings.beginGroup("ExchangeServerDetails");
+        settings.setValue("mult_interface_ip","192.168.15.63");
         settings.setValue("fo_mult_ip","233.1.2.5");
         settings.setValue("fo_mult_port","34330");
         settings.setValue("cm_mult_ip","233.1.2.5");
@@ -1421,6 +1421,8 @@ void MainWindow::createINIFileIfNotExist(){
     }
     else{
         settings.beginGroup("ExchangeServerDetails");
+        if (!settings.contains("mult_interface_ip"))
+            settings.setValue("mult_interface_ip", "192.168.15.63");
         if (!settings.contains("fo_mult_ip"))
             settings.setValue("fo_mult_ip", "233.1.2.5");
         if (!settings.contains("fo_mult_port"))
@@ -1668,7 +1670,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             int lotSize = P->GetLotSize();//T_Portfolio_Model->portfolio_data_list[index.row()]->GetLotSize();
             int OpenLimitThrBuy = OpenLimit+P->BuyTradedQuantity;
             int OpenLimitThrSell = OpenLimit+P->SellTradedQuantity;
-
+            double BTTQ = static_cast<double>(P->BuyTradedQuantity);
+            double STTQ = static_cast<double>(P->SellTradedQuantity);
 
             ///----------------_OrderQuantity and _BuyTotalQuantity and _SellTotalQuantity edited-------------
             if(editedCellData.contains(PortfolioData_Idx::_OrderQuantity)&&
@@ -1679,8 +1682,16 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 double BTQ = editedCellData[_BuyTotalQuantity].newVal.toDouble();
                 double STQ = editedCellData[_SellTotalQuantity].newVal.toDouble();
 
+
+                if(BTQ<BTTQ){
+                    oq_btq_stq_msg.append("BTQ "+QString::number(BTQ)+" is less than  BTTQ " + QString::number(BTTQ));
+                }
+                else if(STQ<STTQ){
+                    oq_btq_stq_msg.append("STQ "+QString::number(STQ)+" is less than  STTQ " + QString::number(STTQ));
+                }
+
                 //if BTQ and STQ greater than OpenLimitThr, do not update BTQ STQ and OQ
-                if(BTQ>OpenLimitThrBuy&&STQ>OpenLimitThrSell){
+                else if(BTQ>OpenLimitThrBuy&&STQ>OpenLimitThrSell){
                     oq_btq_stq_msg.append("BTQ/STQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
                 }
                 // BTQ do not satifsy condtion  STQ statisfy, so update STQ
@@ -1733,7 +1744,12 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 double OQ = editedCellData[_OrderQuantity].newVal.toDouble();
                 double BTQ = editedCellData[_BuyTotalQuantity].newVal.toDouble();
 
-                if(BTQ>OpenLimitThrBuy){
+
+                if(BTQ<BTTQ){
+                    oq_btq_stq_msg.append("BTQ "+QString::number(BTQ)+" is less than  BTTQ " + QString::number(BTTQ));
+                }
+
+                else if(BTQ>OpenLimitThrBuy){
                     oq_btq_stq_msg.append("BTQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
                     if(OQ <= order_qty_limit){
                        updateQueryList.append("OrderQuantity="+QString::number(OQ*lotSize));
@@ -1758,7 +1774,10 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 double OQ = editedCellData[_OrderQuantity].newVal.toDouble();
                 double STQ = editedCellData[_SellTotalQuantity].newVal.toDouble();
 
-                if(STQ>OpenLimitThrSell){
+                if(STQ<STTQ){
+                    oq_btq_stq_msg.append("STQ "+QString::number(STQ)+" is less than  STTQ " + QString::number(STTQ));
+                }
+                else if(STQ>OpenLimitThrSell){
                     oq_btq_stq_msg.append("STQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
                     if(OQ <= order_qty_limit){
                        updateQueryList.append("OrderQuantity="+QString::number(OQ*lotSize));
@@ -1785,7 +1804,13 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                 double BTQ = editedCellData[_BuyTotalQuantity].newVal.toDouble();
                 double STQ = editedCellData[_SellTotalQuantity].newVal.toDouble();
 
-                if(BTQ>OpenLimitThrBuy&&STQ>OpenLimitThrSell){
+                if(BTQ<BTTQ){
+                    oq_btq_stq_msg.append("BTQ "+QString::number(BTQ)+" is less than  BTTQ " + QString::number(BTTQ));
+                }
+                else if(STQ<STTQ){
+                    oq_btq_stq_msg.append("STQ "+QString::number(STQ)+" is less than  STTQ " + QString::number(STTQ));
+                }
+                else if(BTQ>OpenLimitThrBuy&&STQ>OpenLimitThrSell){
                     oq_btq_stq_msg.append("BTQ/STQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
                 }
                 else if(BTQ>OpenLimitThrBuy&&STQ<=OpenLimitThrSell){
@@ -1843,7 +1868,11 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             else if(editedCellData.contains(PortfolioData_Idx::_BuyTotalQuantity)){
                 double BTQ = editedCellData[_BuyTotalQuantity].newVal.toDouble();
 
-                if(BTQ>OpenLimitThrBuy){
+                if(BTQ<BTTQ){
+                    oq_btq_stq_msg.append("BTQ "+QString::number(BTQ)+" is less than  BTTQ " + QString::number(BTTQ));
+                }
+
+                else if(BTQ>OpenLimitThrBuy){
                     oq_btq_stq_msg.append("BTQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
                 }
                 else{
@@ -1860,7 +1889,11 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             ///------only _SellTotalQuantity edited-------------
             else if(editedCellData.contains(PortfolioData_Idx::_SellTotalQuantity)){
                 double STQ = editedCellData[_SellTotalQuantity].newVal.toDouble();
-                if(STQ>OpenLimitThrSell){
+
+                if(STQ<STTQ){
+                    oq_btq_stq_msg.append("STQ "+QString::number(STQ)+" is less than  STTQ " + QString::number(STTQ));
+                }
+                else if(STQ>OpenLimitThrSell){
                     oq_btq_stq_msg.append("STQ should not be greater than "+openLimitType+" " + QString::number(OpenLimit));
                 }
                 else{
@@ -2658,22 +2691,23 @@ void MainWindow::stopBG_Threads(){
     qDebug() << "Time taken for stop_dataLoadingThread: " << time1 << "ms";
 
     // Measure stop_slowdata_worker
-    timer.start();
+    timer.restart();
     stop_slowdata_worker();
     qint64 time2 = timer.elapsed();
     qDebug() << "Time taken for stop_slowdata_worker: " << time2 << "ms";
 
     // Measure stop_slowdata_indices_worker
-    timer.start();
+    timer.restart();
     stop_slowdata_indices_worker();
     qint64 time3 = timer.elapsed();
     qDebug() << "Time taken for stop_slowdata_indices_worker: " << time3 << "ms";
 
     // Measure stop_backend_comm_socket_worker
-    timer.start();
+    timer.restart();
     stop_backend_comm_socket_worker();
     qint64 time4 = timer.elapsed();
     qDebug() << "Time taken for stop_backend_comm_socket_worker: " << time4 << "ms";
+
 }
 
 void MainWindow::loggedOut(){
@@ -3354,18 +3388,18 @@ void MainWindow::slotHideProgressBar()
 //}
 
 
-//void MainWindow::saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList) {
-//    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-//    QString fileName = appDataPath+"/Data/watch_cache.bin";
-//    QFile file(fileName);
-//    if (!file.open(QIODevice::WriteOnly)) {
-//        qWarning("Could not open file for writing.");
-//        return;
-//    }
-//    QDataStream out(&file);
-//    out << indicesDataList;
-//    file.close();
-//}
+void MainWindow::saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList) {
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString fileName = appDataPath+"/Data/watch_cache.bin";
+    QFile file(fileName);
+    if (!file.open(QIODevice::WriteOnly)) {
+        qWarning("Could not open file for writing.");
+        return;
+    }
+    QDataStream out(&file);
+    out << indicesDataList;
+    file.close();
+}
 
 //void MainWindow::loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList) {
 //    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
@@ -3386,37 +3420,22 @@ void MainWindow::indicesDataRecv_Slot(Indices_Data_Struct data){
     updateWatchDataCard(data);
 
     //remove below code
-//    bool newIndicesData = false;
-//    indicesDataMutex.lock();
-//    if(!indicesDataList.contains(data.indexName)){
-//        indicesDataList.insert(data.indexName,data);
-//        newIndicesData = true;
-//    }
-//    //check any of the value changed
-//    else if((indicesDataList[data.indexName].indexValue!=data.indexValue) || (indicesDataList[data.indexName].change!=data.change) || (indicesDataList[data.indexName].percentagechange!=data.percentagechange)){
-//        indicesDataList[data.indexName]=data;
-//        newIndicesData = true;
-//    }
+   // indicesDataMutex.lock();
+    if(!indicesDataList.contains(data.indexName)){
+        indicesDataList.insert(data.indexName,data);
+        newIndicesData = true;
+    }
+    //check any of the value changed
+    else if((indicesDataList[data.indexName].indexValue!=data.indexValue) || (indicesDataList[data.indexName].change!=data.change) || (indicesDataList[data.indexName].percentagechange!=data.percentagechange)){
+        indicesDataList[data.indexName]=data;
+        newIndicesData = true;
+    }
 
-//    indicesDataMutex.unlock();
-//   // qDebug()<<"indicesDataRecv_Slot: " <<data.indexName;
+  //  indicesDataMutex.unlock();
+   // qDebug()<<"indicesDataRecv_Slot: " <<data.indexName;
 
-//    if(newIndicesData==true&&ui->lineEditWatchSearch->text()=="")
-//        showSaveWatchOnListView();
 
-//    if(newIndicesData==true){
 
-//        QListWidgetItem *item = ui->listWidgetWatch->currentItem();
-//        if (item) {
-//            watch_Data_List_Item *widget = static_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(item));
-//            if (widget) {
-//                updateSelecteWatch_UI( widget->data);
-//            }
-//        }
-
-//        saveIndicesDataListToFile(indicesDataList);
-
-//    }
 
 }
 //void MainWindow::on_lineEditWatchSearch_textChanged(const QString &text)
@@ -3761,7 +3780,7 @@ void MainWindow::saveTableViewColumnState(QTableView *tableView){
 
     // Save the state of the table view headers
    settings.setValue(key,tableView->horizontalHeader()->saveState());
-   qDebug()<<"Saving table state  for "<<tableView->objectName();
+  // qDebug()<<"Saving table state  for "<<tableView->objectName();
 }
 
 void MainWindow::restoreTableViewColumnState(QTableView *tableView){
@@ -3773,7 +3792,7 @@ void MainWindow::restoreTableViewColumnState(QTableView *tableView){
      if (settings.contains(key))
      {
        tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
-       qDebug()<<"Restoring table state  for "<<tableView->objectName();
+      // qDebug()<<"Restoring table state  for "<<tableView->objectName();
      }
 }
 
@@ -3847,6 +3866,9 @@ void MainWindow::closeEvent(QCloseEvent* event)
     saveTableViewColumnState(missed_trade_table);
 
 
+    if(newIndicesData==true){
+        saveIndicesDataListToFile(indicesDataList);
+    }
     stopBG_Threads();
 
     saveDockManagerState();
@@ -3970,11 +3992,12 @@ void MainWindow::onWatchActionTriggered() {
           watch->setWindowFlags(flags | Qt::Dialog);
           // Uncomment if you want the Watch_cards to be deleted when it's closed
           // watch->setAttribute(Qt::WA_DeleteOnClose);
+          // Make sure the connections are made after the object is created
+          connect(this, &MainWindow::indicesDataRecv_Signal_watch_card, watch, &Watch_cards::indicesDataRecv_Slot);
+          connect(watch, &Watch_cards::add_remove_watch_card_signal, this, &MainWindow::add_remove_watch_card_slot);
+
     }
 
-    // Make sure the connections are made after the object is created
-    connect(this, &MainWindow::indicesDataRecv_Signal_watch_card, watch, &Watch_cards::indicesDataRecv_Slot);
-    connect(watch, &Watch_cards::add_remove_watch_card_signal, this, &MainWindow::add_remove_watch_card_slot);
 
     if (!watch->isVisible()) {
           watch->show();
@@ -4310,16 +4333,20 @@ void MainWindow::instilizeWatchUIOnTopBar(){
         settings.endGroup();
     }
 
+
     QHash<QString, Indices_Data_Struct> indicesDataList;
     QString fileName = appDataPath+"/Data/watch_cache.bin";
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly)) {
         qWarning("Could not open file for reading--> watch_cache.bin");
-        return;
     }
-    QDataStream in(&file);
-    in >> indicesDataList;
-    file.close();
+    else{
+        QDataStream in(&file);
+        in >> indicesDataList;
+        file.close();
+    }
+
+
 
     ui->horizontalLayout_Watch->setSpacing(5);
     watchCardWidgetList.clear();
@@ -4327,6 +4354,20 @@ void MainWindow::instilizeWatchUIOnTopBar(){
     for(int i=0;i<savedWatchItems.length();i++){
         if(indicesDataList.contains(savedWatchItems[i])){
            addWatchDataCard_TO_UI(indicesDataList[savedWatchItems[i]]);
+        }
+        else{
+            Indices_Data_Struct tmp;
+            tmp.indexName = savedWatchItems[i];
+            tmp.indexValue = "-";
+            tmp.change = "-";
+            tmp.percentagechange = "-";
+            tmp.netChangeIndicator = "-";
+            tmp.openingIdx = "-";
+            tmp.closingIdx = "-";
+            tmp.highIndexValue = "-";
+            tmp.lowIndexValue = "-";
+            tmp.marketCapitialisation = "-";
+            addWatchDataCard_TO_UI(tmp);
         }
     }
 
@@ -4348,6 +4389,13 @@ void MainWindow::addWatchDataCard_TO_UI(Indices_Data_Struct data){
     watchCardWidgetList.append(widget1);
     // Add the widget to the horizontal layout
     ui->horizontalLayout_Watch->addWidget(widget1);
+   // ui->horizontalLayout_Watch->layout()->activate();
+
+    QTimer::singleShot(0, this, [=]() {
+      //  qDebug() << "Updated Watch width : " << ui->horizontalLayout_Watch->geometry().width();
+        adjustTopBarLayout();
+
+    });
 }
 
 void MainWindow::removeWatchDataCard_From_UI(Indices_Data_Struct data){
@@ -4360,6 +4408,13 @@ void MainWindow::removeWatchDataCard_From_UI(Indices_Data_Struct data){
               break;
           }
       }
+   // ui->horizontalLayout_Watch->layout()->activate();
+
+    QTimer::singleShot(0, this, [=]() {
+       // qDebug() << "Updated Watch width : " << ui->horizontalLayout_Watch->geometry().width();
+        adjustTopBarLayout();
+    });
+
 }
 
 
@@ -4468,7 +4523,7 @@ void MainWindow::exportTableViewToCSV(){
 //    }
 //}
 
-bool MainWindow::checkChildOverlapLayout(QHBoxLayout* layout) {
+int MainWindow::getWatchWindowChildWidth(QHBoxLayout* layout) {
     int layoutWidth = layout->geometry().width();  // Width of the layout
     int totalChildWidth = 0;
 
@@ -4479,32 +4534,82 @@ bool MainWindow::checkChildOverlapLayout(QHBoxLayout* layout) {
             totalChildWidth += item->widget()->width();  // Sum the widths of each child widget
         }
     }
+    return totalChildWidth;
 
-    // Check if child widgets are overlapping the layout width
-    if (totalChildWidth > layoutWidth) {
-        qDebug() << "Warning: Child widgets are overlapping in the layout.";
-        return true;
-    } else {
-        qDebug() << "All child widgets fit within the layout.";
-        return false;
-    }
+//    // Check if child widgets are overlapping the layout width
+//    if (totalChildWidth > layoutWidth) {
+//      //  qDebug() << "Warning: Child widgets are overlapping in the layout.";
+//        return true;
+//    } else {
+//        //qDebug() << "All child widgets fit within the layout.";
+//        return false;
+//    }
 }
 void MainWindow::resizeEvent(QResizeEvent *event) {
     QMainWindow::resizeEvent(event);
 
-    static int thresholdWidth = 1300;  // Set your width threshold
-    static bool one_row = false;
+    adjustTopBarLayout();
+}
+void MainWindow::adjustTopBarLayout(){
+   // static int thresholdWidth = 0;  // Set your width threshold
+   // static bool one_row = false;
 
     bool smallScreen = false;
-    if(one_row){
-        if(checkChildOverlapLayout(ui->horizontalLayout_Watch)){
-           thresholdWidth = event->size().width();
-        }
-    }
 
-    if(event->size().width() <= thresholdWidth)
+    int parentWidth = ui->widget_5->geometry().width();
+    int otherItemWidth = ui->widget->geometry().width()+getWatchWindowChildWidth(ui->horizontalLayout_Watch);
+    int buttonParentWidth = ui->widgetButtonParent->geometry().width();
+    int remainingWidth = parentWidth-otherItemWidth;
+    if(remainingWidth <buttonParentWidth){
         smallScreen = true;
+    }
+//    qDebug() << "parentWidth       : "<<parentWidth;
+//    qDebug() << "otherItemWidth    : "<<otherItemWidth<<"="<<ui->widget->geometry().width()<<"-"<<getWatchWindowChildWidth(ui->horizontalLayout_Watch);
+//    qDebug() << "remainingWidth    : "<<remainingWidth;
+//    qDebug() << "buttonParentWidth : "<<buttonParentWidth;
 
+//    qDebug() << "watch Width      : "<<ui->horizontalLayout_Watch->geometry().width();
+//    qDebug() << "watch ChildWidth : "<<getWatchWindowChildWidth(ui->horizontalLayout_Watch);
+
+
+
+//    int currentWidth =this->geometry().width();
+//    if(one_row){
+//        if(checkChildOverlapLayout(ui->horizontalLayout_Watch)){
+//           thresholdWidth = currentWidth;
+//        }
+//    }
+
+//    if(currentWidth <= thresholdWidth)
+//        smallScreen = true;
+
+//    if(!one_row){
+//        int parentWidth = ui->widget_5->geometry().width();
+//        int otherItemWidth = ui->widget->geometry().width()+ui->horizontalLayout_Watch->geometry().width();
+//        int buttonParentWidth = ui->widgetButtonParent->geometry().width();
+
+//        qDebug() << "parentWidth       : "<<parentWidth;
+//        qDebug() << "otherItemWidth    : "<<otherItemWidth;
+//        qDebug() << "buttonParentWidth : "<<buttonParentWidth;
+
+//        if((parentWidth-otherItemWidth)>buttonParentWidth){
+//            smallScreen = false;
+//            thresholdWidth =0;
+//        }
+//        else{
+//            thresholdWidth = currentWidth;
+//        }
+//    }
+//    //check
+
+//    qDebug() << "currentWidth   : "<<currentWidth;
+//    qDebug() << "thresholdWidth : "<<thresholdWidth;
+
+//    qDebug() << "parent_Width       : "<<ui->widget_5->geometry().width();
+//    qDebug() << "ch1+ch2+ch3        : "<<ui->widgetButtonParent->geometry().width()+ui->widget->geometry().width()+ui->horizontalLayout_Watch->geometry().width();
+//    qDebug() << "widgetButtonParent : "<<ui->widgetButtonParent->geometry().width();
+//    qDebug() << "widget5            : "<<ui->widget ->geometry().width();
+//    qDebug() << "Watch              : "<<ui->horizontalLayout_Watch->geometry().width();
 
     // Cast the layout to QGridLayout
     QGridLayout *gridLayout = qobject_cast<QGridLayout*>(ui->widget_5->layout());
@@ -4524,7 +4629,7 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
             gridLayout->addItem(ui->horizontalSpacer_3, 0, 1);
             gridLayout->addWidget(ui->widget, 0, 2);
             gridLayout->addWidget(ui->widgetButtonParent, 1, 0, 1, 3); // Span across columns
-            one_row = false;
+          //  one_row = false;
         } else {
             // Adjust widget_5 height for larger width
             ui->widget_5->setMinimumHeight(50);
@@ -4540,7 +4645,8 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
             gridLayout->addItem(ui->horizontalSpacer_3, 0, 1);
             gridLayout->addWidget(ui->widgetButtonParent, 0, 2);
             gridLayout->addWidget(ui->widget, 0, 3);
-            one_row = true;
+           // one_row = true;
+           // thresholdWidth =0;
 
         }
     } else {

@@ -17,8 +17,10 @@ int main(int argc, char *argv[])
     QCoreApplication::setApplicationName("New_SpeedTrade");
     QCoreApplication::setOrganizationName("New_AlgoMethods");
 
- #ifndef QT_DEBUG
-  //  logger::initLogging("SpeedTradeLog_");
+ //#ifndef QT_DEBUG
+
+ #ifdef RELEASE_BUILD
+    logger::initLogging("SpeedTradeLog_");
  #endif
     QFontDatabase::addApplicationFont(":/RacingSansOne-Regular.ttf");
     QTranslator translator;

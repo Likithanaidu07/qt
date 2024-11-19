@@ -103,6 +103,8 @@ void Watch_cards::indicesDataRecv_Slot(Indices_Data_Struct data){
 
     //remove below code
     bool newIndicesData = false;
+    bool updatedIndicesData = false;
+
     indicesDataMutex.lock();
     if(!indicesDataList.contains(data.indexName)){
         indicesDataList.insert(data.indexName,data);
@@ -111,7 +113,7 @@ void Watch_cards::indicesDataRecv_Slot(Indices_Data_Struct data){
     //check any of the value changed
     else if((indicesDataList[data.indexName].indexValue!=data.indexValue) || (indicesDataList[data.indexName].change!=data.change) || (indicesDataList[data.indexName].percentagechange!=data.percentagechange)){
         indicesDataList[data.indexName]=data;
-        newIndicesData = true;
+        updatedIndicesData = true;
     }
 
     indicesDataMutex.unlock();
@@ -120,7 +122,9 @@ void Watch_cards::indicesDataRecv_Slot(Indices_Data_Struct data){
     if(newIndicesData==true&&ui->lineEditWatchSearch->text()=="")
         showSaveWatchOnListView();
 
-    if(newIndicesData==true){
+    if(updatedIndicesData==true){
+
+        refreshIndicesListViewItem(data);
 
         QListWidgetItem *item = ui->listWidgetWatch->currentItem();
         if (item) {
@@ -130,11 +134,24 @@ void Watch_cards::indicesDataRecv_Slot(Indices_Data_Struct data){
             }
         }
 
-        saveIndicesDataListToFile(indicesDataList);
-
     }
 
 }
+
+void Watch_cards::refreshIndicesListViewItem(const Indices_Data_Struct& data) {
+    for (int j = 0; j < ui->listWidgetWatch->count(); j++) {
+        QListWidgetItem* existingItem = ui->listWidgetWatch->item(j);
+        watch_Data_List_Item* existingWidget = qobject_cast<watch_Data_List_Item*>(ui->listWidgetWatch->itemWidget(existingItem));
+
+        if (existingWidget && existingWidget->data.indexName == data.indexName) {
+            // Item exists, update it with new data
+            existingWidget->setData(data, &savedWatchItemsMainWin);
+            return; // Exit the function once the item is updated
+        }
+    }
+
+}
+
 void Watch_cards::on_lineEditWatchSearch_textChanged(const QString &text)
 {
     if(text==""){
@@ -308,6 +325,9 @@ void Watch_cards::showSaveWatchOnListView(){
     if(ui->listWidgetWatch->selectedItems().count()==0){
         ui->watchListSelectedDetails_Parent->setVisible(false);
     }
+
+
+
 }
 
 void Watch_cards::on_listWidgetWatch_itemClicked(QListWidgetItem *item)

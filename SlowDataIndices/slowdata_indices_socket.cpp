@@ -1,6 +1,8 @@
 #include "slowdata_indices_socket.h"
 
-//#define ENABLE_DEBUG_MSG
+#define ENABLE_DEBUG_MSG
+//#define WRITE_ALL_INDEXNAME_TO_FILE // enable this will write all index name to file for slow data
+
 
 /************Socket server receive data from slowdata exchange**********************/
 
@@ -119,67 +121,67 @@ void Slowdata_Indices_Socket::getIndexFilter(){
     indexNameFilter.append("NIFTY SMALLCAP 100");
     indexNameFilter.append("INDIA VIX");
     indexNameFilter.append("NIFTY MIDCAP 150");
-    indexNameFilter.append("NIFTY SMALLCAP 50");
-    indexNameFilter.append("NIFTY SMALLCAP 250");
-    indexNameFilter.append("NIFTY MIDSMALLCAP 400");
-    indexNameFilter.append("NIFTY500 MULTICAP 50:25:25");
-    indexNameFilter.append("NIFTY LARGEMIDCAP 250");
-    indexNameFilter.append("NIFTY MIDCAP SELECT");
-    indexNameFilter.append("NIFTY TOTAL MARKET");
-    indexNameFilter.append("NIFTY MICROCAP 250");
+    indexNameFilter.append("NIFTY SMLCAP 50");
+    indexNameFilter.append("NIFTY SMLCAP 250");
+    indexNameFilter.append("NIFTY MIDSML 400");
+    indexNameFilter.append("NIFTY500 MULTICAP");
+    indexNameFilter.append("NIFTY LARGEMID250");
+    indexNameFilter.append("NIFTY MID SELECT");
+    indexNameFilter.append("NIFTY TOTAL MKT");
+    indexNameFilter.append("NIFTY MICROCAP250");
     indexNameFilter.append("NIFTY BANK");
     indexNameFilter.append("NIFTY AUTO");
-    indexNameFilter.append("NIFTY FINANCIAL SERVICES");
-    indexNameFilter.append("NIFTY FINANCIAL SERVICES 25/50");
+    indexNameFilter.append("Nifty Fin Service");
+    indexNameFilter.append("Nifty FinSrv25 50");
     indexNameFilter.append("NIFTY FMCG");
     indexNameFilter.append("NIFTY IT");
     indexNameFilter.append("NIFTY MEDIA");
     indexNameFilter.append("NIFTY METAL");
     indexNameFilter.append("NIFTY PHARMA");
     indexNameFilter.append("NIFTY PSU BANK");
-    indexNameFilter.append("NIFTY PRIVATE BANK");
+    indexNameFilter.append("Nifty Pvt Bank");
     indexNameFilter.append("NIFTY REALTY");
-    indexNameFilter.append("NIFTY HEALTHCARE INDEX");
-    indexNameFilter.append("NIFTY CONSUMER DURABLES");
-    indexNameFilter.append("NIFTY OIL & GAS");
-    indexNameFilter.append("NIFTY DIVIDEND OPPORTUNITIES 50");
-    indexNameFilter.append("NIFTY GROWTH SECTORS 15");
-    indexNameFilter.append("NIFTY100 QUALITY 30");
+    indexNameFilter.append("NIFTY HEALTHCARE");
+    indexNameFilter.append("NIFTY CONSR DURBL");
+    indexNameFilter.append("NIFTY OIL AND GAS");
+    indexNameFilter.append("Nifty Div Opps 50");
+    indexNameFilter.append("Nifty GrowSect 15");
+    indexNameFilter.append("NIFTY100 Qualty30");
     indexNameFilter.append("NIFTY50 VALUE 20");
-    indexNameFilter.append("NIFTY50 TR 2X LEVERAGE");
-    indexNameFilter.append("NIFTY50 PR 2X LEVERAGE");
-    indexNameFilter.append("NIFTY50 TR 1X INVERSE");
-    indexNameFilter.append("NIFTY50 PR 1X INVERSE");
-    indexNameFilter.append("NIFTY50 DIVIDEND POINTS");
+    indexNameFilter.append("Nifty50 TR 2x Lev");
+    indexNameFilter.append("Nifty50 PR 2x Lev");
+    indexNameFilter.append("Nifty50 TR 1x Inv");
+    indexNameFilter.append("Nifty50 PR 1x Inv");
+    indexNameFilter.append("Nifty50 Div Point");
     indexNameFilter.append("NIFTY ALPHA 50");
-    indexNameFilter.append("NIFTY50 EQUAL WEIGHT");
-    indexNameFilter.append("NIFTY100 EQUAL WEIGHT");
-    indexNameFilter.append("NIFTY100 LOW VOLATILITY 30");
-    indexNameFilter.append("NIFTY200 QUALITY 30");
-    indexNameFilter.append("NIFTY ALPHA LOW-VOLATILITY 30");
-    indexNameFilter.append("NIFTY200 MOMENTUM 30");
-    indexNameFilter.append("NIFTY MIDCAP150 QUALITY 50");
+    indexNameFilter.append("NIFTY50 EQL Wgt");
+    indexNameFilter.append("NIFTY100 EQL Wgt");
+    indexNameFilter.append("NIFTY100 LowVol30");
+    indexNameFilter.append("NIFTY200 QUALTY30");
+    indexNameFilter.append("NIFTY AlphaLowVol");
+    indexNameFilter.append("Nifty200Momentm30");
+    indexNameFilter.append("NIFTY M150 QLTY50");
     indexNameFilter.append("NIFTY COMMODITIES");
-    indexNameFilter.append("NIFTY INDIA CONSUMPTION");
+    indexNameFilter.append("Nifty Consumption");
     indexNameFilter.append("NIFTY CPSE");
     indexNameFilter.append("NIFTY ENERGY");
-    indexNameFilter.append("NIFTY INFRASTRUCTURE");
-    indexNameFilter.append("NIFTY100 LIQUID 15");
-    indexNameFilter.append("NIFTY MIDCAP LIQUID 15");
+    indexNameFilter.append("Nifty Infra");
+    indexNameFilter.append("Nifty100 Liq 15");
+    indexNameFilter.append("Nifty Mid Liq 15");
     indexNameFilter.append("NIFTY MNC");
     indexNameFilter.append("NIFTY PSE");
-    indexNameFilter.append("NIFTY SERVICES SECTOR");
-    indexNameFilter.append("NIFTY100 ESG SECTOR LEADERS");
-    indexNameFilter.append("NIFTY INDIA DIGITAL");
+    indexNameFilter.append("Nifty Serv Sector");
+    indexNameFilter.append("Nifty100ESGSecLdr");
+    indexNameFilter.append("NIFTY IND DIGITAL");
     indexNameFilter.append("NIFTY100 ESG");
-    indexNameFilter.append("NIFTY INDIA MANUFACTURING");
-    indexNameFilter.append("NIFTY 8-13 YR G-SEC");
-    indexNameFilter.append("NIFTY 10 YR BENCHMARK G-SEC");
-    indexNameFilter.append("NIFTY 10 YR BENCHMARK G-SEC (CLEAN PRICE)");
-    indexNameFilter.append("NIFTY 4-8 YR G-SEC INDEX");
-    indexNameFilter.append("NIFTY 11-15 YR G-SEC INDEX");
-    indexNameFilter.append("NIFTY 15 YR AND ABOVE G-SEC INDEX");
-    indexNameFilter.append("NIFTY COMPOSITE G-SEC INDEX");
+    indexNameFilter.append("NIFTY INDIA MFG");
+    indexNameFilter.append("Nifty GS 8 13Yr");
+    indexNameFilter.append("Nifty GS 10Yr");
+    indexNameFilter.append("Nifty GS 10Yr Cln");
+    indexNameFilter.append("Nifty GS 4 8Yr");
+    indexNameFilter.append("Nifty GS 11 15Yr");
+    indexNameFilter.append("Nifty GS 15YrPlus");
+    indexNameFilter.append("Nifty GS Compsite");
 
     //capiltalize
     for (int i = 0; i < indexNameFilter.size(); ++i) {
@@ -192,7 +194,10 @@ void Slowdata_Indices_Socket::run()
 {
     mc_port     = 34330;
     const char* mc_addr_str = "233.1.2.6";
+    const char* interface_ip_addr_str = "0.0.0.0";
     std::string ipStdString;
+    std::string ipStdString1;
+
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
     QStringList groups = settings.childGroups();
@@ -200,11 +205,20 @@ void Slowdata_Indices_Socket::run()
         settings.beginGroup("ExchangeServerDetails");
         if (settings.contains("cm_mult_ip")){
             QString ip_address = settings.value("cm_mult_ip").toString();
-            ipStdString = ip_address.toStdString();
+            ipStdString  = ip_address.toStdString();
             mc_addr_str = ipStdString.c_str();
+
         }
         else{
             qDebug()<<"Warning: Settings.ini not contain cm_mult_ip";
+        }
+        if (settings.contains("mult_interface_ip")){
+            QString ip_address = settings.value("mult_interface_ip").toString();
+            ipStdString1 = ip_address.toStdString();
+            interface_ip_addr_str = ipStdString1.c_str();
+        }
+        else{
+            qDebug()<<"Warning: Settings.ini not contain mult_interface_ip";
         }
 
         if (settings.contains("cm_mult_port")){
@@ -290,8 +304,31 @@ void Slowdata_Indices_Socket::run()
         return;
     }
 
-    mc_req.imr_multiaddr.s_addr = inet_addr(mc_addr_str);
-    mc_req.imr_interface.s_addr = htonl(INADDR_ANY);
+   // mc_req.imr_multiaddr.s_addr = inet_addr(mc_addr_str);
+   // mc_req.imr_interface.s_addr = htonl(INADDR_ANY);
+   // mc_req.imr_interface.s_addr = inet_addr(interface_ip_addr_str);
+
+
+
+    // Convert multicast address to binary
+    if (inet_pton(AF_INET, mc_addr_str, &mc_req.imr_multiaddr.s_addr) <= 0) {
+    #ifdef ENABLE_DEBUG_MSG
+        qDebug() << "Error: Invalid multicast address:" << mc_addr_str;
+    #endif
+        emit socket_conn_info_Signal("Error: Invalid multicast address");
+        return;
+    }
+
+    // Convert interface IP address to binary
+    if (inet_pton(AF_INET, interface_ip_addr_str, &mc_req.imr_interface.s_addr) <= 0) {
+    #ifdef ENABLE_DEBUG_MSG
+        qDebug() << "Error: Invalid interface address:" << interface_ip_addr_str;
+    #endif
+        emit socket_conn_info_Signal("Error: Invalid interface address");
+        return;
+    }
+
+
 
     if((setsockopt(sock,IPPROTO_IP,IP_ADD_MEMBERSHIP,(const char*) &mc_req,sizeof(mc_req))) < 0)
     {
@@ -414,6 +451,12 @@ void Slowdata_Indices_Socket::run()
              //   qDebug()<<"indexName:  "<<indexName;
                 double indexValueD = indexValue/100.0; //"N", "BN", "FN","VIX"
 
+#ifdef WRITE_ALL_INDEXNAME_TO_FILE
+                if(!indexNameAll.contains(indexName)){
+                    qDebug()<<"New indexName:  "<<indexName;
+                    indexNameAll.append(indexName);
+                }
+#endif
                 if(indexNameFilter.contains(indexName.toUpper())){
                     Indices_Data_Struct data;
                     data.indexName =indexName;
@@ -555,6 +598,21 @@ void Slowdata_Indices_Socket::run()
 }
 
 void Slowdata_Indices_Socket::sendUDP_TO_Quit(){
+#ifdef WRITE_ALL_INDEXNAME_TO_FILE
+        QString fileName = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data/IndexAll.txt";
+        QFile file(fileName);
+        if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+            QTextStream out(&file);
+            for (const QString& line : indexNameAll) {
+                out << line << "\n";  // Write each item in the QStringList on a new line
+            }
+            file.close();
+            qDebug() << "File written successfully.";
+        } else {
+            qWarning() << "Could not open file for writing:" << file.errorString();
+        }
+#endif
+
     run_thread = false;
     struct sockaddr_in si_other;
     int s, slen=sizeof(si_other);

@@ -3,6 +3,10 @@
 
 #include <QWidget>
 #include "defines.h"
+
+#define RELEASE_BUILD // comment this to enable logs on console
+
+
 namespace Ui {
 class loginwindow;
 }

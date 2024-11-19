@@ -49,6 +49,7 @@ private:
     void removeFromSavedWatchItems(Indices_Data_Struct data, QString key);
     void saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList);
     void loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList);
+    void refreshIndicesListViewItem(const Indices_Data_Struct& data);
 
 signals:
     void add_remove_watch_card_signal(bool,Indices_Data_Struct);

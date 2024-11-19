@@ -125,6 +125,8 @@ private:
     QList<watch_data_card*> watchCardWidgetList;
   //  QTimer* TableRefreshTimer;
     QStringList summarydatList;
+    bool newIndicesData;
+
    // QTimer* Trade_TableRefreshTimer;
 
     loadingdatawindow *loadingDataWinodw;
@@ -269,7 +271,7 @@ private:
     void updateSelecteWatch_UI( Indices_Data_Struct data);
     void addToSavedWatchItems(Indices_Data_Struct data);
     void removeFromSavedWatchItems(Indices_Data_Struct data);
- //   void saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList);
+    void saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList);
  //   void loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList);
 
     void saveDockManagerState();
@@ -281,8 +283,8 @@ private:
       QModelIndexList  getSelectedPortFolioIndexs();
       void instilizeWatchUIOnTopBar();
       void updateWatchDataCard(Indices_Data_Struct data);
-      bool checkChildOverlapLayout(QHBoxLayout* layout);
-
+      int getWatchWindowChildWidth(QHBoxLayout* layout);
+      void adjustTopBarLayout();
 public slots:
 
     void addWatchDataCard_TO_UI(Indices_Data_Struct data);

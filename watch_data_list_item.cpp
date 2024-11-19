@@ -84,7 +84,7 @@ void watch_Data_List_Item::on_checkBoxShowMainScreen_clicked(bool checked)
     if(checked){
         if(savedWatchItemsMainWinPtr->size()==6){
             QMessageBox msgBox;
-            msgBox.setText("Cannot add more than 4 Index , please remove 1 item and try again.!");
+            msgBox.setText("Cannot add more than 6 Index , please remove 1 item and try again.!");
             msgBox.setIcon(QMessageBox::Warning);
             msgBox.exec();
             ui->checkBoxShowMainScreen->setChecked(false);

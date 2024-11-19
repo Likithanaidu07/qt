@@ -1,5 +1,5 @@
 #include "slowdatasocket.h"
-//#define ENABLE_DEBUG_MSG
+#define ENABLE_DEBUG_MSG
 
 
 /************Socket server receive data from slowdata exchange**********************/
@@ -144,7 +144,11 @@ void SlowDataSocket::run()
 {
     mc_port     = 34330;
     const char* mc_addr_str = "233.1.2.6";
+   const  char* interface_ip_addr_str = "0.0.0.0";
+
     std::string ipStdString;
+    std::string ipStdString1;
+
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
     QSettings settings(appDataPath + "/settings.ini", QSettings::IniFormat);
     QStringList groups = settings.childGroups();
@@ -158,6 +162,15 @@ void SlowDataSocket::run()
         else{
             qDebug()<<"Warning: Settings.ini not contain fo_mult_ip";
         }
+        if (settings.contains("mult_interface_ip")){
+            QString ip_address = settings.value("mult_interface_ip").toString();
+            ipStdString1 = ip_address.toStdString();
+            interface_ip_addr_str = ipStdString1.c_str();
+        }
+        else{
+            qDebug()<<"Warning: Settings.ini not contain mult_interface_ip";
+        }
+
 
         if (settings.contains("fo_mult_port")){
             mc_port = settings.value("fo_mult_port").toString().toUShort();
@@ -241,8 +254,28 @@ void SlowDataSocket::run()
         return;
     }
 
-    mc_req.imr_multiaddr.s_addr = inet_addr(mc_addr_str);
-    mc_req.imr_interface.s_addr = htonl(INADDR_ANY);
+   // mc_req.imr_multiaddr.s_addr = inet_addr(mc_addr_str);
+   // mc_req.imr_interface.s_addr = htonl(INADDR_ANY);
+    //mc_req.imr_interface.s_addr = inet_addr(interface_ip_addr_str);
+
+    // Convert multicast address to binary
+    if (inet_pton(AF_INET, mc_addr_str, &mc_req.imr_multiaddr.s_addr) <= 0) {
+    #ifdef ENABLE_DEBUG_MSG
+        qDebug() << "Error: Invalid multicast address:" << mc_addr_str;
+    #endif
+        emit socket_conn_info_Signal("Error: Invalid multicast address");
+        return;
+    }
+
+    // Convert interface IP address to binary
+    if (inet_pton(AF_INET, interface_ip_addr_str, &mc_req.imr_interface.s_addr) <= 0) {
+    #ifdef ENABLE_DEBUG_MSG
+        qDebug() << "Error: Invalid interface address:" << interface_ip_addr_str;
+    #endif
+        emit socket_conn_info_Signal("Error: Invalid interface address");
+        return;
+    }
+
 
     if((setsockopt(sock,IPPROTO_IP,IP_ADD_MEMBERSHIP,(const char*) &mc_req,sizeof(mc_req))) < 0)
     {

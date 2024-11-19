@@ -34,9 +34,9 @@ public:
     {
         if (watch_data_card->objectName().isEmpty())
             watch_data_card->setObjectName("watch_data_card");
-        watch_data_card->resize(210, 48);
-        watch_data_card->setMinimumSize(QSize(180, 0));
-        watch_data_card->setMaximumSize(QSize(210, 16777215));
+        watch_data_card->resize(195, 48);
+        watch_data_card->setMinimumSize(QSize(195, 0));
+        watch_data_card->setMaximumSize(QSize(195, 16777215));
         gridLayout = new QGridLayout(watch_data_card);
         gridLayout->setSpacing(0);
         gridLayout->setObjectName("gridLayout");
@@ -50,8 +50,8 @@ public:
         gridLayout_2->setContentsMargins(4, 4, 4, 4);
         value2 = new QLabel(Background);
         value2->setObjectName("value2");
-        value2->setMinimumSize(QSize(80, 0));
-        value2->setMaximumSize(QSize(80, 16777215));
+        value2->setMinimumSize(QSize(90, 0));
+        value2->setMaximumSize(QSize(90, 16777215));
         value2->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout_2->addWidget(value2, 1, 3, 1, 1);
@@ -65,14 +65,14 @@ public:
 
         value1 = new QLabel(Background);
         value1->setObjectName("value1");
-        value1->setMinimumSize(QSize(60, 0));
-        value1->setMaximumSize(QSize(60, 16777215));
+        value1->setMinimumSize(QSize(70, 0));
+        value1->setMaximumSize(QSize(70, 16777215));
         value1->setLayoutDirection(Qt::LeftToRight);
         value1->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
 
         gridLayout_2->addWidget(value1, 1, 0, 1, 1);
 
-        horizontalSpacer = new QSpacerItem(10, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        horizontalSpacer = new QSpacerItem(5, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
 
         gridLayout_2->addItem(horizontalSpacer, 1, 4, 1, 1);
 

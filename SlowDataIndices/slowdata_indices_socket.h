@@ -31,7 +31,7 @@ private:
     bool run_thread;
     unsigned short mc_port;
     QStringList indexNameFilter;
-
+    QStringList indexNameAll;
 };
 
 #endif // SLOWDATA_INDICES_SOCKET_H

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1087</width>
+    <width>1129</width>
     <height>912</height>
    </rect>
   </property>
@@ -120,8 +120,14 @@ background: #46454d;
         <widget class="QWidget" name="widget" native="true">
          <property name="minimumSize">
           <size>
-           <width>50</width>
+           <width>200</width>
            <height>0</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>200</width>
+           <height>16777215</height>
           </size>
          </property>
          <layout class="QHBoxLayout" name="horizontalLayout_2">
@@ -135,14 +141,14 @@ background: #46454d;
            <widget class="QLineEdit" name="lineEditSearch">
             <property name="minimumSize">
              <size>
-              <width>15</width>
-              <height>20</height>
+              <width>190</width>
+              <height>25</height>
              </size>
             </property>
             <property name="maximumSize">
              <size>
-              <width>16777215</width>
-              <height>20</height>
+              <width>190</width>
+              <height>25</height>
              </size>
             </property>
            </widget>
@@ -183,13 +189,13 @@ background: #46454d;
          </property>
          <property name="minimumSize">
           <size>
-           <width>0</width>
+           <width>800</width>
            <height>35</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>16777215</width>
+           <width>800</width>
            <height>35</height>
           </size>
          </property>
@@ -995,7 +1001,7 @@ background: transperent;
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1087</width>
+     <width>1129</width>
      <height>21</height>
     </rect>
    </property>
