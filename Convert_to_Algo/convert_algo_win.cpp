@@ -106,6 +106,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
         ui->lineEdit_EndStrike_BoxBid,
         ui->lineEdit_StrikeDifference_BoxBid,
         ui->lineEdit_EndStrike_Bs1221_1331,
+        ui->lineEdit_Start_strike_Bs1221_1331,
         ui->lineEdit_StrikeDifference_Bs1221_1331,
         ui->lineEdit_EndStrike_CRJellyBid,
         ui->lineEdit_Start_strike_CRJellyBid,
