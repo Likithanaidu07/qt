@@ -2780,13 +2780,8 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                             msg="Failed to insert record to DB";
                             ret = algo_data_insert_status::FAILED;
                             qDebug() << "Executed Query: " << query.lastQuery();
-
                             qDebug()<<"query.lastError: "+query.lastError().text();
                         }
-
-
-
-
                  }
                 }
         }
@@ -2794,6 +2789,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
             qDebug()<<"Cannot connect Database: "+db.lastError().text();
             msg="Cannot connect Database: "+db.lastError().text();
         }
+
 
         // db.close();
     }
