@@ -115,6 +115,7 @@ public:
     void loadCurrentDayLogs();
     QHash<QString, contract_table> prpareContractDataFromDB(QString queryStr, QSqlDatabase *db,QStringList &tokenData);
     QList<int> getPortfolioTypesForInstrumentType(const QString& data, const QMap<int, QStringList>& algoFilterMap);
+    QHash<QString,QString>  getOrderDetailsData(QString  PortfolioNumberStr,QString user_id);
 
 private:
     bool checkDBOpened( QString &mesg);

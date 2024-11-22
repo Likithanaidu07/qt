@@ -6,8 +6,17 @@ OrderDetail_Popup::OrderDetail_Popup(QWidget *parent)
     , ui(new Ui::OrderDetail_Popup)
 {
     ui->setupUi(this);
-    setWindowState( (windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
-    QObject::connect(this, SIGNAL(dataLoaded(QList<QHash<QString, QString>>)), this, SLOT(updateUI(QList<QHash<QString, QString>>)));
+    //setWindowState( (windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+    //Qt::WindowFlags flags = this->windowFlags();
+  // this->setWindowFlags(Qt::Dialog | Qt::WindowStaysOnTopHint);
+    // Set window flags
+      Qt::WindowFlags flags = this->windowFlags();
+      this->setWindowFlags(flags | Qt::Dialog );
+
+      // Ensure the window is non-modal
+      this->setWindowModality(Qt::NonModal);
+
+      connect(this, &OrderDetail_Popup::dataLoaded, this, &OrderDetail_Popup::updateUI);
 
  QString styleSheet = R"(
     QTableWidget {
@@ -62,7 +71,7 @@ OrderDetail_Popup::OrderDetail_Popup(QWidget *parent)
     ui->tableWidget_Sell->setStyleSheet(styleSheet1);
 }
 
-void OrderDetail_Popup::setData(PortfolioObject *p){
+void OrderDetail_Popup::setData(PortfolioObject *p,QStringList linersData){
    ui->algo_id->setText(QString::number(p->PortfolioNumber));
    ui->algo_name->setText(p->AlgoName);
    ui->bid_leg->setText(p->BidLeg);
@@ -70,6 +79,20 @@ void OrderDetail_Popup::setData(PortfolioObject *p){
    ui->sell_qty->setText(QString::number(p->SellTradedQuantity));
    ui->buy_avg->setText(p->BuyAveragePrice);
    ui->sell_avg->setText(p->SellAveragePrice);
+   ui->lo_size->setText(QString::number(p->Leg1LotSizeOrg));
+
+   if(linersData.size()>0){
+    ui->net_qty->setText(linersData[Liners_Idx::NetQty]);
+    ui->p_l->setText(linersData[Liners_Idx::Profit]);
+   }
+   else{
+       ui->net_qty->setText("-");
+       ui->p_l->setText("-");
+   }
+
+
+
+
 
 }
 
@@ -82,8 +105,12 @@ void OrderDetail_Popup::getTradeDataFromDB(QString user_id, QString portfolioNum
         // Capture captured variables by value to ensure thread safety
         mysql_conn *db_conn = new mysql_conn(0, "get_popup_data_conn");
         QList<QHash<QString, QString>> data = db_conn->getOrderPopUPData(user_id, portfolioNumber, PortfolioType);
+
+        QHash<QString, QString> OrderDetailsData = db_conn->getOrderDetailsData(portfolioNumber,user_id);
+
+
         delete db_conn; // Release memory after use
-        emit dataLoaded(data);
+        emit dataLoaded(data,OrderDetailsData);
 
     };
 
@@ -92,7 +119,7 @@ void OrderDetail_Popup::getTradeDataFromDB(QString user_id, QString portfolioNum
 }
 
 
-void OrderDetail_Popup::updateUI(const QList<QHash<QString, QString>>& data){
+void OrderDetail_Popup::updateUI(const QList<QHash<QString, QString>>& data,QHash<QString, QString>OrderDetailsData){
 
 
     for(int i=0;i<data.length();i++){
@@ -163,6 +190,28 @@ void OrderDetail_Popup::updateUI(const QList<QHash<QString, QString>>& data){
             ui->tableWidget_Sell->setItem(ui->tableWidget_Sell->rowCount()-1, 5, c5);
         }
     }
+
+    ui->buy_value->setText("-");
+    ui->sell_value->setText("-");
+    ui->total_order->setText("-");
+    ui->executed_order->setText("-");
+
+    if(OrderDetailsData.contains("BuyTotalVal")){
+      ui->buy_value->setText(OrderDetailsData["BuyTotalVal"]);
+    }
+    if(OrderDetailsData.contains("SellTotalVal")){
+      ui->sell_value->setText(OrderDetailsData["SellTotalVal"]);
+    }
+    if(OrderDetailsData.contains("OrderCount")){
+      ui->total_order->setText(OrderDetailsData["OrderCount"]);
+    }
+    if(OrderDetailsData.contains("TraderCount")){
+      ui->executed_order->setText(OrderDetailsData["TraderCount"]);
+    }
+
+
+
+
 }
 
 OrderDetail_Popup::~OrderDetail_Popup()

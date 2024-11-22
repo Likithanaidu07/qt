@@ -363,10 +363,96 @@ void  mysql_conn::getSummaryTableData(int &OrderCount,QString user_id)
 
              OrderCount = query.value(0).toInt(); // Assuming the count is in the first column
 
-
         }
     }
 }
+
+QHash<QString,QString>  mysql_conn::getOrderDetailsData(QString  PortfolioNumberStr,QString user_id)
+{
+    QMutexLocker lock(&mutex);
+    QString msg;
+    QHash<QString,QString> OrderDetailsData;
+
+    int PortfolioNumber = PortfolioNumberStr.toInt();
+
+    QString portfolioNum1;
+    QString portfolioNum2;
+    if(PortfolioNumber<1500000){
+        portfolioNum1 = PortfolioNumberStr;
+        portfolioNum2 = QString::number(PortfolioNumber+1500000);
+    }
+    else{
+        portfolioNum1 = PortfolioNumberStr;
+        portfolioNum2 = QString::number(1500000-PortfolioNumber);
+    }
+
+
+
+    bool ok = checkDBOpened(msg);
+    if(ok){
+
+         QString sqlquery ="WITH AggregatedTrades AS ("
+             "SELECT "
+                 "Trades.TokenNo,"
+                 "Trades.BuySellIndicator,"
+                 "MAX(Trades.PortfolioNumber) AS PortfolioNumber,"
+                 "ROUND(SUM(Trades.TradedPrice * Trades.TotalVolume) / 100, 2) AS buysellvalue"
+             " FROM "
+                 "Trades "
+             " JOIN "
+                 "Contract ON Contract.Token = Trades.TokenNo"
+             " WHERE "
+                 "Trades.TraderId = '"+user_id+"'"
+             " GROUP BY "
+                 "Trades.TokenNo, Trades.BuySellIndicator"
+             " HAVING "
+                 "MAX(Trades.PortfolioNumber) IN ("+portfolioNum1+", "+portfolioNum2+")"
+         ")"
+         " SELECT "
+            "MAX(PortfolioNumber) AS PortfolioNumber,"
+             "SUM(CASE WHEN BuySellIndicator = 1 THEN buysellvalue ELSE 0 END) AS BuyTotalVal,"
+             "SUM(CASE WHEN BuySellIndicator = 2 THEN buysellvalue ELSE 0 END) AS SellTotalVal,"
+             "(SELECT COUNT(*)"
+              " FROM Order_Table_Bid"
+              " WHERE Trader_ID = 2 AND Order_Table_Bid.AlgoID = 227) AS OrderCount,"
+             "(SELECT COUNT(*)"
+              " FROM Order_Table_Bid"
+              " WHERE Trader_ID = 2 AND "
+                    "(Leg1_OrderState = 7 OR Leg2_OrderState = 7 OR Leg3_OrderState = 7 OR "
+                     "Leg4_OrderState = 7 OR Leg5_OrderState = 7 OR Leg6_OrderState = 7)) AS TraderCount"
+         " FROM "
+             "AggregatedTrades;";
+
+         QSqlQuery query(sqlquery, db);
+        if(!query.exec())
+        {
+            // Error Handling, check query.lastError(), probably return
+            qDebug()<<"getOrderDetailsData: "<<query.lastError().text();
+            qDebug()<<"query : "<<sqlquery;
+
+        }
+        else{
+            QSqlRecord rec = query.record();
+            while (query.next()) {
+                QString BuyTotalVal =query.value(rec.indexOf("PortfolioNumber")).toString();
+                QString SellTotalVal =query.value(rec.indexOf("SellTotalVal")).toString();
+                QString OrderCount =query.value(rec.indexOf("OrderCount")).toString();
+                QString TraderCount =query.value(rec.indexOf("TraderCount")).toString();
+                OrderDetailsData["BuyTotalVal"]=BuyTotalVal;
+                OrderDetailsData["SellTotalVal"]=SellTotalVal;
+                OrderDetailsData["OrderCount"]=OrderCount;
+                OrderDetailsData["TraderCount"]=TraderCount;
+
+            }
+
+        }
+    }
+
+    return OrderDetailsData;
+}
+
+
+
 
 
 
@@ -2254,7 +2340,7 @@ QHash<QString, contract_table>  mysql_conn::getContractTable( QHash<int , QStrin
                             << contractTableTmp.OperatingRangeshighPriceRange;
                     }
                     else{
-                        qDebug()<<"Waring: Cannot find portfolio type(InstrumentType) for contract table token = "<<contractTableTmp.TokenNumber;
+                        //qDebug()<<"Waring: Cannot find portfolio type(InstrumentType) for contract table token = "<<contractTableTmp.TokenNumber;
                     }
                 }
 

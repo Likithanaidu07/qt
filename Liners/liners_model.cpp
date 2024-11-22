@@ -59,6 +59,8 @@ QVariant Liners_Model::data(const QModelIndex &index, int role) const
 
 
 void Liners_Model::setDataList(QList <QStringList> liners_data_listNew){
+    QMutexLocker locker(&mutex);
+
     if(liners_data_list.size()==0){
         Liners_Model::beginResetModel();
         liners_data_list.clear();
@@ -71,9 +73,8 @@ void Liners_Model::setDataList(QList <QStringList> liners_data_listNew){
         for(int i=0;i<liners_data_listNew.length();i++){
             bool newData = true;
             for(int j=0;j<liners_data_list.length();j++){
-                int unique_id_idx = liners_data_listNew[i].length()-1; // token_numebr(last element in array)---this will be unique for row
 
-                if(liners_data_listNew[i][unique_id_idx]==liners_data_list[j][unique_id_idx]){
+                if(liners_data_listNew[i][Liners_Idx::AlgoId]==liners_data_list[j][Liners_Idx::AlgoId]){
                     newData = false;
                     for(int k=0;k<liners_data_listNew[i].size();k++){
                         if(liners_data_listNew[i][k]!=liners_data_list[j][k]){
@@ -96,8 +97,7 @@ void Liners_Model::setDataList(QList <QStringList> liners_data_listNew){
         for(int i=0;i<liners_data_list.length();i++){
             bool deletRow = true;
             for(int j=0;j<liners_data_listNew.length();j++){
-                int unique_id_idx = liners_data_list[i].length()-1; // token_numebr(last element in array)---this will be unique for row
-                if(liners_data_list[i][unique_id_idx]==liners_data_listNew[j][unique_id_idx]){ // token_numebr(last element in array)---this will be unique for row
+                if(liners_data_list[i][Liners_Idx::AlgoId]==liners_data_listNew[j][Liners_Idx::AlgoId]){ // AlgoId  will be unique for row
                     deletRow=false; //the id is there in new and old data so do not remove this row.
                 }
             }
@@ -118,7 +118,17 @@ void Liners_Model::setDataList(QList <QStringList> liners_data_listNew){
 
 }
 
-
+QStringList Liners_Model::getLinersDataForAlgoID(QString algoID){
+    QMutexLocker locker(&mutex);
+    QStringList data;
+    for(int i=0;i<liners_data_list.size();i++){
+       if(liners_data_list[i][0]==algoID){
+           data = liners_data_list[i];
+           break;
+       }
+    }
+    return data;
+}
 
 QVariant Liners_Model::headerData(int section, Qt::Orientation orientation,   int role) const
 {

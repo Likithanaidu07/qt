@@ -449,7 +449,6 @@ void Slowdata_Indices_Socket::run()
                 emit socket_conn_info_Signal("MS_BCAST_INDICES Data: \n================\n"+dataStr+"\n\n");
                 indexName = indexName.trimmed();
              //   qDebug()<<"indexName:  "<<indexName;
-                double indexValueD = indexValue/100.0; //"N", "BN", "FN","VIX"
 
 #ifdef WRITE_ALL_INDEXNAME_TO_FILE
                 if(!indexNameAll.contains(indexName)){
@@ -458,11 +457,19 @@ void Slowdata_Indices_Socket::run()
                 }
 #endif
                 if(indexNameFilter.contains(indexName.toUpper())){
+
+
+                    double devicer = 100.0;
+                    if(indexName.toUpper()=="INDIA VIX")
+                        devicer = 10000.0;
+
+                    double indexValueD = indexValue/devicer;
+
                     Indices_Data_Struct data;
                     data.indexName =indexName;
                     data.indexValue = QString::number(indexValueD,'f',2);
-                    data.change = QString::number(((indexValue-closingIDx)/100.0),'f',2);
-                    data.percentagechange = QString::number(((percentChange)/100.0),'f',2);
+                    data.change = QString::number(((indexValue-closingIDx)/devicer),'f',2);
+                    data.percentagechange = QString::number(((percentChange)/devicer),'f',2);
                     data.netChangeIndicator = netChangeIndicator;
                     data.highIndexValue = QString::number(highIndexValue);
                     data.lowIndexValue = QString::number(lowIndexValue);

@@ -6,6 +6,7 @@
 #include <QFont>
 #include "defines.h"
 #include "QColor"
+#include "QMutex"
 
 
 
@@ -22,11 +23,13 @@ public:
     void setDataList(QList <QStringList> alog_data_list);
     QVariant headerData(int section, Qt::Orientation ,   int role) const override;
     QList <QStringList> liners_data_list;
+    //QHash <QString,QStringList> liners_data_hash;
+    QStringList getLinersDataForAlgoID(QString algoID);
 
 private:
     int col_count;
     QStringList header={"Algo Id","Algo Name","BAvg","BLot","SAvg","SLot","Net Qty","Profit"};
-
+    mutable  QMutex mutex;
 
 signals:
     void  editCompleted(int row,int col,QString,QString,QString,bool);

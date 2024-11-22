@@ -208,8 +208,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(db_conn,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
 
     connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
-    orderPopUpWin = new OrderDetail_Popup();
-    tradePopUpWin = new TradeDetailsPopup();
+    orderPopUpWin = new OrderDetail_Popup(this);
+    tradePopUpWin = new TradeDetailsPopup(this);
 
 
     QDir dir;
@@ -3285,9 +3285,10 @@ void MainWindow::T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index){
 
         QString PortfolioType =P->PortfolioType;
         QString PortfolioNumber = QString::number(P->PortfolioNumber);
+        QStringList linersData = liners_model->getLinersDataForAlgoID(PortfolioNumber); // This contain profit and netqty for portfolio
         orderPopUpWin->getTradeDataFromDB(QString::number(userData.UserId), PortfolioNumber,PortfolioType);
-        orderPopUpWin->setData(P);
-        orderPopUpWin->activateWindow();
+        orderPopUpWin->setData(P,linersData);
+       // orderPopUpWin->activateWindow();
         delete P;
     }
 

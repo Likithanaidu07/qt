@@ -1074,9 +1074,11 @@ void Table_Portfolios_Model::updateMarketRate(const QHash<QString, MBP_Data_Stru
                      portfolioPareser.CalculatePriceDifference(*portfolio_data_list[i],MBP_Data_Hash,devicer,decimal_precision);
                     // portfolio_data_list[i]->BuyMarketRate = 1000;
                     // portfolio_data_list[i]->SellMarketRate = 1000;
-                     QModelIndex topLeft = index(i, PortfolioData_Idx::_BuyMarketRate);
-                     QModelIndex bottomRight = index(i, PortfolioData_Idx::_SellMarketRate);
-                     emit dataChanged(topLeft, bottomRight);
+                     //QModelIndex topLeft = index(i, PortfolioData_Idx::_BuyMarketRate);
+                     //QModelIndex bottomRight = index(i, PortfolioData_Idx::_SellMarketRate);
+                     //emit dataChanged(topLeft, bottomRight);
+                     emit dataChanged(index(i, PortfolioData_Idx::_BuyMarketRate), index(i, PortfolioData_Idx::_BuyMarketRate));
+                     emit dataChanged(index(i, PortfolioData_Idx::_SellMarketRate), index(i, PortfolioData_Idx::_SellMarketRate));
                      emit dataChanged(index(i, PortfolioData_Idx::_FuturePrice), index(i, PortfolioData_Idx::_FuturePrice));
 
 
