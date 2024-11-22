@@ -1,7 +1,7 @@
 /********************************************************************************
 ** Form generated from reading UI file 'watch_data_card.ui'
 **
-** Created by: Qt User Interface Compiler version 6.5.3
+** Created by: Qt User Interface Compiler version 6.3.2
 **
 ** WARNING! All changes made in this file will be lost when recompiling UI file!
 ********************************************************************************/
@@ -34,24 +34,24 @@ public:
     void setupUi(QWidget *watch_data_card)
     {
         if (watch_data_card->objectName().isEmpty())
-            watch_data_card->setObjectName("watch_data_card");
+            watch_data_card->setObjectName(QString::fromUtf8("watch_data_card"));
         watch_data_card->resize(170, 48);
         watch_data_card->setMinimumSize(QSize(170, 0));
         watch_data_card->setMaximumSize(QSize(153, 16777215));
         gridLayout = new QGridLayout(watch_data_card);
         gridLayout->setSpacing(0);
-        gridLayout->setObjectName("gridLayout");
+        gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
         Background = new QWidget(watch_data_card);
-        Background->setObjectName("Background");
+        Background->setObjectName(QString::fromUtf8("Background"));
         Background->setMaximumSize(QSize(16777215, 16777215));
         Background->setStyleSheet(QString::fromUtf8(""));
         gridLayout_2 = new QGridLayout(Background);
         gridLayout_2->setSpacing(2);
-        gridLayout_2->setObjectName("gridLayout_2");
+        gridLayout_2->setObjectName(QString::fromUtf8("gridLayout_2"));
         gridLayout_2->setContentsMargins(4, 4, 4, 4);
         indicator = new QLabel(Background);
-        indicator->setObjectName("indicator");
+        indicator->setObjectName(QString::fromUtf8("indicator"));
         indicator->setMinimumSize(QSize(10, 6));
         indicator->setMaximumSize(QSize(10, 6));
 
@@ -62,14 +62,14 @@ public:
         gridLayout_2->addItem(horizontalSpacer, 1, 5, 1, 1);
 
         value2 = new QLabel(Background);
-        value2->setObjectName("value2");
+        value2->setObjectName(QString::fromUtf8("value2"));
         value2->setMinimumSize(QSize(50, 0));
         value2->setMaximumSize(QSize(50, 16777215));
 
         gridLayout_2->addWidget(value2, 1, 4, 1, 1);
 
         name = new QLabel(Background);
-        name->setObjectName("name");
+        name->setObjectName(QString::fromUtf8("name"));
         name->setMaximumSize(QSize(16777215, 16777215));
         QFont font;
         font.setPointSize(9);
@@ -80,7 +80,7 @@ public:
         gridLayout_2->addWidget(name, 0, 0, 1, 4);
 
         value1 = new QLabel(Background);
-        value1->setObjectName("value1");
+        value1->setObjectName(QString::fromUtf8("value1"));
         value1->setMinimumSize(QSize(70, 0));
         value1->setMaximumSize(QSize(70, 16777215));
         value1->setLayoutDirection(Qt::LeftToRight);
@@ -89,7 +89,7 @@ public:
         gridLayout_2->addWidget(value1, 1, 0, 1, 1);
 
         value3 = new QLabel(Background);
-        value3->setObjectName("value3");
+        value3->setObjectName(QString::fromUtf8("value3"));
         value3->setMaximumSize(QSize(50, 16777215));
         value3->setLayoutDirection(Qt::RightToLeft);
         value3->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);

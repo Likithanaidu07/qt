@@ -25,7 +25,7 @@ public:
 
 private:
     int col_count;
-    QStringList header={"Stock Name","BLot","SLot","BValue","SValue","BAvg","SAvg","Net Lot","Profit","MTM"};
+    QStringList header={"Stock Name","BLot","SLot","BValue","SValue","BAvg","SAvg","Net Lot","P&L","MTM"};
 
 
 signals:
