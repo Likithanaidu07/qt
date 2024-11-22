@@ -414,14 +414,16 @@ QHash<QString,QString>  mysql_conn::getOrderDetailsData(QString  PortfolioNumber
              "SUM(CASE WHEN BuySellIndicator = 2 THEN buysellvalue ELSE 0 END) AS SellTotalVal,"
              "(SELECT COUNT(*)"
               " FROM Order_Table_Bid"
-              " WHERE Trader_ID = 2 AND Order_Table_Bid.AlgoID = 227) AS OrderCount,"
+              " WHERE Trader_ID = '"+user_id+"' AND Order_Table_Bid.PortfolioNumber IN ("+portfolioNum1+", "+portfolioNum2+")) AS OrderCount,"
              "(SELECT COUNT(*)"
               " FROM Order_Table_Bid"
-              " WHERE Trader_ID = 2 AND "
+              " WHERE Trader_ID = '"+user_id+"' AND  Order_Table_Bid.PortfolioNumber IN ("+portfolioNum1+", "+portfolioNum2+")  AND "
                     "(Leg1_OrderState = 7 OR Leg2_OrderState = 7 OR Leg3_OrderState = 7 OR "
                      "Leg4_OrderState = 7 OR Leg5_OrderState = 7 OR Leg6_OrderState = 7)) AS TraderCount"
          " FROM "
              "AggregatedTrades;";
+
+        // qDebug()<<"query : "<<sqlquery;
 
          QSqlQuery query(sqlquery, db);
         if(!query.exec())
@@ -944,7 +946,7 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
     return Algo_Name.toUpper();
 }
 
-  QList<QHash<QString,QString>>  mysql_conn::getOrderPopUPData(QString user_id, QString portfolioNumber,QString PortfolioType){
+  QList<QHash<QString,QString>>  mysql_conn::getOrderPopUPData(QString user_id, QString PortfolioNumberStr,QString PortfolioType){
 
     QList<QHash<QString,QString>> orderData;
     QMutexLocker lock(&mutex);
@@ -952,10 +954,25 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
     QList <QStringList> orderData_listTmp;
     QString msg;
 
+    int PortfolioNumber = PortfolioNumberStr.toInt();
+
+    QString portfolioNum1;
+    QString portfolioNum2;
+    if(PortfolioNumber<1500000){
+        portfolioNum1 = PortfolioNumberStr;
+        portfolioNum2 = QString::number(PortfolioNumber+1500000);
+    }
+    else{
+        portfolioNum1 = PortfolioNumberStr;
+        portfolioNum2 = QString::number(1500000-PortfolioNumber);
+    }
+
     bool ok = checkDBOpened(msg);
     if(ok)
     {
-        QString query_str = "SELECT * FROM Order_Table_bid WHERE Trader_ID='"+user_id+"' and Leg2_OrderState=7  ORDER BY Trader_Data DESC";
+
+        QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and Leg2_OrderState=7 and PortfolioNumber IN ("+portfolioNum1+", "+portfolioNum2+")  ORDER BY Trader_Data DESC";
+        qDebug()<<query_str;
 
         QSqlQuery query(query_str,db);
         if( !query.exec() )
@@ -2866,13 +2883,8 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                             msg="Failed to insert record to DB";
                             ret = algo_data_insert_status::FAILED;
                             qDebug() << "Executed Query: " << query.lastQuery();
-
                             qDebug()<<"query.lastError: "+query.lastError().text();
                         }
-
-
-
-
                  }
                 }
         }
@@ -2880,6 +2892,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
             qDebug()<<"Cannot connect Database: "+db.lastError().text();
             msg="Cannot connect Database: "+db.lastError().text();
         }
+
 
         // db.close();
     }

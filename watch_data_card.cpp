@@ -69,10 +69,11 @@ void watch_data_card::setData(Indices_Data_Struct data) {
                                   );
     }
 
-    QString percent = (data.change+"("+data.percentagechange+"%)");
+   //QString percent = (data.change+"("+data.percentagechange+"%)");
     ui->name->setText(data.indexName);
     ui->value1->setText(data.indexValue);
-    ui->value2->setText(percent);
+    ui->value2->setText(data.change);
+    ui->value3->setText(data.percentagechange+"%");
 
 
 }

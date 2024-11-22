@@ -24,44 +24,60 @@ public:
     QGridLayout *gridLayout;
     QWidget *Background;
     QGridLayout *gridLayout_2;
-    QLabel *value2;
     QLabel *indicator;
-    QLabel *value1;
     QSpacerItem *horizontalSpacer;
+    QLabel *value2;
     QLabel *name;
+    QLabel *value1;
+    QLabel *value3;
 
     void setupUi(QWidget *watch_data_card)
     {
         if (watch_data_card->objectName().isEmpty())
             watch_data_card->setObjectName("watch_data_card");
-        watch_data_card->resize(195, 48);
-        watch_data_card->setMinimumSize(QSize(195, 0));
-        watch_data_card->setMaximumSize(QSize(195, 16777215));
+        watch_data_card->resize(170, 48);
+        watch_data_card->setMinimumSize(QSize(170, 0));
+        watch_data_card->setMaximumSize(QSize(153, 16777215));
         gridLayout = new QGridLayout(watch_data_card);
         gridLayout->setSpacing(0);
         gridLayout->setObjectName("gridLayout");
         gridLayout->setContentsMargins(0, 0, 0, 0);
         Background = new QWidget(watch_data_card);
         Background->setObjectName("Background");
+        Background->setMaximumSize(QSize(16777215, 16777215));
         Background->setStyleSheet(QString::fromUtf8(""));
         gridLayout_2 = new QGridLayout(Background);
         gridLayout_2->setSpacing(2);
         gridLayout_2->setObjectName("gridLayout_2");
         gridLayout_2->setContentsMargins(4, 4, 4, 4);
-        value2 = new QLabel(Background);
-        value2->setObjectName("value2");
-        value2->setMinimumSize(QSize(90, 0));
-        value2->setMaximumSize(QSize(90, 16777215));
-        value2->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
-
-        gridLayout_2->addWidget(value2, 1, 3, 1, 1);
-
         indicator = new QLabel(Background);
         indicator->setObjectName("indicator");
         indicator->setMinimumSize(QSize(10, 6));
         indicator->setMaximumSize(QSize(10, 6));
 
         gridLayout_2->addWidget(indicator, 1, 1, 1, 1);
+
+        horizontalSpacer = new QSpacerItem(5, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+
+        gridLayout_2->addItem(horizontalSpacer, 1, 5, 1, 1);
+
+        value2 = new QLabel(Background);
+        value2->setObjectName("value2");
+        value2->setMinimumSize(QSize(50, 0));
+        value2->setMaximumSize(QSize(50, 16777215));
+
+        gridLayout_2->addWidget(value2, 1, 4, 1, 1);
+
+        name = new QLabel(Background);
+        name->setObjectName("name");
+        name->setMaximumSize(QSize(16777215, 16777215));
+        QFont font;
+        font.setPointSize(9);
+        font.setBold(false);
+        name->setFont(font);
+        name->setAlignment(Qt::AlignCenter);
+
+        gridLayout_2->addWidget(name, 0, 0, 1, 4);
 
         value1 = new QLabel(Background);
         value1->setObjectName("value1");
@@ -72,21 +88,16 @@ public:
 
         gridLayout_2->addWidget(value1, 1, 0, 1, 1);
 
-        horizontalSpacer = new QSpacerItem(5, 20, QSizePolicy::Fixed, QSizePolicy::Minimum);
+        value3 = new QLabel(Background);
+        value3->setObjectName("value3");
+        value3->setMaximumSize(QSize(50, 16777215));
+        value3->setLayoutDirection(Qt::RightToLeft);
+        value3->setAlignment(Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter);
 
-        gridLayout_2->addItem(horizontalSpacer, 1, 4, 1, 1);
-
-        name = new QLabel(Background);
-        name->setObjectName("name");
-        QFont font;
-        font.setPointSize(9);
-        font.setBold(false);
-        name->setFont(font);
-
-        gridLayout_2->addWidget(name, 0, 0, 1, 5);
+        gridLayout_2->addWidget(value3, 0, 4, 1, 1);
 
 
-        gridLayout->addWidget(Background, 0, 0, 1, 4);
+        gridLayout->addWidget(Background, 0, 0, 1, 3);
 
 
         retranslateUi(watch_data_card);
@@ -97,10 +108,11 @@ public:
     void retranslateUi(QWidget *watch_data_card)
     {
         watch_data_card->setWindowTitle(QCoreApplication::translate("watch_data_card", "Form", nullptr));
-        value2->setText(QCoreApplication::translate("watch_data_card", "9.50 (0.05%)", nullptr));
         indicator->setText(QCoreApplication::translate("watch_data_card", "^", nullptr));
-        value1->setText(QCoreApplication::translate("watch_data_card", "1936.75", nullptr));
+        value2->setText(QCoreApplication::translate("watch_data_card", "9.50 ", nullptr));
         name->setText(QCoreApplication::translate("watch_data_card", "Nifty Fifty", nullptr));
+        value1->setText(QCoreApplication::translate("watch_data_card", "1936.75", nullptr));
+        value3->setText(QCoreApplication::translate("watch_data_card", "(0.05%)", nullptr));
     } // retranslateUi
 
 };
