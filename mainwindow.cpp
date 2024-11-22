@@ -29,6 +29,7 @@
 #include "PortFolio/portfolio_searchfilterproxymodel.h"
 #include "TradePosition/tradetable_searchfilterproxymodel.h"
 #include <algorithm>
+#include "MissedTrades/missed_trades_headerview.h"
 
 //#define ENABLE_BACKEND_DEBUG_MSG
 
@@ -1190,6 +1191,23 @@ MainWindow::MainWindow(QWidget *parent)
     missed_trade_table->setShowGrid(false);
     missed_trade_table->setAlternatingRowColors(true);
 
+
+    missed_trades_headerview* headerView_missedtrades = new missed_trades_headerview(Qt::Horizontal, missed_trade_table);
+    headerView_missedtrades->setFixedHeight(32);
+    headerView_missedtrades->setFont(headerfont);
+    headerView_missedtrades->setStyleSheet(
+        "   background: #495867;"
+        "   border: none;"
+        "   color: #FFF; "
+        "   text-align: center; "
+        "   font-size: 12px; "
+        "   font-style: normal; "
+        "   font-weight: 600; "
+        "   line-height: normal;"
+        );
+    connect(headerView_missedtrades, &QHeaderView::sectionMoved, this, &MainWindow::onMissed_trade_tableHeader_Rearranged);
+    missed_trade_table->setHorizontalHeader(headerView_missedtrades);
+
     missed_trade_model = new Missed_Trade_Table_Model();
     missed_trade_table->setModel(missed_trade_model);
     missed_trade_table->horizontalHeader()->setStretchLastSection(false);
@@ -1204,7 +1222,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     int missedtrades_columnCount = missed_trade_table->model()->columnCount();
     for (int col = 0; col < missedtrades_columnCount; ++col) {
-        missed_trade_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
+        missed_trade_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Interactive);
     }
 
       /************Missed Trades ********************************/

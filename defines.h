@@ -169,6 +169,19 @@ enum Liners_Idx{
 
 };
 
+enum Missed_Trades_Idx{
+    OrderId=0,
+    BuySell,
+    Type,
+    Lot,
+    AlgoNo,
+    Symbol,
+    Message,
+    Price,
+    DateTime
+
+};
+
 enum NET_POS
 {
     StockName_NP=0,
