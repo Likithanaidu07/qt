@@ -103,33 +103,54 @@ MainWindow::MainWindow(QWidget *parent)
 
     /********************************************************************************/
 
+    /**********************Top Bar Button Widget Secton******************************/
 
-    //    // Create the Card menu
+    QString toolButtonStyle =  "QToolButton {"
+                                      "    color: white;"
+                                      "    font-family: 'Work Sans';"
+                                      "    font-weight: bold;"
+                               "}";
+
+    // Create the Card menu
     QMenu *cardMenu = new QMenu("Card", this);
-
-    // Create actions
-    summaryAction = new QAction("Summary", this);
-    QAction *watchAction = new QAction("Watch", this);
-    QAction *LogAction = new QAction("Logs", this);
-
-    // Add actions to the Card menu
-    cardMenu->addAction(summaryAction);
-    cardMenu->addAction(watchAction);
-    cardMenu->addAction(LogAction);
-
-
-    // Create a ToolButton to act as the menu title on ui->card
+    cardMenu->addAction("Summary", this, &MainWindow::onSummaryActionTriggered);
+    cardMenu->addAction("Watch", this, &MainWindow::onWatchActionTriggered);
+    cardMenu->addAction("Logs", this, &MainWindow::onLogActionTriggered);
     ui->toolButtonCards->setMenu(cardMenu);
     ui->toolButtonCards->setPopupMode(QToolButton::InstantPopup);
+    ui->toolButtonCards->setStyleSheet(toolButtonStyle);
 
-    ui->toolButtonCards->setStyleSheet(
-        "QToolButton {"
-        "    color: white;"
-        "    font-family: 'Work Sans';"
-        "    font-weight: bold;"
-        "}"
-        );
-    QFont font("Work Sans", 10, QFont::Bold); // Set the font to Work Sans, size 10, bold
+
+
+    QMenu *menuAlgorithm = new QMenu(this);
+    menuAlgorithm->addAction("Pre-Defined Algos", this, &MainWindow::on_Algorithms_Button_clicked);
+    menuAlgorithm->addAction("Defined Algos", this, &MainWindow::on_Templates_Button_clicked);
+    ui->toolButtonAlgorithm->setMenu(menuAlgorithm);
+    ui->toolButtonAlgorithm->setPopupMode(QToolButton::InstantPopup);
+    ui->toolButtonAlgorithm->setStyleSheet(toolButtonStyle);
+
+
+    QMenu *menuPosition = new QMenu(this);
+    menuPosition->addAction("Net Position", this, &MainWindow::on_Positions_Button_clicked);
+    menuPosition->addAction("Algo Position", this, &MainWindow::on_Liners_Button_clicked);
+    menuPosition->addAction("Historical Position", this, &MainWindow::on_HP_Button_clicked);
+    ui->toolButtonPostion->setMenu(menuPosition);
+    ui->toolButtonPostion->setPopupMode(QToolButton::InstantPopup);
+    ui->toolButtonPostion->setStyleSheet(toolButtonStyle);
+
+
+
+    QMenu *menuOrders = new QMenu(this);
+    menuOrders->addAction("Executed Orders", this, &MainWindow::on_OrderBook_Button_clicked);
+    menuOrders->addAction("Skipped Orders", this, &MainWindow::on_MissedTrade_Button_clicked);
+    menuOrders->addAction("Manaual Orders", this, &MainWindow::on_F1F2Trade_Button_clicked);
+    ui->toolButtonOrders->setMenu(menuOrders);
+    ui->toolButtonOrders->setPopupMode(QToolButton::InstantPopup);
+    ui->toolButtonOrders->setStyleSheet(toolButtonStyle);
+
+
+
+//QFont font("Work Sans", 10, QFont::Bold); // Set the font to Work Sans, size 10, bold
 //    ui->label_4->setFont(font);
 //    ui->label_4->setText("status :");
 //    ui->label_2->setFont(font);
@@ -138,10 +159,6 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    // Connect the actions to their respective slots (if needed)
-    connect(summaryAction, &QAction::triggered, this, &MainWindow::onSummaryActionTriggered);
-    connect(watchAction, &QAction::triggered, this, &MainWindow::onWatchActionTriggered);
-    connect(LogAction, &QAction::triggered, this, &MainWindow::onLogActionTriggered);
 
     ui->lineEditSearch->setPlaceholderText("Search...");
     ui->lineEditSearch->setStyleSheet(
@@ -160,34 +177,53 @@ MainWindow::MainWindow(QWidget *parent)
     ui->lineEditSearch->setStyleSheet(lineedit_dock_SS);
 
 
-    ui->Templates_Widget->setToolTip("Coming Soon");
-    // Apply stylesheet for hover effect with sparkles
-    ui->Templates_Widget->setStyleSheet(
-        "QWidget#Templates_Widget {"
-      //  "    background-color: rgb(77, 77, 115);"  // Normal background
-        "    color: white;"
-        "    font-family: 'Work Sans';"
-        "    font-weight: bold;"
-        "}"
-        "QWidget#Templates_Widget:hover {"
-        "    background-color: rgb(100, 100, 150);"  // Change background on hover
-        "    color: white;"
-        "    border: 1px solid yellow;"  // Example effect
-     //   "    qproperty-toolTip: 'Coming Soon';"
-        "    /* Sparkle Effect: Add sparkles as a background image or custom animation */"
-        "}"
-        );
+//    ui->Templates_Widget->setToolTip("Coming Soon");
+//    // Apply stylesheet for hover effect with sparkles
+//    ui->Templates_Widget->setStyleSheet(
+//        "QWidget#Templates_Widget {"
+//      //  "    background-color: rgb(77, 77, 115);"  // Normal background
+//        "    color: white;"
+//        "    font-family: 'Work Sans';"
+//        "    font-weight: bold;"
+//        "}"
+//        "QWidget#Templates_Widget:hover {"
+//        "    background-color: rgb(100, 100, 150);"  // Change background on hover
+//        "    color: white;"
+//        "    border: 1px solid yellow;"  // Example effect
+//     //   "    qproperty-toolTip: 'Coming Soon';"
+//        "    /* Sparkle Effect: Add sparkles as a background image or custom animation */"
+//        "}"
+//        );
 
-    ui->lineEditSearch->setStyleSheet(
+      ui->lineEditSearch->setStyleSheet(
         "QLineEdit {"
         "    padding-right: 50px;"  // Add 20 pixels of space on the right
         "}"
         );
-    ui->HP_Widget->setVisible(false);
+
+      ui->HP_Widget->setVisible(false);
+      ui->Templates_Widget->setVisible(false);
+      ui->Positions_Widget->setVisible(false);
+      ui->OrderBook_Widget->setVisible(false);
+      ui->MissedTrade_widget->setVisible(false);
+      ui->Liners_Widget->setVisible(false);
+      ui->F1F2Trade_widget->setVisible(false);
+      ui->Algorithms_Widget->setVisible(false);
+
     //ui->widget_3->setVisible(false);
       ui->widget_5->setVisible(true);
     //ui->widget_4->setVisible(false);
     //ui->toggle_Button_1->setVisible(false);
+
+      ui->Algorithms_Close->setVisible(false);
+      ui->OrderBook_Close->setVisible(false);
+      ui->Positions_Close->setVisible(false);
+      ui->Liners_Close->setVisible(false);
+      ui->HP_Close->setVisible(false);
+      ui->Templates_Close->setVisible(false);
+
+      /********************************************************************************/
+
   //  connect(this,SIGNAL(data_summary_update_signal()),this,SLOT(updateSummaryLabels()));
 //      setTabOrder(ui->Algorithms_Button,ui->Liners_Button);
 //    setTabOrder(ui->Liners_Button,ui->OrderBook_Button);
@@ -197,6 +233,9 @@ MainWindow::MainWindow(QWidget *parent)
 //    setTabOrder(ui->Templates_Button,ui->toolButtonCards);
 //    setTabOrder(ui->toolButtonCards,ui->lineEditSearch);
 //    setTabOrder(ui->lineEditSearch,ui->Algorithms_Button);
+
+
+
 
 
     connect(this,SIGNAL(display_log_text_signal(QString)),this,SLOT(slotAddLogForAddAlgoRecord(QString)));
@@ -1243,12 +1282,7 @@ MainWindow::MainWindow(QWidget *parent)
 //    ui->label_3->setText(QString::number(AlgoCount));
 //    ui->label_25->setText(QString::number(OrderCount));
 
-    ui->Algorithms_Close->setVisible(false);
-    ui->OrderBook_Close->setVisible(false);
-    ui->Positions_Close->setVisible(false);
-    ui->Liners_Close->setVisible(false);
-    ui->HP_Close->setVisible(false);
-    ui->Templates_Close->setVisible(false);
+
 
 //    ui->lineEditWatchSearch->setPlaceholderText("Search...");
 //    ui->lineEditWatchSearch->setStyleSheet("font-family: 'Work Sans';"
@@ -2732,7 +2766,7 @@ void MainWindow::on_OrderBook_Button_clicked()
     //dock_win_trade->show();
     dock_win_trade->toggleView(true);
 
-    ui->OrderBook_Widget->setStyleSheet(stylesheetvis);
+   // ui->OrderBook_Widget->setStyleSheet(stylesheetvis);
    // ui->OrderBook_Close->setVisible(true);
 }
 
@@ -2742,7 +2776,7 @@ void MainWindow::on_F1F2Trade_Button_clicked()
     //dock_win_trade->show();
     dock_win_f1f2_order->toggleView(true);
 
-    ui->F1F2Trade_widget->setStyleSheet(stylesheetvis);
+   // ui->F1F2Trade_widget->setStyleSheet(stylesheetvis);
    // ui->OrderBook_Close->setVisible(true);
 }
 
@@ -2760,7 +2794,7 @@ void MainWindow::on_Positions_Button_clicked()
     //9
     dock_win_net_pos->toggleView(true);
 
-    ui->Positions_Widget->setStyleSheet(stylesheetvis);
+   // ui->Positions_Widget->setStyleSheet(stylesheetvis);
    // ui->Positions_Close->setVisible(true);
 }
 
@@ -2776,7 +2810,7 @@ void MainWindow::on_Liners_Button_clicked()
 {
     //10
     dock_win_liners->toggleView(true);
-    ui->Liners_Widget->setStyleSheet(stylesheetvis);
+   // ui->Liners_Widget->setStyleSheet(stylesheetvis);
    // ui->Liners_Close->setVisible(true);
 }
 
@@ -2796,7 +2830,7 @@ void MainWindow::on_HP_Button_clicked()
 {
     //11
     dock_win_combined_tracker->toggleView(true);
-    ui->HP_Widget->setStyleSheet(stylesheetvis);
+    //ui->HP_Widget->setStyleSheet(stylesheetvis);
    // ui->HP_Close->setVisible(true);
 }
 
@@ -2813,7 +2847,7 @@ void MainWindow::on_HP_Button_clicked()
 void MainWindow::on_MissedTrade_Button_clicked()
 {
     dock_win_missed_trades->toggleView(true);
-    ui->MissedTrade_widget->setStyleSheet(stylesheetvis);
+  // ui->MissedTrade_widget->setStyleSheet(stylesheetvis);
    // ui->MissedTrade_Close->setVisible(true);
 }
 
@@ -2827,7 +2861,7 @@ void MainWindow::on_MissedTrade_Button_clicked()
 void MainWindow::on_Templates_Button_clicked()
 {
     //12
-    ui->Templates_Widget->setStyleSheet(stylesheetvis);
+   // ui->Templates_Widget->setStyleSheet(stylesheetvis);
    // ui->Templates_Close->setVisible(true);
 }
 
@@ -3052,27 +3086,27 @@ void MainWindow::duplicate_Button_clicked(){
 
 void MainWindow::OnAlgorithmDockWidgetVisiblityChanged(bool p_Visible)
 {
-    if(p_Visible)
+   /* if(p_Visible)
         ui->Algorithms_Widget->setStyleSheet(stylesheetvis);
     else
-        ui->Algorithms_Widget->setStyleSheet("");
+        ui->Algorithms_Widget->setStyleSheet("");*/
   //  ui->Algorithms_Close->setVisible(p_Visible);
 }
 
 void MainWindow::OnOrderBookDockWidgetVisiblityChanged(bool p_Visible)
 {
-    if(p_Visible)
+   /* if(p_Visible)
         ui->OrderBook_Widget->setStyleSheet(stylesheetvis);
     else
-        ui->OrderBook_Widget->setStyleSheet("");
+        ui->OrderBook_Widget->setStyleSheet("");*/
   //  ui->OrderBook_Close->setVisible(p_Visible);
 }
 void MainWindow::OnF1F2OrderDockWidgetVisiblityChanged(bool p_Visible)
 {
-    if(p_Visible)
+    /*if(p_Visible)
         ui->F1F2Trade_widget->setStyleSheet(stylesheetvis);
     else
-        ui->F1F2Trade_widget->setStyleSheet("");
+        ui->F1F2Trade_widget->setStyleSheet("");*/
   //  ui->OrderBook_Close->setVisible(p_Visible);
 }
 
@@ -3080,36 +3114,36 @@ void MainWindow::OnF1F2OrderDockWidgetVisiblityChanged(bool p_Visible)
 
 void MainWindow::OnPositionsDockWidgetVisiblityChanged(bool p_Visible)
 {
-    if(p_Visible)
+  /*  if(p_Visible)
         ui->Positions_Widget->setStyleSheet(stylesheetvis);
     else
-        ui->Positions_Widget->setStyleSheet("");
+        ui->Positions_Widget->setStyleSheet("");*/
    // ui->Positions_Close->setVisible(p_Visible);
 }
 void MainWindow::OnLinersDockWidgetVisiblityChanged(bool p_Visible)
 {
-    if(p_Visible)
+  /*  if(p_Visible)
         ui->Liners_Widget->setStyleSheet(stylesheetvis);
     else
-        ui->Liners_Widget->setStyleSheet("");
+        ui->Liners_Widget->setStyleSheet("");*/
    // ui->Liners_Close->setVisible(p_Visible);
 }
 
 void MainWindow::OnHPDockWidgetVisiblityChanged(bool p_Visible)
 {
-    if(p_Visible)
+  /*  if(p_Visible)
         ui->HP_Widget->setStyleSheet(stylesheetvis);
     else
-        ui->HP_Widget->setStyleSheet("");
+        ui->HP_Widget->setStyleSheet("");*/
    // ui->HP_Close->setVisible(p_Visible);
 }
 
 void MainWindow::OnMTDockWidgetVisiblityChanged(bool p_Visible)
 {
-    if(p_Visible)
+    /*if(p_Visible)
         ui->MissedTrade_widget->setStyleSheet(stylesheetvis);
     else
-        ui->MissedTrade_widget->setStyleSheet("");
+        ui->MissedTrade_widget->setStyleSheet("");*/
     ui->MissedTrade_Close->setVisible(p_Visible);
 }
 
@@ -3118,7 +3152,7 @@ void MainWindow::on_Algorithms_Button_clicked()
 {
     T_Portfolio_DockWin->toggleView(true);
     //7
-    ui->Algorithms_Widget->setStyleSheet(stylesheetvis);
+  //  ui->Algorithms_Widget->setStyleSheet(stylesheetvis);
    // ui->Algorithms_Close->setVisible(true);
 }
 

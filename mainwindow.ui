@@ -189,13 +189,13 @@ background: #46454d;
          </property>
          <property name="minimumSize">
           <size>
-           <width>800</width>
+           <width>300</width>
            <height>35</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>800</width>
+           <width>300</width>
            <height>35</height>
           </size>
          </property>
