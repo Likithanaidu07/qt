@@ -35,15 +35,23 @@ public:
     {
         if (watch_data_card->objectName().isEmpty())
             watch_data_card->setObjectName(QString::fromUtf8("watch_data_card"));
-        watch_data_card->resize(170, 48);
-        watch_data_card->setMinimumSize(QSize(170, 0));
-        watch_data_card->setMaximumSize(QSize(153, 16777215));
+        watch_data_card->resize(192, 48);
+        QSizePolicy sizePolicy(QSizePolicy::Minimum, QSizePolicy::Preferred);
+        sizePolicy.setHorizontalStretch(0);
+        sizePolicy.setVerticalStretch(0);
+        sizePolicy.setHeightForWidth(watch_data_card->sizePolicy().hasHeightForWidth());
+        watch_data_card->setSizePolicy(sizePolicy);
+        watch_data_card->setMinimumSize(QSize(0, 0));
+        watch_data_card->setMaximumSize(QSize(16777215, 16777215));
         gridLayout = new QGridLayout(watch_data_card);
         gridLayout->setSpacing(0);
         gridLayout->setObjectName(QString::fromUtf8("gridLayout"));
         gridLayout->setContentsMargins(0, 0, 0, 0);
         Background = new QWidget(watch_data_card);
         Background->setObjectName(QString::fromUtf8("Background"));
+        sizePolicy.setHeightForWidth(Background->sizePolicy().hasHeightForWidth());
+        Background->setSizePolicy(sizePolicy);
+        Background->setMinimumSize(QSize(0, 0));
         Background->setMaximumSize(QSize(16777215, 16777215));
         Background->setStyleSheet(QString::fromUtf8(""));
         gridLayout_2 = new QGridLayout(Background);
@@ -63,7 +71,7 @@ public:
 
         value2 = new QLabel(Background);
         value2->setObjectName(QString::fromUtf8("value2"));
-        value2->setMinimumSize(QSize(50, 0));
+        value2->setMinimumSize(QSize(0, 0));
         value2->setMaximumSize(QSize(50, 16777215));
 
         gridLayout_2->addWidget(value2, 1, 4, 1, 1);
@@ -76,12 +84,13 @@ public:
         font.setBold(false);
         name->setFont(font);
         name->setAlignment(Qt::AlignCenter);
+        name->setWordWrap(true);
 
         gridLayout_2->addWidget(name, 0, 0, 1, 4);
 
         value1 = new QLabel(Background);
         value1->setObjectName(QString::fromUtf8("value1"));
-        value1->setMinimumSize(QSize(70, 0));
+        value1->setMinimumSize(QSize(0, 0));
         value1->setMaximumSize(QSize(70, 16777215));
         value1->setLayoutDirection(Qt::LeftToRight);
         value1->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
@@ -97,7 +106,7 @@ public:
         gridLayout_2->addWidget(value3, 0, 4, 1, 1);
 
 
-        gridLayout->addWidget(Background, 0, 0, 1, 3);
+        gridLayout->addWidget(Background, 0, 0, 1, 2);
 
 
         retranslateUi(watch_data_card);
