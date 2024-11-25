@@ -24,6 +24,8 @@ public:
     QStringList getTradedPortFolioList();
     QStringList getTradedDataForIdx(int idx);
     void setColumnWidths(QTableView *tableView) const;
+    QList<QHash<QString,QString>> getTradedPortFolioListForAlgoID(QString algoID);
+
 //    QStringList getTradeTableHighlight_ExcludeList();
 //    QStringList  TradeTableHighlight_ExcludeList;
 public slots:

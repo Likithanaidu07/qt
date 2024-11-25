@@ -22,7 +22,13 @@ OrderDetail_Popup::OrderDetail_Popup(QWidget *parent)
                                 "background-color: #E9ECEF;"
                               "}";
       ui->groupBox_2->setStyleSheet(groupBoxStyle);
-      ui->groupBox_3->setStyleSheet(groupBoxStyle);
+      this->setStyleSheet(
+          "QLabel { "
+          "    border: 1px solid lightgray; "  // Set border width and color
+          "    border-radius: 4px; "    // Optional: Round the corners
+          "    padding: 5px; "          // Optional: Add padding
+          "}"
+      );
 
       // Set horizontal header to resize columns to fit the available width
       ui->tableWidget_Buy->horizontalHeader()->setSectionResizeMode(QHeaderView::Stretch);
@@ -87,7 +93,7 @@ OrderDetail_Popup::OrderDetail_Popup(QWidget *parent)
     ui->tableWidget_Sell->setStyleSheet(styleSheet1);
 }
 
-void OrderDetail_Popup::setData(PortfolioObject *p,QStringList linersData){
+void OrderDetail_Popup::setData(PortfolioObject *p,QStringList linersData,QList<QHash<QString,QString>>  tradeData){
    ui->algo_id->setText(QString::number(p->PortfolioNumber));
    ui->algo_name->setText(p->AlgoName);
    ui->bid_leg->setText(p->BidLeg);
@@ -107,7 +113,86 @@ void OrderDetail_Popup::setData(PortfolioObject *p,QStringList linersData){
    }
 
 
+   for(int i=0;i<tradeData.length();i++){
+       if(tradeData[i]["Buy_Sell"]=="Buy"){
+           ui->tableWidget_Buy->insertRow( ui->tableWidget_Buy->rowCount());
+           QTableWidgetItem *c0 = new QTableWidgetItem();
+           //c0->setData(Qt::UserRole + 1,data[i]["Exch_Price"]);
+           c0->setData(Qt::DisplayRole,tradeData[i]["Exch_Price"]);
+           c0->setTextAlignment(Qt::AlignCenter);
+           c0->setFlags(c0->flags() & ~Qt::ItemIsEditable);
+           ui->tableWidget_Buy->setItem(ui->tableWidget_Buy->rowCount()-1, 0, c0);
 
+           QTableWidgetItem *c1 = new QTableWidgetItem();
+           c1->setData(Qt::DisplayRole,tradeData[i]["User_Price"]);
+           c1->setTextAlignment(Qt::AlignCenter);
+           c1->setFlags(c1->flags() & ~Qt::ItemIsEditable);
+           ui->tableWidget_Buy->setItem(ui->tableWidget_Buy->rowCount()-1, 1, c1);
+
+           QTableWidgetItem *c2 = new QTableWidgetItem();
+           c2->setData(Qt::DisplayRole,tradeData[i]["Jackpot"]);
+           c2->setTextAlignment(Qt::AlignCenter);
+           c2->setFlags(c2->flags() & ~Qt::ItemIsEditable);
+           ui->tableWidget_Buy->setItem(ui->tableWidget_Buy->rowCount()-1, 2, c2);
+
+           QTableWidgetItem *c3 = new QTableWidgetItem();
+           c3->setData(Qt::DisplayRole,tradeData[i]["Traded_Lot"]);
+           c3->setTextAlignment(Qt::AlignCenter);
+           c3->setFlags(c3->flags() & ~Qt::ItemIsEditable);
+           ui->tableWidget_Buy->setItem(ui->tableWidget_Buy->rowCount()-1, 3, c3);
+
+           QTableWidgetItem *c4 = new QTableWidgetItem();
+           c4->setData(Qt::DisplayRole,tradeData[i]["Remaining_Lot"]);
+           c4->setTextAlignment(Qt::AlignCenter);
+           c4->setFlags(c4->flags() & ~Qt::ItemIsEditable);
+           ui->tableWidget_Buy->setItem(ui->tableWidget_Buy->rowCount()-1, 4, c4);
+
+           QTableWidgetItem *c5 = new QTableWidgetItem();
+           c5->setData(Qt::DisplayRole,tradeData[i]["Time"]);
+           c5->setTextAlignment(Qt::AlignCenter);
+           c5->setFlags(c5->flags() & ~Qt::ItemIsEditable);
+           ui->tableWidget_Buy->setItem(ui->tableWidget_Buy->rowCount()-1, 5, c5);
+       }
+       else{
+           ui->tableWidget_Sell->insertRow( ui->tableWidget_Sell->rowCount());
+           QTableWidgetItem *c0 = new QTableWidgetItem();
+           //c0->setData(Qt::UserRole + 1,data[i]["Exch_Price"]);
+           c0->setData(Qt::DisplayRole,tradeData[i]["Exch_Price"]);
+           c0->setTextAlignment(Qt::AlignCenter);
+           c0->setFlags(c0->flags() & ~Qt::ItemIsEditable);
+           ui->tableWidget_Sell->setItem(ui->tableWidget_Sell->rowCount()-1, 0, c0);
+
+           QTableWidgetItem *c1 = new QTableWidgetItem();
+           c1->setData(Qt::DisplayRole,tradeData[i]["User_Price"]);
+           c1->setTextAlignment(Qt::AlignCenter);
+           c1->setFlags(c1->flags() & ~Qt::ItemIsEditable);
+           ui->tableWidget_Sell->setItem(ui->tableWidget_Sell->rowCount()-1, 1, c1);
+
+           QTableWidgetItem *c2 = new QTableWidgetItem();
+           c2->setData(Qt::DisplayRole,tradeData[i]["Jackpot"]);
+           c2->setTextAlignment(Qt::AlignCenter);
+           c2->setFlags(c2->flags() & ~Qt::ItemIsEditable);
+           ui->tableWidget_Sell->setItem(ui->tableWidget_Sell->rowCount()-1, 2, c2);
+
+           QTableWidgetItem *c3 = new QTableWidgetItem();
+           c3->setData(Qt::DisplayRole,tradeData[i]["Traded_Lot"]);
+           c3->setTextAlignment(Qt::AlignCenter);
+           c3->setFlags(c3->flags() & ~Qt::ItemIsEditable);
+           ui->tableWidget_Sell->setItem(ui->tableWidget_Sell->rowCount()-1, 3, c3);
+
+           QTableWidgetItem *c4 = new QTableWidgetItem();
+           c4->setData(Qt::DisplayRole,tradeData[i]["Remaining_Lot"]);
+           c4->setTextAlignment(Qt::AlignCenter);
+           c4->setFlags(c4->flags() & ~Qt::ItemIsEditable);
+           ui->tableWidget_Sell->setItem(ui->tableWidget_Sell->rowCount()-1, 4, c4);
+
+           QTableWidgetItem *c5 = new QTableWidgetItem();
+           c5->setData(Qt::DisplayRole,tradeData[i]["Time"]);
+           c5->setTextAlignment(Qt::AlignCenter);
+           c5->setFlags(c5->flags() & ~Qt::ItemIsEditable);
+           ui->tableWidget_Sell->setItem(ui->tableWidget_Sell->rowCount()-1, 5, c5);
+       }
+   }
 
 
 }
@@ -120,13 +205,13 @@ void OrderDetail_Popup::getTradeDataFromDB(QString user_id, QString portfolioNum
     auto loadDataFromDB_BackgroundTask = [this, user_id, portfolioNumber, PortfolioType]() {
         // Capture captured variables by value to ensure thread safety
         mysql_conn *db_conn = new mysql_conn(0, "get_popup_data_conn");
-        QList<QHash<QString, QString>> data = db_conn->getOrderPopUPData(user_id, portfolioNumber, PortfolioType);
+        //QList<QHash<QString, QString>> data = db_conn->getOrderPopUPData(user_id, portfolioNumber, PortfolioType);
 
         QHash<QString, QString> OrderDetailsData = db_conn->getOrderDetailsData(portfolioNumber,user_id);
 
 
         delete db_conn; // Release memory after use
-        emit dataLoaded(data,OrderDetailsData);
+        emit dataLoaded(OrderDetailsData);
 
     };
 
@@ -135,89 +220,10 @@ void OrderDetail_Popup::getTradeDataFromDB(QString user_id, QString portfolioNum
 }
 
 
-void OrderDetail_Popup::updateUI(const QList<QHash<QString, QString>>& data,QHash<QString, QString>OrderDetailsData){
+void OrderDetail_Popup::updateUI(QHash<QString, QString>OrderDetailsData){
 
 
-    for(int i=0;i<data.length();i++){
-        if(data[i]["Buy_Sell"]=="Buy"){
-            ui->tableWidget_Buy->insertRow( ui->tableWidget_Buy->rowCount());
-            QTableWidgetItem *c0 = new QTableWidgetItem();
-            //c0->setData(Qt::UserRole + 1,data[i]["Exch_Price"]);
-            c0->setData(Qt::DisplayRole,data[i]["Exch_Price"]);
-            c0->setTextAlignment(Qt::AlignCenter);
-            c0->setFlags(c0->flags() & ~Qt::ItemIsEditable);
-            ui->tableWidget_Buy->setItem(ui->tableWidget_Buy->rowCount()-1, 0, c0);
 
-            QTableWidgetItem *c1 = new QTableWidgetItem();
-            c1->setData(Qt::DisplayRole,data[i]["User_Price"]);
-            c1->setTextAlignment(Qt::AlignCenter);
-            c1->setFlags(c1->flags() & ~Qt::ItemIsEditable);
-            ui->tableWidget_Buy->setItem(ui->tableWidget_Buy->rowCount()-1, 1, c1);
-
-            QTableWidgetItem *c2 = new QTableWidgetItem();
-            c2->setData(Qt::DisplayRole,data[i]["Jackpot"]);
-            c2->setTextAlignment(Qt::AlignCenter);
-            c2->setFlags(c2->flags() & ~Qt::ItemIsEditable);
-            ui->tableWidget_Buy->setItem(ui->tableWidget_Buy->rowCount()-1, 2, c2);
-
-            QTableWidgetItem *c3 = new QTableWidgetItem();
-            c3->setData(Qt::DisplayRole,data[i]["Traded_Lot"]);
-            c3->setTextAlignment(Qt::AlignCenter);
-            c3->setFlags(c3->flags() & ~Qt::ItemIsEditable);
-            ui->tableWidget_Buy->setItem(ui->tableWidget_Buy->rowCount()-1, 3, c3);
-
-            QTableWidgetItem *c4 = new QTableWidgetItem();
-            c4->setData(Qt::DisplayRole,data[i]["Remaining_Lot"]);
-            c4->setTextAlignment(Qt::AlignCenter);
-            c4->setFlags(c4->flags() & ~Qt::ItemIsEditable);
-            ui->tableWidget_Buy->setItem(ui->tableWidget_Buy->rowCount()-1, 4, c4);
-
-            QTableWidgetItem *c5 = new QTableWidgetItem();
-            c5->setData(Qt::DisplayRole,data[i]["Time"]);
-            c5->setTextAlignment(Qt::AlignCenter);
-            c5->setFlags(c5->flags() & ~Qt::ItemIsEditable);
-            ui->tableWidget_Buy->setItem(ui->tableWidget_Buy->rowCount()-1, 5, c5);
-        }
-        else{
-            ui->tableWidget_Sell->insertRow( ui->tableWidget_Sell->rowCount());
-            QTableWidgetItem *c0 = new QTableWidgetItem();
-            //c0->setData(Qt::UserRole + 1,data[i]["Exch_Price"]);
-            c0->setData(Qt::DisplayRole,data[i]["Exch_Price"]);
-            c0->setTextAlignment(Qt::AlignCenter);
-            c0->setFlags(c0->flags() & ~Qt::ItemIsEditable);
-            ui->tableWidget_Sell->setItem(ui->tableWidget_Sell->rowCount()-1, 0, c0);
-
-            QTableWidgetItem *c1 = new QTableWidgetItem();
-            c1->setData(Qt::DisplayRole,data[i]["User_Price"]);
-            c1->setTextAlignment(Qt::AlignCenter);
-            c1->setFlags(c1->flags() & ~Qt::ItemIsEditable);
-            ui->tableWidget_Sell->setItem(ui->tableWidget_Sell->rowCount()-1, 1, c1);
-
-            QTableWidgetItem *c2 = new QTableWidgetItem();
-            c2->setData(Qt::DisplayRole,data[i]["Jackpot"]);
-            c2->setTextAlignment(Qt::AlignCenter);
-            c2->setFlags(c2->flags() & ~Qt::ItemIsEditable);
-            ui->tableWidget_Sell->setItem(ui->tableWidget_Sell->rowCount()-1, 2, c2);
-
-            QTableWidgetItem *c3 = new QTableWidgetItem();
-            c3->setData(Qt::DisplayRole,data[i]["Traded_Lot"]);
-            c3->setTextAlignment(Qt::AlignCenter);
-            c3->setFlags(c3->flags() & ~Qt::ItemIsEditable);
-            ui->tableWidget_Sell->setItem(ui->tableWidget_Sell->rowCount()-1, 3, c3);
-
-            QTableWidgetItem *c4 = new QTableWidgetItem();
-            c4->setData(Qt::DisplayRole,data[i]["Remaining_Lot"]);
-            c4->setTextAlignment(Qt::AlignCenter);
-            c4->setFlags(c4->flags() & ~Qt::ItemIsEditable);
-            ui->tableWidget_Sell->setItem(ui->tableWidget_Sell->rowCount()-1, 4, c4);
-
-            QTableWidgetItem *c5 = new QTableWidgetItem();
-            c5->setData(Qt::DisplayRole,data[i]["Time"]);
-            c5->setTextAlignment(Qt::AlignCenter);
-            c5->setFlags(c5->flags() & ~Qt::ItemIsEditable);
-            ui->tableWidget_Sell->setItem(ui->tableWidget_Sell->rowCount()-1, 5, c5);
-        }
-    }
 
     ui->buy_value->setText("-");
     ui->sell_value->setText("-");

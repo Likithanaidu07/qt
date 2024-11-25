@@ -106,7 +106,7 @@ public:
     bool deleteNonTradedAlgos(QStringList PortfolioNumbers,QString &msg);
     void logToDB(QString logMessage);
 
-    QList<QHash<QString,QString>> getOrderPopUPData(QString user_id, QString portfolioNumber,QString PortfolioType);
+   // QList<QHash<QString,QString>> getOrderPopUPData(QString user_id, QString portfolioNumber,QString PortfolioType);
     QList<QHash<QString,QString>> getTradePopUPData(QString user_id, QString localOrderID, int lotSize );
     algo_data_insert_status place_F1F2_Order(QString userID,QString Leg1TokenNumber,QString sellprice,QString sellqty,QString buyprice,QString buyqty,int MaxPortfolioCount,QString orderQty,QString &msg,bool checkDuplicateExist);
     ///

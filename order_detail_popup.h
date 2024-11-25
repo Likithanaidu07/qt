@@ -17,14 +17,14 @@ public:
     explicit OrderDetail_Popup(QWidget *parent = nullptr);
     ~OrderDetail_Popup();
     void getTradeDataFromDB(QString user_id, QString portfolioNumber,QString PortfolioType );
-    void setData(PortfolioObject *p,QStringList linersData);
+    void setData(PortfolioObject *p,QStringList linersData,QList<QHash<QString,QString>>  tradeData);
 
 signals:
-    void dataLoaded(const QList<QHash<QString, QString>>& data, QHash<QString, QString> OrderDetailsData);
+    void dataLoaded( QHash<QString, QString> OrderDetailsData);
 
 
 public slots:
-    void updateUI(const QList<QHash<QString, QString>>& data, QHash<QString, QString> OrderDetailsData);
+    void updateUI(QHash<QString, QString> OrderDetailsData);
 
 private:
     Ui::OrderDetail_Popup *ui;
