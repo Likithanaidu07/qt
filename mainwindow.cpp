@@ -2053,6 +2053,8 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
 }
 void MainWindow::loadContract(){
 
+
+
     auto loadContract_BackgroundTask = [this]() {
 
         QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
@@ -2086,11 +2088,10 @@ void MainWindow::loadContract(){
 
         if(loggedInFlg.loadRelaxed()==1){
             start_dataLoadingThread();
-           // QMetaObject::invokeMethod(this, [this]() { //onSummaryActionTriggered();}, Qt::QueuedConnection);
+            QMetaObject::invokeMethod(this, [this]() { onSummaryActionTriggered();}, Qt::QueuedConnection);
 
-            QMetaObject::invokeMethod(summaryAction, "trigger", Qt::QueuedConnection);
-
-                    }
+            //QMetaObject::invokeMethod(summaryAction, "trigger", Qt::QueuedConnection);
+        }
     };
     emit update_ui_signal(LOADED_MODEL);
     QFuture<void> future = QtConcurrent::run(loadContract_BackgroundTask);
@@ -4033,7 +4034,7 @@ void MainWindow::onSummaryActionTriggered() {
     if (!summary->isVisible()) {
           summary->show();
           //summary->updateSummaryData(summarydatList);
-          emit data_summary_update_signal(summarydatList);
+        //  emit data_summary_update_signal(summarydatList);
     }
 
 }
