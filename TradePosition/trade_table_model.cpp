@@ -271,6 +271,30 @@ QStringList Trade_Table_Model::getTradedPortFolioList(){
 }
 
 
+QList<QHash<QString,QString>> Trade_Table_Model::getTradedPortFolioListForAlgoID(QString algoID){
+
+    QList<QHash<QString,QString>> tradedPortFolios;
+    for(int j=0;j<trade_data_list.length();j++){
+        if(algoID==trade_data_list[j][OrderBook_Idx::AlgoNo_OB]){
+            QHash<QString,QString> tmp;
+            tmp.insert("Algo_ID",trade_data_list[j][OrderBook_Idx::AlgoNo_OB]);
+            tmp.insert("Algo_Name",trade_data_list[j][OrderBook_Idx::AlgoName_OB]);
+            tmp.insert("Exch_Price",trade_data_list[j][OrderBook_Idx::ExchPrice_OB]);
+            tmp.insert("User_Price",trade_data_list[j][OrderBook_Idx::UserPrice_OB]);
+            tmp.insert("Jackpot",trade_data_list[j][OrderBook_Idx::Jackpot_OB]);
+            tmp.insert("Traded_Lot",trade_data_list[j][OrderBook_Idx::TradedLot_OB]);
+            tmp.insert("Remaining_Lot",trade_data_list[j][OrderBook_Idx::RemainingLot_OB]);
+            tmp.insert("Buy_Sell",trade_data_list[j][OrderBook_Idx::BuyorSell_OB]);
+            tmp.insert("Time",trade_data_list[j][OrderBook_Idx::TradeTime_OB]);
+            tradedPortFolios.append(tmp);
+        }
+    }
+    return tradedPortFolios;
+}
+
+
+
+
 QVariant Trade_Table_Model::headerData(int section, Qt::Orientation orientation,   int role) const
 {
     if (role != Qt::DisplayRole){

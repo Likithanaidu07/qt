@@ -124,7 +124,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     QMenu *menuAlgorithm = new QMenu(this);
-    menuAlgorithm->addAction("Pre-Defined Algos", this, &MainWindow::on_Algorithms_Button_clicked);
+    menuAlgorithm->addAction("Algos", this, &MainWindow::on_Algorithms_Button_clicked);
+    menuAlgorithm->addAction("Pre-Define Algos", this, &MainWindow::ConvertAlgo_button_clicked);
     menuAlgorithm->addAction("Defined Algos", this, &MainWindow::on_Templates_Button_clicked);
     ui->toolButtonAlgorithm->setMenu(menuAlgorithm);
     ui->toolButtonAlgorithm->setPopupMode(QToolButton::InstantPopup);
@@ -3091,7 +3092,9 @@ void MainWindow::duplicate_Button_clicked(){
 
             algo_data_insert_status status = db_conn->insertToAlgoTable(data, MaxPortfolioCount, msg);
             if (status == algo_data_insert_status::INSERTED) {
-            triggerImmediate_refreshTables();
+                triggerImmediate_refreshTables();
+                onPortfolioAdded(); //send backend command
+
             }
   }
 
@@ -3339,7 +3342,10 @@ void MainWindow::T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index){
         QString PortfolioNumber = QString::number(P->PortfolioNumber);
         QStringList linersData = liners_model->getLinersDataForAlgoID(PortfolioNumber); // This contain profit and netqty for portfolio
         orderPopUpWin->getTradeDataFromDB(QString::number(userData.UserId), PortfolioNumber,PortfolioType);
-        orderPopUpWin->setData(P,linersData);
+
+        QList<QHash<QString,QString>>  tradeData= trade_model->getTradedPortFolioListForAlgoID(PortfolioNumber);
+
+        orderPopUpWin->setData(P,linersData,tradeData);
        // orderPopUpWin->activateWindow();
         delete P;
     }

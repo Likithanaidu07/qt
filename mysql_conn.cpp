@@ -391,39 +391,61 @@ QHash<QString,QString>  mysql_conn::getOrderDetailsData(QString  PortfolioNumber
     bool ok = checkDBOpened(msg);
     if(ok){
 
-         QString sqlquery ="WITH AggregatedTrades AS ("
-             "SELECT "
-                 "Trades.TokenNo,"
-                 "Trades.BuySellIndicator,"
-                 "MAX(Trades.PortfolioNumber) AS PortfolioNumber,"
-                 "ROUND(SUM(Trades.TradedPrice * Trades.TotalVolume) / 100, 2) AS buysellvalue"
-             " FROM "
-                 "Trades "
-             " JOIN "
-                 "Contract ON Contract.Token = Trades.TokenNo"
-             " WHERE "
-                 "Trades.TraderId = '"+user_id+"'"
-             " GROUP BY "
-                 "Trades.TokenNo, Trades.BuySellIndicator"
-             " HAVING "
-                 "MAX(Trades.PortfolioNumber) IN ("+portfolioNum1+", "+portfolioNum2+")"
-         ")"
-         " SELECT "
-            "MAX(PortfolioNumber) AS PortfolioNumber,"
-             "SUM(CASE WHEN BuySellIndicator = 1 THEN buysellvalue ELSE 0 END) AS BuyTotalVal,"
-             "SUM(CASE WHEN BuySellIndicator = 2 THEN buysellvalue ELSE 0 END) AS SellTotalVal,"
-             "(SELECT COUNT(*)"
-              " FROM Order_Table_Bid"
-              " WHERE Trader_ID = '"+user_id+"' AND Order_Table_Bid.PortfolioNumber IN ("+portfolioNum1+", "+portfolioNum2+")) AS OrderCount,"
-             "(SELECT COUNT(*)"
-              " FROM Order_Table_Bid"
-              " WHERE Trader_ID = '"+user_id+"' AND  Order_Table_Bid.PortfolioNumber IN ("+portfolioNum1+", "+portfolioNum2+")  AND "
-                    "(Leg1_OrderState = 7 OR Leg2_OrderState = 7 OR Leg3_OrderState = 7 OR "
-                     "Leg4_OrderState = 7 OR Leg5_OrderState = 7 OR Leg6_OrderState = 7)) AS TraderCount"
-         " FROM "
-             "AggregatedTrades;";
 
-        // qDebug()<<"query : "<<sqlquery;
+        QString sqlquery = QString(
+            "SELECT "
+            "    FORMAT("
+            "        SUM("
+            "            CASE "
+            "                WHEN Trades.BuySellIndicator = 1 THEN (Trades.TradedPrice * Trades.TotalVolume) "
+            "                ELSE 0 "
+            "            END"
+            "        ) / 100, "
+            "        2"
+            "    ) AS BuyValue, "
+            "    FORMAT("
+            "        SUM("
+            "            CASE "
+            "                WHEN Trades.BuySellIndicator = 2 THEN (Trades.TradedPrice * Trades.TotalVolume) "
+            "                ELSE 0 "
+            "            END"
+            "        ) / 100, "
+            "        2"
+            "    ) AS SellValue, "
+            "    ("
+            "        SELECT "
+            "            COUNT(*) "
+            "        FROM "
+            "            Order_Table_Bid "
+            "        WHERE "
+            "            Trader_ID = '%1' "
+            "            AND Order_Table_Bid.PortfolioNumber IN (%2, %3)"
+            "    ) AS OrderCount, "
+            "    ("
+            "        SELECT "
+            "            COUNT(*) "
+            "        FROM "
+            "            Order_Table_Bid "
+            "        WHERE "
+            "            Trader_ID = '%1' "
+            "            AND Order_Table_Bid.PortfolioNumber IN (%2, %3) "
+            "            AND ("
+            "                Leg1_OrderState = 7 OR Leg2_OrderState = 7 OR "
+            "                Leg3_OrderState = 7 OR Leg4_OrderState = 7 OR "
+            "                Leg5_OrderState = 7 OR Leg6_OrderState = 7"
+            "            )"
+            "    ) AS TraderCount "
+            "FROM "
+            "    Trades "
+            "JOIN "
+            "    Contract ON Contract.Token = Trades.TokenNo "
+            "WHERE "
+            "    Trades.PortfolioNumber IN (%2, %3) "
+            "    AND Trades.BuySellIndicator IN (1, 2);"
+        ).arg(user_id, portfolioNum1, portfolioNum2);
+
+
+      //  qDebug()<<"query : "<<sqlquery;
 
          QSqlQuery query(sqlquery, db);
         if(!query.exec())
@@ -436,8 +458,8 @@ QHash<QString,QString>  mysql_conn::getOrderDetailsData(QString  PortfolioNumber
         else{
             QSqlRecord rec = query.record();
             while (query.next()) {
-                QString BuyTotalVal =query.value(rec.indexOf("PortfolioNumber")).toString();
-                QString SellTotalVal =query.value(rec.indexOf("SellTotalVal")).toString();
+                QString BuyTotalVal =query.value(rec.indexOf("BuyValue")).toString();
+                QString SellTotalVal =query.value(rec.indexOf("SellValue")).toString();
                 QString OrderCount =query.value(rec.indexOf("OrderCount")).toString();
                 QString TraderCount =query.value(rec.indexOf("TraderCount")).toString();
                 OrderDetailsData["BuyTotalVal"]=BuyTotalVal;
@@ -946,205 +968,205 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
     return Algo_Name.toUpper();
 }
 
-  QList<QHash<QString,QString>>  mysql_conn::getOrderPopUPData(QString user_id, QString PortfolioNumberStr,QString PortfolioType){
+//  QList<QHash<QString,QString>>  mysql_conn::getOrderPopUPData(QString user_id, QString PortfolioNumberStr,QString PortfolioType){
 
-    QList<QHash<QString,QString>> orderData;
-    QMutexLocker lock(&mutex);
+//    QList<QHash<QString,QString>> orderData;
+//    QMutexLocker lock(&mutex);
 
-    QList <QStringList> orderData_listTmp;
-    QString msg;
+//    QList <QStringList> orderData_listTmp;
+//    QString msg;
 
-    int PortfolioNumber = PortfolioNumberStr.toInt();
+//    int PortfolioNumber = PortfolioNumberStr.toInt();
 
-    QString portfolioNum1;
-    QString portfolioNum2;
-    if(PortfolioNumber<1500000){
-        portfolioNum1 = PortfolioNumberStr;
-        portfolioNum2 = QString::number(PortfolioNumber+1500000);
-    }
-    else{
-        portfolioNum1 = PortfolioNumberStr;
-        portfolioNum2 = QString::number(1500000-PortfolioNumber);
-    }
+//    QString portfolioNum1;
+//    QString portfolioNum2;
+//    if(PortfolioNumber<1500000){
+//        portfolioNum1 = PortfolioNumberStr;
+//        portfolioNum2 = QString::number(PortfolioNumber+1500000);
+//    }
+//    else{
+//        portfolioNum1 = PortfolioNumberStr;
+//        portfolioNum2 = QString::number(1500000-PortfolioNumber);
+//    }
 
-    bool ok = checkDBOpened(msg);
-    if(ok)
-    {
+//    bool ok = checkDBOpened(msg);
+//    if(ok)
+//    {
 
-        QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and Leg2_OrderState=7 and PortfolioNumber IN ("+portfolioNum1+", "+portfolioNum2+")  ORDER BY Trader_Data DESC";
-        qDebug()<<query_str;
+//        QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and Leg2_OrderState=7 and PortfolioNumber IN ("+portfolioNum1+", "+portfolioNum2+")  ORDER BY Trader_Data DESC";
+//        qDebug()<<query_str;
 
-        QSqlQuery query(query_str,db);
-        if( !query.exec() )
-        {
-            // Error Handling, check query.lastError(), probably return
-            qDebug()<<query.lastError().text();
-        }
-        else{
-            QSqlRecord rec = query.record();
-            while (query.next()) {
+//        QSqlQuery query(query_str,db);
+//        if( !query.exec() )
+//        {
+//            // Error Handling, check query.lastError(), probably return
+//            qDebug()<<query.lastError().text();
+//        }
+//        else{
+//            QSqlRecord rec = query.record();
+//            while (query.next()) {
 
-                QString Algo_ID = ""; // same as PortfolioNumber
-                QString Buy_Sell = "";
-
-
-                int Algo_ID_Int = query.value(rec.indexOf("PortfolioNumber")).toInt();
-
-                if(Algo_ID_Int>1500000){
-                    Buy_Sell = "Buy";
-                    Algo_ID = QString::number(Algo_ID_Int - 1500000);
-                }
-                else{
-                    Buy_Sell = "Sell";
-                    Algo_ID = QString::number(Algo_ID_Int);
-                }
-
-                QString Volant_No = query.value(rec.indexOf("Trader_Data")).toString();
-                int leg1_token_number = query.value(rec.indexOf("Leg1_Tok_No")).toInt();
-                int leg2_token_number = query.value(rec.indexOf("Leg2_Tok_No")).toInt();
-                int leg3_token_number = query.value(rec.indexOf("Leg3_Tok_No")).toInt();
-
-                int portfolio_type = PortfolioType.toInt();
-                QString Algo_Name = "";
+//                QString Algo_ID = ""; // same as PortfolioNumber
+//                QString Buy_Sell = "";
 
 
-                 Algo_Name =get_Algo_Name(portfolio_type,leg1_token_number,leg2_token_number,leg3_token_number,devicer,decimal_precision);
+//                int Algo_ID_Int = query.value(rec.indexOf("PortfolioNumber")).toInt();
+
+//                if(Algo_ID_Int>1500000){
+//                    Buy_Sell = "Buy";
+//                    Algo_ID = QString::number(Algo_ID_Int - 1500000);
+//                }
+//                else{
+//                    Buy_Sell = "Sell";
+//                    Algo_ID = QString::number(Algo_ID_Int);
+//                }
+
+//                QString Volant_No = query.value(rec.indexOf("Trader_Data")).toString();
+//                int leg1_token_number = query.value(rec.indexOf("Leg1_Tok_No")).toInt();
+//                int leg2_token_number = query.value(rec.indexOf("Leg2_Tok_No")).toInt();
+//                int leg3_token_number = query.value(rec.indexOf("Leg3_Tok_No")).toInt();
+
+//                int portfolio_type = PortfolioType.toInt();
+//                QString Algo_Name = "";
 
 
-                int qty = query.value(rec.indexOf("Leg1_Total_Volume")).toInt();
-                //int leg2qty = query.value(rec.indexOf("Leg2_Total_Volume")).toInt();
-                int leg1Price = query.value(rec.indexOf("Leg1_Price")).toInt();
-                int leg2Price = query.value(rec.indexOf("Leg2_Price")).toInt();
-                int leg3Price = query.value(rec.indexOf("Leg3_Price")).toInt();
-                int Leg1BuySellIndicator = query.value(rec.indexOf("Leg1_Buy/Sell")).toInt();
-
-                QString Exch_Price = "0";
-                double Exch_Price_val  = 0;
-
-                switch (portfolio_type) {
-                case PortfolioType::F2F:{
-                    if(Leg1BuySellIndicator==1){
-                        Exch_Price_val = static_cast<double>((leg2Price - leg1Price) * 1.0) / devicer;
-                    }
-                    else{
-                        Exch_Price_val = static_cast<double>((leg1Price - leg2Price) * 1.0) / devicer;
-                    }
-
-                    break;
-
-                }
-                case PortfolioType::BY:{
-                    if(Leg1BuySellIndicator==1){
-                        Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
-                    }
-                    else{
-                        Exch_Price_val = static_cast<double>((leg3Price + leg1Price) * 1.0 - (2.0 * leg2Price)) / devicer;
-                    }
-
-                    break;
-                }
-                case PortfolioType::CR:{
-                    int strikePrice = ContractDetail::getInstance().GetStrikePrice(leg2_token_number,portfolio_type).toInt();
-                    if(Leg1BuySellIndicator==1){
-                        float diff = -leg1Price - leg3Price + leg2Price + strikePrice;
-                        Exch_Price_val = static_cast<double>(diff) / devicer;
-                    }
-                    else{
-                        float diff = -leg2Price - strikePrice + leg3Price + leg1Price;
-                        Exch_Price_val = static_cast<double>(diff) / devicer;
-                    }
+//                 Algo_Name =get_Algo_Name(portfolio_type,leg1_token_number,leg2_token_number,leg3_token_number,devicer,decimal_precision);
 
 
-                    break;
-                }
-                case PortfolioType::CR_JELLY:{
-                    int strikePrice = ContractDetail::getInstance().GetStrikePrice(leg2_token_number,portfolio_type).toInt();
-                    if(Leg1BuySellIndicator==1){
-                        float diff = -leg1Price - leg3Price + leg2Price + strikePrice;
-                        Exch_Price_val = static_cast<double>(diff) / devicer;
-                    }
-                    else{
-                        float diff = -leg2Price - strikePrice + leg3Price + leg1Price;
-                        Exch_Price_val = static_cast<double>(diff) / devicer;
-                    }
+//                int qty = query.value(rec.indexOf("Leg1_Total_Volume")).toInt();
+//                //int leg2qty = query.value(rec.indexOf("Leg2_Total_Volume")).toInt();
+//                int leg1Price = query.value(rec.indexOf("Leg1_Price")).toInt();
+//                int leg2Price = query.value(rec.indexOf("Leg2_Price")).toInt();
+//                int leg3Price = query.value(rec.indexOf("Leg3_Price")).toInt();
+//                int Leg1BuySellIndicator = query.value(rec.indexOf("Leg1_Buy/Sell")).toInt();
+
+//                QString Exch_Price = "0";
+//                double Exch_Price_val  = 0;
+
+//                switch (portfolio_type) {
+//                case PortfolioType::F2F:{
+//                    if(Leg1BuySellIndicator==1){
+//                        Exch_Price_val = static_cast<double>((leg2Price - leg1Price) * 1.0) / devicer;
+//                    }
+//                    else{
+//                        Exch_Price_val = static_cast<double>((leg1Price - leg2Price) * 1.0) / devicer;
+//                    }
+
+//                    break;
+
+//                }
+//                case PortfolioType::BY:{
+//                    if(Leg1BuySellIndicator==1){
+//                        Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
+//                    }
+//                    else{
+//                        Exch_Price_val = static_cast<double>((leg3Price + leg1Price) * 1.0 - (2.0 * leg2Price)) / devicer;
+//                    }
+
+//                    break;
+//                }
+//                case PortfolioType::CR:{
+//                    int strikePrice = ContractDetail::getInstance().GetStrikePrice(leg2_token_number,portfolio_type).toInt();
+//                    if(Leg1BuySellIndicator==1){
+//                        float diff = -leg1Price - leg3Price + leg2Price + strikePrice;
+//                        Exch_Price_val = static_cast<double>(diff) / devicer;
+//                    }
+//                    else{
+//                        float diff = -leg2Price - strikePrice + leg3Price + leg1Price;
+//                        Exch_Price_val = static_cast<double>(diff) / devicer;
+//                    }
 
 
-                    break;
-                }
-                case PortfolioType::BFLY_BID:{
-                    if(Leg1BuySellIndicator==1){
-                        Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
-                    }
-                    else{
-                        Exch_Price_val = static_cast<double>((leg3Price + leg1Price) * 1.0 - (2.0 * leg2Price)) / devicer;
-                    }
-
-                    break;
-                }
-
-                case PortfolioType::BX_BID:{
-                    if(Leg1BuySellIndicator==1){
-                        Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
-                    }
-                    else{
-                        Exch_Price_val = static_cast<double>((leg3Price + leg1Price) * 1.0 - (2.0 * leg2Price)) / devicer;
-                    }
-
-                    break;
-                }
-
-                case PortfolioType::BS1221:{
-                    if(Leg1BuySellIndicator==1){
-                        Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
-                    }
-                    else{
-                        Exch_Price_val = static_cast<double>((leg3Price + leg1Price) * 1.0 - (2.0 * leg2Price)) / devicer;
-                    }
-
-                    break;
-                }
-
-                default:
-                    break;
-                }
-
-                Exch_Price = QString::number(Exch_Price_val,'f',decimal_precision);
-                QString User_Price = fixDecimal(((query.value(rec.indexOf("DesiredRate")).toDouble()) / devicer),decimal_precision);//QString::number(static_cast<double>(query.value(rec.indexOf("DesiredRate")).toDouble()) / devicer, 'f', decimal_precision+1);
-
-                double userPriceVal = query.value(rec.indexOf("DesiredRate")).toDouble() / devicer;
-                double JackpotVal =(Exch_Price_val-userPriceVal);
-                QString Jackpot = QString::number(JackpotVal,'f',decimal_precision);
+//                    break;
+//                }
+//                case PortfolioType::CR_JELLY:{
+//                    int strikePrice = ContractDetail::getInstance().GetStrikePrice(leg2_token_number,portfolio_type).toInt();
+//                    if(Leg1BuySellIndicator==1){
+//                        float diff = -leg1Price - leg3Price + leg2Price + strikePrice;
+//                        Exch_Price_val = static_cast<double>(diff) / devicer;
+//                    }
+//                    else{
+//                        float diff = -leg2Price - strikePrice + leg3Price + leg1Price;
+//                        Exch_Price_val = static_cast<double>(diff) / devicer;
+//                    }
 
 
-                int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
+//                    break;
+//                }
+//                case PortfolioType::BFLY_BID:{
+//                    if(Leg1BuySellIndicator==1){
+//                        Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
+//                    }
+//                    else{
+//                        Exch_Price_val = static_cast<double>((leg3Price + leg1Price) * 1.0 - (2.0 * leg2Price)) / devicer;
+//                    }
 
-                if(qty>0&&lotSize>0) // to prevent crash
-                    qty = qty / lotSize;
-                QString Traded_Lot = QString::number(qty);
+//                    break;
+//                }
 
-                QString Remaining_Lot = QString::number(static_cast<double>(query.value(rec.indexOf("RemainingQty")).toDouble()) / lotSize);
-                long long Trade_Time = query.value(rec.indexOf("TimeOrderEnteredHost")).toLongLong();
-                QDateTime dt = QDateTime::fromSecsSinceEpoch(Trade_Time);
-                dt = dt.toUTC();
+//                case PortfolioType::BX_BID:{
+//                    if(Leg1BuySellIndicator==1){
+//                        Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
+//                    }
+//                    else{
+//                        Exch_Price_val = static_cast<double>((leg3Price + leg1Price) * 1.0 - (2.0 * leg2Price)) / devicer;
+//                    }
 
-                QHash<QString,QString> tmp;
-                tmp.insert("Algo_ID",Algo_ID);
-                tmp.insert("Algo_Name",Algo_Name);
-                tmp.insert("Exch_Price",Exch_Price);
-                tmp.insert("User_Price",User_Price);
-                tmp.insert("Jackpot",Jackpot);
-                tmp.insert("Traded_Lot",Traded_Lot);
-                tmp.insert("Remaining_Lot",Remaining_Lot);
-                tmp.insert("Buy_Sell",Buy_Sell);
-                tmp.insert("Time",dt.toString("hh:mm:ss"));
+//                    break;
+//                }
 
-                orderData.append(tmp);
-            }
+//                case PortfolioType::BS1221:{
+//                    if(Leg1BuySellIndicator==1){
+//                        Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
+//                    }
+//                    else{
+//                        Exch_Price_val = static_cast<double>((leg3Price + leg1Price) * 1.0 - (2.0 * leg2Price)) / devicer;
+//                    }
 
-        }
-    }
-    return orderData;
-}
+//                    break;
+//                }
+
+//                default:
+//                    break;
+//                }
+
+//                Exch_Price = QString::number(Exch_Price_val,'f',decimal_precision);
+//                QString User_Price = fixDecimal(((query.value(rec.indexOf("DesiredRate")).toDouble()) / devicer),decimal_precision);//QString::number(static_cast<double>(query.value(rec.indexOf("DesiredRate")).toDouble()) / devicer, 'f', decimal_precision+1);
+
+//                double userPriceVal = query.value(rec.indexOf("DesiredRate")).toDouble() / devicer;
+//                double JackpotVal =(Exch_Price_val-userPriceVal);
+//                QString Jackpot = QString::number(JackpotVal,'f',decimal_precision);
+
+
+//                int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
+
+//                if(qty>0&&lotSize>0) // to prevent crash
+//                    qty = qty / lotSize;
+//                QString Traded_Lot = QString::number(qty);
+
+//                QString Remaining_Lot = QString::number(static_cast<double>(query.value(rec.indexOf("RemainingQty")).toDouble()) / lotSize);
+//                long long Trade_Time = query.value(rec.indexOf("TimeOrderEnteredHost")).toLongLong();
+//                QDateTime dt = QDateTime::fromSecsSinceEpoch(Trade_Time);
+//                dt = dt.toUTC();
+
+//                QHash<QString,QString> tmp;
+//                tmp.insert("Algo_ID",Algo_ID);
+//                tmp.insert("Algo_Name",Algo_Name);
+//                tmp.insert("Exch_Price",Exch_Price);
+//                tmp.insert("User_Price",User_Price);
+//                tmp.insert("Jackpot",Jackpot);
+//                tmp.insert("Traded_Lot",Traded_Lot);
+//                tmp.insert("Remaining_Lot",Remaining_Lot);
+//                tmp.insert("Buy_Sell",Buy_Sell);
+//                tmp.insert("Time",dt.toString("hh:mm:ss"));
+
+//                orderData.append(tmp);
+//            }
+
+//        }
+//    }
+//    return orderData;
+//}
 
 
 
