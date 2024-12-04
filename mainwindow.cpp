@@ -2773,6 +2773,7 @@ void MainWindow::loggedIn(){
         QFont font = ui->label_6->font();
         font.setBold(true);
         ui->label_6->setFont(font);
+        ui->label_6->setStyleSheet("color: white;");
 
         start_slowdata_worker();
         start_slowdata_indices_worker();
@@ -2855,6 +2856,7 @@ void MainWindow::add_logs(QString str){
     emit logDataSignal(logsdata);
     ui->label_5->setWordWrap(true);
     ui->label_5->setText("UserMessage: " + str);
+    ui->label_5->setStyleSheet("color: white;");
 
 }
 
@@ -3499,6 +3501,7 @@ void MainWindow::slotAddLogForAddAlgoRecord(QString str)
     emit logDataSignal(logsdata);
     ui->label_5->setWordWrap(true);
     ui->label_5->setText("UserMessage: " + str);
+    ui->label_5->setStyleSheet("color: white;");
 
 }
 

@@ -19,8 +19,13 @@ loginwindow::loginwindow(QWidget *parent) :
 
 //#ifdef QT_DEBUG
 #ifndef RELEASE_BUILD
+
     ui->lineEditUsername->setText("JNK82");
-    ui->lineEdit_Password->setText("MTIz");
+    ui->lineEdit_Password->setText("123");
+
+    ui->lineEditUsername->setText("JNK82");
+    ui->lineEdit_Password->setText("123");
+
     ui->pushButtonlogin->click();
 #endif
 
@@ -32,8 +37,6 @@ loginwindow::loginwindow(QWidget *parent) :
                                     "background: #D9D9D9;");
 
     ui->progressBar->setVisible(false);
-
-
 
     ui->lineEditUsername->setFocus();
     setWindowFlags(Qt::Window | Qt::FramelessWindowHint);
