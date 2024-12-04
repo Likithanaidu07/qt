@@ -18,7 +18,7 @@ const char DockTitleBar_Style[]="background: #FFF;"
                                 "border-top-right-radius : 12px;"
                                 "border-bottom-left-radius : 0px;"
                                 "border-bottom-right-radius : 0px;";
-const char lineedit_dock_SS[]="border-radius: 10px;"
+const char lineedit_dock_SS[]="border-radius: 50px;"
                               "border: 1px solid #ADB5BD;"
                               "background: #FFF;";
 

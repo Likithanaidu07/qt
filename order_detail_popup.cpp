@@ -24,8 +24,8 @@ OrderDetail_Popup::OrderDetail_Popup(QWidget *parent)
       ui->groupBox_2->setStyleSheet(groupBoxStyle);
       this->setStyleSheet(
           "QLabel { "
-          "    border: 1px solid lightgray; "  // Set border width and color
-          "    border-radius: 4px; "    // Optional: Round the corners
+          "    border-bottom: 1px solid black; "  // Set border width and color
+          "    border-radius: 1px; "    // Optional: Round the corners
           "    padding: 5px; "          // Optional: Add padding
           "}"
       );
@@ -40,11 +40,11 @@ OrderDetail_Popup::OrderDetail_Popup(QWidget *parent)
 
 
 
- QString styleSheet = R"(
+      QString styleSheet = R"(
     QTableWidget {
         background-color: #E9ECEF;
         alternate-background-color: #D6FCF0; /* light green with transparency */
-        gridline-color: #FFF;
+        gridline-color: transparent; /* Make gridlines invisible */
         font: bold;
     }
     QHeaderView::section {
@@ -55,22 +55,26 @@ OrderDetail_Popup::OrderDetail_Popup(QWidget *parent)
     }
     QTableWidget::item {
         background-color: rgba(0, 255, 0, 0.1); /* light green with transparency */
-        border: 1px solid #D6FCF0;
+        border-bottom: 1px solid black; /* Only a bottom border for horizontal lines */
+        border-right: none; /* No vertical borders */
+        border-left: none; /* No vertical borders */
     }
     QTableWidget::item:selected {
         background-color: #D6FCF0; /* selected color, slightly darker */
         color: black; /* black text color when selected */
+        border-bottom: 1px solid black; /* Keep the bottom border for selected items */
+        border-right: none; /* No vertical borders for selected */
+        border-left: none; /* No vertical borders for selected */
     }
+)";
+      ui->tableWidget_Buy->setStyleSheet(styleSheet);
 
-    )";
 
-    ui->tableWidget_Buy->setStyleSheet(styleSheet);
-
- QString styleSheet1 = R"(
+      QString styleSheet1 = R"(
     QTableWidget {
         background-color: #E9ECEF;
         alternate-background-color: #FED9D9;
-        gridline-color: #FFF;
+         gridline-color: transparent;
         font: bold;
     }
     QHeaderView::section {
@@ -80,15 +84,25 @@ OrderDetail_Popup::OrderDetail_Popup(QWidget *parent)
         border: 1px solid #FFF;
     }
     QTableWidget::item {
-        background-color:#FED9D9 ;
-        border: 1px solid #FED9D9;
+        background-color: #FED9D9;
+        border-bottom: 1px solid black; /* horizontal line only */
+        border-right: none; /* No vertical borders */
+        border-left: none; /* No vertical borders */
     }
     QTableWidget::item:selected {
         background-color: #FED9D9;
         color: black;
-    }
+        border-bottom: 1px solid black; /* Keep the bottom
 
-    )";
+
+
+
+border for selected items */
+        border-right: none; /* No vertical borders for selected */
+        border-left: none; /* No vertical borders for selected */
+    }
+)";
+
 
     ui->tableWidget_Sell->setStyleSheet(styleSheet1);
 }

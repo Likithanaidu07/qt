@@ -76,6 +76,11 @@ void watch_data_card::setData(Indices_Data_Struct data) {
     ui->value3->setText(data.percentagechange+"%");
 
 
+    int newWidth = ui->Background->sizeHint().width(); // Use sizeHint() to estimate the required width
+    //qDebug()<<newWidth;
+    this->setMinimumWidth(newWidth);
+    this->setMaximumWidth(newWidth);
+
 }
 
 
