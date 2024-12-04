@@ -2252,6 +2252,7 @@ void MainWindow::stop_slowdata_worker(){
 void MainWindow::slowDataRecv_Slot(const QHash<QString, MBP_Data_Struct>& data){
 
     T_Portfolio_Model->updateMarketRate(data);
+    net_pos_model->updateM2M(data);
 }
 
 
@@ -3455,7 +3456,7 @@ void MainWindow::slotHideProgressBar()
 
 void MainWindow::saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList) {
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QString fileName = appDataPath+"/Data/watch_cache.bin";
+    QString fileName = appDataPath+"/Data/indices_data.bin";
     QFile file(fileName);
     if (!file.open(QIODevice::WriteOnly)) {
         qWarning("Could not open file for writing.");
@@ -3468,10 +3469,10 @@ void MainWindow::saveIndicesDataListToFile(const QHash<QString, Indices_Data_Str
 
 //void MainWindow::loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList) {
 //    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-//    QString fileName = appDataPath+"/Data/watch_cache.bin";
+//    QString fileName = appDataPath+"/Data/indices_data.bin";
 //    QFile file(fileName);
 //    if (!file.open(QIODevice::ReadOnly)) {
-//        qWarning("Could not open file for reading--> watch_cache.bin");
+//        qWarning("Could not open file for reading--> indices_data.bin");
 //        return;
 //    }
 //    QDataStream in(&file);
@@ -4400,10 +4401,10 @@ void MainWindow::instilizeWatchUIOnTopBar(){
 
 
     QHash<QString, Indices_Data_Struct> indicesDataList;
-    QString fileName = appDataPath+"/Data/watch_cache.bin";
+    QString fileName = appDataPath+"/Data/indices_data.bin";
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly)) {
-        qWarning("Could not open file for reading--> watch_cache.bin");
+        qWarning("Could not open file for reading--> indices_data.bin");
     }
     else{
         QDataStream in(&file);

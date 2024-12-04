@@ -193,7 +193,9 @@ enum NET_POS
     SellAvgPrice_NP,
     NetQty_NP,
     Profit_NP,
-    MTM,
+    MTM_NP,
+    Margin_Used_NP,
+    lotSize_NP,
     TokenNo_NP,
 };
 
@@ -340,6 +342,7 @@ struct contract_table{
     int OperatingRangeslowPriceRange;
     int OperatingRangeshighPriceRange;
 };
+
 struct userInfo{
     int UserId;
     QString UserName;
@@ -353,6 +356,7 @@ struct userInfo{
     int MaxActiveCount;
     QStringList ExFilterPF;
     QMap<int,QStringList> algoFilterMap;
+    long exp_mar;
 
 };
 
@@ -374,6 +378,11 @@ struct mbpInfo
     QString numberOfOrders;
     QString bbBuySellFlag;
 };
+// Serialize mbpInfo
+QDataStream &operator<<(QDataStream &out, const mbpInfo &info);
+QDataStream &operator>>(QDataStream &in, mbpInfo &info);
+
+
 struct MBP_Data_Struct{
     QString token;
     QString volumeTradedToday;
@@ -392,6 +401,10 @@ struct MBP_Data_Struct{
     QList<mbpInfo> recordBuffer;
 
 };
+
+// Serialization operators
+QDataStream &operator<<(QDataStream &out, const MBP_Data_Struct &data);
+QDataStream &operator>>(QDataStream &in, MBP_Data_Struct &data);
 
 struct Indices_Data_Struct{
     QString indexName;

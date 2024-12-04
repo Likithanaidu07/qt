@@ -22,11 +22,12 @@ public:
     QVariant headerData(int section, Qt::Orientation ,   int role) const override;
     QList <QStringList> net_pos_data_list;
     // void setColumnWidths(QTableView *tableView) const;
+    void updateM2M(const QHash<QString, MBP_Data_Struct>& MBP_Data_Hash);
 
 private:
     int col_count;
-    QStringList header={"Stock Name","BLot","SLot","BValue","SValue","BAvg","SAvg","Net Lot","P&L","MTM"};
-
+    QStringList header={"Stock Name","BLot","SLot","BValue","SValue","BAvg","SAvg","Net Lot","P&L","MTM","Margin Used"};
+    double devicer;
 
 signals:
     void  editCompleted(int row,int col,QString,QString,QString,bool);

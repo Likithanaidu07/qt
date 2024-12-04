@@ -1,11 +1,12 @@
 #include "net_position_table_model.h"
 #include <QTableView>
 #include <QHeaderView>
-
+#include "defines.h"
 
 Net_Position_Table_Model::Net_Position_Table_Model(QObject *parent) : QAbstractTableModel(parent)
 {
     col_count = header.count();
+    devicer = FO_DEVICER;
 }
 int Net_Position_Table_Model::rowCount(const QModelIndex & /*parent*/) const
 {
@@ -88,7 +89,7 @@ void Net_Position_Table_Model::setDataList(QList <QStringList> net_pos_data_list
         for(int i=0;i<net_pos_data_listNew.length();i++){
             bool newData = true;
             for(int j=0;j<net_pos_data_list.length();j++){
-                int unique_id_idx = net_pos_data_listNew[i].length()-1; // token_numebr(last element in array)---this will be unique for row
+                int unique_id_idx = NET_POS::TokenNo_NP;//net_pos_data_listNew[i].length()-1; // token_numebr(last element in array)---this will be unique for row
 
                 if(net_pos_data_listNew[i][unique_id_idx]==net_pos_data_list[j][unique_id_idx]){
                     newData = false;
@@ -113,7 +114,7 @@ void Net_Position_Table_Model::setDataList(QList <QStringList> net_pos_data_list
         for(int i=0;i<net_pos_data_list.length();i++){
             bool deletRow = true;
             for(int j=0;j<net_pos_data_listNew.length();j++){
-                int unique_id_idx = net_pos_data_list[i].length()-1; // token_numebr(last element in array)---this will be unique for row
+                int unique_id_idx = NET_POS::TokenNo_NP;//net_pos_data_list[i].length()-1; // token_numebr(last element in array)---this will be unique for row
                 if(net_pos_data_list[i][unique_id_idx]==net_pos_data_listNew[j][unique_id_idx]){ // token_numebr(last element in array)---this will be unique for row
                     deletRow=false; //the id is there in new and old data so do not remove this row.
                 }
@@ -123,7 +124,6 @@ void Net_Position_Table_Model::setDataList(QList <QStringList> net_pos_data_list
         }
 
         //remove rows
-
         for (int i = rowsToRemove.length() - 1; i >= 0; i--) {
             int rowIndex = rowsToRemove[i];
             beginRemoveRows(QModelIndex(), rowIndex, rowIndex);
@@ -134,6 +134,35 @@ void Net_Position_Table_Model::setDataList(QList <QStringList> net_pos_data_list
     }
 
 }
+void Net_Position_Table_Model::updateM2M(const QHash<QString, MBP_Data_Struct>& MBP_Data_Hash){
+
+    for(int i=0;i<net_pos_data_list.length();i++){
+
+
+        QString TokenNo = net_pos_data_list[i][NET_POS::TokenNo_NP];
+        /***************M2M calcualtion**********************/
+        if(MBP_Data_Hash.contains(TokenNo))
+        {
+            MBP_Data_Struct mbpData = MBP_Data_Hash[TokenNo];
+            double Net_Qty = net_pos_data_list[i][NET_POS::NetQty_NP].toDouble();
+            if ( Net_Qty> 0) {
+                double Buy_Avg_Price = net_pos_data_list[i][NET_POS::BuyAvgPrice_NP].toDouble();
+                double M2M = ((((mbpData.lastTradedPrice.toDouble()  / devicer) - Buy_Avg_Price) * Net_Qty));
+                net_pos_data_list[i][NET_POS::MTM_NP] = QString::number(M2M);
+                emit dataChanged(index(i, NET_POS::MTM_NP), index(i, NET_POS::MTM_NP));
+
+            }
+            else if (Net_Qty < 0) {
+               double Sell_Avg_Price = net_pos_data_list[i][NET_POS::SellAvgPrice_NP].toDouble();
+               double M2M = ((((mbpData.lastTradedPrice.toDouble() / devicer) - Sell_Avg_Price) * Net_Qty));
+               net_pos_data_list[i][NET_POS::MTM_NP] = QString::number(M2M);
+               emit dataChanged(index(i, NET_POS::MTM_NP), index(i, NET_POS::MTM_NP));
+            }
+        }
+        /******************************************************************/
+    }
+}
+
 
 
 

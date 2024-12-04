@@ -27,7 +27,9 @@
 struct net_pos_data_{
     QString  token_number;
     QString  Stock_Name;
-    //QString  Expiry;
+    QString OptionType;
+    QString InstrumentName;
+    QString  Expiry;
     double Buy_Total_Lot;
     double Sell_Total_Lot;
     double Buy_Price;
@@ -38,7 +40,10 @@ struct net_pos_data_{
     double SellValue;
     double Net_Qty;
     int lotSize;
-
+    double M2M;
+    double MarginUsed;
+    double exp;
+    int Span;
 
     //QString MTM;
 };
@@ -79,12 +84,14 @@ public:
     double devicer{100.0};
     int decimal_precision;
     QString InstrumentTypeFilter;
+    static userInfo userDataStatic;
 
     userInfo login( QString user_name,  QString password);
     QHash<QString,PortFolioData_Less>  getPortfoliosTableData(QAtomicInt &reloadSortSettFlg,int &AlgoCount,Combined_Tracker_Table_Model *comb_tracker_model,QHash<QString, PortfolioAvgPrice> &averagePriceList,QString user_id, QStringList TradedPortFolioList, QStringList &PortFoliosToDelete );
 
     //QHash<QString, contract_table>  getContractTable( QHash<int , QStringList> &m_ContractDetails_Grouped_,userInfo userData);
     QHash<QString, contract_table>  getContractTable( QHash<int , QStringList> &m_ContractDetails_Grouped_,QHash<QString, QStringList> &_m_ContractDetailsFiltered,userInfo userData);
+    QHash<QString, int>  get_SettPrice();
 
     QSqlQuery runQuery(QString qry_str);
     bool updateDB_Table(QString query_str,QString &msg);

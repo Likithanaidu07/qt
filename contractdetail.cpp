@@ -12,6 +12,8 @@ QHash<QString, contract_table> ContractDetail::m_ContractDetails_Hash; //store t
 
 QHash<QString, QStringList> ContractDetail::m_ContractDetailsFiltered;
 
+QHash<QString, int> ContractDetail::m_SettPrice;
+
 //QStandardItemModel* ContractDetail::model_searchInstrument_BOX_Leg1  = nullptr;
 //QStandardItemModel* ContractDetail::model_start_strike_BFLY = nullptr;
 //QStandardItemModel* ContractDetail::model_searchInstrument_F2F_Leg1 = nullptr;
@@ -707,6 +709,17 @@ QString ContractDetail::GetOptionType(int token, int type)
         return "-";
 
 }
+QString ContractDetail::GetOptionType(QString token)
+{
+    if (token == "0")
+        return "-";
+    if(m_ContractDetails_Hash.contains(token)){
+        return m_ContractDetails_Hash[token].OptionType;
+    }
+    else
+        return "-";
+
+}
 
 
 QString ContractDetail::GetExpiry(int token, QString format, int type)
@@ -919,6 +932,17 @@ qint64 ContractDetail::GetExpiry(int token,int type)
 
      return false;
  }
+
+
+ QHash<QString,int> ContractDetail::get_SettPrice(){
+     if (m_SettPrice.isEmpty()) {
+         mysql_conn con(0,"SettPrice_conn");
+         m_SettPrice = con.get_SettPrice();
+      }
+
+     return m_SettPrice;
+ }
+
 /*
  void ContractDetail::StoreContractToLocalFile() {
      QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);

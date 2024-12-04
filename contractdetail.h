@@ -41,6 +41,7 @@ public:
 
     static QHash<QString, QStringList> m_ContractDetailsFiltered;
 
+    static QHash<QString, int> m_SettPrice;
 
 
 //    static QStandardItemModel *model_searchInstrument_BOX_Leg1; // used in add algo window  for BOX startegy
@@ -63,6 +64,9 @@ public:
     QStringList Get_Tokens_For_PortfolioType(PortfolioType type);
     QStringList Get_Tokens_For_IntrumentType(InstrumentType type);
 
+    QHash<QString, int> get_SettPrice();
+
+
    // QHash<QString, contract_table> GetFutureContracts();
     QHash<QString, contract_table> GetContracts(QString type);
 
@@ -77,6 +81,8 @@ public:
     QString GetStrikePrice(int token, int type);
     double GetVolumeFreezeQty(int token, int type);
     QString GetOptionType(int token, int type);
+    QString GetOptionType(QString token);
+
     QString GetExpiry(int token, QString format, int type);
     QString GetExpiry(QString format, long long Expiry) const;
     QDateTime GetExpiryDate(int token, int type);

@@ -19,6 +19,7 @@
 extern MainWindow *MainWindowObj;
 
 //#include "CombinedTracker/combined_tracker_table_model.h"
+userInfo mysql_conn::userDataStatic;
 
 
 mysql_conn::mysql_conn(QObject *parent,QString conne_name):
@@ -119,8 +120,14 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
         bool ok = checkDBOpened(msg);
         userLoginInfo.loginResponse = msg;
         if(ok){
-           // QSqlQuery query("SELECT UserId, UserName,Password,STKOpenLimit,IDXOpenLimit,MaxPortfolioCount,BFLY_BIDInFilter,BYInFilter,F2FInFilter,CRInFilter,F1_F2InFilter FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
-            QSqlQuery query("SELECT * FROM rt_usertable WHERE UserName='"+UserName_+"'", db);
+
+
+            QString queryStr = "SELECT rms_table.exp_mar, rt_usertable.* FROM rms_table JOIN rt_usertable ON rms_table.foo_user_id = rt_usertable.UserID WHERE rt_usertable.UserName = '"+UserName_+"'";
+
+            QSqlQuery query(db);
+            query.prepare(queryStr);
+
+
             if(!query.exec())
             {
                 // Error Handling, check query.lastError(), probably return
@@ -212,6 +219,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                     userLoginInfo.errorCode = T_LoginErroCode::OK;
                     userLoginInfo.IDXOpenLimit = query.value(rec.indexOf("IDXOpenLimit")).toInt();
                     userLoginInfo.STKOpenLimit = query.value(rec.indexOf("STKOpenLimit")).toInt();
+                    userLoginInfo.exp_mar =  query.value(rec.indexOf("exp_mar")).toLongLong();
 
                     //make the entry to logs table
 
@@ -338,6 +346,8 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
         }
     }
     // QSqlDatabase::removeDatabase("login_conn");
+
+    userDataStatic = userLoginInfo;
     return userLoginInfo;
 }
 void  mysql_conn::getSummaryTableData(int &OrderCount,QString user_id)
@@ -1838,8 +1848,6 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
             liners_model->setDataList(liners_listTmp);
 
 
-
-
         }
     }
 }
@@ -1967,11 +1975,22 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
     QString msg;
     QList<QStringList> netPos_data_listTmp;
     QHash<QString, net_pos_data_> net_pos_dataList;
+    QHash<QString, int> spanHash;
+    SlowData slowData;
+    QHash<QString, MBP_Data_Struct>  MBP_Data_Hash = slowData.getMBP_Data_Hash();
+    QStringList slowDataCurrentTokens = slowData.getMonitoringTokens();
+    QHash<QString, int> sett_price = ContractDetail::getInstance().get_SettPrice();
+
+    QStringList tokenInOrder;
 
     bool ok = checkDBOpened(msg);
     if (ok) {
         // Define the SQL query to retrieve the desired data
-        QString query_str = "SELECT Trades.TokenNo, Contract.StockName, Trades.BuySellIndicator, Contract.LotSize, ROUND((SUM(Trades.TradedPrice * Trades.TotalVolume) / SUM(Trades.TotalVolume) / " + QString::number(devicer) + "), 2) AS AvgPrice, SUM(TotalVolume) AS Qty, ROUND((SUM(Trades.TradedPrice * Trades.TotalVolume) / " + QString::number(devicer) + "), 2) AS buysellvalue FROM Trades JOIN Contract ON Contract.Token = Trades.TokenNo WHERE Trades.TraderId = '" + user_id + "' GROUP BY Trades.TokenNo, Trades.BuySellIndicator, Contract.StockName ORDER BY Contract.StockName ASC";
+        QString query_str = "SELECT Trades.TokenNo, Contract.StockName,Contract.OptionType,Contract.InstrumentName, Trades.BuySellIndicator, Contract.LotSize, Trades.Expiry, "
+                            "ROUND((SUM(Trades.TradedPrice * Trades.TotalVolume) / SUM(Trades.TotalVolume) / " + QString::number(devicer) + "), 2) AS AvgPrice, "
+                             "SUM(TotalVolume) AS Qty, ROUND((SUM(Trades.TradedPrice * Trades.TotalVolume) / " + QString::number(devicer) + "), 2) AS buysellvalue "
+                             "FROM Trades JOIN Contract ON Contract.Token = Trades.TokenNo WHERE Trades.TraderId = '" + user_id +
+                             "' GROUP BY Trades.TokenNo, Trades.Expiry,Trades.BuySellIndicator, Contract.StockName";
         QSqlQuery query(query_str, db);
         if (!query.exec()) {
             // Error Handling, check query.lastError()
@@ -1985,23 +2004,32 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
              double Qty = query.value(rec.indexOf("Qty")).toDouble();
              double AvgPrice = query.value(rec.indexOf("AvgPrice")).toDouble();
              QString StockName = query.value(rec.indexOf("StockName")).toString();
+             QString OptionType = query.value(rec.indexOf("OptionType")).toString();
+             QString InstrumentName = query.value(rec.indexOf("InstrumentName")).toString();
+             QString Expiry = query.value(rec.indexOf("Expiry")).toString();
+
              int lotSize = query.value(rec.indexOf("LotSize")).toInt();
              double buysellvalue = query.value(rec.indexOf("buysellvalue")).toDouble();
 
-             QString key = QString::number(TokenNo);
-             if (net_pos_dataList.contains(key)) {
+             QString TokenStr = QString::number(TokenNo);             
+
+             if (net_pos_dataList.contains(TokenStr)) {
                     if (buy_sell == "1") {
-                        net_pos_dataList[key].Buy_Avg_Price += AvgPrice;
-                        net_pos_dataList[key].Buy_Total_Lot += Qty;
-                        net_pos_dataList[key].Buy_Price += buysellvalue;
+                        net_pos_dataList[TokenStr].Buy_Avg_Price += AvgPrice;
+                        net_pos_dataList[TokenStr].Buy_Total_Lot += Qty;
+                        net_pos_dataList[TokenStr].Buy_Price += buysellvalue;
                     } else {
-                        net_pos_dataList[key].Sell_Avg_Price += AvgPrice;
-                        net_pos_dataList[key].Sell_Total_Lot += Qty;
-                        net_pos_dataList[key].Sell_Price += buysellvalue;
+                        net_pos_dataList[TokenStr].Sell_Avg_Price += AvgPrice;
+                        net_pos_dataList[TokenStr].Sell_Total_Lot += Qty;
+                        net_pos_dataList[TokenStr].Sell_Price += buysellvalue;
                     }
              } else {
                     net_pos_data_ net_pos;
                     net_pos.Stock_Name = StockName;
+                    net_pos.OptionType = OptionType;
+                    net_pos.InstrumentName = InstrumentName;
+                    net_pos.Expiry = Expiry;
+
                     net_pos.lotSize = lotSize;
                     net_pos.Buy_Avg_Price = (buy_sell == "1") ? AvgPrice : 0;
                     net_pos.Buy_Total_Lot = (buy_sell == "1") ? Qty : 0;
@@ -2009,10 +2037,44 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
                     net_pos.Sell_Avg_Price = (buy_sell == "2") ? AvgPrice : 0;
                     net_pos.Sell_Total_Lot = (buy_sell == "2") ? Qty : 0;
                     net_pos.Sell_Price = (buy_sell == "2") ? buysellvalue : 0;
+                    net_pos.M2M = 0;
+                    net_pos.MarginUsed = 0;
+                    net_pos.exp = 0;
+                    net_pos.token_number = TokenStr;
+                    net_pos_dataList.insert(TokenStr, net_pos);
 
-                    net_pos_dataList.insert(key, net_pos);
+                    tokenInOrder.append(TokenStr);
+
+                    spanHash[TokenStr] = 0;
+                    if(!slowDataCurrentTokens.contains(TokenStr))
+                        slowData.addLeg_n_token(TokenStr);
+
              }
             }
+
+            /***************Get Span data for tokens***************************/
+            QStringList distinct_tokens = net_pos_dataList.keys();
+            QString tokenListStr = "(" + distinct_tokens.join(",") + ")";
+            QString sqlQuery = QString("SELECT Token, StockName, Min_Value, Max_Value FROM Span WHERE Token IN %1").arg(tokenListStr);
+            QSqlQuery query2(sqlQuery,db);
+            if( !query2.exec() )
+            {
+                qDebug()<<query2.lastError().text();
+            }
+            else{
+                QSqlRecord rec1 = query2.record();
+                while (query2.next())
+                {
+                    QString TokenNo = query2.value(rec1.indexOf("Token")).toString();
+                    if(spanHash.contains(TokenNo)){
+                        int Min_Value = query2.value(rec1.indexOf("Min_Value")).toInt();
+                        spanHash[TokenNo] = Min_Value;
+                    }
+                }
+            }
+            query2.finish();
+            /******************************************************************/
+
 
             // Calculate the net quantities and summarize the data
             QHashIterator<QString, net_pos_data_> iter(net_pos_dataList);
@@ -2026,24 +2088,172 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
              NetQty_summary += (net_pos_dataList[TokenNo].Net_Qty) / net_pos_dataList[TokenNo].lotSize;
              BuyQty_summary += (net_pos_dataList[TokenNo].Buy_Total_Lot) / net_pos_dataList[TokenNo].lotSize;
              SellQty_summary += (net_pos_dataList[TokenNo].Sell_Total_Lot) / net_pos_dataList[TokenNo].lotSize;
-
              double Profit = net_pos_dataList[TokenNo].Buy_Price - net_pos_dataList[TokenNo].Sell_Price;
              Profit_summary += Profit;
 
-             QStringList rowList;
-             rowList.append(net_pos_dataList[TokenNo].Stock_Name);
-             rowList.append(QString::number((net_pos_dataList[TokenNo].Buy_Total_Lot) / net_pos_dataList[TokenNo].lotSize));
-             rowList.append(QString::number((net_pos_dataList[TokenNo].Sell_Total_Lot) / net_pos_dataList[TokenNo].lotSize));
-             rowList.append(fixDecimal(net_pos_dataList[TokenNo].Buy_Price, decimal_precision));
-             rowList.append(fixDecimal(net_pos_dataList[TokenNo].Sell_Price, decimal_precision));
-             rowList.append(fixDecimal((net_pos_dataList[TokenNo].Buy_Avg_Price), decimal_precision));
-             rowList.append(fixDecimal((net_pos_dataList[TokenNo].Sell_Avg_Price), decimal_precision));
-             rowList.append(QString::number(net_pos_dataList[TokenNo].Net_Qty / net_pos_dataList[TokenNo].lotSize));
-             rowList.append(fixDecimal(Profit, decimal_precision));
-             rowList.append("-");
-             rowList.append(TokenNo); // TokenNo should be the last one
+             /***************M2M calcualtion**********************/
+             if(MBP_Data_Hash.contains(TokenNo))
+             {
+                 MBP_Data_Struct mbpData = MBP_Data_Hash[TokenNo];
+                 if (net_pos_dataList[TokenNo].Net_Qty > 0) {
+                    net_pos_dataList[TokenNo].M2M = ((((mbpData.lastTradedPrice.toDouble()  / devicer) - net_pos_dataList[TokenNo].Buy_Avg_Price) * net_pos_dataList[TokenNo].Net_Qty));
+                 }
+                 else if (net_pos_dataList[TokenNo].Net_Qty < 0) {
+                    net_pos_dataList[TokenNo].M2M = ((((mbpData.lastTradedPrice.toDouble() / devicer) - net_pos_dataList[TokenNo].Sell_Avg_Price) * net_pos_dataList[TokenNo].Net_Qty));
+                 }
+             }
+             /******************************************************************/
 
-             netPos_data_listTmp.append(rowList);
+
+
+
+            }
+
+
+
+
+            /***************MarginUsed calcualtion**********************/
+              //group net_pos_dataList  based on InstrumentName
+              QHash<QString, QStringList> net_pos_dataList_grouped_by_InstrumentName;
+              for (auto it = net_pos_dataList.constBegin(); it != net_pos_dataList.constEnd(); ++it) {
+                    const QString& token = it.key();
+                    const net_pos_data_& netPos = it.value();
+
+                    // Group tokens by InstrumentName
+                    if (!net_pos_dataList_grouped_by_InstrumentName.contains(netPos.InstrumentName)) {
+                        net_pos_dataList_grouped_by_InstrumentName[netPos.InstrumentName] = QStringList();
+                    }
+                    net_pos_dataList_grouped_by_InstrumentName[netPos.InstrumentName].append(token);
+             }
+
+             //iterate grouped net pos data and calculate    MarginUsed
+             for (auto it = net_pos_dataList_grouped_by_InstrumentName.constBegin();
+                     it != net_pos_dataList_grouped_by_InstrumentName.constEnd(); ++it) {
+
+                    QString instrumentName = it.key();        // Get the InstrumentName
+                    QStringList tokenList = it.value();       // Get the list of tokens
+                    QStringList reorderedList;  // this should contin the token same as in the order like it retreved from DB, For Margin used calculation
+                    //To rearrange the tokenList to match the order of tokenInOrder,
+                    //while omitting tokens not in tokenList and ensuring the existing ones follow the order in tokenInOrder
+                    for (const QString& token : tokenInOrder) {
+                        if (tokenList.contains(token)) {
+                           reorderedList.append(token);
+                        }
+                    }
+
+                    double spanToSubtract = 0;
+                    double buyTotalPrice = 0;
+                    for (const QString& TokenNo : reorderedList) {
+                        net_pos_data_  net_pos_data = net_pos_dataList[TokenNo];
+                        int span = 0;
+                        if (spanHash.contains(TokenNo))
+                            span = spanHash[TokenNo];
+
+                        net_pos_data.Span = span;
+
+                        //buy side
+                        if (net_pos_data.Net_Qty > 0)
+                        {
+                            double value = 0;// net_pos_data.BuyAvgPrice;
+                            buyTotalPrice = buyTotalPrice+net_pos_data.Buy_Total_Lot;
+
+                            // FUT option
+                            if (net_pos_data.OptionType == "XX")
+                            {
+                                net_pos_dataList[TokenNo].MarginUsed = (double)value + (double)span + ((double)value * (double)userDataStatic.exp_mar) / devicer;
+                                net_pos_dataList[TokenNo].MarginUsed = abs(net_pos_dataList[TokenNo].MarginUsed * net_pos_data.Net_Qty);
+                            }
+                            // CE/PE option
+                            else
+                            {
+                                net_pos_dataList[TokenNo].MarginUsed = abs(value * net_pos_data.Net_Qty)+ buyTotalPrice;
+                                spanToSubtract = spanToSubtract + abs(span * net_pos_data.Net_Qty);
+                            }
+                        }
+                        //sell side
+                        else if (net_pos_data.Net_Qty < 0)
+                        {
+                            double value = 0;// net_pos_data.SellAvgPrice;
+                            net_pos_data.exp = ((double)value * (double)userDataStatic.exp_mar) / devicer;
+
+
+                            // FUT option
+                            if (net_pos_data.OptionType == "XX")
+                            {
+                                net_pos_dataList[TokenNo].MarginUsed = (double)span + ((double)value * (double)userDataStatic.exp_mar) / devicer;
+                                net_pos_dataList[TokenNo].MarginUsed = abs(net_pos_dataList[TokenNo].MarginUsed * net_pos_data.Net_Qty);
+                            }
+                            // CE/PE option
+                            else
+                            {
+                                //find the tokennumenr(instrumennam+expriy+XX) -> Find LTP --> value
+                                /*int value_token = ContractDetail.GetTokenNumebr(net_pos_data.InstrumentName, net_pos_data.ExpiryDate, "XX");
+                                INTERACTIVE_ONLY_MBP_DATA mbpData = null;
+                                if (SlowDataReader.GetInstance().GetLeg(value_token, out mbpData))
+                                {
+                                    value = mbpData.LastTradedPrice;
+                                }*/
+
+
+
+                                // Define the base date: January 1, 1980, 00:00:00 UTC
+                              //  QDateTime baseDate(QDate(1980, 1, 1), QTime(0, 0), Qt::UTC);
+
+                                // Add seconds to the base date
+                               // qint64 expirySeconds = net_pos_data.Expiry.toLongLong();
+                               // QDateTime expiryDate = baseDate.addSecs(expirySeconds);
+
+                                // Format the date to "MMM" (e.g., "Jan", "Feb")
+                                //QString formattedDate = expiryDate.toString("MMM");
+                                QString key_sett_price =  net_pos_data.Stock_Name;//net_pos_data.Stock_Name + "_" + formattedDate + "_XX";// + net_pos_data.OptionType;
+
+                                if (sett_price.contains(key_sett_price)){
+                                    value = sett_price[key_sett_price];
+                                }
+
+                                net_pos_dataList[TokenNo].MarginUsed = (double)span + ((double)value * (double)userDataStatic.exp_mar) / devicer;
+
+                                net_pos_dataList[TokenNo].MarginUsed = abs(net_pos_dataList[TokenNo].MarginUsed * net_pos_data.Net_Qty);
+                                //net_pos_data.exp = ((double)value * (double)userDataStatic.exp_mar) / devicer;
+
+
+                            }
+                        }
+
+
+
+                    }
+            }
+
+
+            /********************************************************************************/
+
+
+
+           QList<QStringList> netPos_data_listTmp; // Assuming this is declared as a list of QStringList
+
+           for (auto it = net_pos_dataList.constBegin(); it != net_pos_dataList.constEnd(); ++it) {
+                 QString tokenNo = it.key();              // TokenNo (key in QHash)
+                 const net_pos_data_& data = it.value();  // Access the net_pos_data_ object
+
+                 QStringList rowList;
+                 //rowList.append(data.Stock_Name+"("+data.token_number+")"); // Stock_Name
+                 rowList.append(data.Stock_Name); // Stock_Name
+                 rowList.append(QString::number(data.Buy_Total_Lot / data.lotSize)); // Buy Total Lot
+                 rowList.append(QString::number(data.Sell_Total_Lot / data.lotSize)); // Sell Total Lot
+                 rowList.append(fixDecimal(data.Buy_Price, decimal_precision)); // Buy Price
+                 rowList.append(fixDecimal(data.Sell_Price, decimal_precision)); // Sell Price
+                 rowList.append(fixDecimal(data.Buy_Avg_Price, decimal_precision)); // Buy Avg Price
+                 rowList.append(fixDecimal(data.Sell_Avg_Price, decimal_precision)); // Sell Avg Price
+                 rowList.append(QString::number(data.Net_Qty / data.lotSize)); // Net Qty
+                 double Profit = (data.Sell_Price - data.Buy_Price); // Example profit calculation
+                 rowList.append(fixDecimal(Profit, decimal_precision)); // Profit
+                 rowList.append(fixDecimal(data.M2M, decimal_precision)); // M2M
+                 rowList.append(QString::number((data.MarginUsed))); // MarginUsed
+                 rowList.append(QString::number((data.lotSize))); //lotSize
+                 rowList.append(tokenNo); // TokenNo as the last element
+
+                 netPos_data_listTmp.append(rowList);
             }
 
             // Sort the data based on StockName (first column in rowList)
@@ -2396,6 +2606,53 @@ QHash<QString, contract_table>  mysql_conn::getContractTable( QHash<int , QStrin
     return contractTableData;
 }
 
+
+QHash<QString, int>  mysql_conn::get_SettPrice()
+{
+
+    QMutexLocker lock(&mutex);
+    QString queryStr = "SELECT StockName, Close FROM BhavCopy";
+
+
+    QHash<QString, int> SettPrice;
+    QString msg;
+    bool ok = checkDBOpened(msg);
+    if(ok)
+    {
+        QSqlQuery query(queryStr, db);
+        if( !query.exec() )
+        {
+            qDebug()<<"get_SettPrice: "<<query.lastError().text();
+        }
+        else{
+
+            QSqlRecord rec = query.record();
+            while (query.next())
+            {
+                QString StockName = query.value("StockName").toString();
+              //  QString Expiry = query.value("Expiry").toString();
+              //  QString Option_type = query.value("Option_type").toString();
+                int Sett_price = query.value("Close").toInt();
+
+//                QString monthAbbreviation;
+
+//                // Parse the string into a QDate object
+//                QDate date = QDate::fromString(Expiry, "dd-MMM-yyyy");
+//                if (date.isValid()) {
+//                    // Get the month abbreviation
+//                    monthAbbreviation = date.toString("MMM");
+//                }
+
+//                QString key = Symbol + "_" + monthAbbreviation + "_" + Option_type;
+                SettPrice.insert(StockName, Sett_price);
+
+            }
+
+        }
+
+    }
+    return SettPrice;
+}
 bool mysql_conn::deleteAlgo(QString PortfolioNumber,QString &msg)
 {
     QMutexLocker lock(&mutex);

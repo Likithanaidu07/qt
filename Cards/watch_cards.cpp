@@ -71,25 +71,25 @@ void Watch_cards::loadWatch_InstrumentNames(){
 
 }
 
-void Watch_cards::saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList) {
-    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QString fileName = appDataPath+"/Data/watch_cache.bin";
-    QFile file(fileName);
-    if (!file.open(QIODevice::WriteOnly)) {
-        qWarning("Could not open file for writing.");
-        return;
-    }
-    QDataStream out(&file);
-    out << indicesDataList;
-    file.close();
-}
+//void Watch_cards::saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList) {
+//    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+//    QString fileName = appDataPath+"/Data/indices_data.bin";
+//    QFile file(fileName);
+//    if (!file.open(QIODevice::WriteOnly)) {
+//        qWarning("Could not open file for writing.");
+//        return;
+//    }
+//    QDataStream out(&file);
+//    out << indicesDataList;
+//    file.close();
+//}
 
 void Watch_cards::loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList) {
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
-    QString fileName = appDataPath+"/Data/watch_cache.bin";
+    QString fileName = appDataPath+"/Data/indices_data.bin";
     QFile file(fileName);
     if (!file.open(QIODevice::ReadOnly)) {
-        qWarning("Could not open file for reading--> watch_cache.bin");
+        qWarning("Could not open file for reading--> indices_data.bin");
         return;
     }
     QDataStream in(&file);

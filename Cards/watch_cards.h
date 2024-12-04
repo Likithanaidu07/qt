@@ -47,7 +47,7 @@ private:
     void updateSelecteWatch_UI( Indices_Data_Struct data);
     void addToSavedWatchItems(Indices_Data_Struct data, QString key);
     void removeFromSavedWatchItems(Indices_Data_Struct data, QString key);
-    void saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList);
+    //void saveIndicesDataListToFile(const QHash<QString, Indices_Data_Struct> &indicesDataList);
     void loadIndicesDataListFromFile(QHash<QString, Indices_Data_Struct> &indicesDataList);
     void refreshIndicesListViewItem(const Indices_Data_Struct& data);
 
