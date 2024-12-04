@@ -122,7 +122,7 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
         if(ok){
 
 
-            QString queryStr = "SELECT rms_table.exp_mar, rt_usertable.* FROM rms_table JOIN rt_usertable ON rms_table.foo_user_id = rt_usertable.UserID WHERE rt_usertable.UserName = '"+UserName_+"'";
+            QString queryStr = "SELECT rt_usertable.*, COALESCE(rms_table.exp_mar, 0) AS exp_mar FROM rt_usertable LEFT JOIN rms_table ON rms_table.foo_user_id = rt_usertable.UserID WHERE rt_usertable.UserName = '"+UserName_+"'";
 
             QSqlQuery query(db);
             query.prepare(queryStr);
