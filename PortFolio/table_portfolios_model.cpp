@@ -1319,3 +1319,9 @@ void Table_Portfolios_Model::editCancelled(int row) {
 }
 
 
+QStringList Table_Portfolios_Model::getHeaders(){
+     return header;
+}
+
+
+

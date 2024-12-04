@@ -2579,337 +2579,342 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
     algo_data_insert_status ret = algo_data_insert_status::FAILED;
     {
         bool ok = checkDBOpened(msg);
-        if(ok){
+        if (ok) {
             QSqlQuery query(db);
             int PortfoliosCount = -1;
-            query.prepare("SELECT * FROM Portfolios WHERE TraderID=" + (data.user_id));
 
-            if( !query.exec() )
-            {
+            query.prepare("SELECT COUNT(*) FROM Portfolios WHERE TraderID = :user_id AND PortfolioType != 208");
+            query.bindValue(":user_id", data.user_id);
+
+            if (!query.exec()) {
                 msg = query.lastError().text();
-                qDebug()<<query.lastError().text();
-            }
-            else{
-                PortfoliosCount = query.size();
-                //if portfolio limit reaches do not insert
-                if(PortfoliosCount>=MaxPortfolioCount){
+                qDebug() << query.lastError().text();
+            } else {
+                if (query.next()) {
+                    PortfoliosCount = query.value(0).toInt(); // Retrieve the count
+                }
+
+                // Check if the portfolio limit has been reached
+                if (PortfoliosCount >= MaxPortfolioCount) {
                     ret = algo_data_insert_status::LIMIT_REACHED;
                     msg = "Maximum Portfolio Limit Reached";
                 }
                 else{
-                   // QString str = "";
-                        //F2F
-                        if(data.algo_type==QString::number(PortfolioType::F2F)){
-                            query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
-                                          "Leg1TokenNo, Leg2TokenNo"
-                                          ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
-                                          "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                          "OrderQuantity,ModifyType) "
-                                          "VALUES (:PortfolioType, :TraderID, :Status, "
-                                          ":Leg1TokenNo, :Leg2TokenNo,"
-                                          ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
-                                          ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                          ":OrderQuantity,:ModifyType)");
-                            query.bindValue(":PortfolioType", data.algo_type);
-                            query.bindValue(":TraderID", data.user_id);
-                            query.bindValue(":Status", data.Algo_Status);
-                            query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
-                            query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
-                            query.bindValue(":BuyPriceDifference", 0);
-                            query.bindValue(":BuyTotalQuantity", 0);
-                            query.bindValue(":BuyTradedQuantity", 0);
-                            query.bindValue(":SellPriceDifference", 0);
-                            query.bindValue(":SellTotalQuantity", 0);
-                            query.bindValue(":SellTradedQuantity", 0);
-                            query.bindValue(":OrderQuantity", 0);
-                            query.bindValue(":ModifyType", 1);
+                    // QString str = "";
+                    //F2F
+                    if(data.algo_type==QString::number(PortfolioType::F2F)){
+                        query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
+                                      "Leg1TokenNo, Leg2TokenNo"
+                                      ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                                      "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
+                                      "OrderQuantity,ModifyType) "
+                                      "VALUES (:PortfolioType, :TraderID, :Status, "
+                                      ":Leg1TokenNo, :Leg2TokenNo,"
+                                      ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                                      ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
+                                      ":OrderQuantity,:ModifyType)");
+                        query.bindValue(":PortfolioType", data.algo_type);
+                        query.bindValue(":TraderID", data.user_id);
+                        query.bindValue(":Status", data.Algo_Status);
+                        query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
+                        query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
+                        query.bindValue(":BuyPriceDifference", 0);
+                        query.bindValue(":BuyTotalQuantity", 0);
+                        query.bindValue(":BuyTradedQuantity", 0);
+                        query.bindValue(":SellPriceDifference", 0);
+                        query.bindValue(":SellTotalQuantity", 0);
+                        query.bindValue(":SellTradedQuantity", 0);
+                        query.bindValue(":OrderQuantity", 0);
+                        query.bindValue(":ModifyType", 1);
 
 
-                        }
-                        //BFLY
-                        else if(data.algo_type==QString::number(PortfolioType::BY)){
-                            query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
-                                          "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
-                                          ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
-                                          "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                          "OrderQuantity) "
-                                          "VALUES (:PortfolioType, :TraderID, :Status,"
-                                          ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
-                                          ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
-                                          ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                          ":OrderQuantity)");
-                            query.bindValue(":PortfolioType", data.algo_type);
-                            query.bindValue(":TraderID", data.user_id);
-                            query.bindValue(":Status", data.Algo_Status);
-                            query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
-                            query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
-                            query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
-                            query.bindValue(":BuyPriceDifference", 0);
-                            query.bindValue(":BuyTotalQuantity", 0);
-                            query.bindValue(":BuyTradedQuantity", 0);
-                            query.bindValue(":SellPriceDifference", 0);
-                            query.bindValue(":SellTotalQuantity", 0);
-                            query.bindValue(":SellTradedQuantity", 0);
-                            query.bindValue(":OrderQuantity", 0);
+                    }
+                    //BFLY
+                    else if(data.algo_type==QString::number(PortfolioType::BY)){
+                        query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
+                                      "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
+                                      ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                                      "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
+                                      "OrderQuantity) "
+                                      "VALUES (:PortfolioType, :TraderID, :Status,"
+                                      ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
+                                      ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                                      ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
+                                      ":OrderQuantity)");
+                        query.bindValue(":PortfolioType", data.algo_type);
+                        query.bindValue(":TraderID", data.user_id);
+                        query.bindValue(":Status", data.Algo_Status);
+                        query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
+                        query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
+                        query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
+                        query.bindValue(":BuyPriceDifference", 0);
+                        query.bindValue(":BuyTotalQuantity", 0);
+                        query.bindValue(":BuyTradedQuantity", 0);
+                        query.bindValue(":SellPriceDifference", 0);
+                        query.bindValue(":SellTotalQuantity", 0);
+                        query.bindValue(":SellTradedQuantity", 0);
+                        query.bindValue(":OrderQuantity", 0);
 
-                        }
-                        //CON-REV
-                        else if(data.algo_type==QString::number(PortfolioType::CR)){
-                            query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
-                                          "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
-                                          ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
-                                          "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                          "OrderQuantity) "
-                                          "VALUES (:PortfolioType, :TraderID, :Status,"
-                                          ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
-                                          ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
-                                          ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                          ":OrderQuantity)");
-                            query.bindValue(":PortfolioType", data.algo_type);
-                            query.bindValue(":TraderID", data.user_id);
-                            query.bindValue(":Status", data.Algo_Status);
-                            query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
-                            query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
-                            query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
-                            query.bindValue(":BuyPriceDifference", 0);
-                            query.bindValue(":BuyTotalQuantity", 0);
-                            query.bindValue(":BuyTradedQuantity", 0);
-                            query.bindValue(":SellPriceDifference", 0);
-                            query.bindValue(":SellTotalQuantity", 0);
-                            query.bindValue(":SellTradedQuantity", 0);
-                            query.bindValue(":OrderQuantity", 0);
+                    }
+                    //CON-REV
+                    else if(data.algo_type==QString::number(PortfolioType::CR)){
+                        query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
+                                      "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
+                                      ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                                      "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
+                                      "OrderQuantity) "
+                                      "VALUES (:PortfolioType, :TraderID, :Status,"
+                                      ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
+                                      ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                                      ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
+                                      ":OrderQuantity)");
+                        query.bindValue(":PortfolioType", data.algo_type);
+                        query.bindValue(":TraderID", data.user_id);
+                        query.bindValue(":Status", data.Algo_Status);
+                        query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
+                        query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
+                        query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
+                        query.bindValue(":BuyPriceDifference", 0);
+                        query.bindValue(":BuyTotalQuantity", 0);
+                        query.bindValue(":BuyTradedQuantity", 0);
+                        query.bindValue(":SellPriceDifference", 0);
+                        query.bindValue(":SellTotalQuantity", 0);
+                        query.bindValue(":SellTradedQuantity", 0);
+                        query.bindValue(":OrderQuantity", 0);
 
-                        }
+                    }
 
-                        //CRJELLY
-                        else if(data.algo_type==QString::number(PortfolioType::CR_JELLY)){
-                            query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
-                                          "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
-                                          ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
-                                          "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                          "OrderQuantity,ModifyType) "
-                                          "VALUES (:PortfolioType, :TraderID, :Status,"
-                                          ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
-                                          ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
-                                          ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                          ":OrderQuantity,:ModifyType)");
-                            query.bindValue(":PortfolioType", data.algo_type);
-                            query.bindValue(":TraderID", data.user_id);
-                            query.bindValue(":Status", data.Algo_Status);
-                            query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
-                            query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
-                            query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
-                            query.bindValue(":BuyPriceDifference", 0);
-                            query.bindValue(":BuyTotalQuantity", 0);
-                            query.bindValue(":BuyTradedQuantity", 0);
-                            query.bindValue(":SellPriceDifference", 0);
-                            query.bindValue(":SellTotalQuantity", 0);
-                            query.bindValue(":SellTradedQuantity", 0);
-                            query.bindValue(":OrderQuantity", 0);
-                            query.bindValue(":ModifyType", 1);
+                    //CRJELLY
+                    else if(data.algo_type==QString::number(PortfolioType::CR_JELLY)){
+                        query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
+                                      "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
+                                      ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                                      "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
+                                      "OrderQuantity,ModifyType) "
+                                      "VALUES (:PortfolioType, :TraderID, :Status,"
+                                      ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
+                                      ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                                      ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
+                                      ":OrderQuantity,:ModifyType)");
+                        query.bindValue(":PortfolioType", data.algo_type);
+                        query.bindValue(":TraderID", data.user_id);
+                        query.bindValue(":Status", data.Algo_Status);
+                        query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
+                        query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
+                        query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
+                        query.bindValue(":BuyPriceDifference", 0);
+                        query.bindValue(":BuyTotalQuantity", 0);
+                        query.bindValue(":BuyTradedQuantity", 0);
+                        query.bindValue(":SellPriceDifference", 0);
+                        query.bindValue(":SellTotalQuantity", 0);
+                        query.bindValue(":SellTradedQuantity", 0);
+                        query.bindValue(":OrderQuantity", 0);
+                        query.bindValue(":ModifyType", 1);
 
-                        }
-                        //BOX
-                        else if(data.algo_type==QString::number(PortfolioType::BOX)){
-                            query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
-                                          "Leg1TokenNo, Leg2TokenNo, Leg3TokenNo, Leg4TokenNo, Leg5TokenNo"
-                                          ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
-                                          "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                          "OrderQuantity,AdditionalData1,AdditionalData2,AdditionalData3) "
-                                          "VALUES (:PortfolioType, :TraderID, :Status, "
-                                          ":Leg1TokenNo, :Leg2TokenNo, :Leg3TokenNo, :Leg4TokenNo, :Leg5TokenNo,"
-                                          ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
-                                          ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                          ":OrderQuantity, :AdditionalData1, :AdditionalData2, :AdditionalData3)");
-                            query.bindValue(":PortfolioType", data.algo_type);
-                            query.bindValue(":TraderID", data.user_id);
-                            query.bindValue(":Status", data.Algo_Status);
-                            query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
-                            query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
-                            query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
-                            query.bindValue(":Leg4TokenNo", data.Leg4_token_number);
-                            query.bindValue(":Leg5TokenNo", data.Leg5_token_number);
-                            query.bindValue(":BuyPriceDifference", 0);
-                            query.bindValue(":BuyTotalQuantity", 0);
-                            query.bindValue(":BuyTradedQuantity", 0);
-                            query.bindValue(":SellPriceDifference", 0);
-                            query.bindValue(":SellTotalQuantity", 0);
-                            query.bindValue(":SellTradedQuantity", 0);
-                            query.bindValue(":OrderQuantity", 0);
-                            query.bindValue(":AdditionalData1", "CE");
-                            query.bindValue(":AdditionalData2", "PE");
-                            query.bindValue(":AdditionalData3", data.option_type);
+                    }
+                    //BOX
+                    else if(data.algo_type==QString::number(PortfolioType::BOX)){
+                        query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
+                                      "Leg1TokenNo, Leg2TokenNo, Leg3TokenNo, Leg4TokenNo, Leg5TokenNo"
+                                      ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                                      "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
+                                      "OrderQuantity,AdditionalData1,AdditionalData2,AdditionalData3) "
+                                      "VALUES (:PortfolioType, :TraderID, :Status, "
+                                      ":Leg1TokenNo, :Leg2TokenNo, :Leg3TokenNo, :Leg4TokenNo, :Leg5TokenNo,"
+                                      ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                                      ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
+                                      ":OrderQuantity, :AdditionalData1, :AdditionalData2, :AdditionalData3)");
+                        query.bindValue(":PortfolioType", data.algo_type);
+                        query.bindValue(":TraderID", data.user_id);
+                        query.bindValue(":Status", data.Algo_Status);
+                        query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
+                        query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
+                        query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
+                        query.bindValue(":Leg4TokenNo", data.Leg4_token_number);
+                        query.bindValue(":Leg5TokenNo", data.Leg5_token_number);
+                        query.bindValue(":BuyPriceDifference", 0);
+                        query.bindValue(":BuyTotalQuantity", 0);
+                        query.bindValue(":BuyTradedQuantity", 0);
+                        query.bindValue(":SellPriceDifference", 0);
+                        query.bindValue(":SellTotalQuantity", 0);
+                        query.bindValue(":SellTradedQuantity", 0);
+                        query.bindValue(":OrderQuantity", 0);
+                        query.bindValue(":AdditionalData1", "CE");
+                        query.bindValue(":AdditionalData2", "PE");
+                        query.bindValue(":AdditionalData3", data.option_type);
 
 
-                        }
-                        //OPEN_BY
-                        else if(data.algo_type==QString::number(PortfolioType::OPEN_BY)){
-                            query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
-                                          "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
-                                          ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
-                                          "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                          "OrderQuantity,Leg1Ratio,Leg2Ratio,Leg3Ratio) "
-                                          "VALUES (:PortfolioType, :TraderID, :Status,"
-                                          ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
-                                          ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
-                                          ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                          ":OrderQuantity,:Leg1Ratio,:Leg2Ratio,:Leg3Ratio)");
-                            query.bindValue(":PortfolioType", data.algo_type);
-                            query.bindValue(":TraderID", data.user_id);
-                            query.bindValue(":Status", data.Algo_Status);
-                            query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
-                            query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
-                            query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
-                            query.bindValue(":BuyPriceDifference", 0);
-                            query.bindValue(":BuyTotalQuantity", 0);
-                            query.bindValue(":BuyTradedQuantity", 0);
-                            query.bindValue(":SellPriceDifference", 0);
-                            query.bindValue(":SellTotalQuantity", 0);
-                            query.bindValue(":SellTradedQuantity", 0);
-                            query.bindValue(":OrderQuantity", 0);
-                            query.bindValue(":Leg1Ratio", data.Leg1Ratio);
-                            query.bindValue(":Leg2Ratio", data.Leg2Ratio);
-                            query.bindValue(":Leg3Ratio", data.Leg3Ratio);
+                    }
+                    //OPEN_BY
+                    else if(data.algo_type==QString::number(PortfolioType::OPEN_BY)){
+                        query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
+                                      "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
+                                      ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                                      "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
+                                      "OrderQuantity,Leg1Ratio,Leg2Ratio,Leg3Ratio) "
+                                      "VALUES (:PortfolioType, :TraderID, :Status,"
+                                      ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
+                                      ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                                      ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
+                                      ":OrderQuantity,:Leg1Ratio,:Leg2Ratio,:Leg3Ratio)");
+                        query.bindValue(":PortfolioType", data.algo_type);
+                        query.bindValue(":TraderID", data.user_id);
+                        query.bindValue(":Status", data.Algo_Status);
+                        query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
+                        query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
+                        query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
+                        query.bindValue(":BuyPriceDifference", 0);
+                        query.bindValue(":BuyTotalQuantity", 0);
+                        query.bindValue(":BuyTradedQuantity", 0);
+                        query.bindValue(":SellPriceDifference", 0);
+                        query.bindValue(":SellTotalQuantity", 0);
+                        query.bindValue(":SellTradedQuantity", 0);
+                        query.bindValue(":OrderQuantity", 0);
+                        query.bindValue(":Leg1Ratio", data.Leg1Ratio);
+                        query.bindValue(":Leg2Ratio", data.Leg2Ratio);
+                        query.bindValue(":Leg3Ratio", data.Leg3Ratio);
 
-                        }
-                        //OPEN BOX
-                        else if(data.algo_type==QString::number(PortfolioType::OPEN_BOX)){
-                            query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
-                                          "Leg1TokenNo, Leg2TokenNo, Leg3TokenNo, Leg4TokenNo, Leg5TokenNo"
-                                          ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
-                                          "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                          "OrderQuantity,AdditionalData1,AdditionalData2,AdditionalData3,Leg1Ratio,Leg2Ratio,Leg3Ratio,Leg4Ratio) "
-                                          "VALUES (:PortfolioType, :TraderID, :Status, "
-                                          ":Leg1TokenNo, :Leg2TokenNo, :Leg3TokenNo, :Leg4TokenNo, :Leg5TokenNo,"
-                                          ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
-                                          ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                          ":OrderQuantity, :AdditionalData1, :AdditionalData2, :AdditionalData3,:Leg1Ratio,:Leg2Ratio,:Leg3Ratio,:Leg4Ratio)");
-                            query.bindValue(":PortfolioType", data.algo_type);
-                            query.bindValue(":TraderID", data.user_id);
-                            query.bindValue(":Status", data.Algo_Status);
-                            query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
-                            query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
-                            query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
-                            query.bindValue(":Leg4TokenNo", data.Leg4_token_number);
-                            query.bindValue(":Leg5TokenNo", data.Leg5_token_number);
-                            query.bindValue(":BuyPriceDifference", 0);
-                            query.bindValue(":BuyTotalQuantity", 0);
-                            query.bindValue(":BuyTradedQuantity", 0);
-                            query.bindValue(":SellPriceDifference", 0);
-                            query.bindValue(":SellTotalQuantity", 0);
-                            query.bindValue(":SellTradedQuantity", 0);
-                            query.bindValue(":OrderQuantity", 0);
-                            query.bindValue(":AdditionalData1", "CE");
-                            query.bindValue(":AdditionalData2", "PE");
-                            query.bindValue(":AdditionalData3", data.option_type);
-                            query.bindValue(":Leg1Ratio", data.Leg1Ratio);
-                            query.bindValue(":Leg2Ratio", data.Leg2Ratio);
-                            query.bindValue(":Leg3Ratio", data.Leg3Ratio);
-                            query.bindValue(":Leg4Ratio", data.Leg4Ratio);
+                    }
+                    //OPEN BOX
+                    else if(data.algo_type==QString::number(PortfolioType::OPEN_BOX)){
+                        query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
+                                      "Leg1TokenNo, Leg2TokenNo, Leg3TokenNo, Leg4TokenNo, Leg5TokenNo"
+                                      ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                                      "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
+                                      "OrderQuantity,AdditionalData1,AdditionalData2,AdditionalData3,Leg1Ratio,Leg2Ratio,Leg3Ratio,Leg4Ratio) "
+                                      "VALUES (:PortfolioType, :TraderID, :Status, "
+                                      ":Leg1TokenNo, :Leg2TokenNo, :Leg3TokenNo, :Leg4TokenNo, :Leg5TokenNo,"
+                                      ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                                      ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
+                                      ":OrderQuantity, :AdditionalData1, :AdditionalData2, :AdditionalData3,:Leg1Ratio,:Leg2Ratio,:Leg3Ratio,:Leg4Ratio)");
+                        query.bindValue(":PortfolioType", data.algo_type);
+                        query.bindValue(":TraderID", data.user_id);
+                        query.bindValue(":Status", data.Algo_Status);
+                        query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
+                        query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
+                        query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
+                        query.bindValue(":Leg4TokenNo", data.Leg4_token_number);
+                        query.bindValue(":Leg5TokenNo", data.Leg5_token_number);
+                        query.bindValue(":BuyPriceDifference", 0);
+                        query.bindValue(":BuyTotalQuantity", 0);
+                        query.bindValue(":BuyTradedQuantity", 0);
+                        query.bindValue(":SellPriceDifference", 0);
+                        query.bindValue(":SellTotalQuantity", 0);
+                        query.bindValue(":SellTradedQuantity", 0);
+                        query.bindValue(":OrderQuantity", 0);
+                        query.bindValue(":AdditionalData1", "CE");
+                        query.bindValue(":AdditionalData2", "PE");
+                        query.bindValue(":AdditionalData3", data.option_type);
+                        query.bindValue(":Leg1Ratio", data.Leg1Ratio);
+                        query.bindValue(":Leg2Ratio", data.Leg2Ratio);
+                        query.bindValue(":Leg3Ratio", data.Leg3Ratio);
+                        query.bindValue(":Leg4Ratio", data.Leg4Ratio);
 
-                        }
-                        //BFLY_BID
-                        else if(data.algo_type==QString::number(PortfolioType::BFLY_BID)){
-                            query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
-                                          "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
-                                          ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
-                                          "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                          "OrderQuantity,ModifyType) "
-                                          "VALUES (:PortfolioType, :TraderID, :Status,"
-                                          ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
-                                          ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
-                                          ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                          ":OrderQuantity,:ModifyType)");
-                            query.bindValue(":PortfolioType", data.algo_type);
-                            query.bindValue(":TraderID", data.user_id);
-                            query.bindValue(":Status", data.Algo_Status);
-                            query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
-                            query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
-                            query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
-                            query.bindValue(":BuyPriceDifference", 0);
-                            query.bindValue(":BuyTotalQuantity", 0);
-                            query.bindValue(":BuyTradedQuantity", 0);
-                            query.bindValue(":SellPriceDifference", 0);
-                            query.bindValue(":SellTotalQuantity", 0);
-                            query.bindValue(":SellTradedQuantity", 0);
-                            query.bindValue(":OrderQuantity", 0);
-                            query.bindValue(":ModifyType", 1);
+                    }
+                    //BFLY_BID
+                    else if(data.algo_type==QString::number(PortfolioType::BFLY_BID)){
+                        query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
+                                      "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
+                                      ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                                      "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
+                                      "OrderQuantity,ModifyType) "
+                                      "VALUES (:PortfolioType, :TraderID, :Status,"
+                                      ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
+                                      ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                                      ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
+                                      ":OrderQuantity,:ModifyType)");
+                        query.bindValue(":PortfolioType", data.algo_type);
+                        query.bindValue(":TraderID", data.user_id);
+                        query.bindValue(":Status", data.Algo_Status);
+                        query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
+                        query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
+                        query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
+                        query.bindValue(":BuyPriceDifference", 0);
+                        query.bindValue(":BuyTotalQuantity", 0);
+                        query.bindValue(":BuyTradedQuantity", 0);
+                        query.bindValue(":SellPriceDifference", 0);
+                        query.bindValue(":SellTotalQuantity", 0);
+                        query.bindValue(":SellTradedQuantity", 0);
+                        query.bindValue(":OrderQuantity", 0);
+                        query.bindValue(":ModifyType", 1);
 
-                        }
+                    }
 
-                        //BFLY_BID
-                        else if(data.algo_type==QString::number(PortfolioType::BX_BID)){
-                            query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
-                                          "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo,Leg4TokenNo"
-                                          ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
-                                          "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                          "OrderQuantity,ModifyType) "
-                                          "VALUES (:PortfolioType, :TraderID, :Status,"
-                                          ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo,:Leg4TokenNo"
-                                          ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
-                                          ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                          ":OrderQuantity,:ModifyType)");
-                            query.bindValue(":PortfolioType", data.algo_type);
-                            query.bindValue(":TraderID", data.user_id);
-                            query.bindValue(":Status", data.Algo_Status);
-                            query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
-                            query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
-                            query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
-                            query.bindValue(":Leg4TokenNo", data.Leg4_token_number);
-                            query.bindValue(":BuyPriceDifference", 0);
-                            query.bindValue(":BuyTotalQuantity", 0);
-                            query.bindValue(":BuyTradedQuantity", 0);
-                            query.bindValue(":SellPriceDifference", 0);
-                            query.bindValue(":SellTotalQuantity", 0);
-                            query.bindValue(":SellTradedQuantity", 0);
-                            query.bindValue(":OrderQuantity", 0);
-                            query.bindValue(":ModifyType", 1);
+                    //BFLY_BID
+                    else if(data.algo_type==QString::number(PortfolioType::BX_BID)){
+                        query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
+                                      "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo,Leg4TokenNo"
+                                      ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                                      "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
+                                      "OrderQuantity,ModifyType) "
+                                      "VALUES (:PortfolioType, :TraderID, :Status,"
+                                      ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo,:Leg4TokenNo"
+                                      ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                                      ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
+                                      ":OrderQuantity,:ModifyType)");
+                        query.bindValue(":PortfolioType", data.algo_type);
+                        query.bindValue(":TraderID", data.user_id);
+                        query.bindValue(":Status", data.Algo_Status);
+                        query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
+                        query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
+                        query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
+                        query.bindValue(":Leg4TokenNo", data.Leg4_token_number);
+                        query.bindValue(":BuyPriceDifference", 0);
+                        query.bindValue(":BuyTotalQuantity", 0);
+                        query.bindValue(":BuyTradedQuantity", 0);
+                        query.bindValue(":SellPriceDifference", 0);
+                        query.bindValue(":SellTotalQuantity", 0);
+                        query.bindValue(":SellTradedQuantity", 0);
+                        query.bindValue(":OrderQuantity", 0);
+                        query.bindValue(":ModifyType", 1);
 
-                        }
+                    }
 
-                        //BX1221l
-                        else if(data.algo_type==QString::number(PortfolioType::BS1221)||data.algo_type==QString::number(PortfolioType::BS1331)){
-                            query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
-                                          "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo,Leg4TokenNo"
-                                          ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
-                                          "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                          "OrderQuantity) "
-                                          "VALUES (:PortfolioType, :TraderID, :Status,"
-                                          ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo,:Leg4TokenNo"
-                                          ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
-                                          ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                          ":OrderQuantity)");
-                            query.bindValue(":PortfolioType", data.algo_type);
-                            query.bindValue(":TraderID", data.user_id);
-                            query.bindValue(":Status", data.Algo_Status);
-                            query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
-                            query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
-                            query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
-                            query.bindValue(":Leg4TokenNo", data.Leg4_token_number);
-                            query.bindValue(":BuyPriceDifference", 0);
-                            query.bindValue(":BuyTotalQuantity", 0);
-                            query.bindValue(":BuyTradedQuantity", 0);
-                            query.bindValue(":SellPriceDifference", 0);
-                            query.bindValue(":SellTotalQuantity", 0);
-                            query.bindValue(":SellTradedQuantity", 0);
-                            query.bindValue(":OrderQuantity", 0);
+                    //BX1221l
+                    else if(data.algo_type==QString::number(PortfolioType::BS1221)||data.algo_type==QString::number(PortfolioType::BS1331)){
+                        query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID, Status, "
+                                      "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo,Leg4TokenNo"
+                                      ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                                      "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
+                                      "OrderQuantity) "
+                                      "VALUES (:PortfolioType, :TraderID, :Status,"
+                                      ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo,:Leg4TokenNo"
+                                      ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                                      ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
+                                      ":OrderQuantity)");
+                        query.bindValue(":PortfolioType", data.algo_type);
+                        query.bindValue(":TraderID", data.user_id);
+                        query.bindValue(":Status", data.Algo_Status);
+                        query.bindValue(":Leg1TokenNo", data.Leg1_token_number);
+                        query.bindValue(":Leg2TokenNo", data.Leg2_token_number);
+                        query.bindValue(":Leg3TokenNo", data.Leg3_token_number);
+                        query.bindValue(":Leg4TokenNo", data.Leg4_token_number);
+                        query.bindValue(":BuyPriceDifference", 0);
+                        query.bindValue(":BuyTotalQuantity", 0);
+                        query.bindValue(":BuyTradedQuantity", 0);
+                        query.bindValue(":SellPriceDifference", 0);
+                        query.bindValue(":SellTotalQuantity", 0);
+                        query.bindValue(":SellTradedQuantity", 0);
+                        query.bindValue(":OrderQuantity", 0);
 
-                        }
+                    }
 
-                        if(query.exec()){
-                            msg="Add record to DB successfully";
-                            ret = algo_data_insert_status::INSERTED;
+                    if(query.exec()){
+                        msg="Add record to DB successfully";
+                        ret = algo_data_insert_status::INSERTED;
 
-                        }
-                        else{
-                            msg="Failed to insert record to DB";
-                            ret = algo_data_insert_status::FAILED;
-                            qDebug() << "Executed Query: " << query.lastQuery();
-                            qDebug()<<"query.lastError: "+query.lastError().text();
-                        }
+                    }
+                    else{
+                        msg="Failed to insert record to DB";
+                        ret = algo_data_insert_status::FAILED;
+                        qDebug() << "Executed Query: " << query.lastQuery();
+                        qDebug()<<"query.lastError: "+query.lastError().text();
+                    }
                  }
                 }
-        }
+
+                }
+
         else{
             qDebug()<<"Cannot connect Database: "+db.lastError().text();
             msg="Cannot connect Database: "+db.lastError().text();
@@ -2920,6 +2925,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
     }
     return ret;
 }
+
 
 QString mysql_conn::getAlgoTypeQuery(PortfolioType type, userInfo userLoginInfo)
 {

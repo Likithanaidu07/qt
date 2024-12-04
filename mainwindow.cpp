@@ -161,22 +161,20 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-
-    ui->lineEditSearch->setPlaceholderText("Search...");
-    ui->lineEditSearch->setStyleSheet(
-        "QLineEdit {"
-        "    font-family: 'Work Sans';"
-        "    font-size: 10pt;"
-        "}"
-        );
-   // ui->lineEditSearch->setMaximumWidth(360);
-   // ui->lineEditSearch->setMaximumHeight(1500);
     ui->lineEditSearch->setPlaceholderText("Search Algo");
     QAction* search_action = new QAction(QIcon(":/search.png"), "", ui->lineEditSearch);
 
     // Add the action to the QLineEdit
     ui->lineEditSearch->addAction(search_action, QLineEdit::LeadingPosition);
-    ui->lineEditSearch->setStyleSheet(lineedit_dock_SS);
+    ui->lineEditSearch->setStyleSheet(
+        "QLineEdit {"
+        "    font-family: 'Work Sans';"
+        "    font-size: 10pt;"
+        "    border-radius: 15px;"      // Use 15px for a curved effect
+        "    padding-left: 30px;"       // Adjust padding to make space for the icon
+        "}"
+        );
+
 
 
 //    ui->Templates_Widget->setToolTip("Coming Soon");
@@ -197,11 +195,11 @@ MainWindow::MainWindow(QWidget *parent)
 //        "}"
 //        );
 
-      ui->lineEditSearch->setStyleSheet(
-        "QLineEdit {"
-        "    padding-right: 50px;"  // Add 20 pixels of space on the right
-        "}"
-        );
+//      ui->lineEditSearch->setStyleSheet(
+//        "QLineEdit {"
+//        "    padding-right: 50px;"  // Add 20 pixels of space on the right
+//        "}"
+//        );
 
       ui->HP_Widget->setVisible(false);
       ui->Templates_Widget->setVisible(false);
@@ -300,7 +298,7 @@ MainWindow::MainWindow(QWidget *parent)
     /***********Init portfolio table Window**************************/
    // QPixmap pixmapdock_algorithms_close(":/dock_close.png");
 
-    T_Portfolio_DockWin = new CDockWidget("Algorithms");// new QDockWidget(tr("Algorithms"), this);
+    T_Portfolio_DockWin = new CDockWidget("Algos");// new QDockWidget(tr("Algorithms"), this);
     connect(T_Portfolio_DockWin, SIGNAL(visibilityChanged(bool)), this, SLOT(OnAlgorithmDockWidgetVisiblityChanged(bool)));
     T_Portfolio_DockWin->setStyleSheet(dock_style);
     T_Portfolio_DockWin->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
@@ -320,7 +318,7 @@ MainWindow::MainWindow(QWidget *parent)
         QHBoxLayout *titleinternalLayout = new QHBoxLayout(titlecontainer);
         titleinternalLayout->setSpacing(10);
         titleinternalLayout->setContentsMargins(17,8,10,6);
-        QLabel *label = new QLabel("Algorithms");
+        QLabel *label = new QLabel("Algos");
         QFont fontlabel=label->font();
         QSpacerItem* titlespc = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
         QToolButton* dockclose=new QToolButton();
@@ -359,7 +357,8 @@ MainWindow::MainWindow(QWidget *parent)
             connect(ConvertAlgo_button, SIGNAL(clicked()), this, SLOT(ConvertAlgo_button_clicked()));
             //Frame 364.png
             ConvertAlgo_button->setToolButtonStyle(Qt::ToolButtonIconOnly);
-            ConvertAlgo_button->setIcon(QIcon(":/BuildAlgo.png"));
+            //ConvertAlgo_button->setIcon(QIcon(":/BuildAlgo.png"));
+            ConvertAlgo_button->setText("Build Algo");
             ConvertAlgo_button->setToolTip("Build Algo");
 
             const char convert_to_algo_button[]="QToolButton {"
@@ -367,10 +366,10 @@ MainWindow::MainWindow(QWidget *parent)
                                                   "background: #495057;"
                                                   "text-align: center;"
                                                   "color: #FFF;"
-                                                  "min-width: 22px;"   // Set minimum width
-                                                  "max-width: 22px;"   // Set maximum width
-                                                  "min-height: 22px;"  // Set minimum height
-                                                  "max-height: 22px;"
+//                                                  "min-width: 22px;"   // Set minimum width
+//                                                  "max-width: 22px;"   // Set maximum width
+//                                                  "min-height: 22px;"  // Set minimum height
+//                                                  "max-height: 22px;"
                                                   "}"
                                                   "QToolButton:hover{"
                                                   "border-radius: 4px;"
@@ -393,23 +392,27 @@ MainWindow::MainWindow(QWidget *parent)
             connect(button1, SIGNAL(clicked()), this, SLOT(startall_Button_clicked()));
 
            // button1->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            button1->setIcon(QIcon(":/start_all.png"));
+            //button1->setIcon(QIcon(":/start_all.png"));
+            button1->setText("Start All");
             button1->setToolTip("Start All");
 
             QToolButton* button2 = new QToolButton();
             connect(button2, SIGNAL(clicked()), this, SLOT(stopall_Button_clicked()));
            // button2->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            button2->setIcon(QIcon(":/stop_all.png"));
+           // button2->setIcon(QIcon(":/stop_all.png"));
+            button2->setText("Stop All");
             button2->setToolTip("Stop All");
 
             QToolButton* button3 = new QToolButton();
            // button3->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            button3->setIcon(QIcon(":/import.png"));
+            //button3->setIcon(QIcon(":/import.png"));
+            button3->setText("Import");
             button3->setToolTip("Import");
 
             QToolButton* button4 = new QToolButton();
             //button4->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            button4->setIcon(QIcon(":/reset.png"));
+            //button4->setIcon(QIcon(":/reset.png"));
+            button4->setText("Sorting");
             button4->setToolTip("Sorting");
             connect(button4, SIGNAL(clicked()), this, SLOT(sorting_Button_clicked()));
 
@@ -421,14 +424,53 @@ MainWindow::MainWindow(QWidget *parent)
 
             QToolButton* button6 = new QToolButton();
           //  button6->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
-            button6->setIcon(QIcon(":/export.png"));
+           // button6->setIcon(QIcon(":/export.png"));
+            button6->setText("Export");
             button6->setToolTip("Export");
 
             QToolButton* button7 = new QToolButton();
             //  button7->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             button7->setText("Duplicate");
             button7->setToolTip("Duplicate");
-             connect(button7, SIGNAL(clicked()), this, SLOT(duplicate_Button_clicked()));
+            connect(button7, SIGNAL(clicked()), this, SLOT(duplicate_Button_clicked()));
+
+            // Create the QToolButton
+            QToolButton* button8 = new QToolButton(this);
+            button8->setText("Filter");
+            button8->setPopupMode(QToolButton::InstantPopup); // Shows the menu immediately on click
+            button8->setStyleSheet(
+                "QToolButton {" // Corrected to QToolButton
+                "   border-radius: 4px;"
+                "   border: 1px solid #4F5D75;"
+                "   background: #106B9A;"
+                "   color: white;"
+                "   font-family: 'Work Sans';"
+                "   width: 50px;"      // Set button width
+             "line-height: normal;"      // Optional: Set button height
+                "}"
+                "QToolButton:hover {" // Corrected to QToolButton:hover
+                "   border-radius: 4px;"
+                "   border: 1px solid #495057;"
+                "   background: #495057;"
+                "   color: white;"
+                "   font-family: 'Work Sans';"
+                "   width: 120px;"      // Ensure width remains consistent
+                "}"
+                );
+
+
+
+
+
+
+
+
+
+//            // Connect the button to the filter functionality
+//            connect(button8, &QToolButton::clicked, this, &MainWindow::onFilterButtonClicked);
+
+//            // Optionally, add the button to a layout
+//            ui->someLayout->addWidget(button8); // Replace 'someLayout' with your actual layout object
 
 
             // Apply custom stylesheet
@@ -516,11 +558,14 @@ MainWindow::MainWindow(QWidget *parent)
 
                 internalLayout->addWidget(button1);
                 internalLayout->addWidget(button2);
+                internalLayout->addWidget(button7);
+                internalLayout->addWidget(button8);
+                internalLayout->addWidget(button4);
                 internalLayout->addWidget(button3);
                 internalLayout->addWidget(button6);
-                internalLayout->addWidget(button4);
                 internalLayout->addWidget(button5);
-                internalLayout->addWidget(button7);
+
+
                 internalLayout->addSpacerItem(spc);
                 //internalLayout->addWidget(button5);
                 //internalLayout->addWidget(line_edit_trade_search);
@@ -620,14 +665,51 @@ MainWindow::MainWindow(QWidget *parent)
 
     //This will make first column fixed size
     T_Portfolio_Table->horizontalHeader()->setSectionResizeMode(PortfolioData_Idx::_Status, QHeaderView::Fixed);
-    T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_Status, 60); // Set width to fixed pixels
-    int Portfolio_columnCount = T_Portfolio_Table->model()->columnCount(); // Get the column count from the model
+    T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_Status, 60);
+    T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_AlgoName, 250);
+    T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_BidLeg, 200);
+
+    int Portfolio_columnCount = T_Portfolio_Table->model()->columnCount();
 
     for (int col = 0; col < Portfolio_columnCount; ++col) {
+        if (col != PortfolioData_Idx::_Status && col != PortfolioData_Idx::_AlgoName && col != PortfolioData_Idx::_BidLeg) {
+            // Set all other columns to 70 pixels
+            T_Portfolio_Table->setColumnWidth(col, 70);
+        }
+        // Allow interactive resizing for all columns except _Status
         if (col != PortfolioData_Idx::_Status) {
             T_Portfolio_Table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Interactive);
         }
     }
+
+
+    //load the settings, get all the column index we checked already
+
+    //create menu to show hide the table view columns
+    QStringList headers = T_Portfolio_Model->getHeaders();
+    // List of columns to exclude
+    QSet<int> excludedColumns = {0,3, 7, 6,  12,13, 16, 17};
+
+    // Create the filter menu
+    QMenu* algoTableColumnShowHideMenu = new QMenu(this);
+    for (int i = 0; i < headers.size(); ++i) {
+        // Skip the excluded columns
+        if (excludedColumns.contains(i)) {
+            continue;
+        }
+
+        QAction* action = algoTableColumnShowHideMenu->addAction(headers[i]);
+        action->setCheckable(true);
+        action->setChecked(!T_Portfolio_Table->isColumnHidden(i));
+
+        // Connect action's triggered signal
+        connect(action, &QAction::triggered, this, [=](bool checked) {
+            T_Portfolio_Table->setColumnHidden(i, !checked);
+        });
+    }
+
+       button8->setMenu(algoTableColumnShowHideMenu);
+
 
 
     /***********Init portfolio table Window**************************/
@@ -762,19 +844,15 @@ MainWindow::MainWindow(QWidget *parent)
     trade_table->show();
     // Restore the previous state of the table view if any
     restoreTableViewColumnState(trade_table);
-
+    trade_table->setColumnWidth(OrderBook_Idx::AlgoName_OB, 200);
     int Trade_columnCount = trade_table->model()->columnCount();
     for (int col = 0; col < Trade_columnCount; ++col) {
-        trade_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
+        if (col != OrderBook_Idx::AlgoName_OB) {
+            // Set other columns to a width of 100
+            trade_table->setColumnWidth(col, 70);
+        }
     }
 
-    trade_table->horizontalHeader()->setSectionsMovable(true);
-    trade_table->horizontalHeader()->setStretchLastSection(false);
-
-    // Now change the mode to allow interactive resizing
-    for (int col = 0; col < Trade_columnCount; ++col) {
-        trade_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Interactive);
-    }
 
     //connect this signal only after every table init completed, or else it will overwrite table state with defult setting before restore previous state
    // connect(headerViews, &QHeaderView::sectionResized, this, &MainWindow::onTradeTableHeader_Rearranged,Qt::UniqueConnection);
@@ -899,16 +977,13 @@ MainWindow::MainWindow(QWidget *parent)
 
     f1f2_order_table->show();
     restoreTableViewColumnState(f1f2_order_table);
+    f1f2_order_table->setColumnWidth(F1F2_Order_Data_Idx::AlgoName_F1F2, 250);
     int f1f2_order_columnCount = f1f2_order_table->model()->columnCount();
     for (int col = 0; col < f1f2_order_columnCount; ++col) {
-        f1f2_order_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
-    }
-
-    f1f2_order_table->horizontalHeader()->resizeSections(QHeaderView::ResizeToContents);
-    f1f2_order_table->horizontalHeader()->setSectionsMovable(true);
-    f1f2_order_table->horizontalHeader()->setStretchLastSection(false);
-    for (int col = 0; col < f1f2_order_columnCount; ++col) {
-        f1f2_order_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Interactive);
+        if (col != F1F2_Order_Data_Idx::AlgoName_F1F2) {
+            // Set other columns to a width of 100
+            f1f2_order_table->setColumnWidth(col, 70);
+        }
     }
 
 
@@ -936,7 +1011,7 @@ MainWindow::MainWindow(QWidget *parent)
     QHBoxLayout *position_title_layout=new QHBoxLayout(position_titlebar);
     position_title_layout->setSpacing(10);
     position_title_layout->setContentsMargins(17,8,10,6);
-    QLabel *position_label=new QLabel("Positions");
+    QLabel *position_label=new QLabel("Net Positions");
     QFont font_position_label=position_label->font();
     font_position_label.setFamily("Work Sans");
     position_label->setFont(font_position_label);
@@ -1005,16 +1080,14 @@ MainWindow::MainWindow(QWidget *parent)
     dock_win_net_pos->setWidget(net_pos_table);
     net_pos_table->show();
     restoreTableViewColumnState(net_pos_table);
+    net_pos_table->setColumnWidth(NET_POS::StockName_NP, 170);
     int netpos_columnCount = net_pos_table->model()->columnCount();
-
-    // First, set the resize mode to fit the contents
     for (int col = 0; col < netpos_columnCount; ++col) {
-        net_pos_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
+        if (col !=NET_POS::StockName_NP) {
+            // Set other columns to a width of 100
+            net_pos_table->setColumnWidth(col, 70);
+        }
     }
-
-    // Allow user to resize columns interactively after fitting to contents
-    net_pos_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
-
 
     /************Net Position Window********************************/
 
@@ -1100,13 +1173,14 @@ MainWindow::MainWindow(QWidget *parent)
     dock_win_liners->setWidget(liners_table);
     liners_table->show();
     restoreTableViewColumnState(liners_table);
+    liners_table->setColumnWidth(Liners_Idx::AlgoName, 250);
 
     int liners_columnCount = liners_table->model()->columnCount();
     for (int col = 0; col < liners_columnCount; ++col) {
-        liners_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::ResizeToContents);
-    }
-    for (int col = 0; col < liners_columnCount; ++col) {
-        liners_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Interactive);
+        if (col !=Liners_Idx::AlgoName) {
+            // Set other columns to a width of 100
+            liners_table->setColumnWidth(col, 70);
+        }
     }
 
 
@@ -1260,10 +1334,13 @@ MainWindow::MainWindow(QWidget *parent)
     missed_trade_table->show();
     restoreTableViewColumnState(missed_trade_table);
 
-    int missedtrades_columnCount = missed_trade_table->model()->columnCount();
-    for (int col = 0; col < missedtrades_columnCount; ++col) {
-        missed_trade_table->horizontalHeader()->setSectionResizeMode(col, QHeaderView::Interactive);
-    }
+//    int missedtrades_columnCount = missed_trade_table->model()->columnCount();
+//    for (int col = 0; col < missedtrades_columnCount; ++col) {
+//        if (col !=Liners_Idx::AlgoName) {
+//            // Set other columns to a width of 100
+//            missed_trade_table->setColumnWidth(col, 70);
+//        }
+//    }
 
       /************Missed Trades ********************************/
 

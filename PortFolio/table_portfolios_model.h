@@ -44,7 +44,7 @@ public:
     void updateMarketRate(const QHash<QString, MBP_Data_Struct>& data);
     bool removeRowsByIndices(const QList<int> &portFolioIdxToDelete);
 
-
+    QStringList getHeaders();
 
 private:
    // QStringList header={"Status","Algo ID","Algo Name","Rate", "Avg", "Diff" ,"TQ", "TTQ", "RQ", "Rate", "Avg", "Diff", "TQ", "TTQ", "RQ", "Odr Qty" ,"Qty Ratio", "Skip/Market Strike", "Bid Leg", "Cost", "Fut Price"};
@@ -56,6 +56,7 @@ private:
                           "STTQ","SRQ","Odr Qty","Bid Price","Expiry 1", /*"Expiry 2",*/
                           "Cost" ,"Qty Ratio",
                           "Bid Leg", "Fut Price"};
+
 
 
     QString double_to_Human_Readable(double num, int precision) const;

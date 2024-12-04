@@ -111,6 +111,12 @@ TradeDetailsPopup::TradeDetailsPopup(QWidget *parent) :
                ui->tableWidget->setItem(ui->tableWidget->rowCount()-1, 6, c6);
 
        }
+        ui->tableWidget->resizeColumnsToContents();
+       int columnCount = ui->tableWidget->columnCount();
+       for (int col = 0; col < columnCount; ++col) {
+               int currentWidth = ui->tableWidget->columnWidth(col);
+               ui->tableWidget->setColumnWidth(col, currentWidth + 1); // Add 0.5 units on each side
+       }
  }
 
 TradeDetailsPopup::~TradeDetailsPopup()
