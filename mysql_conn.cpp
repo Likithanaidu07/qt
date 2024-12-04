@@ -2132,18 +2132,18 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
 
                     QString instrumentName = it.key();        // Get the InstrumentName
                     QStringList tokenList = it.value();       // Get the list of tokens
-                    QStringList reorderedList;  // this should contin the token same as in the order like it retreved from DB, For Margin used calculation
+                    /*QStringList reorderedList;  // this should contin the token same as in the order like it retreved from DB, For Margin used calculation
                     //To rearrange the tokenList to match the order of tokenInOrder,
                     //while omitting tokens not in tokenList and ensuring the existing ones follow the order in tokenInOrder
                     for (const QString& token : tokenInOrder) {
                         if (tokenList.contains(token)) {
                            reorderedList.append(token);
                         }
-                    }
+                    }*/
 
                     double spanToSubtract = 0;
-                    double buyTotalPrice = 0;
-                    for (const QString& TokenNo : reorderedList) {
+                  //  double buyTotalPrice = 0;
+                    for (const QString& TokenNo : tokenList) {
                         net_pos_data_  net_pos_data = net_pos_dataList[TokenNo];
                         int span = 0;
                         if (spanHash.contains(TokenNo))
@@ -2155,7 +2155,7 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
                         if (net_pos_data.Net_Qty > 0)
                         {
                             double value = 0;// net_pos_data.BuyAvgPrice;
-                            buyTotalPrice = buyTotalPrice+net_pos_data.Buy_Total_Lot;
+                           // buyTotalPrice = buyTotalPrice+net_pos_data.Buy_Price;
 
                             // FUT option
                             if (net_pos_data.OptionType == "XX")
@@ -2166,7 +2166,7 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
                             // CE/PE option
                             else
                             {
-                                net_pos_dataList[TokenNo].MarginUsed = abs(value * net_pos_data.Net_Qty)+ buyTotalPrice;
+                                net_pos_dataList[TokenNo].MarginUsed = abs(value * net_pos_data.Net_Qty)+net_pos_data.Buy_Price;//buyTotalPrice;
                                 spanToSubtract = spanToSubtract + abs(span * net_pos_data.Net_Qty);
                             }
                         }
