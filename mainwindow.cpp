@@ -171,7 +171,6 @@ MainWindow::MainWindow(QWidget *parent)
         "    font-family: 'Work Sans';"
         "    font-size: 10pt;"
         "    border-radius: 15px;"      // Use 15px for a curved effect
-        "    padding-left: 30px;"       // Adjust padding to make space for the icon
         "}"
         );
 
@@ -667,7 +666,7 @@ MainWindow::MainWindow(QWidget *parent)
     T_Portfolio_Table->horizontalHeader()->setSectionResizeMode(PortfolioData_Idx::_Status, QHeaderView::Fixed);
     T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_Status, 60);
     T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_AlgoName, 250);
-    T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_BidLeg, 200);
+    T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_BidLeg, 180);
 
     int Portfolio_columnCount = T_Portfolio_Table->model()->columnCount();
 
@@ -2136,7 +2135,7 @@ void MainWindow::loadContract(){
 
         QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
                               "<span>" + QTime::currentTime().toString("hh:mm:ss")
-                              + "&nbsp;</span><span style='font-weight:400;color: black;'> file loading... </span></p>";
+                              + "&nbsp;</span><span style='font-weight:400;color: white;'> file loading... </span></p>";
 
         emit display_log_text_signal(htmlContent);
 
@@ -2153,7 +2152,7 @@ void MainWindow::loadContract(){
 
         htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
                       "<span>" + QTime::currentTime().toString("hh:mm:ss")
-                      + "&nbsp;</span><span style='font-weight:400;color: black;'> file loaded </span></p>";
+                      + "&nbsp;</span><span style='font-weight:400;color: white;'> file loaded </span></p>";
 
 
         emit display_log_text_signal(htmlContent);
@@ -2855,8 +2854,8 @@ void MainWindow::add_logs(QString str){
     logsdata.append(str);
     emit logDataSignal(logsdata);
     ui->label_5->setWordWrap(true);
-    ui->label_5->setText("UserMessage: " + str);
-    ui->label_5->setStyleSheet("color: white;");
+    ui->label_5->setText(str);
+    ui->label_5->setStyleSheet("font-family: 'Work Sans'; font-size: 8pt; color: white;");
 
 }
 
@@ -3500,7 +3499,7 @@ void MainWindow::slotAddLogForAddAlgoRecord(QString str)
     logsdata.append(str);
     emit logDataSignal(logsdata);
     ui->label_5->setWordWrap(true);
-    ui->label_5->setText("UserMessage: " + str);
+    ui->label_5->setText(str);
     ui->label_5->setStyleSheet("color: white;");
 
 }
