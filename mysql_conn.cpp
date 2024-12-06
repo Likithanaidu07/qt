@@ -548,6 +548,13 @@ QHash<QString,PortFolioData_Less> mysql_conn::getPortfoliosTableData(QAtomicInt 
                     avgPrice.AvgPrice = queryAvgPrice.value(rec.indexOf("AvgPrice")).toDouble();
                     averagePriceList.insert(key,avgPrice);
                 }
+                else{
+                    averagePriceList[key].PortfolioNumber = portfolioNumber;
+                    averagePriceList[key].TokenNo = token;
+                    averagePriceList[key].BuySellIndicator = queryAvgPrice.value(rec.indexOf("BuySellIndicator")).toString();
+                    averagePriceList[key].AvgPrice = queryAvgPrice.value(rec.indexOf("AvgPrice")).toDouble();
+
+                }
             }
         }
         // Print elapsed time
