@@ -1012,7 +1012,7 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                 QString Algo_Name = algo_type+"-"+sharedData->algo_data_list[i].Algo_Name;
                 QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.2;'>"
                                       "<span>" + QTime::currentTime().toString("hh:mm:ss") +"&nbsp;</span>"
-                              + "<span style='font-weight:400;color: black;'>"+sharedData->foo_user_id +
+                              + "<span style='font-weight:400;color: white;'>"+sharedData->foo_user_id +
                                       " Inserted New Algo: "+ Algo_Name +"</span> </p>";
 
                 emit display_log_text_signal(htmlContent);

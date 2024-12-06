@@ -705,7 +705,7 @@ void mysql_conn::logToDB(QString logMessage)
 
         QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
                               "<span>" + QTime::currentTime().toString("hh:mm:ss")
-                              + "&nbsp;</span><span style='font-weight:400;color: black;'>"+ logMessage + "</span></p>";
+                              + "&nbsp;</span><span style='font-weight:400;color: white;'>"+ logMessage + "</span></p>";
         emit display_log_text_signal(htmlContent);
 
     }
@@ -752,7 +752,7 @@ void mysql_conn::loadCurrentDayLogs()
             QDateTime dateTime = QDateTime::fromSecsSinceEpoch(epochTime);
             QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0'>"
                                   "<span>" + QTime::currentTime().toString("hh:mm:ss")
-                                  + "&nbsp;</span><span style='font-weight:400;color: black;'>"+ logMessage.prepend("  ") + "</span></p>";
+                                  + "&nbsp;</span><span style='font-weight:400;color: white;'>"+ logMessage.prepend("  ") + "</span></p>";
             emit display_log_text_signal(htmlContent);
         }
     }
@@ -1585,6 +1585,26 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 {
                     Leg3_OrderStateStr = Leg3_OrderStateStr;
                                          //+" ("+(QString::number(Leg3_OrderState))+")";
+                }
+                if(Leg2_OrderState==8)
+                {
+                    Leg2_OrderStateStr = Leg2_OrderStateStr+"["+(QString::number(Leg2_Total_Volume/lotSize))+"]";
+                    // +" ("+(QString::number(Leg3_OrderState))+")"+" "
+                }
+                else
+                {
+                    Leg2_OrderStateStr = Leg2_OrderStateStr;
+                        //+" ("+(QString::number(Leg3_OrderState))+")";
+                }
+                if(Leg4_OrderState==8)
+                {
+                    Leg4_OrderStateStr = Leg4_OrderStateStr+"["+(QString::number(Leg4_Total_Volume/lotSize))+"]";
+                    // +" ("+(QString::number(Leg3_OrderState))+")"+" "
+                }
+                else
+                {
+                    Leg4_OrderStateStr = Leg4_OrderStateStr;
+                        //+" ("+(QString::number(Leg3_OrderState))+")";
                 }
 
                 QString Exch_Price = "0";
