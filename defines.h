@@ -165,7 +165,7 @@ enum Liners_Idx{
     SellAvgPrice,
     SellQtyinLots,
     NetQty,
-    Profit,
+   // Profit,
 
 };
 
@@ -192,7 +192,7 @@ enum NET_POS
     BuyAvgPrice_NP,
     SellAvgPrice_NP,
     NetQty_NP,
-    Profit_NP,
+   // Profit_NP,
     MTM_NP,
     Margin_Used_NP,
     lotSize_NP,

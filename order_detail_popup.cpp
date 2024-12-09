@@ -119,7 +119,7 @@ void OrderDetail_Popup::setData(PortfolioObject *p,QStringList linersData,QList<
 
    if(linersData.size()>0){
     ui->net_qty->setText(linersData[Liners_Idx::NetQty]);
-    ui->p_l->setText(linersData[Liners_Idx::Profit]);
+    //ui->p_l->setText(linersData[Liners_Idx::Profit]);
    }
    else{
        ui->net_qty->setText("-");

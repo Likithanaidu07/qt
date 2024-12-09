@@ -2273,8 +2273,8 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
                  rowList.append(fixDecimal(data.Buy_Avg_Price, decimal_precision)); // Buy Avg Price
                  rowList.append(fixDecimal(data.Sell_Avg_Price, decimal_precision)); // Sell Avg Price
                  rowList.append(QString::number(data.Net_Qty / data.lotSize)); // Net Qty
-                 double Profit = (data.Sell_Price - data.Buy_Price); // Example profit calculation
-                 rowList.append(fixDecimal(Profit, decimal_precision)); // Profit
+           //     double Profit = (data.Sell_Price - data.Buy_Price); // Example profit calculation
+//                 rowList.append(fixDecimal(Profit, decimal_precision)); // Profit
                  rowList.append(fixDecimal(data.M2M, decimal_precision)); // M2M
                  rowList.append(QString::number((data.MarginUsed))); // MarginUsed
                  rowList.append(QString::number((data.lotSize))); //lotSize
