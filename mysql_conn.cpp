@@ -1699,6 +1699,26 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     break;
                 }
 
+                case PortfolioType::BS1221: {
+                    if (Leg1BuySellIndicator == 1) {
+                        Exch_Price_val = static_cast<double>(leg2Price * 2 + leg4Price - leg1Price - leg3Price * 2) / devicer;
+                    } else {
+                        Exch_Price_val = static_cast<double>(leg3Price * 2 + leg1Price - leg4Price - leg2Price*2) / devicer;
+
+                    }
+
+                    break;
+                }
+                case PortfolioType::BS1331: {
+                    if (Leg1BuySellIndicator == 1) {
+                        Exch_Price_val = static_cast<double>(leg2Price * 3 + leg4Price - leg1Price - leg3Price * 3) / devicer;
+                    } else {
+                        Exch_Price_val = static_cast<double>(leg3Price * 3 + leg1Price - leg4Price-leg2Price*3) / devicer;
+                    }
+
+                    break;
+                }
+
 
                 default:
                     break;
