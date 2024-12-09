@@ -144,7 +144,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QMenu *menuOrders = new QMenu(this);
     menuOrders->addAction("Executed Orders", this, &MainWindow::on_OrderBook_Button_clicked);
-    menuOrders->addAction("Skipped Orders", this, &MainWindow::on_MissedTrade_Button_clicked);
+    menuOrders->addAction("Aborted Orders", this, &MainWindow::on_MissedTrade_Button_clicked);
     menuOrders->addAction("Manaual Orders", this, &MainWindow::on_F1F2Trade_Button_clicked);
     ui->toolButtonOrders->setMenu(menuOrders);
     ui->toolButtonOrders->setPopupMode(QToolButton::InstantPopup);
@@ -718,7 +718,7 @@ MainWindow::MainWindow(QWidget *parent)
     /***********Init Order Book Window**************************/
     QPixmap pixmapdock_trade_close(":/dock_close.png");
 
-    dock_win_trade =  new CDockWidget(tr("Trades"));
+    dock_win_trade =  new CDockWidget(tr("Executed Orders"));
 
     connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookDockWidgetVisiblityChanged(bool)));
    // subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_trade);
@@ -735,7 +735,7 @@ MainWindow::MainWindow(QWidget *parent)
     QHBoxLayout *trade_title_layout=new QHBoxLayout(trade_titlebar);
     trade_title_layout->setSpacing(10);
     trade_title_layout->setContentsMargins(17,8,10,6);
-    QLabel *trade_label=new QLabel("Trades");
+    QLabel *trade_label=new QLabel("Executed Orders");
     QFont font_trade_label=trade_label->font();
     font_trade_label.setFamily("Work Sans");
     trade_label->setFont(font_trade_label);
@@ -1259,7 +1259,7 @@ MainWindow::MainWindow(QWidget *parent)
     /************Missed Trades Window********************************/
     QPixmap pixmapdock_mt_close(":/dock_close.png");
 
-    dock_win_missed_trades =  new CDockWidget(tr("Missed Trades"));
+    dock_win_missed_trades =  new CDockWidget(tr("Aborted Orders"));
     connect(dock_win_missed_trades, SIGNAL(visibilityChanged(bool)), this, SLOT(OnMTDockWidgetVisiblityChanged(bool)));
     dock_win_missed_trades->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
     dock_win_missed_trades->setMinimumSize(200,150);
@@ -1272,7 +1272,7 @@ MainWindow::MainWindow(QWidget *parent)
     QHBoxLayout *position_mt_layout=new QHBoxLayout(mt_titlebar);
     position_mt_layout->setSpacing(10);
    position_mt_layout->setContentsMargins(17,8,10,6);
-    QLabel *mt_label=new QLabel("Missed Trades");
+    QLabel *mt_label=new QLabel("Aborted Orders");
     QFont font_mt_label=mt_label->font();
     font_mt_label.setFamily("Work Sans");
     mt_label->setFont(font_mt_label);
@@ -3171,6 +3171,10 @@ void MainWindow::duplicate_Button_clicked(){
             data.user_id = QString::number(userData.UserId);
 
             algo_data_insert_status status = db_conn->insertToAlgoTable(data, MaxPortfolioCount, msg);
+            if (status == algo_data_insert_status::LIMIT_REACHED) {
+            QMessageBox::warning(this, "Duplicate Portfolio", msg);
+            break;
+            }
             if (status == algo_data_insert_status::INSERTED) {
                 triggerImmediate_refreshTables();
                 onPortfolioAdded(); //send backend command
