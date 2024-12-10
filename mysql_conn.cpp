@@ -697,26 +697,26 @@ void mysql_conn::logToDB(QString logMessage)
             qDebug() << "Failed to fetch server time: " << timeQuery.lastError().text();
             return;
         }
-
         // Fetch the server time
         qint64 serverTime = timeQuery.value(0).toLongLong();
 
-        // Insert log entry into the database
+        // Convert serverTime to human-readable format
+        QDateTime dateTime = QDateTime::fromSecsSinceEpoch(serverTime);
+        QString humanReadableTime = dateTime.toString("hh:mm:ss");
         QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedTime)";
         QSqlQuery query1(db);
         query1.prepare(qryStr);
         query1.bindValue(":logMessage", logMessage);
         query1.bindValue(":userName", userNameLogged);
-        query1.bindValue(":formattedTime", serverTime);
+        query1.bindValue(":formattedTime", humanReadableTime); // Use formatted time
 
         if (!query1.exec()) {
             qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
             qDebug() << "Query Str: " << qryStr;
         }
-
-        // Prepare HTML content for display
+        QString serverTimeFormatted = dateTime.toString("hh:mm:ss");
         QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
-                              "<span>" /*+ QTime::currentTime().toString("hh:mm:ss")*/
+                              "<span>" + serverTimeFormatted +
                               "&nbsp;</span><span style='font-weight:400;color: white;'>" + logMessage + "</span></p>";
         emit display_log_text_signal(htmlContent);
 
@@ -1287,17 +1287,6 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
        // QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and (Leg1_OrderState=7 and Leg2_OrderState=7 and Leg3_OrderState=7) ORDER BY Trader_Data DESC";
        // QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and  Leg1_OrderState=7 or Leg2_OrderState=7 or Leg3_OrderState=7 or Leg4_OrderState = 7  ORDER BY Trader_Data DESC";
         //QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' AND (Leg1_OrderState=7 OR Leg2_OrderState=7 OR Leg3_OrderState=7 OR Leg4_OrderState=7) ORDER BY Trader_Data DESC";
-        QString query_str =
-            "SELECT O.*, P.PortfolioType "
-            "FROM Order_Table_Bid O "
-            "INNER JOIN Portfolios P "
-            "ON CASE "
-            "    WHEN O.PortfolioNumber > 1500000 THEN O.PortfolioNumber - 1500000 "
-            "    ELSE O.PortfolioNumber "
-            "END = P.PortfolioNumber "
-            "WHERE O.Trader_ID='" + user_id + "' "
-            "AND (O.Leg1_OrderState=7 OR O.Leg2_OrderState=7 OR O.Leg3_OrderState=7 OR O.Leg4_OrderState=7) "
-            "ORDER BY O.Trader_Data DESC";
 //        QString query_str =
 //            "SELECT O.*, P.PortfolioType "
 //            "FROM Order_Table_Bid O "
@@ -1307,11 +1296,22 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
 //            "    ELSE O.PortfolioNumber "
 //            "END = P.PortfolioNumber "
 //            "WHERE O.Trader_ID='" + user_id + "' "
-//                        "AND (O.Leg1_OrderState IN (7, 8) OR "
-//                        "     O.Leg2_OrderState IN (7, 8) OR "
-//                        "     O.Leg3_OrderState IN (7, 8) OR "
-//                        "     O.Leg4_OrderState IN (7, 8)) "
-//                        "ORDER BY O.Trader_Data DESC";
+//            "AND (O.Leg1_OrderState=7 OR O.Leg2_OrderState=7 OR O.Leg3_OrderState=7 OR O.Leg4_OrderState=7) "
+//            "ORDER BY O.Trader_Data DESC";
+        QString query_str =
+            "SELECT O.*, P.PortfolioType "
+            "FROM Order_Table_Bid O "
+            "INNER JOIN Portfolios P "
+            "ON CASE "
+            "    WHEN O.PortfolioNumber > 1500000 THEN O.PortfolioNumber - 1500000 "
+            "    ELSE O.PortfolioNumber "
+            "END = P.PortfolioNumber "
+            "WHERE O.Trader_ID='" + user_id + "' "
+                        "AND (O.Leg1_OrderState IN (7, 8) OR "
+                        "     O.Leg2_OrderState IN (7, 8) OR "
+                        "     O.Leg3_OrderState IN (7, 8) OR "
+                        "     O.Leg4_OrderState IN (7, 8)) "
+                        "ORDER BY O.Trader_Data DESC";
 
 
 
@@ -1568,7 +1568,6 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
 //                }
                 QString Stockname = ContractDetail::getInstance().GetStockName(leg1_token_number,portfolio_type);
                 int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
-
 //                Leg1_OrderStateStr = ContractDetail::getInstance().GetStockName(leg1_token_number,portfolio_type)+" "+"["+(QString::number(Leg1_Total_Volume/lotSize))+"]";
 //                Leg3_OrderStateStr = ContractDetail::getInstance().GetStockName(leg3_token_number,portfolio_type)+" "+"["+(QString::number(Leg3_Total_Volume/lotSize))+"]";
                 //Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")";
@@ -1578,7 +1577,9 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                               //       +" ("+(QString::number(Leg2_OrderState))+")";
                 if(Leg1_OrderState==8)
                 {
+                   int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
                    Leg1_OrderStateStr = Leg1_OrderStateStr+"["+(QString::number(Leg1_Total_Volume/lotSize))+"]";
+                   Stockname = ContractDetail::getInstance().GetStockName(leg1_token_number,portfolio_type);
                    // +" ("+(QString::number(Leg1_OrderState))+")"+" "
                 }
                 else
@@ -1588,7 +1589,9 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 }
                 if(Leg3_OrderState==8)
                 {
+                   int lotSize =  ContractDetail::getInstance().GetLotSize(leg3_token_number,portfolio_type);
                     Leg3_OrderStateStr = Leg3_OrderStateStr+"["+(QString::number(Leg3_Total_Volume/lotSize))+"]";
+                   Stockname = ContractDetail::getInstance().GetStockName(leg3_token_number,portfolio_type);
                   // +" ("+(QString::number(Leg3_OrderState))+")"+" "
                 }
                 else
@@ -1598,7 +1601,9 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 }
                 if(Leg2_OrderState==8)
                 {
+                     int lotSize =  ContractDetail::getInstance().GetLotSize(leg2_token_number,portfolio_type);
                     Leg2_OrderStateStr = Leg2_OrderStateStr+"["+(QString::number(Leg2_Total_Volume/lotSize))+"]";
+                     Stockname = ContractDetail::getInstance().GetStockName(leg2_token_number,portfolio_type);
                     // +" ("+(QString::number(Leg3_OrderState))+")"+" "
                 }
                 else
@@ -1608,7 +1613,9 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 }
                 if(Leg4_OrderState==8)
                 {
+                     int lotSize =  ContractDetail::getInstance().GetLotSize(leg4_token_number,portfolio_type);
                     Leg4_OrderStateStr = Leg4_OrderStateStr+"["+(QString::number(Leg4_Total_Volume/lotSize))+"]";
+                     Stockname = ContractDetail::getInstance().GetStockName(leg4_token_number,portfolio_type);
                     // +" ("+(QString::number(Leg3_OrderState))+")"+" "
                 }
                 else
