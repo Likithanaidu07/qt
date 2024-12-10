@@ -110,6 +110,9 @@ MainWindow::MainWindow(QWidget *parent)
                                       "    color: white;"
                                       "    font-family: 'Work Sans';"
                                       "    font-weight: bold;"
+
+                                     // "    padding-right: 10px;"  // Add padding for spacing
+                                     // "   border: 0px solid #4F5D75;"
                                "}";
 
     // Create the Card menu
@@ -444,6 +447,7 @@ MainWindow::MainWindow(QWidget *parent)
                 "   background: #106B9A;"
                 "   color: white;"
                 "   font-family: 'Work Sans';"
+                "   padding-right: 8px;"  // Add padding for spacing
                 "   width: 50px;"      // Set button width
              "line-height: normal;"      // Optional: Set button height
                 "}"
@@ -1981,7 +1985,13 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             else if(editedCellData.contains(PortfolioData_Idx::_OrderQuantity)){
 
                 double OQ = editedCellData[_OrderQuantity].newVal.toDouble();
-                if(OQ <= order_qty_limit){
+                double BTQ_ = static_cast<double>(P->BuyTotalQuantity);
+                double STQ_ = static_cast<double>(P->SellTotalQuantity);
+
+                if(BTQ_==0&&STQ_==0&&OQ>0){
+                    oq_btq_stq_msg.append("OrderQuantity cannot be greater than 0 if both BTQ and STQ are zero.");
+                }
+                else if(OQ <= order_qty_limit){
                    if(OQ==0)
                        OQ = 1;
                    updateQueryList.append("OrderQuantity="+QString::number(OQ*lotSize));

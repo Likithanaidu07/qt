@@ -292,149 +292,165 @@ void SlowDataSocket::run()
     unsigned int dst_len = 1024;
     unsigned char dst[1024];
 
+
+
     while(run_thread)
     {
-        memset(recv_str,0,sizeof(recv_str));
-        from_len = sizeof(from_addr);
-        memset(&from_addr,0,from_len);
+        // Prepare file descriptor set
+        fd_set read_fds;
+        FD_ZERO(&read_fds);
+        FD_SET(sock, &read_fds);
 
-        // emit socket_conn_info_Signal("Waiting to recveive data....");
+        // Set timeout (optional)
+        struct timeval timeout;
+        timeout.tv_sec = 1;  // 1-second timeout
+        timeout.tv_usec = 0;
 
-        if((recv_len = recvfrom(sock, recv_str,1024,0,(struct sockaddr*)&mc_addr, &from_len))<0)
+        // Monitor socket using select
+        int select_result = select(sock + 1, &read_fds, NULL, NULL, &timeout);
+
+        if (select_result < 0)
         {
 #ifdef ENABLE_DEBUG_MSG
-            qDebug()<<("recvfrom() failed");
+            qDebug() << "select() failed";
 #endif
-            emit socket_conn_info_Signal("Error: recvfrom() failed");
-
+            emit socket_conn_info_Signal("Error: select() failed");
             break;
         }
-
-
-        if (recv_len <= 0) continue;
-
-        SHORT prevLength = 0;
-        BroadcastPackData* packData = reinterpret_cast<BroadcastPackData*>(recv_str);
-        const SHORT numPackets = ntohs(packData->numPackets);
-        for (SHORT i = 0; i < numPackets; ++i)
+        else if (select_result == 0)
         {
-            BroadcastData* bcastData = nullptr;
-            BroadcastCompressedPacket* cmpPacket = reinterpret_cast<BroadcastCompressedPacket*>(packData->packData + prevLength);
-            const SHORT cmpLength = ntohs(cmpPacket->length);
-            prevLength += cmpLength;
+            // Timeout occurred, no data to read
+            continue;
+        }
 
-            SHORT bcastLength = cmpLength;
-            if (cmpLength > 0)
+        // Check if the socket is ready for reading
+        if (FD_ISSET(sock, &read_fds))
+        {
+            memset(recv_str, 0, sizeof(recv_str));
+            from_len = sizeof(from_addr);
+            memset(&from_addr, 0, from_len);
+
+            recv_len = recvfrom(sock, recv_str, 1024, 0, (struct sockaddr *)&mc_addr, &from_len);
+            if (recv_len < 0)
             {
-                int rCode = lzo1z_decompress((lzo_bytep) cmpPacket->compressedData, cmpLength,
-                                             (lzo_bytep) dst, (lzo_uintp)&dst_len, 0);
-                if (rCode == LZO_E_OK)
+#ifdef ENABLE_DEBUG_MSG
+                qDebug() << "recvfrom() failed";
+#endif
+                emit socket_conn_info_Signal("Error: recvfrom() failed");
+                break;
+            }
+
+            if (recv_len > 0)
+            {
+                // Process the received data
+                SHORT prevLength = 0;
+                BroadcastPackData* packData = reinterpret_cast<BroadcastPackData*>(recv_str);
+                const SHORT numPackets = ntohs(packData->numPackets);
+                for (SHORT i = 0; i < numPackets; ++i)
                 {
-                    bcastData = reinterpret_cast<BroadcastData*>(dst);
-                    bcastLength = dst_len;
-                }
-            }
-            else if (cmpLength == 0)
-            {
-                bcastData = reinterpret_cast<BroadcastData*>(cmpPacket->compressedData);
-            }
+                    BroadcastData* bcastData = nullptr;
+                    BroadcastCompressedPacket* cmpPacket = reinterpret_cast<BroadcastCompressedPacket*>(packData->packData + prevLength);
+                    const SHORT cmpLength = ntohs(cmpPacket->length);
+                    prevLength += cmpLength;
 
-            if ((bcastData == nullptr) || (bcastLength <= 0)) continue;
+                    SHORT bcastLength = cmpLength;
+                    if (cmpLength > 0)
+                    {
+                        int rCode = lzo1z_decompress((lzo_bytep) cmpPacket->compressedData, cmpLength,
+                                                     (lzo_bytep) dst, (lzo_uintp)&dst_len, 0);
+                        if (rCode == LZO_E_OK)
+                        {
+                            bcastData = reinterpret_cast<BroadcastData*>(dst);
+                            bcastLength = dst_len;
+                        }
+                    }
+                    else if (cmpLength == 0)
+                    {
+                        bcastData = reinterpret_cast<BroadcastData*>(cmpPacket->compressedData);
+                    }
 
-
-            MS_BCAST_ONLY_MBP* mbp = reinterpret_cast<MS_BCAST_ONLY_MBP*>(bcastData->data + 8);
-            const SHORT transactionCode = ntohs(mbp->header.transactionCode);
-
-            /*size_t dataSize = sizeof(bcastData->data) - 1;
-
-              QString hexString;
-
-              // Convert binary data to hexadecimal representation
-              for (size_t i = 0; i < dataSize; ++i) {
-                  hexString += QString("%1 ").arg(static_cast<unsigned char>(bcastData->data[i]), 2, 16, QLatin1Char('0'));
-              }*/
-
-            // Print the hexadecimal representation
-            //  qDebug() << "Hexadecimal Data:" << hexString;
+                    if ((bcastData == nullptr) || (bcastLength <= 0)) continue;
 
 
+                    MS_BCAST_ONLY_MBP* mbp = reinterpret_cast<MS_BCAST_ONLY_MBP*>(bcastData->data + 8);
+                    const SHORT transactionCode = ntohs(mbp->header.transactionCode);
 
-            //qDebug()<<("recv data Thread 1 : transactionCode---- ")<<transactionCode<<"mbp->header.messageLength: "<<mbp->header.messageLength;
-            //qDebug()<<("recv slow data : transactionCode---- ")<<transactionCode<<"mbp->header.messageLength: "<<mbp->header.messageLength;
 
-            /*if (transactionCode == 7207 || transactionCode == 7216){
-                qDebug()<<("recv slow data : transactionCode---- ")<<transactionCode<<"mbp->header.messageLength: "<<mbp->header.messageLength;
-
-            }*/
 #ifdef SLOW_DATA_DEBUG
-            qDebug()<<("recv slow data : transactionCode---- ")<<transactionCode<<"mbp->header.messageLength: "<<mbp->header.messageLength;
+                    qDebug()<<("recv slow data : transactionCode---- ")<<transactionCode<<"mbp->header.messageLength: "<<mbp->header.messageLength;
 #endif
 
-            if (transactionCode != 7208) continue; // BCAST_ONLY_MBP
-            if (ntohs(mbp->header.messageLength) != 470) continue; // size of MS_BCAST_ONLY_MBP is 470
+                    if (transactionCode != 7208) continue; // BCAST_ONLY_MBP
+                    if (ntohs(mbp->header.messageLength) != 470) continue; // size of MS_BCAST_ONLY_MBP is 470
 
 
-            //fwrite(mbp, 1, 470, fd);
-            //fflush(fd);
-            //qDebug()<<mbp->header.timestamp2[0];
-            // int timstamp = mbp->header.timestamp2;
-            /*  for (int i = 0; i < sizeof(mbp->header.timestamp2); i++)
+                    //fwrite(mbp, 1, 470, fd);
+                    //fflush(fd);
+                    //qDebug()<<mbp->header.timestamp2[0];
+                    // int timstamp = mbp->header.timestamp2;
+                    /*  for (int i = 0; i < sizeof(mbp->header.timestamp2); i++)
             {
                 qDebug()<<"mbp->header.timestamp2["<<i<<"] = " <<static_cast<quint8>(mbp->header.timestamp2[i]);
             }*/
 
-            //qDebug()<<"logTime: "<<ntohl(mbp->header.logTime);
-            qint64 timeStampIST =  ntohl(mbp->header.logTime) - 19800; // exchange timestamp is in GMT, so subtract 5 hours 30 minutes to it.
-            data_exchangeTimestamp.storeRelaxed(timeStampIST);
+                    //qDebug()<<"logTime: "<<ntohl(mbp->header.logTime);
+                    qint64 timeStampIST =  ntohl(mbp->header.logTime) - 19800; // exchange timestamp is in GMT, so subtract 5 hours 30 minutes to it.
+                    data_exchangeTimestamp.storeRelaxed(timeStampIST);
 
 
-            for (int j = 0; j < ntohs(mbp->noOfRecords); ++j)
-            {
-                double startValue = ntohl(mbp->mbpData[j].netPriceChangeFromClosingPrice);
-                double endValue = ntohl(mbp->mbpData[j].lastTradedPrice);
-                double netPriceChangeFromClosingPricePerc = (startValue - endValue)/startValue;
-                netPriceChangeFromClosingPricePerc = netPriceChangeFromClosingPricePerc*100.0;
+                    for (int j = 0; j < ntohs(mbp->noOfRecords); ++j)
+                    {
+                        double startValue = ntohl(mbp->mbpData[j].netPriceChangeFromClosingPrice);
+                        double endValue = ntohl(mbp->mbpData[j].lastTradedPrice);
+                        double netPriceChangeFromClosingPricePerc = (startValue - endValue)/startValue;
+                        netPriceChangeFromClosingPricePerc = netPriceChangeFromClosingPricePerc*100.0;
 
-                // qDebug()<<"startValue: "<<startValue<<" endValue: "<<endValue;
-                // qDebug()<<"netPriceChangeFromClosingPricePerc: "<<netPriceChangeFromClosingPricePerc;
+                        // qDebug()<<"startValue: "<<startValue<<" endValue: "<<endValue;
+                        // qDebug()<<"netPriceChangeFromClosingPricePerc: "<<netPriceChangeFromClosingPricePerc;
 
 
-                MBP_Data_Struct  MBP_Data;
-                MBP_Data.token = QString::number(ntohl(mbp->mbpData[j].token));
-                MBP_Data.volumeTradedToday = QString::number(ntohl(mbp->mbpData[j].volumeTradedToday));
-                MBP_Data.netChangeIndicator = QString(mbp->mbpData[j].netChangeIndicator);//fixDecimal(ntohl(mbp->mbpData[j].netChangeIndicator)/100.0);
-                MBP_Data.netPriceChangeFromClosingPrice = QString::number(ntohl(mbp->mbpData[j].netPriceChangeFromClosingPrice));//fixDecimal(netPriceChangeFromClosingPricePerc);
-                MBP_Data.lastTradedPrice = fixDecimal(ntohl(mbp->mbpData[j].lastTradedPrice),decimal_precision);
-                MBP_Data.lastTradeQuantity = QString::number(ntohl(mbp->mbpData[j].lastTradeQuantity));
-                MBP_Data.lastTradeTime = QString::number(ntohl(mbp->mbpData[j].lastTradeTime));
-                MBP_Data.averageTradePrice = fixDecimal(ntohl(mbp->mbpData[j].averageTradePrice),decimal_precision);
-                MBP_Data.totalBuyQuantity = QString::number(ntohd(mbp->mbpData[j].totalBuyQuantity));
-                MBP_Data.totalSellQuantity = QString::number(ntohd(mbp->mbpData[j].totalSellQuantity));
-                MBP_Data.closingPrice = fixDecimal(ntohl(mbp->mbpData[j].closingPrice),decimal_precision);
-                MBP_Data.openPrice = fixDecimal(ntohl(mbp->mbpData[j].openPrice),decimal_precision);
-                MBP_Data.highPrice = fixDecimal(ntohl(mbp->mbpData[j].highPrice),decimal_precision);
-                MBP_Data.lowPrice = fixDecimal(ntohl(mbp->mbpData[j].lowPrice),decimal_precision);
+                        MBP_Data_Struct  MBP_Data;
+                        MBP_Data.token = QString::number(ntohl(mbp->mbpData[j].token));
+                        MBP_Data.volumeTradedToday = QString::number(ntohl(mbp->mbpData[j].volumeTradedToday));
+                        MBP_Data.netChangeIndicator = QString(mbp->mbpData[j].netChangeIndicator);//fixDecimal(ntohl(mbp->mbpData[j].netChangeIndicator)/100.0);
+                        MBP_Data.netPriceChangeFromClosingPrice = QString::number(ntohl(mbp->mbpData[j].netPriceChangeFromClosingPrice));//fixDecimal(netPriceChangeFromClosingPricePerc);
+                        MBP_Data.lastTradedPrice = fixDecimal(ntohl(mbp->mbpData[j].lastTradedPrice),decimal_precision);
+                        MBP_Data.lastTradeQuantity = QString::number(ntohl(mbp->mbpData[j].lastTradeQuantity));
+                        MBP_Data.lastTradeTime = QString::number(ntohl(mbp->mbpData[j].lastTradeTime));
+                        MBP_Data.averageTradePrice = fixDecimal(ntohl(mbp->mbpData[j].averageTradePrice),decimal_precision);
+                        MBP_Data.totalBuyQuantity = QString::number(ntohd(mbp->mbpData[j].totalBuyQuantity));
+                        MBP_Data.totalSellQuantity = QString::number(ntohd(mbp->mbpData[j].totalSellQuantity));
+                        MBP_Data.closingPrice = fixDecimal(ntohl(mbp->mbpData[j].closingPrice),decimal_precision);
+                        MBP_Data.openPrice = fixDecimal(ntohl(mbp->mbpData[j].openPrice),decimal_precision);
+                        MBP_Data.highPrice = fixDecimal(ntohl(mbp->mbpData[j].highPrice),decimal_precision);
+                        MBP_Data.lowPrice = fixDecimal(ntohl(mbp->mbpData[j].lowPrice),decimal_precision);
 
-                //first 5 value is Buy data and the remaining 5 value will be sell data
-                for(int i=0;i<10;i++){
-                    mbpInfo _mbpInfoTmp;
-                    _mbpInfoTmp.quantity = fixDecimal(ntohl(mbp->mbpData[j].recordBuffer[i].quantity),decimal_precision);
-                    _mbpInfoTmp.price = QString::number(ntohl(mbp->mbpData[j].recordBuffer[i].price));
-                    _mbpInfoTmp.numberOfOrders = QString::number(ntohs(mbp->mbpData[j].recordBuffer[i].numberOfOrders));
-                    _mbpInfoTmp.bbBuySellFlag = QString::number(ntohs(mbp->mbpData[j].recordBuffer[i].bbBuySellFlag));
-                    MBP_Data.recordBuffer.append(_mbpInfoTmp);
-                }
+                        //first 5 value is Buy data and the remaining 5 value will be sell data
+                        for(int i=0;i<10;i++){
+                            mbpInfo _mbpInfoTmp;
+                            _mbpInfoTmp.quantity = fixDecimal(ntohl(mbp->mbpData[j].recordBuffer[i].quantity),decimal_precision);
+                            _mbpInfoTmp.price = QString::number(ntohl(mbp->mbpData[j].recordBuffer[i].price));
+                            _mbpInfoTmp.numberOfOrders = QString::number(ntohs(mbp->mbpData[j].recordBuffer[i].numberOfOrders));
+                            _mbpInfoTmp.bbBuySellFlag = QString::number(ntohs(mbp->mbpData[j].recordBuffer[i].bbBuySellFlag));
+                            MBP_Data.recordBuffer.append(_mbpInfoTmp);
+                        }
 #ifdef SLOW_DATA_DEBUG
-                qDebug()<<"SlowData:  token = "<<MBP_Data.token;
-                qDebug()<<"SlowData:  price0 = "<<MBP_Data.recordBuffer[0].price;
-                qDebug()<<"SlowData:  price1 = "<<MBP_Data.recordBuffer[5].price;
+                        qDebug()<<"SlowData:  token = "<<MBP_Data.token;
+                        qDebug()<<"SlowData:  price0 = "<<MBP_Data.recordBuffer[0].price;
+                        qDebug()<<"SlowData:  price1 = "<<MBP_Data.recordBuffer[5].price;
 #endif
-                emit dataSignal(MBP_Data);
+                        emit dataSignal(MBP_Data);
 
 
 
+                    }
+                }
             }
         }
+
+
+
+
     }
 
     if((setsockopt(sock, IPPROTO_IP, IP_DROP_MEMBERSHIP,(const char*)&mc_req, sizeof(mc_req))) < 0)

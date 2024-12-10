@@ -20,8 +20,8 @@ loginwindow::loginwindow(QWidget *parent) :
 //#ifdef QT_DEBUG
 #ifndef RELEASE_BUILD
 
-    ui->lineEditUsername->setText("JNK82");
-    ui->lineEdit_Password->setText("MTIz");
+    ui->lineEditUsername->setText("stm101");
+    ui->lineEdit_Password->setText("123");
     ui->pushButtonlogin->click();
 #endif
 

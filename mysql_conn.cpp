@@ -973,9 +973,19 @@ QString mysql_conn::get_Algo_Name(int algo_type, int leg1_token_number, int leg2
     }
 
     else if(algo_type==PortfolioType::BS1221){
-        Algo_Name = "BX1221-";//Nifty-18000-CE-200";
-        double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
-        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+"-"+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
+        Algo_Name = "BS12-";//Nifty-18000-CE-200";
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+
+                    ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+
+                    ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+
+                    ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type) +"-"+
+                    ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);    }
+    else if(algo_type==PortfolioType::BS1331){
+        Algo_Name = "BS13-";//Nifty-18000-CE-200";
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+
+                    ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+
+                    ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+
+                    ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type) +"-"+
+                    ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
     }
     else if(algo_type==PortfolioType::F1_F2){
         Algo_Name = "F1_F2-";//Nifty-18000-CE-200";
@@ -1517,7 +1527,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     Leg2_OrderStateStr="-";
                 }
 
-                if (portfolio_type == PortfolioType::BX_BID) {
+                if (portfolio_type == PortfolioType::BX_BID || portfolio_type == PortfolioType::BS1221|| portfolio_type == PortfolioType::BS1331) {
                     if (Leg4_OrderState == 1) {
                         Leg4_OrderStateStr = "Sent to Exchange";
                     }
@@ -1558,6 +1568,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
 //                }
                 QString Stockname = ContractDetail::getInstance().GetStockName(leg1_token_number,portfolio_type);
                 int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
+
 
 //                Leg1_OrderStateStr = ContractDetail::getInstance().GetStockName(leg1_token_number,portfolio_type)+" "+"["+(QString::number(Leg1_Total_Volume/lotSize))+"]";
 //                Leg3_OrderStateStr = ContractDetail::getInstance().GetStockName(leg3_token_number,portfolio_type)+" "+"["+(QString::number(Leg3_Total_Volume/lotSize))+"]";
@@ -2101,25 +2112,28 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
 
             /***************Get Span data for tokens***************************/
             QStringList distinct_tokens = net_pos_dataList.keys();
-            QString tokenListStr = "(" + distinct_tokens.join(",") + ")";
-            QString sqlQuery = QString("SELECT Token, StockName, Min_Value, Max_Value FROM Span WHERE Token IN %1").arg(tokenListStr);
-            QSqlQuery query2(sqlQuery,db);
-            if( !query2.exec() )
-            {
-                qDebug()<<query2.lastError().text();
-            }
-            else{
-                QSqlRecord rec1 = query2.record();
-                while (query2.next())
+            if(distinct_tokens.size()>0){
+                QString tokenListStr = "(" + distinct_tokens.join(",") + ")";
+                QString sqlQuery = QString("SELECT Token, StockName, Min_Value, Max_Value FROM Span WHERE Token IN %1").arg(tokenListStr);
+                QSqlQuery query2(sqlQuery,db);
+                if( !query2.exec() )
                 {
-                    QString TokenNo = query2.value(rec1.indexOf("Token")).toString();
-                    if(spanHash.contains(TokenNo)){
-                        int Min_Value = query2.value(rec1.indexOf("Min_Value")).toInt();
-                        spanHash[TokenNo] = Min_Value;
+                    qDebug()<<sqlQuery;
+                    qDebug()<<query2.lastError().text();
+                }
+                else{
+                    QSqlRecord rec1 = query2.record();
+                    while (query2.next())
+                    {
+                        QString TokenNo = query2.value(rec1.indexOf("Token")).toString();
+                        if(spanHash.contains(TokenNo)){
+                            int Min_Value = query2.value(rec1.indexOf("Min_Value")).toInt();
+                            spanHash[TokenNo] = Min_Value;
+                        }
                     }
                 }
+                query2.finish();
             }
-            query2.finish();
             /******************************************************************/
 
 
@@ -2293,13 +2307,12 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
                  rowList.append(fixDecimal(data.Buy_Avg_Price, decimal_precision)); // Buy Avg Price
                  rowList.append(fixDecimal(data.Sell_Avg_Price, decimal_precision)); // Sell Avg Price
                  rowList.append(QString::number(data.Net_Qty / data.lotSize)); // Net Qty
-           //     double Profit = (data.Sell_Price - data.Buy_Price); // Example profit calculation
-//                 rowList.append(fixDecimal(Profit, decimal_precision)); // Profit
+                 double Profit = (data.Buy_Price - data.Sell_Price); // Example profit calculation
+                 rowList.append(fixDecimal(Profit, decimal_precision)); // Profit
                  rowList.append(fixDecimal(data.M2M, decimal_precision)); // M2M
                  rowList.append(QString::number((data.MarginUsed))); // MarginUsed
                  rowList.append(QString::number((data.lotSize))); //lotSize
                  rowList.append(tokenNo); // TokenNo as the last element
-
                  netPos_data_listTmp.append(rowList);
             }
 

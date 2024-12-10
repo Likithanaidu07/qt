@@ -582,15 +582,20 @@ bool ContractDetail::checkTokenExist(int token){
 
 int ContractDetail::GetLotSize(int token,int type)
 {
-    if (token == 0)
+    if (token == 0){
+        qDebug()<<"Warning: GetLotSize--> token cannot be zero.";
         return 0;
+    }
 
     QString key = QString::number(token);
-    if(m_ContractDetails_Hash.contains(key))
+    if(m_ContractDetails_Hash.contains(key)){
         return m_ContractDetails_Hash[key].LotSize;
+    }
 
-    else
+    else{
+        qDebug()<<"Warning: GetLotSize--> token not exist in contract for token=."<<token;
         return 0;
+    }
 }
 
 QString ContractDetail::GetStockName(int token,int type)

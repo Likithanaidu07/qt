@@ -347,28 +347,58 @@ void Slowdata_Indices_Socket::run()
 
     while(run_thread)
     {
-        memset(recv_str,0,sizeof(recv_str));
-        from_len = sizeof(from_addr);
-        memset(&from_addr,0,from_len);
 
-        // emit socket_conn_info_Signal("Waiting to recveive data....");
+        // Prepare file descriptor set
+        fd_set read_fds;
+        FD_ZERO(&read_fds);
+        FD_SET(sock, &read_fds);
 
-        if((recv_len = recvfrom(sock, recv_str,1024,0,(struct sockaddr*)&mc_addr, &from_len))<0)
+        // Set timeout (optional)
+        struct timeval timeout;
+        timeout.tv_sec = 1;  // 1-second timeout
+        timeout.tv_usec = 0;
+
+        // Monitor socket using select
+        int select_result = select(sock + 1, &read_fds, NULL, NULL, &timeout);
+
+        if (select_result < 0)
         {
 #ifdef ENABLE_DEBUG_MSG
-            qDebug()<<("Slowdata_Indices_Socket: recvfrom() failed");
+            qDebug() << "select() failed";
 #endif
-            emit socket_conn_info_Signal("Slowdata_Indices_SocketError: recvfrom() failed");
-
+            emit socket_conn_info_Signal("Error: select() failed");
             break;
         }
+        else if (select_result == 0)
+        {
+            // Timeout occurred, no data to read
+            continue;
+        }
+
+        // Check if the socket is ready for reading
+        if (FD_ISSET(sock, &read_fds))
+        {
+            memset(recv_str, 0, sizeof(recv_str));
+            from_len = sizeof(from_addr);
+            memset(&from_addr, 0, from_len);
+
+            recv_len = recvfrom(sock, recv_str, 1024, 0, (struct sockaddr *)&mc_addr, &from_len);
+            if (recv_len < 0)
+            {
+#ifdef ENABLE_DEBUG_MSG
+                qDebug()<<("Slowdata_Indices_Socket: recvfrom() failed");
+#endif
+                emit socket_conn_info_Signal("Slowdata_Indices_SocketError: recvfrom() failed");
+
+                break;
+            }
+
+            if (recv_len > 0)
+            {
 
 
-        if (recv_len <= 0) continue;
-
-
-        /* *************DEBUGGING CODE*****************/
-        /*    size_t dataSize = sizeof(recv_str) - 1;
+                /* *************DEBUGGING CODE*****************/
+                /*    size_t dataSize = sizeof(recv_str) - 1;
            QString hexString;
 
            // Convert binary data to hexadecimal representation
@@ -404,181 +434,92 @@ void Slowdata_Indices_Socket::run()
               qDebug() << "Transaction Code: " << transactionCode;*/
 
 
-        MS_BCAST_INDICES* mbi = reinterpret_cast<MS_BCAST_INDICES*>(recv_str + 14);
-        const SHORT transactionCode = ntohs(mbi->header.transactionCode);
-        //qDebug()<<("recv data Thread 1 : transactionCode---- ")<<transactionCode<<"mbp->header.messageLength: "<<mbp->header.messageLength;
-        //qDebug()<<("recv slow data indices : transactionCode---- ")<<transactionCode<<"mbp->header.messageLength: "<<mbi->header.messageLength;
+                MS_BCAST_INDICES* mbi = reinterpret_cast<MS_BCAST_INDICES*>(recv_str + 14);
+                const SHORT transactionCode = ntohs(mbi->header.transactionCode);
+                //qDebug()<<("recv data Thread 1 : transactionCode---- ")<<transactionCode<<"mbp->header.messageLength: "<<mbp->header.messageLength;
+                //qDebug()<<("recv slow data indices : transactionCode---- ")<<transactionCode<<"mbp->header.messageLength: "<<mbi->header.messageLength;
 
-        if (transactionCode == 7207 || transactionCode == 7216){
+                if (transactionCode == 7207 || transactionCode == 7216){
 
 
-            // qDebug()<<("recv slow data : transactionCode---- ")<<transactionCode<<"mbp->header.messageLength: "<<mbi->header.messageLength;
-            qint64 timeStampIST =  ntohl(mbi->header.logTime) - 19800; // exchange timestamp is in GMT, so subtract 5 hours 30 minutes to it.
-            data_exchangeTimestamp.storeRelaxed(timeStampIST);
-            for (int j = 0; j < ntohs(mbi->noOfRecords); ++j) {
-                QString indexName =  QString(mbi->msiData[j].indexName);
-                long indexValue  = ntohl(mbi->msiData[j].indexValue);
-                long highIndexValue = ntohl(mbi->msiData[j].highIndexValue);
-                long lowIndexValue = ntohl(mbi->msiData[j].lowIndexValue);
-                long openingIdx = ntohl(mbi->msiData[j].openingIdx);
-                long closingIDx = ntohl(mbi->msiData[j].closingIDx);
-                long percentChange = ntohl(mbi->msiData[j].percentChange);
-                long yearlyHigh = ntohl(mbi->msiData[j].yearlyHigh);
-                long yearlyLow = ntohl(mbi->msiData[j].yearlyLow);
-                long noOfUpmoves = ntohl(mbi->msiData[j].noOfUpmoves);
-                long noOfDownmoves = ntohl(mbi->msiData[j].noOfDownmoves);
-                double marketCapitialisation = ntohd(mbi->msiData[j].marketCapitialisation);
-                QString netChangeIndicator = QString(mbi->msiData[j].netChangeIndicator);
-                QString reserved = QString(mbi->msiData[j].reserved);
+                    // qDebug()<<("recv slow data : transactionCode---- ")<<transactionCode<<"mbp->header.messageLength: "<<mbi->header.messageLength;
+                    qint64 timeStampIST =  ntohl(mbi->header.logTime) - 19800; // exchange timestamp is in GMT, so subtract 5 hours 30 minutes to it.
+                    data_exchangeTimestamp.storeRelaxed(timeStampIST);
+                    for (int j = 0; j < ntohs(mbi->noOfRecords); ++j) {
+                        QString indexName =  QString(mbi->msiData[j].indexName);
+                        long indexValue  = ntohl(mbi->msiData[j].indexValue);
+                        long highIndexValue = ntohl(mbi->msiData[j].highIndexValue);
+                        long lowIndexValue = ntohl(mbi->msiData[j].lowIndexValue);
+                        long openingIdx = ntohl(mbi->msiData[j].openingIdx);
+                        long closingIDx = ntohl(mbi->msiData[j].closingIDx);
+                        long percentChange = ntohl(mbi->msiData[j].percentChange);
+                        long yearlyHigh = ntohl(mbi->msiData[j].yearlyHigh);
+                        long yearlyLow = ntohl(mbi->msiData[j].yearlyLow);
+                        long noOfUpmoves = ntohl(mbi->msiData[j].noOfUpmoves);
+                        long noOfDownmoves = ntohl(mbi->msiData[j].noOfDownmoves);
+                        double marketCapitialisation = ntohd(mbi->msiData[j].marketCapitialisation);
+                        QString netChangeIndicator = QString(mbi->msiData[j].netChangeIndicator);
+                        QString reserved = QString(mbi->msiData[j].reserved);
 
-                QString dataStr = "indexName: "+indexName+"\n"+
-                                  "indexValue: "+QString::number(indexValue)+"\n"+
-                                  "highIndexValue: "+QString::number(highIndexValue)+"\n"+
-                                  "lowIndexValue: "+QString::number(lowIndexValue)+"\n"+
-                                  "openingIdx: "+QString::number(openingIdx)+"\n"+
-                                  "closingIDx: "+QString::number(closingIDx)+"\n"+
-                                  "percentChange: "+QString::number(percentChange)+"\n"+
-                                  "yearlyHigh: "+QString::number(yearlyHigh)+"\n"+
-                                  "yearlyLow: "+QString::number(yearlyLow)+"\n"+
-                                  "noOfUpmoves: "+QString::number(noOfUpmoves)+"\n"+
-                                  "noOfDownmoves: "+QString::number(noOfDownmoves)+"\n"+
-                                  "marketCapitialisation: "+QString::number(marketCapitialisation)+"\n"+
-                                  "netChangeIndicator: "+netChangeIndicator+"\n"+
-                                  "reserved: "+reserved;
+                        QString dataStr = "indexName: "+indexName+"\n"+
+                                          "indexValue: "+QString::number(indexValue)+"\n"+
+                                          "highIndexValue: "+QString::number(highIndexValue)+"\n"+
+                                          "lowIndexValue: "+QString::number(lowIndexValue)+"\n"+
+                                          "openingIdx: "+QString::number(openingIdx)+"\n"+
+                                          "closingIDx: "+QString::number(closingIDx)+"\n"+
+                                          "percentChange: "+QString::number(percentChange)+"\n"+
+                                          "yearlyHigh: "+QString::number(yearlyHigh)+"\n"+
+                                          "yearlyLow: "+QString::number(yearlyLow)+"\n"+
+                                          "noOfUpmoves: "+QString::number(noOfUpmoves)+"\n"+
+                                          "noOfDownmoves: "+QString::number(noOfDownmoves)+"\n"+
+                                          "marketCapitialisation: "+QString::number(marketCapitialisation)+"\n"+
+                                          "netChangeIndicator: "+netChangeIndicator+"\n"+
+                                          "reserved: "+reserved;
 
-                emit socket_conn_info_Signal("MS_BCAST_INDICES Data: \n================\n"+dataStr+"\n\n");
-                indexName = indexName.trimmed();
-             //   qDebug()<<"indexName:  "<<indexName;
+                        emit socket_conn_info_Signal("MS_BCAST_INDICES Data: \n================\n"+dataStr+"\n\n");
+                        indexName = indexName.trimmed();
+                        //   qDebug()<<"indexName:  "<<indexName;
 
 #ifdef WRITE_ALL_INDEXNAME_TO_FILE
-                if(!indexNameAll.contains(indexName)){
-                    qDebug()<<"New indexName:  "<<indexName;
-                    indexNameAll.append(indexName);
-                }
+                        if(!indexNameAll.contains(indexName)){
+                            qDebug()<<"New indexName:  "<<indexName;
+                            indexNameAll.append(indexName);
+                        }
 #endif
-                if(indexNameFilter.contains(indexName.toUpper())){
+                        if(indexNameFilter.contains(indexName.toUpper())){
 
 
-                    double devicer = 100.0;
-                    if(indexName.toUpper()=="INDIA VIX")
-                        devicer = 10000.0;
+                            double devicer = 100.0;
+                            if(indexName.toUpper()=="INDIA VIX")
+                                devicer = 10000.0;
 
-                    double indexValueD = indexValue/devicer;
+                            double indexValueD = indexValue/devicer;
 
-                    Indices_Data_Struct data;
-                    data.indexName =indexName;
-                    data.indexValue = QString::number(indexValueD,'f',2);
-                    data.change = QString::number(((indexValue-closingIDx)/devicer),'f',2);
-                    data.percentagechange = QString::number(((percentChange)/devicer),'f',2);
-                    data.netChangeIndicator = netChangeIndicator;
-                    data.highIndexValue = QString::number(highIndexValue);
-                    data.lowIndexValue = QString::number(lowIndexValue);
-                    data.openingIdx = QString::number(openingIdx);
-                    data.closingIdx = QString::number(closingIDx);
-                    data.marketCapitialisation = QString::number(marketCapitialisation);
-                    data.display_widget_idx = IndicesDataWidgetID::NA;
-                    emit dataSignal(data);
+                            Indices_Data_Struct data;
+                            data.indexName =indexName;
+                            data.indexValue = QString::number(indexValueD,'f',2);
+                            data.change = QString::number(((indexValue-closingIDx)/devicer),'f',2);
+                            data.percentagechange = QString::number(((percentChange)/devicer),'f',2);
+                            data.netChangeIndicator = netChangeIndicator;
+                            data.highIndexValue = QString::number(highIndexValue);
+                            data.lowIndexValue = QString::number(lowIndexValue);
+                            data.openingIdx = QString::number(openingIdx);
+                            data.closingIdx = QString::number(closingIDx);
+                            data.marketCapitialisation = QString::number(marketCapitialisation);
+                            data.display_widget_idx = IndicesDataWidgetID::NA;
+                            emit dataSignal(data);
+                        }
+
+
+
+                    }
+
                 }
-
-                /*if(indexName =="Nifty 50"){
-                    Indices_Data_Struct data;
-                    data.indexName =indexName;
-                    data.indexValue = QString::number(indexValueD,'f',2);
-                    data.change = QString::number(((indexValue-closingIDx)/100.0),'f',2);
-                    data.percentagechange = QString::number(((percentChange)/100.0),'f',2);
-                    data.netChangeIndicator = netChangeIndicator;
-                    data.highIndexValue = QString::number(highIndexValue);
-                    data.lowIndexValue = QString::number(lowIndexValue);
-                    data.openingIdx = QString::number(openingIdx);
-                    data.closingIdx = QString::number(closingIDx);
-                    data.marketCapitialisation = QString::number(marketCapitialisation);
-                    data.display_widget_idx = IndicesDataWidgetID::NA;
-                    emit dataSignal(data);
-                }
-                else if(indexName == "Nifty Bank"){
-                    Indices_Data_Struct data;
-                    data.indexName =indexName;
-                    data.indexValue = QString::number(indexValueD,'f',2);
-                    data.change = QString::number(((indexValue-closingIDx)/100.0),'f',2);
-                    data.percentagechange = QString::number(((percentChange)/100.0),'f',2);
-                    data.netChangeIndicator = netChangeIndicator;
-                    data.highIndexValue = QString::number(highIndexValue);
-                    data.lowIndexValue = QString::number(lowIndexValue);
-                    data.openingIdx = QString::number(openingIdx);
-                    data.closingIdx = QString::number(closingIDx);
-                    data.marketCapitialisation = QString::number(marketCapitialisation);
-                    data.display_widget_idx = IndicesDataWidgetID::NA;
-                    emit dataSignal(data);
-                }
-                else if(indexName == "India VIX"){
-                    Indices_Data_Struct data;
-                    data.indexName =indexName;
-                    indexValueD = indexValueD/100.0; // for VIX it need to device with 10000 follow swastika app
-                    data.indexValue = QString::number(indexValueD,'f',2);
-                    data.change = QString::number(((indexValue-closingIDx)/10000.0),'f',2);// for VIX it need to device with 10000 follow swastika app
-                    data.percentagechange = QString::number(((percentChange)/10000.0),'f',2);
-                    data.netChangeIndicator = netChangeIndicator;
-                    data.highIndexValue = QString::number(highIndexValue);
-                    data.lowIndexValue = QString::number(lowIndexValue);
-                    data.openingIdx = QString::number(openingIdx);
-                    data.closingIdx = QString::number(closingIDx);
-                    data.marketCapitialisation = QString::number(marketCapitialisation);
-                    data.display_widget_idx = IndicesDataWidgetID::NA;
-                    emit dataSignal(data);
-                }
-                else if(indexName == "Nifty Fin Service"){
-                    Indices_Data_Struct data;
-                    data.indexName =indexName;
-                    data.indexValue = QString::number(indexValueD,'f',2);
-                    data.change = QString::number(((indexValue-closingIDx)/100.0),'f',2);
-                    data.percentagechange = QString::number(((percentChange)/100.0),'f',2);
-                    data.netChangeIndicator = netChangeIndicator;
-                    data.highIndexValue = QString::number(highIndexValue);
-                    data.lowIndexValue = QString::number(lowIndexValue);
-                    data.openingIdx = QString::number(openingIdx);
-                    data.closingIdx = QString::number(closingIDx);
-                    data.marketCapitialisation = QString::number(marketCapitialisation);
-                    data.display_widget_idx = IndicesDataWidgetID::NA;
-                    emit dataSignal(data);
-                }
-                else if(indexName == "Nifty Midcap 50"){
-                    Indices_Data_Struct data;
-                    data.indexName =indexName;
-                    data.indexValue = QString::number(indexValueD,'f',2);
-                    data.change = QString::number(((indexValue-closingIDx)/100.0),'f',2);
-                    data.percentagechange = QString::number(((percentChange)/100.0),'f',2);
-                    data.netChangeIndicator = netChangeIndicator;
-                    data.highIndexValue = QString::number(highIndexValue);
-                    data.lowIndexValue = QString::number(lowIndexValue);
-                    data.openingIdx = QString::number(openingIdx);
-                    data.closingIdx = QString::number(closingIDx);
-                    data.marketCapitialisation = QString::number(marketCapitialisation);
-                    data.display_widget_idx = IndicesDataWidgetID::NA;
-                    emit dataSignal(data);
-                }*/
-
-
-
-
-
-
-                /*  if(indexName.contains("Nifty 50")){
-                                size_t dataSize = sizeof(recv_str) - 1;
-                                 QString hexString;
-
-                                 // Convert binary data to hexadecimal representation
-                                 for (size_t i = 0; i < dataSize; ++i) {
-                                    // hexString += QString::number(i)+"-->"+QString("%1 ").arg(static_cast<unsigned char>(recv_str[i]), 2, 16, QLatin1Char('0'))+"   ";
-                                   //  hexString += QString("0x%1, ").arg(static_cast< char>(recv_str[i]), 2, 16, QLatin1Char('0'));
-                                       hexString += QString("%1 ").arg(static_cast< char>(recv_str[i]), 2, 16, QLatin1Char('0'));
-
-                                 }
-                                 qDebug()<<"MS_BCAST_INDICES data("<<indexName<<"):  "<<hexString;
-                                }*/
-
             }
-
         }
+
+
+
 
 
 
