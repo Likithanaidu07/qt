@@ -689,32 +689,42 @@ void mysql_conn::logToDB(QString logMessage)
 
     QString msg;
     bool ok = checkDBOpened(msg);
-    if(ok){
-        QTime currentTime = QTime::currentTime();
+    if (ok) {
+        // Query to get the database server's current time
+        QString timeQueryStr = "SELECT UNIX_TIMESTAMP(NOW())";
+        QSqlQuery timeQuery(db);
+        if (!timeQuery.exec(timeQueryStr) || !timeQuery.next()) {
+            qDebug() << "Failed to fetch server time: " << timeQuery.lastError().text();
+            return;
+        }
+
+        // Fetch the server time
+        qint64 serverTime = timeQuery.value(0).toLongLong();
+
+        // Insert log entry into the database
         QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedTime)";
         QSqlQuery query1(db);
         query1.prepare(qryStr);
         query1.bindValue(":logMessage", logMessage);
         query1.bindValue(":userName", userNameLogged);
-        query1.bindValue(":formattedTime", QDateTime::currentDateTime().toSecsSinceEpoch());
+        query1.bindValue(":formattedTime", serverTime);
 
         if (!query1.exec()) {
             qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
             qDebug() << "Query Str: " << qryStr;
         }
 
+        // Prepare HTML content for display
         QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
-                              "<span>" + QTime::currentTime().toString("hh:mm:ss")
-                              + "&nbsp;</span><span style='font-weight:400;color: white;'>"+ logMessage + "</span></p>";
+                              "<span>" /*+ QTime::currentTime().toString("hh:mm:ss")*/
+                              "&nbsp;</span><span style='font-weight:400;color: white;'>" + logMessage + "</span></p>";
         emit display_log_text_signal(htmlContent);
 
-    }
-    else{
+    } else {
         qDebug() << "logToDB : " << msg;
-
     }
-
 }
+
 
 
 void mysql_conn::loadCurrentDayLogs()
@@ -1277,17 +1287,6 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
        // QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and (Leg1_OrderState=7 and Leg2_OrderState=7 and Leg3_OrderState=7) ORDER BY Trader_Data DESC";
        // QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' and  Leg1_OrderState=7 or Leg2_OrderState=7 or Leg3_OrderState=7 or Leg4_OrderState = 7  ORDER BY Trader_Data DESC";
         //QString query_str = "SELECT * FROM Order_Table_Bid WHERE Trader_ID='"+user_id+"' AND (Leg1_OrderState=7 OR Leg2_OrderState=7 OR Leg3_OrderState=7 OR Leg4_OrderState=7) ORDER BY Trader_Data DESC";
-//        QString query_str =
-//            "SELECT O.*, P.PortfolioType "
-//            "FROM Order_Table_Bid O "
-//            "INNER JOIN Portfolios P "
-//            "ON CASE "
-//            "    WHEN O.PortfolioNumber > 1500000 THEN O.PortfolioNumber - 1500000 "
-//            "    ELSE O.PortfolioNumber "
-//            "END = P.PortfolioNumber "
-//            "WHERE O.Trader_ID='" + user_id + "' "
-//            "AND (O.Leg1_OrderState=7 OR O.Leg2_OrderState=7 OR O.Leg3_OrderState=7 OR O.Leg4_OrderState=7) "
-//            "ORDER BY O.Trader_Data DESC";
         QString query_str =
             "SELECT O.*, P.PortfolioType "
             "FROM Order_Table_Bid O "
@@ -1297,11 +1296,22 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
             "    ELSE O.PortfolioNumber "
             "END = P.PortfolioNumber "
             "WHERE O.Trader_ID='" + user_id + "' "
-                        "AND (O.Leg1_OrderState IN (7, 8) OR "
-                        "     O.Leg2_OrderState IN (7, 8) OR "
-                        "     O.Leg3_OrderState IN (7, 8) OR "
-                        "     O.Leg4_OrderState IN (7, 8)) "
-                        "ORDER BY O.Trader_Data DESC";
+            "AND (O.Leg1_OrderState=7 OR O.Leg2_OrderState=7 OR O.Leg3_OrderState=7 OR O.Leg4_OrderState=7) "
+            "ORDER BY O.Trader_Data DESC";
+//        QString query_str =
+//            "SELECT O.*, P.PortfolioType "
+//            "FROM Order_Table_Bid O "
+//            "INNER JOIN Portfolios P "
+//            "ON CASE "
+//            "    WHEN O.PortfolioNumber > 1500000 THEN O.PortfolioNumber - 1500000 "
+//            "    ELSE O.PortfolioNumber "
+//            "END = P.PortfolioNumber "
+//            "WHERE O.Trader_ID='" + user_id + "' "
+//                        "AND (O.Leg1_OrderState IN (7, 8) OR "
+//                        "     O.Leg2_OrderState IN (7, 8) OR "
+//                        "     O.Leg3_OrderState IN (7, 8) OR "
+//                        "     O.Leg4_OrderState IN (7, 8)) "
+//                        "ORDER BY O.Trader_Data DESC";
 
 
 
