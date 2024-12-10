@@ -689,32 +689,42 @@ void mysql_conn::logToDB(QString logMessage)
 
     QString msg;
     bool ok = checkDBOpened(msg);
-    if(ok){
-        QTime currentTime = QTime::currentTime();
+    if (ok) {
+        // Query to get the database server's current time
+        QString timeQueryStr = "SELECT UNIX_TIMESTAMP(NOW())";
+        QSqlQuery timeQuery(db);
+        if (!timeQuery.exec(timeQueryStr) || !timeQuery.next()) {
+            qDebug() << "Failed to fetch server time: " << timeQuery.lastError().text();
+            return;
+        }
+        // Fetch the server time
+        qint64 serverTime = timeQuery.value(0).toLongLong();
+
+        // Convert serverTime to human-readable format
+        QDateTime dateTime = QDateTime::fromSecsSinceEpoch(serverTime);
+        QString humanReadableTime = dateTime.toString("hh:mm:ss");
         QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedTime)";
         QSqlQuery query1(db);
         query1.prepare(qryStr);
         query1.bindValue(":logMessage", logMessage);
         query1.bindValue(":userName", userNameLogged);
-        query1.bindValue(":formattedTime", QDateTime::currentDateTime().toSecsSinceEpoch());
+        query1.bindValue(":formattedTime", humanReadableTime); // Use formatted time
 
         if (!query1.exec()) {
             qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
             qDebug() << "Query Str: " << qryStr;
         }
-
+        QString serverTimeFormatted = dateTime.toString("hh:mm:ss");
         QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
-                              "<span>" + QTime::currentTime().toString("hh:mm:ss")
-                              + "&nbsp;</span><span style='font-weight:400;color: white;'>"+ logMessage + "</span></p>";
+                              "<span>" + serverTimeFormatted +
+                              "&nbsp;</span><span style='font-weight:400;color: white;'>" + logMessage + "</span></p>";
         emit display_log_text_signal(htmlContent);
 
-    }
-    else{
+    } else {
         qDebug() << "logToDB : " << msg;
-
     }
-
 }
+
 
 
 void mysql_conn::loadCurrentDayLogs()
@@ -1569,7 +1579,6 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 QString Stockname = ContractDetail::getInstance().GetStockName(leg1_token_number,portfolio_type);
                 int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
 
-
 //                Leg1_OrderStateStr = ContractDetail::getInstance().GetStockName(leg1_token_number,portfolio_type)+" "+"["+(QString::number(Leg1_Total_Volume/lotSize))+"]";
 //                Leg3_OrderStateStr = ContractDetail::getInstance().GetStockName(leg3_token_number,portfolio_type)+" "+"["+(QString::number(Leg3_Total_Volume/lotSize))+"]";
                 //Leg3_OrderStateStr+" ("+(QString::number(Leg3_OrderState))+")";
@@ -1579,7 +1588,9 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                               //       +" ("+(QString::number(Leg2_OrderState))+")";
                 if(Leg1_OrderState==8)
                 {
+                   int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
                    Leg1_OrderStateStr = Leg1_OrderStateStr+"["+(QString::number(Leg1_Total_Volume/lotSize))+"]";
+                   Stockname = ContractDetail::getInstance().GetStockName(leg1_token_number,portfolio_type);
                    // +" ("+(QString::number(Leg1_OrderState))+")"+" "
                 }
                 else
@@ -1589,7 +1600,9 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 }
                 if(Leg3_OrderState==8)
                 {
+                   int lotSize =  ContractDetail::getInstance().GetLotSize(leg3_token_number,portfolio_type);
                     Leg3_OrderStateStr = Leg3_OrderStateStr+"["+(QString::number(Leg3_Total_Volume/lotSize))+"]";
+                   Stockname = ContractDetail::getInstance().GetStockName(leg3_token_number,portfolio_type);
                   // +" ("+(QString::number(Leg3_OrderState))+")"+" "
                 }
                 else
@@ -1599,7 +1612,9 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 }
                 if(Leg2_OrderState==8)
                 {
+                     int lotSize =  ContractDetail::getInstance().GetLotSize(leg2_token_number,portfolio_type);
                     Leg2_OrderStateStr = Leg2_OrderStateStr+"["+(QString::number(Leg2_Total_Volume/lotSize))+"]";
+                     Stockname = ContractDetail::getInstance().GetStockName(leg2_token_number,portfolio_type);
                     // +" ("+(QString::number(Leg3_OrderState))+")"+" "
                 }
                 else
@@ -1609,7 +1624,9 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 }
                 if(Leg4_OrderState==8)
                 {
+                     int lotSize =  ContractDetail::getInstance().GetLotSize(leg4_token_number,portfolio_type);
                     Leg4_OrderStateStr = Leg4_OrderStateStr+"["+(QString::number(Leg4_Total_Volume/lotSize))+"]";
+                     Stockname = ContractDetail::getInstance().GetStockName(leg4_token_number,portfolio_type);
                     // +" ("+(QString::number(Leg3_OrderState))+")"+" "
                 }
                 else

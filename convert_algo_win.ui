@@ -1247,6 +1247,9 @@ background: #E0E8EE;
  </customwidgets>
  <tabstops>
   <tabstop>comboBox_AlgoType</tabstop>
+  <tabstop>lineEdit_Start_strike_BtfyBid</tabstop>
+  <tabstop>lineEdit_EndStrike_BtfyBid</tabstop>
+  <tabstop>lineEdit_StrikeDifference_BtfyBid</tabstop>
   <tabstop>pushButtonAdd</tabstop>
   <tabstop>pushButtonSelectAll</tabstop>
   <tabstop>pushButton_Reset</tabstop>
@@ -1254,6 +1257,23 @@ background: #E0E8EE;
   <tabstop>tableWidget</tabstop>
   <tabstop>pushButtonUpload</tabstop>
   <tabstop>pushButton_Cancel</tabstop>
+  <tabstop>lineEdit_Start_strike_f2f</tabstop>
+  <tabstop>lineEdit_EndStrike_f2f</tabstop>
+  <tabstop>lineEdit_Start_strike_BoxBid</tabstop>
+  <tabstop>lineEdit_EndStrike_BoxBid</tabstop>
+  <tabstop>lineEdit_StrikeDifference_BoxBid</tabstop>
+  <tabstop>lineEdit_Start_strike_Bs1221_1331</tabstop>
+  <tabstop>lineEdit_EndStrike_Bs1221_1331</tabstop>
+  <tabstop>lineEdit_StrikeDifference_Bs1221_1331</tabstop>
+  <tabstop>lineEdit_Start_strike_Btfy</tabstop>
+  <tabstop>lineEdit_EndStrike_Btfy</tabstop>
+  <tabstop>lineEdit_StrikeDifference_Btfy</tabstop>
+  <tabstop>lineEdit_Fut_ConvRev</tabstop>
+  <tabstop>lineEdit_Start_strike_ConvRev</tabstop>
+  <tabstop>lineEdit_EndStrike_ConvRev</tabstop>
+  <tabstop>lineEdit_Fut_CRJellyBid</tabstop>
+  <tabstop>lineEdit_Start_strike_CRJellyBid</tabstop>
+  <tabstop>lineEdit_EndStrike_CRJellyBid</tabstop>
  </tabstops>
  <resources/>
  <connections/>
