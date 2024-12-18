@@ -23,8 +23,12 @@ public:
 public slots:
     void updateSummaryData(const QStringList &data);
 
+
+
 private:
     Ui::Summary_cards *ui;
+
+
 };
 
 #endif // SUMMARY_CARDS_H

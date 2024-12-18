@@ -4121,7 +4121,9 @@ void MainWindow::onSummaryActionTriggered() {
           connect(this, SIGNAL(data_summary_update_signal(const QStringList&)), summary, SLOT(updateSummaryData(const QStringList&)));
 
           Qt::WindowFlags flags = summary->windowFlags();
-          summary->setWindowFlags(flags | Qt::Dialog);
+         // summary->setWindowFlags(flags | Qt::Dialog);
+          summary->setWindowFlags(Qt::Window | Qt::Tool);
+
          // summary->setAttribute(Qt::WA_DeleteOnClose);
     }
 
@@ -4148,7 +4150,9 @@ void MainWindow::onWatchActionTriggered() {
     if (!watch) {
           watch = new Watch_cards(this);
           Qt::WindowFlags flags = watch->windowFlags();
-          watch->setWindowFlags(flags | Qt::Dialog);
+          //watch->setWindowFlags(flags | Qt::Dialog);
+          watch->setWindowFlags(Qt::Window | Qt::Tool);
+
           // Uncomment if you want the Watch_cards to be deleted when it's closed
           // watch->setAttribute(Qt::WA_DeleteOnClose);
           // Make sure the connections are made after the object is created
@@ -4178,7 +4182,9 @@ void MainWindow::onLogActionTriggered() {
     if (!logs) {
           logs = new Logs_cards(this);
           Qt::WindowFlags flags = logs->windowFlags();
-          logs->setWindowFlags(flags | Qt::Dialog);
+          //logs->setWindowFlags(flags | Qt::Dialog);
+          logs->setWindowFlags(Qt::Window | Qt::Tool);
+
           //logsCards->setAttribute(Qt::WA_DeleteOnClose);
 
     }

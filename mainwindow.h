@@ -66,7 +66,7 @@
 #include "Order_F1_F2/order_f1_f2_model.h"
 #include "Order_F1_F2/order_f1_f2_tableheaderview.h"
 #include "cache_file_io.h"
-
+#include <QApplication>
 using namespace ads;
 
 class mysql_conn;

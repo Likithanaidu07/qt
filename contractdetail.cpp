@@ -583,7 +583,7 @@ bool ContractDetail::checkTokenExist(int token){
 int ContractDetail::GetLotSize(int token,int type)
 {
     if (token == 0){
-        qDebug()<<"Warning: GetLotSize--> token cannot be zero.";
+        //qDebug()<<"Warning: GetLotSize--> token cannot be zero.";
         return 0;
     }
 
