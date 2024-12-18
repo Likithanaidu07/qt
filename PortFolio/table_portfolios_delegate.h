@@ -141,6 +141,7 @@ private:
     QTableView* view;
 
 
+
 };
 
 #endif // TABLE_PORTFOLIOS_DELEGATE_H
