@@ -128,8 +128,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     QMenu *menuAlgorithm = new QMenu(this);
     menuAlgorithm->addAction("Algos", this, &MainWindow::on_Algorithms_Button_clicked);
-    menuAlgorithm->addAction("Pre-Define Algos", this, &MainWindow::ConvertAlgo_button_clicked);
-    menuAlgorithm->addAction("Defined Algos", this, &MainWindow::on_Templates_Button_clicked);
+    menuAlgorithm->addAction("Build Algo", this, &MainWindow::ConvertAlgo_button_clicked);
+    menuAlgorithm->addAction("Define Algos", this, &MainWindow::on_Templates_Button_clicked);
     ui->toolButtonAlgorithm->setMenu(menuAlgorithm);
     ui->toolButtonAlgorithm->setPopupMode(QToolButton::InstantPopup);
     ui->toolButtonAlgorithm->setStyleSheet(toolButtonStyle);
@@ -647,11 +647,14 @@ MainWindow::MainWindow(QWidget *parent)
 
     connect(ui->lineEditSearch, &QLineEdit::textChanged, this, [=](const QString &text) {
         // Check if the relevant window or widget is open/visible
-        if (T_Portfolio_Table->isVisible()) { // Replace 'this' with the specific window or widget if needed
+       // if (T_Portfolio_Table->isVisible()) { // Replace 'this' with the specific window or widget if needed
             T_Portfolio_ProxyModel->setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
             T_Portfolio_Delegate->setHighlightText(text);
             T_Portfolio_Table->viewport()->update();  // Redraw the view to apply the highlight
-        }
+       // }
+//        else{
+//            T_Portfolio_Delegate->setHighlightText(text);
+//        }
     });
 
 
@@ -722,14 +725,16 @@ MainWindow::MainWindow(QWidget *parent)
     /***********Init Order Book Window**************************/
     QPixmap pixmapdock_trade_close(":/dock_close.png");
 
-    dock_win_trade =  new CDockWidget(tr("Executed Orders"));
+       // Create the dock widget
+       dock_win_trade = new CDockWidget(tr("Executed Orders"));
 
-    connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookDockWidgetVisiblityChanged(bool)));
-   // subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_trade);
-   // dock_win_trade->setAllowedAreas(Qt::AllDockWidgetAreas);
-    dock_win_trade->setStyleSheet(dock_style);
-    dock_win_trade->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
-    dock_win_trade->setMinimumSize(200,150);
+       // Connect the visibilityChanged signal to the slot
+connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookDockWidgetVisiblityChanged(bool)));
+       // Additional dock widget setup
+       dock_win_trade->setStyleSheet(dock_style);
+       dock_win_trade->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
+       dock_win_trade->setMinimumSize(200, 150);
+
     const auto autoHideContainerTrade = DockManagerMainPanel->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_trade);
     autoHideContainerTrade->setSize(480);
 
@@ -866,7 +871,7 @@ MainWindow::MainWindow(QWidget *parent)
     /***********Init F1F2 Order  Window**************************/
     QPixmap pixmapdock_order_f1f2_close(":/dock_close.png");
 
-    dock_win_f1f2_order =  new CDockWidget(tr("Liners"));
+    dock_win_f1f2_order =  new CDockWidget(tr("Manual Orders"));
 
     connect(dock_win_f1f2_order, SIGNAL(visibilityChanged(bool)), this, SLOT(OnF1F2OrderDockWidgetVisiblityChanged(bool)));
    // subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_f1f2_order);
@@ -883,7 +888,7 @@ MainWindow::MainWindow(QWidget *parent)
     QHBoxLayout *f1f2_order_title_layout=new QHBoxLayout(f1f2_order_titlebar);
     f1f2_order_title_layout->setSpacing(10);
     f1f2_order_title_layout->setContentsMargins(17,8,10,6);
-    QLabel *f1f2_order_label=new QLabel("Liners");
+    QLabel *f1f2_order_label=new QLabel("Manual Orders");
     QFont font_f1f2_order_label=f1f2_order_label->font();
     font_f1f2_order_label.setFamily("Work Sans");
     f1f2_order_label->setFont(font_f1f2_order_label);
@@ -1464,11 +1469,27 @@ MainWindow::MainWindow(QWidget *parent)
         QtConcurrent::run(&MainWindow::refreshTradeTable, this);
     });*/
 
+    QObject::connect(qApp, &QApplication::focusChanged,
+                     [this](QWidget* oldWidget, QWidget* newWidget) {
+                         if(newWidget == net_pos_table ||
+                             newWidget == liners_table ||
+                             newWidget == combined_tracker_table ||
+                             newWidget == trade_table ||
+                             newWidget == missed_trade_table ||
+                             newWidget == f1f2_order_table
+                             ){
+                             //clear selected rows of portfolio table
+                             T_Portfolio_Table->clearSelection();
+                         }
 
+                     });
     //Read
     CacheFileIO = new cache_file_io();
     algosToDisableOnExchangePriceLimitExludedList = CacheFileIO->readFile_ExludedAlgos_ExchangePriceLimit(); // this list contain algos whcih will excluded while autmatic disable on  ExchangePriceLimit reach
 
+QObject::connect(ui->toolButtonCards, &QToolButton::clicked, [this]() {
+    T_Portfolio_Table->clearSelection();
+});
 }
 
 
@@ -2058,7 +2079,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     case PortfolioData_Idx::_BuyPriceDifference:{
                         QString BuyPriceDifference = QString::number(P->BuyPriceDifference*devicer,'f',decimal_precision);
                         updateQueryList.append("BuyPriceDifference="+BuyPriceDifference);
-                        logMsg = logMsg+"BuyPriceDifference ["+BuyPriceDifference+"], ";
+                        logMsg = logMsg+"BuyPriceDifference ["+valStr+"], ";
 
                     }
                     break;
@@ -2066,7 +2087,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     case PortfolioData_Idx::_SellPriceDifference:{
                         QString SellPriceDifference = QString::number(P->SellPriceDifference*devicer,'f',decimal_precision);
                         updateQueryList.append("SellPriceDifference="+SellPriceDifference);
-                        logMsg = logMsg+"SellPriceDifference ["+SellPriceDifference+"], ";
+                        logMsg = logMsg+"SellPriceDifference ["+valStr+"], ";
                     }
                     break;
 
@@ -2145,7 +2166,7 @@ void MainWindow::loadContract(){
 
         QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
                               "<span>" + QTime::currentTime().toString("hh:mm:ss")
-                              + "&nbsp;</span><span style='font-weight:400;color: white;'> file loading... </span></p>";
+                              + "&nbsp;</span><span style='font-weight:400;color: black;'> file loading... </span></p>";
 
         emit display_log_text_signal(htmlContent);
 
@@ -2162,7 +2183,7 @@ void MainWindow::loadContract(){
 
         htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
                       "<span>" + QTime::currentTime().toString("hh:mm:ss")
-                      + "&nbsp;</span><span style='font-weight:400;color: white;'> file loaded </span></p>";
+                      + "&nbsp;</span><span style='font-weight:400;color: black;'> file loaded </span></p>";
 
 
         emit display_log_text_signal(htmlContent);
@@ -2687,14 +2708,27 @@ void MainWindow::updatePortFolioStatus(QModelIndex index) {
             // Activate the portfolio if the active portfolio count is below the limit
             QStringList activatedPortFolios = T_Portfolio_Model->getActivatedPortfolios();
             if (activatedPortFolios.size() >= userData.MaxActiveCount) {
+                // Show warning message
                 QMessageBox msgBox;
                 msgBox.setText("Maximum Active Portfolio Limit Reached. Cannot activate more portfolios.");
                 msgBox.setIcon(QMessageBox::Warning);
                 msgBox.exec();
-                qDebug() << "updatePortFolioStatus: Maximum active portfolio limit reached, ActivatedPortFolios ="<<activatedPortFolios.size()<<", Limit="<<userData.MaxActiveCount;
+
+                qDebug() << "updatePortFolioStatus: Maximum active portfolio limit reached, ActivatedPortFolios ="
+                         << activatedPortFolios.size() << ", Limit=" << userData.MaxActiveCount;
+
+                // Ensure the UI remains consistent by refreshing the table to restore the button's visibility
+                T_Portfolio_Table->viewport()->update();
+
+                // Prevent further database updates
                 portfolio_table_updating_db.storeRelaxed(0);
                 return;
             }
+
+            // Proceed with activating the portfolio
+            T_Portfolio_Model->getActivatedPortfolios(); // Example: Call your activation function here
+
+
 
             // Activate portfolio in UI and update the database
             QString Query = "UPDATE Portfolios SET Status='Active' WHERE PortfolioNumber=" + PortfolioNumber;
@@ -2865,7 +2899,7 @@ void MainWindow::add_logs(QString str){
     emit logDataSignal(logsdata);
     ui->label_5->setWordWrap(true);
     ui->label_5->setText(str);
-    ui->label_5->setStyleSheet("font-family: 'Work Sans'; font-size: 8pt; color: white;");
+    ui->label_5->setStyleSheet("font-family: 'Work Sans'; font-size: 8pt; /*color: white;*/");
 
 }
 
@@ -3206,6 +3240,14 @@ void MainWindow::OnAlgorithmDockWidgetVisiblityChanged(bool p_Visible)
     else
         ui->Algorithms_Widget->setStyleSheet("");*/
   //  ui->Algorithms_Close->setVisible(p_Visible);
+  if (!p_Visible) {
+            // Dock is being hidden (likely closed), clear the highlight text
+            //T_Portfolio_Delegate->setHighlightText("");
+            //ui->lineEditSearch->clear();
+           // emit ui->lineEditSearch->textChanged(""); // Emit the signal with an empty string
+
+  }
+
 }
 
 void MainWindow::OnOrderBookDockWidgetVisiblityChanged(bool p_Visible)
@@ -3215,6 +3257,10 @@ void MainWindow::OnOrderBookDockWidgetVisiblityChanged(bool p_Visible)
     else
         ui->OrderBook_Widget->setStyleSheet("");*/
   //  ui->OrderBook_Close->setVisible(p_Visible);
+//  if (!p_Visible) {
+//            // Dock is being hidden (likely closed), clear the highlight text
+//            T_Portfolio_Delegate->setHighlightText("");
+//  }
 }
 void MainWindow::OnF1F2OrderDockWidgetVisiblityChanged(bool p_Visible)
 {
@@ -4004,6 +4050,10 @@ void MainWindow::on_close_clicked()
 {
     db_conn->logToDB("Logged Out");
 
+    //check summary windiow opened
+    //if opende save some value in settings file
+
+    //whne star the app check for that value and open it -- Do this step there
 
     //loggedOut();
     //portfolio->StatusVal.toInt()==portfolio_status::DisabledByUser;

@@ -589,7 +589,7 @@ void add_algo_btfly_bid::itemSelectedEndStrike(QModelIndex index)
                         lineEdit_EndStrike->setCursorPosition(0);
                         startStrikeListView->hide();
                         endStrikeListView->hide();
-                        addButton->setFocus();
+                        lineEdit_StrikeDifference->setFocus();
                         break;
                     }
                 }

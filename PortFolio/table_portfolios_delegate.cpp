@@ -43,7 +43,6 @@ Table_Portfolios_Delegate::Table_Portfolios_Delegate(QObject *parent)  : QStyled
 void Table_Portfolios_Delegate::setHighlightText(const QString &text) {
     // Implement logic to store and handle highlight text
     m_highlightText = text;
-
 }
 
 bool Table_Portfolios_Delegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index)

@@ -231,15 +231,17 @@ userInfo mysql_conn::login(  QString UserName_,   QString password)
                             localIP =  address.toString();
                         }
                     }
-
-                    QTime currentTime = QTime::currentTime();
-                    QString formattedTime = currentTime.toString(LOG_TIME_FORMAT);
+                    QString timeQueryStr = "SELECT UNIX_TIMESTAMP(NOW())";
+                    QSqlQuery timeQuery(db);
+                    qint64 serverTime = timeQuery.value(0).toLongLong();
+                    QDateTime dateTime = QDateTime::fromSecsSinceEpoch(serverTime);
+                    QString humanReadableTime = dateTime.toString("hh:mm:ss");
                     QString qryStr = "INSERT INTO Logs (LogMessage, UserName, Time) VALUES (:logMessage, :userName, :formattedTime)";
                     QSqlQuery query1(db);
                     query1.prepare(qryStr);
                     query1.bindValue(":logMessage", "User:" + UserName_ + " logged in from [" + localIP + "]");
                     query1.bindValue(":userName", UserName_);
-                    query1.bindValue(":formattedTime", QDateTime::currentDateTime().toSecsSinceEpoch());
+                    query1.bindValue(":formattedTime", humanReadableTime);
                     if (!query1.exec())
                     {
                         qDebug() << "Insert Into Logs failed: " << query1.lastError().text();
