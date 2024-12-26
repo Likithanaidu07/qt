@@ -29,10 +29,10 @@ private:
                           "Type",
                           "Lot",
                           "Algo No",
-                          "Symbol",
+                          "StockName",
                           "Message",
                           "Price",
-                          "DateTime"};
+                          "Time"};
 
 
 signals:

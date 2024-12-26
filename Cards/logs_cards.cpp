@@ -21,11 +21,13 @@ Logs_cards::~Logs_cards()
 
 void Logs_cards::logDataSignal_Slot(QStringList data)
 {
+
+    ui->textEdit->clear();
     for (int i = 0; i < data.length(); i++) {
         ui->textEdit->append(data[i]);
 
-        htmlLogsContent.prepend(data[i]);
-        ui->textEdit->setText(htmlLogsContent);
+        //htmlLogsContent.prepend(data[i]);
+       // ui->textEdit->setText(htmlLogsContent);
     }
 }
 

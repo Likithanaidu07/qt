@@ -381,6 +381,8 @@ MainWindow::MainWindow(QWidget *parent)
            ConvertAlgo_button->setStyleSheet(convert_to_algo_button);
            // ConvertAlgo_button->setContentsMargins(10,-1,-1,-1);
             //ConvertAlgo_button->setFont(headerfont);
+           ConvertAlgo_button->setObjectName("buildalgo");
+           ConvertAlgo_button->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 
 
             QWidget *test=new QWidget;
@@ -397,6 +399,8 @@ MainWindow::MainWindow(QWidget *parent)
             //button1->setIcon(QIcon(":/start_all.png"));
             button1->setText("Start All");
             button1->setToolTip("Start All");
+            button1->setObjectName("startallbutton");
+            button1->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 
             QToolButton* button2 = new QToolButton();
             connect(button2, SIGNAL(clicked()), this, SLOT(stopall_Button_clicked()));
@@ -404,12 +408,16 @@ MainWindow::MainWindow(QWidget *parent)
            // button2->setIcon(QIcon(":/stop_all.png"));
             button2->setText("Stop All");
             button2->setToolTip("Stop All");
+            button2->setObjectName("stopallbutton");
+            button2->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 
             QToolButton* button3 = new QToolButton();
            // button3->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             //button3->setIcon(QIcon(":/import.png"));
             button3->setText("Import");
             button3->setToolTip("Import");
+            button3->setObjectName("import");
+            button3->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 
             QToolButton* button4 = new QToolButton();
             //button4->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -417,24 +425,33 @@ MainWindow::MainWindow(QWidget *parent)
             button4->setText("Sorting");
             button4->setToolTip("Sorting");
             connect(button4, SIGNAL(clicked()), this, SLOT(sorting_Button_clicked()));
+            button4->setObjectName("sorting");
+            button4->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 
             QToolButton* button5 = new QToolButton();
             button5->setText("Refresh");
             //button5->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             button5->setToolTip("Refresh");
             connect(button5, SIGNAL(clicked()), this, SLOT(refresh_Button_clicked()));
+            button5->setObjectName("refresh");
+            button5->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 
             QToolButton* button6 = new QToolButton();
           //  button6->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
            // button6->setIcon(QIcon(":/export.png"));
             button6->setText("Export");
             button6->setToolTip("Export");
+            button6->setObjectName("export");
+            button6->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 
             QToolButton* button7 = new QToolButton();
             //  button7->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
             button7->setText("Duplicate");
             button7->setToolTip("Duplicate");
             connect(button7, SIGNAL(clicked()), this, SLOT(duplicate_Button_clicked()));
+            button7->setObjectName("duplicate_bt_id");
+            button7->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
+
 
             // Create the QToolButton
             QToolButton* button8 = new QToolButton(this);
@@ -460,6 +477,8 @@ MainWindow::MainWindow(QWidget *parent)
                 "   width: 120px;"      // Ensure width remains consistent
                 "}"
                 );
+            button8->setObjectName("filter");
+            button8->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 
 
 
@@ -1416,7 +1435,6 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
 //        font.setFamily("Work Sans");
 //        w->setFont(font);
 //    }
-
     const char stylesheet_params_nos[] = "color: #4f3c7f ;""font-family: Work Sans;" "font-size: 14px;" "font-style: normal;" "font-weight: bold;""line-height: normal;";
 //    for (auto w : {ui->Open_Num, ui->High_Num,ui->Low_Num,ui->Volume_Num}){
 //        w->setStyleSheet(stylesheet_params_nos);
@@ -1446,50 +1464,61 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
    // new QShortcut(QKeySequence(Qt::Key_Delete), this,  SLOT(Delete_clicked_slot()));
    // new QShortcut(QKeySequence(Qt::Key_F1), this,  SLOT(F1_clicked_slot()));
    // new QShortcut(QKeySequence(Qt::Key_F2), this,  SLOT(F2_clicked_slot()));
-
     // db_conn =new mysql_conn(this,"main_db_conn");
     // connect(this,SIGNAL(update_ui_signal(int)),this,SLOT(update_ui_slot(int)));
    //loadContract();
     //initWatchWindow();
-
     /***********Initlaize Hotkey here*************/
     initializeGlobalHotKeys();
     /*********************************************/
-
     instilizeWatchUIOnTopBar();
-
-
   /*  TableRefreshTimer = new QTimer(this);
     TableRefreshTimer->setSingleShot(true);  // Make it behave like singleShot
     connect(TableRefreshTimer, &QTimer::timeout, this, &MainWindow::start_dataLoadingThread);*/
-
-
     /*Trade_TableRefreshTimer = new QTimer(this);
     connect(Trade_TableRefreshTimer, &QTimer::timeout, this, [this]() {
         QtConcurrent::run(&MainWindow::refreshTradeTable, this);
     });*/
-
     QObject::connect(qApp, &QApplication::focusChanged,
                      [this](QWidget* oldWidget, QWidget* newWidget) {
-                         if(newWidget == net_pos_table ||
+                     if(newWidget&&oldWidget){
+//            qDebug()<<"newWidget: "<<newWidget->objectName();
+//            qDebug()<<"oldWidget: "<<oldWidget->objectName();
+                         if(oldWidget == T_Portfolio_Table &&  newWidget->objectName() == "duplicate_bt_id"){
+                             //do nothing
+                         }
+                         else if(newWidget != T_Portfolio_Table){
+                             T_Portfolio_Table->clearSelection();
+                         }
+                         else{
+                         }
+                        /* if(newWidget == net_pos_table ||
                              newWidget == liners_table ||
                              newWidget == combined_tracker_table ||
                              newWidget == trade_table ||
                              newWidget == missed_trade_table ||
-                             newWidget == f1f2_order_table
+                             newWidget == f1f2_order_table ||
+                             newWidget->objectName() == "startallbutton" ||
+                             newWidget->objectName() == "stopallbutton" ||
+                             newWidget->objectName() == "buildalgo" ||
+                             newWidget->objectName() == "import" ||
+                             newWidget->objectName() == "sorting" ||
+                             newWidget->objectName() == "refresh" ||
+                             newWidget->objectName() == "export" ||
+                             newWidget->objectName() == "filter" //||
+                            // newWidget->objectName() == "summarycard" ||
+                           //  newWidget->objectName() == "logcard" ||
+                            // newWidget->objectName() == "watchcard"
                              ){
                              //clear selected rows of portfolio table
                              T_Portfolio_Table->clearSelection();
-                         }
+                         }*/
+                     }
 
                      });
     //Read
     CacheFileIO = new cache_file_io();
     algosToDisableOnExchangePriceLimitExludedList = CacheFileIO->readFile_ExludedAlgos_ExchangePriceLimit(); // this list contain algos whcih will excluded while autmatic disable on  ExchangePriceLimit reach
-
-QObject::connect(ui->toolButtonCards, &QToolButton::clicked, [this]() {
-    T_Portfolio_Table->clearSelection();
-});
 }
 
 
@@ -2166,7 +2195,7 @@ void MainWindow::loadContract(){
 
         QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
                               "<span>" + QTime::currentTime().toString("hh:mm:ss")
-                              + "&nbsp;</span><span style='font-weight:400;color: black;'> file loading... </span></p>";
+                              + "&nbsp;</span><span style='font-weight:400;/*color: black;*/'> file loading... </span></p>";
 
         emit display_log_text_signal(htmlContent);
 
@@ -2179,11 +2208,12 @@ void MainWindow::loadContract(){
         //            stackViewSwithAnimation(0,1,ui->stackedWidgetMain);
         //        });
         // Rest of your background task code...
+
         //if not logged in the data loading thread start by login function
 
         htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
                       "<span>" + QTime::currentTime().toString("hh:mm:ss")
-                      + "&nbsp;</span><span style='font-weight:400;color: black;'> file loaded </span></p>";
+                      + "&nbsp;</span><span style='font-weight:400;/*color: black;*/'> file loaded </span></p>";
 
 
         emit display_log_text_signal(htmlContent);
@@ -3170,18 +3200,12 @@ void MainWindow::stopall_Button_clicked()
 }
 
 void MainWindow::refresh_Button_clicked(){
-
   triggerImmediate_refreshTables();
   //updateSummaryData(summarydatList);
-
-
-
-
-
 }
 
 
-void MainWindow::duplicate_Button_clicked(){
+void MainWindow::duplicate_Button_clicked() {
   algo_data_to_insert data;
   int MaxPortfolioCount = userData.MaxPortfolioCount;
   QString msg;
@@ -3220,9 +3244,19 @@ void MainWindow::duplicate_Button_clicked(){
             break;
             }
             if (status == algo_data_insert_status::INSERTED) {
-                triggerImmediate_refreshTables();
-                onPortfolioAdded(); //send backend command
+            // Log the creation of the duplicate
+            QString logMessage = QString("Duplicate added for Portfolio Number: %1").arg(selectedPortfolio->PortfolioNumber);
+            db_conn->logToDB(logMessage);
 
+            // Send backend command
+            quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+            const unsigned char dataBytes[] = { 0x01 };
+            QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
+            QByteArray backendMsg = backend_comm->createPacket(command, data);
+            backend_comm->insertData(backendMsg);
+
+            triggerImmediate_refreshTables();
+            onPortfolioAdded(); // send backend command
             }
   }
 
@@ -3230,6 +3264,7 @@ void MainWindow::duplicate_Button_clicked(){
   T_Portfolio_Table->clearSelection();
   T_Portfolio_Table->clearFocus();
 }
+
 
 
 
@@ -4173,6 +4208,8 @@ void MainWindow::onSummaryActionTriggered() {
           Qt::WindowFlags flags = summary->windowFlags();
          // summary->setWindowFlags(flags | Qt::Dialog);
           summary->setWindowFlags(Qt::Window | Qt::Tool);
+          summary->setObjectName("summarycard");
+          summary->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 
          // summary->setAttribute(Qt::WA_DeleteOnClose);
     }
@@ -4182,6 +4219,7 @@ void MainWindow::onSummaryActionTriggered() {
           //summary->updateSummaryData(summarydatList);
         //  emit data_summary_update_signal(summarydatList);
     }
+
 
 }
 
@@ -4203,11 +4241,14 @@ void MainWindow::onWatchActionTriggered() {
           //watch->setWindowFlags(flags | Qt::Dialog);
           watch->setWindowFlags(Qt::Window | Qt::Tool);
 
+
           // Uncomment if you want the Watch_cards to be deleted when it's closed
           // watch->setAttribute(Qt::WA_DeleteOnClose);
           // Make sure the connections are made after the object is created
           connect(this, &MainWindow::indicesDataRecv_Signal_watch_card, watch, &Watch_cards::indicesDataRecv_Slot);
           connect(watch, &Watch_cards::add_remove_watch_card_signal, this, &MainWindow::add_remove_watch_card_slot);
+          watch->setObjectName("watchcard");
+          watch->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 
     }
 
@@ -4234,6 +4275,8 @@ void MainWindow::onLogActionTriggered() {
           Qt::WindowFlags flags = logs->windowFlags();
           //logs->setWindowFlags(flags | Qt::Dialog);
           logs->setWindowFlags(Qt::Window | Qt::Tool);
+          logs->setObjectName("logcard");
+          logs->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 
           //logsCards->setAttribute(Qt::WA_DeleteOnClose);
 

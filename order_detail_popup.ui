@@ -67,7 +67,7 @@
      </column>
      <column>
       <property name="text">
-       <string>Traded Lot</string>
+       <string>TL</string>
       </property>
      </column>
      <column>
@@ -77,7 +77,7 @@
      </column>
      <column>
       <property name="text">
-       <string>Traded Time</string>
+       <string>Time</string>
       </property>
      </column>
     </widget>
@@ -150,7 +150,7 @@
      </column>
      <column>
       <property name="text">
-       <string>Traded Lot</string>
+       <string>TL</string>
       </property>
      </column>
      <column>
@@ -320,7 +320,7 @@
     &lt;title&gt;Net QTY&lt;/title&gt;
 &lt;/head&gt;
 &lt;body style=&quot;background-color: #333;&quot;&gt;
-    &lt;div class=&quot;net-qty&quot;&gt;Net QTY&lt;/div&gt;
+    &lt;div class=&quot;net-qty&quot;&gt;Net Lot&lt;/div&gt;
 &lt;/body&gt;
 &lt;/html&gt;
 </string>
@@ -661,7 +661,7 @@
     &lt;title&gt;BQTY&lt;/title&gt;
 &lt;/head&gt;
 &lt;body&gt;
-    &lt;div class=&quot;bqty&quot;&gt;BQTY&lt;/div&gt;
+    &lt;div class=&quot;bqty&quot;&gt;BLot&lt;/div&gt;
 &lt;/body&gt;
 &lt;/html&gt;
 </string>
@@ -1588,7 +1588,7 @@
     &lt;title&gt;SQTY&lt;/title&gt;
 &lt;/head&gt;
 &lt;body&gt;
-    &lt;div class=&quot;sqty&quot;&gt;SQTY&lt;/div&gt;
+    &lt;div class=&quot;sqty&quot;&gt;SLot&lt;/div&gt;
 &lt;/body&gt;
 &lt;/html&gt;
 </string>

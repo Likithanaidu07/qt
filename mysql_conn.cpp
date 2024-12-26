@@ -719,7 +719,7 @@ void mysql_conn::logToDB(QString logMessage)
         QString serverTimeFormatted = dateTime.toString("hh:mm:ss");
         QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0;'>"
                               "<span>" + serverTimeFormatted +
-                              "&nbsp;</span><span style='font-weight:400;color: white;'>" + logMessage + "</span></p>";
+                              "&nbsp;</span><span style='font-weight:400;/*color: white;*/'>" + logMessage + "</span></p>";
         emit display_log_text_signal(htmlContent);
 
     } else {
@@ -764,7 +764,7 @@ void mysql_conn::loadCurrentDayLogs()
             QDateTime dateTime = QDateTime::fromSecsSinceEpoch(epochTime);
             QString htmlContent = "<p style='font-family:\"Work Sans\"; font-weight:800; font-size:12px;line-height:1.0'>"
                                   "<span>" + QTime::currentTime().toString("hh:mm:ss")
-                                  + "&nbsp;</span><span style='font-weight:400;color: white;'>"+ logMessage.prepend("  ") + "</span></p>";
+                                  + "&nbsp;</span><span style='font-weight:400;/*color: white;*/'>"+ logMessage.prepend("  ") + "</span></p>";
             emit display_log_text_signal(htmlContent);
         }
     }
@@ -2371,10 +2371,15 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
 
 
                 QString  OrderId =  query.value(rec.indexOf("localOrderID")).toString();
-                long long DateTime = query.value(rec.indexOf("DateTime")).toLongLong();
-                QDateTime dt = QDateTime::fromSecsSinceEpoch(DateTime);
-                dt = dt.toUTC();
-                QString DateTimeStr = dt.toString("hh:mm:ss");
+                 long long DateTime = query.value(rec.indexOf("DateTime")).toLongLong();
+                 QDateTime dt = QDateTime::fromSecsSinceEpoch(DateTime);
+                 dt = dt.toUTC();
+
+                 // Add 5 hours (18000 seconds) and 30 minutes (1800 seconds)
+                 dt = dt.addSecs(19800);
+
+                 QString DateTimeStr = dt.toString("hh:mm:ss");
+
 
 
 

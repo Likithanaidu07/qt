@@ -17,7 +17,8 @@
    <string>Summary</string>
   </property>
   <property name="windowIcon">
-   <iconset theme="dialog-error"/>
+   <iconset theme="dialog-error">
+    <normaloff>.</normaloff>.</iconset>
   </property>
   <property name="modal">
    <bool>false</bool>
@@ -246,7 +247,7 @@ line-height: normal;
               </font>
              </property>
              <property name="text">
-              <string>Buy value</string>
+              <string>Bvalue</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -293,7 +294,7 @@ line-height: normal;
               </font>
              </property>
              <property name="text">
-              <string>Buy Lot</string>
+              <string>BLot</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -450,7 +451,7 @@ line-height: normal;
               </font>
              </property>
              <property name="text">
-              <string>Sell Value</string>
+              <string>SValue</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -515,7 +516,7 @@ line-height: normal;
               </font>
              </property>
              <property name="text">
-              <string>Sell Lot</string>
+              <string>SLot</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
@@ -669,7 +670,7 @@ line-height: normal;
               </font>
              </property>
              <property name="text">
-              <string>Profit</string>
+              <string>P$L</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>
