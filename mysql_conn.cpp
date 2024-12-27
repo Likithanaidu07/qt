@@ -1310,20 +1310,43 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
 //            "WHERE O.Trader_ID='" + user_id + "' "
 //            "AND (O.Leg1_OrderState=7 OR O.Leg2_OrderState=7 OR O.Leg3_OrderState=7 OR O.Leg4_OrderState=7) "
 //            "ORDER BY O.Trader_Data DESC";
+ //       QString query_str =
+//            "SELECT O.*, P.PortfolioType "
+//            "FROM Order_Table_Bid O "
+//            "INNER JOIN Portfolios P "
+//            "ON CASE "
+//            "    WHEN O.PortfolioNumber > 1500000 THEN O.PortfolioNumber - 1500000 "
+//            "    ELSE O.PortfolioNumber "
+//            "END = P.PortfolioNumber "
+//            "WHERE O.Trader_ID='" + user_id + "' "
+//                        "AND (O.Leg1_OrderState IN (7, 8) OR "
+//                        "     O.Leg2_OrderState IN (7, 8) OR "
+//                        "     O.Leg3_OrderState IN (7, 8) OR "
+//                        "     O.Leg4_OrderState IN (7, 8)) "
+//                        "ORDER BY O.Trader_Data DESC";
+
         QString query_str =
-            "SELECT O.*, P.PortfolioType "
+            "SELECT O.*, "
+            "P.PortfolioType, "
+            "P.Leg1TokenNo, "
+            "P.Leg2TokenNo, "
+            "P.Leg3TokenNo, "
+            "P.Leg4TokenNo, "
+            "P.Leg5TokenNo, "
+            "P.Leg6TokenNo "
             "FROM Order_Table_Bid O "
             "INNER JOIN Portfolios P "
             "ON CASE "
             "    WHEN O.PortfolioNumber > 1500000 THEN O.PortfolioNumber - 1500000 "
             "    ELSE O.PortfolioNumber "
             "END = P.PortfolioNumber "
-            "WHERE O.Trader_ID='" + user_id + "' "
-                        "AND (O.Leg1_OrderState IN (7, 8) OR "
-                        "     O.Leg2_OrderState IN (7, 8) OR "
-                        "     O.Leg3_OrderState IN (7, 8) OR "
-                        "     O.Leg4_OrderState IN (7, 8)) "
-                        "ORDER BY O.Trader_Data DESC";
+            "WHERE O.Trader_ID='2' "
+            "AND (O.Leg1_OrderState IN (7, 8) OR "
+            "     O.Leg2_OrderState IN (7, 8) OR "
+            "     O.Leg3_OrderState IN (7, 8) OR "
+            "     O.Leg4_OrderState IN (7, 8)) "
+            "ORDER BY O.Trader_Data DESC;";
+
 
 
 
@@ -1392,10 +1415,10 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
 
 
                 QString Volant_No = query.value(rec.indexOf("Trader_Data")).toString();
-                int leg1_token_number = query.value(rec.indexOf("Leg1_Tok_No")).toInt();
-                int leg2_token_number = query.value(rec.indexOf("Leg2_Tok_No")).toInt();
-                int leg3_token_number = query.value(rec.indexOf("Leg3_Tok_No")).toInt();
-                int leg4_token_number = query.value(rec.indexOf("Leg4_Tok_No")).toInt();
+                int leg1_token_number = query.value(rec.indexOf("Leg1TokenNo")).toInt();
+                int leg2_token_number = query.value(rec.indexOf("Leg2TokenNo")).toInt();
+                int leg3_token_number = query.value(rec.indexOf("Leg3TokenNo")).toInt();
+                int leg4_token_number = query.value(rec.indexOf("Leg4TokenNo")).toInt();
 
                 QString Algo_Name = "";
                 QString Expiry = "";

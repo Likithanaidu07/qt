@@ -1488,6 +1488,7 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
                              //do nothing
                          }
                          else if(newWidget != T_Portfolio_Table){
+                             if(!newWidget->objectName().contains("portfolioTableCell_"))
                              T_Portfolio_Table->clearSelection();
                          }
                          else{

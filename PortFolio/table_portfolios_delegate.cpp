@@ -115,12 +115,13 @@ QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOp
         QLineEdit *editor = new QLineEdit(parent);
         editor->setValidator(new IntDiffValidator(1, 1000000000, editor));
         editor->installEventFilter(const_cast<Table_Portfolios_Delegate *>(this));
-
+        editor->setObjectName("portfolioTableCell_"+QString::number(c));
         return editor;
     }
     else if( c == PortfolioData_Idx::_Alias ){
         QLineEdit *editor = new QLineEdit(parent);
         //  editor->setValidator(new QIntValidator(0, 9999));
+        editor->setObjectName("portfolioTableCell_"+QString::number(c));
         editor->installEventFilter(const_cast<Table_Portfolios_Delegate *>(this));
         return editor;
     }
@@ -128,12 +129,14 @@ QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOp
              c == PortfolioData_Idx::_BuyTotalQuantity ){
         QLineEdit *editor = new QLineEdit(parent);
         editor->setValidator(new QIntValidator(0, 9999));
+        editor->setObjectName("portfolioTableCell_"+QString::number(c));
         editor->installEventFilter(const_cast<Table_Portfolios_Delegate *>(this));
         return editor;
     }
     else if(c == PortfolioData_Idx::_SellPriceDifference ||
              c == PortfolioData_Idx::_BuyPriceDifference ){
         QLineEdit *editor = new QLineEdit(parent);
+        editor->setObjectName("portfolioTableCell_"+QString::number(c));
         if(market_type=="fo")
             editor->setValidator(new DiffValidator(-9999.99, 9999.99, FO_DECIMAL_PRECISION,false, editor));
         else
@@ -144,6 +147,7 @@ QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOp
     }
     else if(c == PortfolioData_Idx::_MaxLoss){
       QLineEdit *editor = new QLineEdit(parent);
+        editor->setObjectName("portfolioTableCell_"+QString::number(c));
       if(market_type=="fo")
           editor->setValidator(new DiffValidator(0, 9999.99, FO_DECIMAL_PRECISION,false, editor));
       else
