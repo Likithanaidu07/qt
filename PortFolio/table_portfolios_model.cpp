@@ -1323,5 +1323,43 @@ QStringList Table_Portfolios_Model::getHeaders(){
      return header;
 }
 
+QList<portfolioImportExportData> Table_Portfolios_Model::getPortFolioToExport(){
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Entering---getPortFolioToExport";
+#endif
+    QMutexLocker locker(&mutex); // Lock the mutex automatically
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Setting Mutex---getPortFolioToExport";
+#endif
+    QList <portfolioImportExportData> p_data_to_export;
+    for(int i=0;i<portfolio_data_list.size();i++){
+        portfolioImportExportData tmp;
+        tmp.PortfolioType = portfolio_data_list[i]->PortfolioType;
+        tmp.TraderID = QString::number(portfolio_data_list[i]->TraderID);
+        tmp.ClientID = QString::number(portfolio_data_list[i]->ClientID);
+        tmp.Status  = portfolio_data_list[i]->StatusVal;
+        tmp.IsBroker = QString::number(portfolio_data_list[i]->IsBroker);
+        tmp.Leg1TokenNo  = QString::number(portfolio_data_list[i]->Leg1TokenNo);
+        tmp.Leg2TokenNo  = QString::number(portfolio_data_list[i]->Leg2TokenNo);
+        tmp.Leg3TokenNo  = QString::number(portfolio_data_list[i]->Leg3TokenNo);
+        tmp.Leg4TokenNo  = QString::number(portfolio_data_list[i]->Leg4TokenNo);
+        tmp.Leg5TokenNo  = QString::number(portfolio_data_list[i]->Leg5TokenNo);
+        tmp.Leg6TokenNo  = QString::number(portfolio_data_list[i]->Leg6TokenNo);
+        tmp.SellPriceDifference  = QString::number(portfolio_data_list[i]->SellPriceDifference);
+        tmp.SellTotalQuantity = QString::number(portfolio_data_list[i]->SellTotalQuantity);
+        tmp.SellTradedQuantity = QString::number(portfolio_data_list[i]->SellTradedQuantity);
+        tmp.BuyPriceDifference = QString::number(portfolio_data_list[i]->BuyPriceDifference);
+        tmp.BuyTotalQuantity = QString::number(portfolio_data_list[i]->BuyTotalQuantity);
+        tmp.BuyTradedQuantity = QString::number(portfolio_data_list[i]->BuyTradedQuantity);
+        tmp.AdditionalData1  = portfolio_data_list[i]->AdditionalData1;
+        tmp.AdditionalData2  = portfolio_data_list[i]->AdditionalData2;
+        tmp.AdditionalData3  = portfolio_data_list[i]->AdditionalData3;
+        tmp.AdditionalData4  = portfolio_data_list[i]->AdditionalData4;
+        p_data_to_export.append(tmp);
+    }
 
-
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Exiting---getPortFolioToExport";
+#endif
+    return p_data_to_export; // Return the deep copy
+}

@@ -482,4 +482,34 @@ struct Cell_Cache{
 };
 
 
+struct portfolioImportExportData{
+    QString PortfolioType;
+    QString TraderID;
+    QString ClientID;
+    QString Status;
+    QString IsBroker;
+    QString Leg1TokenNo;
+    QString Leg2TokenNo;
+    QString Leg3TokenNo;
+    QString Leg4TokenNo;
+    QString Leg5TokenNo;
+    QString Leg6TokenNo;
+    QString SellPriceDifference;
+    QString SellTotalQuantity;
+    QString SellTradedQuantity;
+    QString BuyPriceDifference;
+    QString BuyTotalQuantity;
+    QString BuyTradedQuantity;
+    QString AdditionalData1;
+    QString AdditionalData2;
+    QString AdditionalData3;
+    QString AdditionalData4;
+
+};
+
+// Serialize portfolioImportExportData to QDataStream
+QDataStream &operator<<(QDataStream &out, const portfolioImportExportData &data);
+
+// Deserialize portfolioImportExportData from QDataStream
+QDataStream &operator>>(QDataStream &in, portfolioImportExportData &data);
 #endif // DEFINES_H

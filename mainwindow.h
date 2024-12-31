@@ -399,6 +399,9 @@ private slots:
 
     void on_F1F2Trade_Button_clicked();
 
+    void import_Action();
+    void export_Action();
+
 protected:
     virtual void closeEvent(QCloseEvent* event) override;
     virtual void resizeEvent(QResizeEvent *event) override;

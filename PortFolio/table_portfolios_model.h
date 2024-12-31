@@ -45,7 +45,7 @@ public:
     bool removeRowsByIndices(const QList<int> &portFolioIdxToDelete);
 
     QStringList getHeaders();
-
+    QList<portfolioImportExportData> getPortFolioToExport();
 private:
    // QStringList header={"Status","Algo ID","Algo Name","Rate", "Avg", "Diff" ,"TQ", "TTQ", "RQ", "Rate", "Avg", "Diff", "TQ", "TTQ", "RQ", "Odr Qty" ,"Qty Ratio", "Skip/Market Strike", "Bid Leg", "Cost", "Fut Price"};
     QStringList header={"Status","Algo No",                         

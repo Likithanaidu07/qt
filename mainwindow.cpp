@@ -418,6 +418,7 @@ MainWindow::MainWindow(QWidget *parent)
             button3->setToolTip("Import");
             button3->setObjectName("import");
             button3->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
+            connect(button3, SIGNAL(clicked()), this, SLOT(import_Action()));
 
             QToolButton* button4 = new QToolButton();
             //button4->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -443,6 +444,7 @@ MainWindow::MainWindow(QWidget *parent)
             button6->setToolTip("Export");
             button6->setObjectName("export");
             button6->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
+            connect(button6, SIGNAL(clicked()), this, SLOT(export_Action()));
 
             QToolButton* button7 = new QToolButton();
             //  button7->setToolButtonStyle(Qt::ToolButtonTextBesideIcon);
@@ -4912,5 +4914,96 @@ void MainWindow::adjustTopBarLayout(){
         qWarning() << "widget_5 layout is not a QGridLayout";
     }
 }
+// Serialize portfolioImportExportData to QDataStream
+QDataStream &operator<<(QDataStream &out, const portfolioImportExportData &data) {
+    out << data.PortfolioType
+        << data.TraderID
+        << data.ClientID
+        << data.Status
+        << data.IsBroker
+        << data.Leg1TokenNo
+        << data.Leg2TokenNo
+        << data.Leg3TokenNo
+        << data.Leg4TokenNo
+        << data.Leg5TokenNo
+        << data.Leg6TokenNo
+        << data.SellPriceDifference
+        << data.SellTotalQuantity
+        << data.BuyPriceDifference
+        << data.BuyTotalQuantity
+        << data.BuyTradedQuantity
+        << data.AdditionalData1
+        << data.AdditionalData2
+        << data.AdditionalData3
+        << data.AdditionalData4;
+    return out;
+}
 
+// Deserialize portfolioImportExportData from QDataStream
+QDataStream &operator>>(QDataStream &in, portfolioImportExportData &data) {
+      in  >> data.PortfolioType
+          >> data.TraderID
+          >> data.ClientID
+          >> data.Status
+          >> data.IsBroker
+          >> data.Leg1TokenNo
+          >> data.Leg2TokenNo
+          >> data.Leg3TokenNo
+          >> data.Leg4TokenNo
+          >> data.Leg5TokenNo
+          >> data.Leg6TokenNo
+          >> data.SellPriceDifference
+          >> data.SellTotalQuantity
+          >> data.BuyPriceDifference
+          >> data.BuyTotalQuantity
+          >> data.BuyTradedQuantity
+          >> data.AdditionalData1
+          >> data.AdditionalData2
+          >> data.AdditionalData3
+          >> data.AdditionalData4;
+    return in;
+}
+void MainWindow::import_Action(){
+
+        QString fileName = QFileDialog::getOpenFileName(
+            nullptr,
+            "Import  Portfolios",
+            "",
+            "Portfolios Files (*.bin);;All Files (*)"
+        );
+
+        if (!fileName.isEmpty()) {
+            QList<portfolioImportExportData> pData ;
+            QFile file(fileName);
+              if (!file.open(QIODevice::ReadOnly)) {
+                  QMessageBox::critical(nullptr, "Error", "Failed to open file for reading.");
+                  return;
+              }
+
+            QDataStream in(&file);
+            in >> pData;
+            QMessageBox::information(nullptr, "Success", "Portfolios imported successfully!");
+        }
+}
+
+void MainWindow::export_Action(){
+    QString fileName = QFileDialog::getSaveFileName(
+            nullptr,
+            "Export Portfolios",
+            "",
+            "Portfolios Files (*.bin);;All Files (*)"
+        );
+
+        if (!fileName.isEmpty()) {
+             QFile file(fileName);
+               if (!file.open(QIODevice::WriteOnly)) {
+                   QMessageBox::critical(nullptr, "Error", "Failed to open file for writing.");
+                   return;
+               }
+               QList<portfolioImportExportData> pData = T_Portfolio_Model->getPortFolioToExport(); //get data to export
+               QDataStream out(&file);
+               out << pData;
+               QMessageBox::information(nullptr, "Success", "Portfolios exported successfully!");
+        }
+}
 
