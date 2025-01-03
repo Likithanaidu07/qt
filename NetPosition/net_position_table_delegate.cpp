@@ -15,6 +15,7 @@ void net_position_table_delegate::paint(QPainter *painter, const QStyleOptionVie
     QStringList order_list=model->net_pos_data_list.at(index.row());
 
     QColor color;
+    int x_add=1;
     if (c == NET_POS::BuyAvgPrice_NP || c == NET_POS::BuyTotalLot_NP ||c== NET_POS::BuyValue_NP)
     {
         Net_Position_Table_Model *model=(Net_Position_Table_Model*) index.model();
@@ -35,8 +36,8 @@ void net_position_table_delegate::paint(QPainter *painter, const QStyleOptionVie
 
         QPoint p1 = option.rect.bottomLeft();
         QPoint p2 = option.rect.bottomRight();
-        p1.setX(p1.x() - 5);
-        p2.setX(p2.x() + 5);
+        p1.setX(p1.x() - x_add);
+        p2.setX(p2.x() + x_add);
         painter->drawLine(p1, p2);
     }
     else if (c== NET_POS::SellAvgPrice_NP || c == NET_POS::SellTotalLot_NP ||c== NET_POS::SellValue_NP)
@@ -79,8 +80,8 @@ void net_position_table_delegate::paint(QPainter *painter, const QStyleOptionVie
     painter->setPen(pen);
     QPoint p1= option.rect.bottomLeft();
     QPoint p2= option.rect.bottomRight();
-    p1.setX(p1.x()-5);
-    p2.setX(p2.x()+5);
+    p1.setX(p1.x()-x_add);
+    p2.setX(p2.x()+x_add);
 
 
     painter->drawLine(p1,p2);

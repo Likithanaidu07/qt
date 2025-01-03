@@ -72,6 +72,7 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
 
     QColor textColor = QColor(0, 0, 0);
     int orderState = -1;
+    int x_add = 1;
 
     if (c == OrderBook_Idx::Leg1State_OB) {
         orderState = order_list[OrderBook_Idx::Leg1StateVal_OB].toInt();
@@ -150,8 +151,8 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
             painter->setPen(pen);
             QPoint p1 = option.rect.bottomLeft();
             QPoint p2 = option.rect.bottomRight();
-            p1.setX(p1.x() - 5);
-            p2.setX(p2.x() + 5);
+            p1.setX(p1.x() - x_add);
+            p2.setX(p2.x() + x_add);
             painter->drawLine(p1, p2);
         }
         else if (buy_sell == "Buy") {
@@ -224,8 +225,8 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
 
         QPoint p1 = option.rect.bottomLeft();
         QPoint p2 = option.rect.bottomRight();
-        p1.setX(p1.x() - 5);
-        p2.setX(p2.x() + 5);
+        p1.setX(p1.x() - x_add);
+        p2.setX(p2.x() + x_add);
         painter->drawLine(p1, p2);
 
 
@@ -269,10 +270,10 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
     painter->setPen(pen);
     QPoint p1 = option.rect.bottomLeft();
     QPoint p2 = option.rect.bottomRight();
-    p1.setX(p1.x() - 5);
-    p2.setX(p2.x() + 5);
+    p1.setX(p1.x() - x_add);
+    p2.setX(p2.x() + x_add);
     painter->drawLine(p1, p2);
-    painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
+   // painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
 
     QString text = mappedIndex.data(Qt::DisplayRole).toString();
     int startIndex = text.indexOf(m_highlightText, 0, Qt::CaseInsensitive);

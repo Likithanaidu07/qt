@@ -16,6 +16,7 @@ void liners_delegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
     QStringList order_list=model->liners_data_list.at(index.row());
 
     QColor color;
+    int x_add = 1;
     if (c == Liners_Idx::BuyAvgPrice || c == Liners_Idx::BuyQtyinLots)
     {
 
@@ -35,8 +36,8 @@ void liners_delegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
 
         QPoint p1 = option.rect.bottomLeft();
         QPoint p2 = option.rect.bottomRight();
-        p1.setX(p1.x() - 5);
-        p2.setX(p2.x() + 5);
+        p1.setX(p1.x() - x_add);
+        p2.setX(p2.x() + x_add);
         painter->drawLine(p1, p2);
     }
     else if (c == Liners_Idx::SellAvgPrice || c == Liners_Idx::SellQtyinLots)
@@ -78,8 +79,8 @@ void liners_delegate::paint(QPainter *painter, const QStyleOptionViewItem &optio
     painter->setPen(pen);
     QPoint p1= option.rect.bottomLeft();
     QPoint p2= option.rect.bottomRight();
-    p1.setX(p1.x()-5);
-    p2.setX(p2.x()+5);
+    p1.setX(p1.x()-x_add);
+    p2.setX(p2.x()+x_add);
 
 
     painter->drawLine(p1,p2);

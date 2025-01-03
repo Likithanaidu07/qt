@@ -498,6 +498,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
     pen.setWidthF(0.5);
     painter->setPen(pen);
     QColor HighlightColor("#42A5F5");
+    int x_add=1;
 
 
     if(c == PortfolioData_Idx::_Status)
@@ -527,8 +528,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
             QPoint p1= option.rect.bottomLeft();
             QPoint p2= option.rect.bottomRight();
-            p1.setX(p1.x()-5);
-            p2.setX(p2.x()+5);
+            p1.setX(p1.x()-x_add);
+            p2.setX(p2.x()+x_add);
             painter->drawLine(p1,p2);
 
             // Load an example image (replace with your logic to get the image)
@@ -552,7 +553,6 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             int middleColumnY = option.rect.top() + (option.rect.height() - imagePixmap.height()) / 2;
             QRect imageRect(QPoint(middleColumnX, middleColumnY), imagePixmap.size());
             painter->drawPixmap(imageRect, imagePixmap);
-
         }
         }
 
@@ -572,8 +572,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
                 painter->fillRect(option.rect, QColor("#E0F1FF"));
             QPoint p1= option.rect.bottomLeft();
             QPoint p2= option.rect.bottomRight();
-            p1.setX(p1.x()-5);
-            p2.setX(p2.x()+5);
+            p1.setX(p1.x()-x_add);
+            p2.setX(p2.x()+x_add);
             painter->drawLine(p1,p2);
         }
         else if(portfolio->StatusVal.toInt()==portfolio_status::Filled)
@@ -603,8 +603,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
                 painter->fillRect(option.rect, color);
             QPoint p1= option.rect.bottomLeft();
             QPoint p2= option.rect.bottomRight();
-            p1.setX(p1.x()-5);
-            p2.setX(p2.x()+5);
+            p1.setX(p1.x()-x_add);
+            p2.setX(p2.x()+x_add);
             painter->drawLine(p1,p2);
         }
 
@@ -624,8 +624,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->fillRect(option.rect,  color);
             QPoint p1= option.rect.bottomLeft();
             QPoint p2= option.rect.bottomRight();
-            p1.setX(p1.x()-5);
-            p2.setX(p2.x()+5);
+            p1.setX(p1.x()-x_add);
+            p2.setX(p2.x()+x_add);
             painter->drawLine(p1,p2);
         }
 
@@ -661,8 +661,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->fillRect(option.rect,  color);
             QPoint p1= option.rect.bottomLeft();
             QPoint p2= option.rect.bottomRight();
-            p1.setX(p1.x()-5);
-            p2.setX(p2.x()+5);
+            p1.setX(p1.x()-x_add);
+            p2.setX(p2.x()+x_add);
             painter->drawLine(p1,p2);
         }
 
@@ -730,8 +730,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->fillRect(option.rect, color);
             QPoint p1= option.rect.bottomLeft();
             QPoint p2= option.rect.bottomRight();
-            p1.setX(p1.x()-5);
-            p2.setX(p2.x()+5);
+            p1.setX(p1.x()-x_add);
+            p2.setX(p2.x()+x_add);
             painter->drawLine(p1,p2);
         }
 
@@ -766,8 +766,8 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
             painter->fillRect(option.rect, color);
             QPoint p1= option.rect.bottomLeft();
             QPoint p2= option.rect.bottomRight();
-            p1.setX(p1.x()-5);
-            p2.setX(p2.x()+5);
+            p1.setX(p1.x()-x_add);
+            p2.setX(p2.x()+x_add);
             painter->drawLine(p1,p2);
         }
         else if(portfolio->StatusVal.toInt()==portfolio_status::Filled)

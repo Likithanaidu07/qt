@@ -670,7 +670,7 @@ line-height: normal;
               </font>
              </property>
              <property name="text">
-              <string>P$L</string>
+              <string>P&amp;L</string>
              </property>
              <property name="alignment">
               <set>Qt::AlignCenter</set>

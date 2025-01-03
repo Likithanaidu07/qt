@@ -72,6 +72,7 @@ void Order_F1_F2_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &
 
     auto c = index.column();
     auto r = index.row();
+    int x_add=1;
 
     QColor textColor = QColor(0, 0, 0);
     int orderState = -1;
@@ -115,8 +116,8 @@ void Order_F1_F2_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &
             painter->setPen(pen);
             QPoint p1 = option.rect.bottomLeft();
             QPoint p2 = option.rect.bottomRight();
-            p1.setX(p1.x() - 5);
-            p2.setX(p2.x() + 5);
+            p1.setX(p1.x() - x_add);
+            p2.setX(p2.x() + x_add);
             painter->drawLine(p1, p2);
         }
         else if (buy_sell == "Buy") {
@@ -189,8 +190,8 @@ void Order_F1_F2_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &
 
         QPoint p1 = option.rect.bottomLeft();
         QPoint p2 = option.rect.bottomRight();
-        p1.setX(p1.x() - 5);
-        p2.setX(p2.x() + 5);
+        p1.setX(p1.x() - x_add);
+        p2.setX(p2.x() + x_add);
         painter->drawLine(p1, p2);
 
     } else {
@@ -216,8 +217,8 @@ void Order_F1_F2_Delegate::paint(QPainter *painter, const QStyleOptionViewItem &
     painter->setPen(pen);
     QPoint p1 = option.rect.bottomLeft();
     QPoint p2 = option.rect.bottomRight();
-    p1.setX(p1.x() - 5);
-    p2.setX(p2.x() + 5);
+    p1.setX(p1.x() - x_add);
+    p2.setX(p2.x() + x_add);
     painter->drawLine(p1, p2);
     painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
 
