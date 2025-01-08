@@ -1,4 +1,4 @@
-#include "mainwindow.h"
+ #include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QCheckBox>
 #include <QEvent>
@@ -4210,7 +4210,7 @@ void MainWindow::onSummaryActionTriggered() {
 
           Qt::WindowFlags flags = summary->windowFlags();
          // summary->setWindowFlags(flags | Qt::Dialog);
-          summary->setWindowFlags(Qt::Window | Qt::Tool);
+          summary->setWindowFlags(Qt::Window | Qt::Dialog);
           summary->setObjectName("summarycard");
           summary->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 
@@ -4242,7 +4242,7 @@ void MainWindow::onWatchActionTriggered() {
           watch = new Watch_cards(this);
           Qt::WindowFlags flags = watch->windowFlags();
           //watch->setWindowFlags(flags | Qt::Dialog);
-          watch->setWindowFlags(Qt::Window | Qt::Tool);
+          watch->setWindowFlags(Qt::Window | Qt::Dialog);
 
 
           // Uncomment if you want the Watch_cards to be deleted when it's closed
@@ -4277,7 +4277,7 @@ void MainWindow::onLogActionTriggered() {
           logs = new Logs_cards(this);
           Qt::WindowFlags flags = logs->windowFlags();
           //logs->setWindowFlags(flags | Qt::Dialog);
-          logs->setWindowFlags(Qt::Window | Qt::Tool);
+          logs->setWindowFlags(Qt::Window | Qt::Dialog);
           logs->setObjectName("logcard");
           logs->setFocusPolicy(Qt::FocusPolicy::StrongFocus);
 
