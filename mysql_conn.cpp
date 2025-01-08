@@ -1411,9 +1411,6 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
 //                if(skipRecord==true)
 //                  continue;
 
-
-
-
                 QString Volant_No = query.value(rec.indexOf("Trader_Data")).toString();
                 int leg1_token_number = query.value(rec.indexOf("Leg1TokenNo")).toInt();
                 int leg2_token_number = query.value(rec.indexOf("Leg2TokenNo")).toInt();
