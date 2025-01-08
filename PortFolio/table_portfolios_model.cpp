@@ -1356,6 +1356,7 @@ QList<portfolioImportExportData> Table_Portfolios_Model::getPortFolioToExport(){
             tmp.AdditionalData2  = portfolio_data_list[i]->AdditionalData2;
             tmp.AdditionalData3  = portfolio_data_list[i]->AdditionalData3;
             tmp.AdditionalData4  = portfolio_data_list[i]->AdditionalData4;
+            tmp.Alias  = portfolio_data_list[i]->Alias;
             p_data_to_export.append(tmp);
         }
     }
