@@ -4929,6 +4929,7 @@ QDataStream &operator<<(QDataStream &out, const portfolioImportExportData &data)
         << data.Leg6TokenNo
         << data.SellPriceDifference
         << data.SellTotalQuantity
+        << data.SellTradedQuantity
         << data.BuyPriceDifference
         << data.BuyTotalQuantity
         << data.BuyTradedQuantity
@@ -4954,6 +4955,7 @@ QDataStream &operator>>(QDataStream &in, portfolioImportExportData &data) {
           >> data.Leg6TokenNo
           >> data.SellPriceDifference
           >> data.SellTotalQuantity
+          >> data.SellTradedQuantity
           >> data.BuyPriceDifference
           >> data.BuyTotalQuantity
           >> data.BuyTradedQuantity
@@ -4971,6 +4973,7 @@ void MainWindow::import_Action(){
             "",
             "Portfolios Files (*.bin);;All Files (*)"
         );
+        QString msg;
 
         if (!fileName.isEmpty()) {
             QList<portfolioImportExportData> pData ;
@@ -4982,12 +4985,39 @@ void MainWindow::import_Action(){
 
             QDataStream in(&file);
             in >> pData;
-            QMessageBox::information(nullptr, "Success", "Portfolios imported successfully!");
+            if(pData.size()>0){
+                if(!db_conn->clearAlogsForImport(QString::number(userData.UserId),msg))
+                    QMessageBox::warning(nullptr, "Warning: Clear DB", msg);
+
+                if(db_conn->insertAlogsForImport(pData,msg)){
+                    triggerImmediate_refreshTables();
+                    db_conn->logToDB("Portfolios imported.");
+                    QMessageBox::information(nullptr, "Success", "Portfolios imported successfully!");
+                }
+                else{
+                    QMessageBox::warning(nullptr, "Warning: Portfolios import Failed", msg);
+                }
+            }
+            else{
+                QMessageBox::warning(nullptr, "Failed", "No portfolios in selected file. !");
+            }
+            file.close();
+
+        }
+        else{
+            QMessageBox::warning(nullptr, "Failed", "Selected file is empty!.");
         }
 }
 
 void MainWindow::export_Action(){
-    QString fileName = QFileDialog::getSaveFileName(
+
+    QList<portfolioImportExportData> pData = T_Portfolio_Model->getPortFolioToExport(); //get data to export
+    if(pData.size()==0){
+        QMessageBox::warning(nullptr, "Warning","No traded portfolios avaiable to export.");
+        return;
+    }
+
+        QString fileName = QFileDialog::getSaveFileName(
             nullptr,
             "Export Portfolios",
             "",
@@ -5003,7 +5033,14 @@ void MainWindow::export_Action(){
                QList<portfolioImportExportData> pData = T_Portfolio_Model->getPortFolioToExport(); //get data to export
                QDataStream out(&file);
                out << pData;
+               db_conn->logToDB("Portfolios exported.");
+
                QMessageBox::information(nullptr, "Success", "Portfolios exported successfully!");
+               file.close();
+
+        }
+        else{
+            QMessageBox::warning(nullptr, "Failed","No File selected!.");
         }
 }
 

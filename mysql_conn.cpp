@@ -2936,7 +2936,116 @@ bool mysql_conn::deleteNonTradedAlgos(QStringList PortfolioNumbers, QString &msg
 
     return ret;
 }
+bool mysql_conn::clearAlogsForImport(QString user_id,QString &msg)
+{
+    QMutexLocker lock(&mutex);
 
+    bool ret = false;
+    {
+        bool ok = checkDBOpened(msg);
+        if(ok){
+            QSqlQuery query(db);
+            QString str = "DELETE FROM Portfolios WHERE TraderID='" + user_id + "' AND SellTradedQuantity <= 0 AND BuyTradedQuantity <=0";
+
+            query.prepare(str);
+            if( !query.exec() )
+            {
+                msg = query.lastError().text();
+                qDebug()<<query.lastError().text();
+            }
+            else{
+                int rowsAffected = query.numRowsAffected();
+                if (rowsAffected > 0) {
+                    ret = true;  //delet scuccess
+                    msg = "Portfolios  Deleted successfully.";
+                }
+                else {
+                    msg = "No portfolio cleared from DB.";
+                    ret = true;
+                }
+            }
+
+        }
+        else{
+            qDebug()<<"clearAlogsForImport:  Cannot connect Database: "+db.lastError().text();
+            msg="clearAlogsForImport: Cannot connect Database: "+db.lastError().text();
+        }
+
+        //db.close();
+    }
+    return ret;
+}
+bool mysql_conn::insertAlogsForImport(QList<portfolioImportExportData> pData ,QString &msg)
+{
+    QMutexLocker lock(&mutex);
+
+    int insertCount = 0;
+    bool ret = false;
+    {
+        bool ok = checkDBOpened(msg);
+        if(ok){
+            for(int i=0;i<pData.length();i++){
+                QSqlQuery query(db);
+                query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID,ClientID,IsBroker, Status, "
+                              "Leg1TokenNo,Leg2TokenNo,Leg3TokenNo,Leg4TokenNo,Leg5TokenNo,Leg6TokenNo"
+                              ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                              "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,AdditionalData1,AdditionalData2,AdditionalData3,AdditionalData4,"
+                              "OrderQuantity) "
+                              "VALUES (:PortfolioType, :TraderID, :ClientID, :IsBroker, :Status, "
+                              ":Leg1TokenNo, :Leg2TokenNo, :Leg3TokenNo, :Leg4TokenNo, :Leg5TokenNo, :Leg6TokenNo,"
+                              ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                              ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,:AdditionalData1,:AdditionalData2,:AdditionalData3,:AdditionalData4,"
+                              ":OrderQuantity)");
+                query.bindValue(":PortfolioType", pData[i].PortfolioType);
+                query.bindValue(":TraderID", pData[i].TraderID);
+                query.bindValue(":ClientID", pData[i].ClientID);
+                query.bindValue(":IsBroker", pData[i].IsBroker);
+                query.bindValue(":Status", pData[i].Status);
+                query.bindValue(":Leg1TokenNo", pData[i].Leg1TokenNo);
+                query.bindValue(":Leg2TokenNo", pData[i].Leg2TokenNo);
+                query.bindValue(":Leg3TokenNo", pData[i].Leg3TokenNo);
+                query.bindValue(":Leg4TokenNo", pData[i].Leg4TokenNo);
+                query.bindValue(":Leg5TokenNo", pData[i].Leg5TokenNo);
+                query.bindValue(":Leg6TokenNo", pData[i].Leg6TokenNo);
+
+                query.bindValue(":BuyPriceDifference", pData[i].BuyPriceDifference);
+                query.bindValue(":BuyTotalQuantity", pData[i].BuyTotalQuantity);
+                query.bindValue(":BuyTradedQuantity", pData[i].BuyTradedQuantity);
+                query.bindValue(":SellPriceDifference", pData[i].SellPriceDifference);
+                query.bindValue(":SellTotalQuantity", pData[i].SellTotalQuantity);
+                query.bindValue(":SellTradedQuantity", pData[i].SellTradedQuantity);
+                query.bindValue(":AdditionalData1", pData[i].AdditionalData1);
+                query.bindValue(":AdditionalData2", pData[i].AdditionalData2);
+                query.bindValue(":AdditionalData3", pData[i].AdditionalData3);
+                query.bindValue(":AdditionalData4", pData[i].AdditionalData4);
+                query.bindValue(":OrderQuantity", 0);
+
+                if( !query.exec() )
+                {
+                    msg = query.lastError().text();
+                    qDebug()<<query.lastError().text();
+                }
+                else{
+                    insertCount ++;
+                }
+            }
+
+
+        }
+        else{
+            qDebug()<<"insertAlogsForImport:  Cannot connect Database: "+db.lastError().text();
+            msg="insertAlogsForImport: Cannot connect Database: "+db.lastError().text();
+        }
+
+        //db.close();
+    }
+    if(insertCount==pData.size())
+        ret = true;
+    else{
+        msg = msg+"Some of the portfolio cannot insert to DB.";
+    }
+    return ret;
+}
 
 algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,int MaxPortfolioCount,QString &msg){
     QMutexLocker lock(&mutex);

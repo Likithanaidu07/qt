@@ -24,6 +24,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
 
         obj.IsBroker = query.value("IsBroker").toBool();
         obj.TraderID = query.value("TraderID").toInt();
+        obj.ClientID = query.value("ClientID").toInt();
 
         obj.Leg1TokenNo = query.value("Leg1TokenNo").toInt();
         if(obj.Leg1TokenNo>0){
