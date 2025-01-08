@@ -2986,12 +2986,12 @@ bool mysql_conn::insertAlogsForImport(QList<portfolioImportExportData> pData ,QS
                 query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID,ClientID,IsBroker, Status, "
                               "Leg1TokenNo,Leg2TokenNo,Leg3TokenNo,Leg4TokenNo,Leg5TokenNo,Leg6TokenNo"
                               ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
-                              "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,AdditionalData1,AdditionalData2,AdditionalData3,AdditionalData4,"
+                              "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,AdditionalData1,AdditionalData2,AdditionalData3,AdditionalData4,Alias,"
                               "OrderQuantity) "
                               "VALUES (:PortfolioType, :TraderID, :ClientID, :IsBroker, :Status, "
                               ":Leg1TokenNo, :Leg2TokenNo, :Leg3TokenNo, :Leg4TokenNo, :Leg5TokenNo, :Leg6TokenNo,"
                               ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
-                              ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,:AdditionalData1,:AdditionalData2,:AdditionalData3,:AdditionalData4,"
+                              ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,:AdditionalData1,:AdditionalData2,:AdditionalData3,:AdditionalData4,:Alias,"
                               ":OrderQuantity)");
                 query.bindValue(":PortfolioType", pData[i].PortfolioType);
                 query.bindValue(":TraderID", pData[i].TraderID);
@@ -3015,6 +3015,7 @@ bool mysql_conn::insertAlogsForImport(QList<portfolioImportExportData> pData ,QS
                 query.bindValue(":AdditionalData2", pData[i].AdditionalData2);
                 query.bindValue(":AdditionalData3", pData[i].AdditionalData3);
                 query.bindValue(":AdditionalData4", pData[i].AdditionalData4);
+                query.bindValue(":Alias", pData[i].Alias);
                 query.bindValue(":OrderQuantity", 0);
 
                 if( !query.exec() )

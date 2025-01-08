@@ -4936,7 +4936,8 @@ QDataStream &operator<<(QDataStream &out, const portfolioImportExportData &data)
         << data.AdditionalData1
         << data.AdditionalData2
         << data.AdditionalData3
-        << data.AdditionalData4;
+        << data.AdditionalData4
+        << data.Alias;
     return out;
 }
 
@@ -4962,7 +4963,8 @@ QDataStream &operator>>(QDataStream &in, portfolioImportExportData &data) {
           >> data.AdditionalData1
           >> data.AdditionalData2
           >> data.AdditionalData3
-          >> data.AdditionalData4;
+          >> data.AdditionalData4
+          >> data.Alias;
     return in;
 }
 void MainWindow::import_Action(){

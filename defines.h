@@ -504,7 +504,7 @@ struct portfolioImportExportData{
     QString AdditionalData2;
     QString AdditionalData3;
     QString AdditionalData4;
-
+    QString Alias;
 };
 
 // Serialize portfolioImportExportData to QDataStream
