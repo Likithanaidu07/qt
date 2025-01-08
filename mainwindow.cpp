@@ -4695,6 +4695,7 @@ void MainWindow::exportTableViewToCSV(){
 
     // If the user cancels, folderPath will be empty
     if (folderPath.isEmpty()) {
+
         return;
     }
 
