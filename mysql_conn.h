@@ -123,7 +123,8 @@ public:
     QHash<QString, contract_table> prpareContractDataFromDB(QString queryStr, QSqlDatabase *db,QStringList &tokenData);
     QList<int> getPortfolioTypesForInstrumentType(const QString& data, const QMap<int, QStringList>& algoFilterMap);
     QHash<QString,QString>  getOrderDetailsData(QString  PortfolioNumberStr,QString user_id);
-
+    bool clearAlogsForImport(QString user_id,QString &msg);
+    bool insertAlogsForImport(QList<portfolioImportExportData> pData ,QString &msg);
 private:
     bool checkDBOpened( QString &mesg);
     void loadSettings();
