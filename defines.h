@@ -306,6 +306,7 @@ struct algo_data_to_insert{
     QString Leg4Ratio;
     QString Leg5Ratio;
     QString Leg6Ratio;
+    QString Alias="";
 
     bool uploaded;
     int table_row_unique_id;

@@ -3240,6 +3240,7 @@ void MainWindow::duplicate_Button_clicked() {
             data.Leg3_token_number = QString::number(selectedPortfolio->Leg3TokenNo);
             data.Leg4_token_number = QString::number(selectedPortfolio->Leg4TokenNo);
             data.user_id = QString::number(userData.UserId);
+            data.Alias = selectedPortfolio->Alias;
 
             algo_data_insert_status status = db_conn->insertToAlgoTable(data, MaxPortfolioCount, msg);
             if (status == algo_data_insert_status::LIMIT_REACHED) {

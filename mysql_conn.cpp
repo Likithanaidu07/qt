@@ -3078,12 +3078,12 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                       "Leg1TokenNo, Leg2TokenNo"
                                       ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
                                       "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                      "OrderQuantity,ModifyType) "
+                                      "OrderQuantity,ModifyType,Alias) "
                                       "VALUES (:PortfolioType, :TraderID, :Status, "
                                       ":Leg1TokenNo, :Leg2TokenNo,"
                                       ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
                                       ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                      ":OrderQuantity,:ModifyType)");
+                                      ":OrderQuantity,:ModifyType,:Alias)");
                         query.bindValue(":PortfolioType", data.algo_type);
                         query.bindValue(":TraderID", data.user_id);
                         query.bindValue(":Status", data.Algo_Status);
@@ -3097,6 +3097,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                         query.bindValue(":SellTradedQuantity", 0);
                         query.bindValue(":OrderQuantity", 0);
                         query.bindValue(":ModifyType", 1);
+                        query.bindValue(":Alias", data.Alias);
 
 
                     }
@@ -3106,12 +3107,12 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                       "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
                                       ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
                                       "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                      "OrderQuantity) "
+                                      "OrderQuantity,Alias) "
                                       "VALUES (:PortfolioType, :TraderID, :Status,"
                                       ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
                                       ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
                                       ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                      ":OrderQuantity)");
+                                      ":OrderQuantity,:Alias)");
                         query.bindValue(":PortfolioType", data.algo_type);
                         query.bindValue(":TraderID", data.user_id);
                         query.bindValue(":Status", data.Algo_Status);
@@ -3125,6 +3126,8 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                         query.bindValue(":SellTotalQuantity", 0);
                         query.bindValue(":SellTradedQuantity", 0);
                         query.bindValue(":OrderQuantity", 0);
+                        query.bindValue(":Alias", data.Alias);
+
 
                     }
                     //CON-REV
@@ -3133,12 +3136,12 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                       "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
                                       ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
                                       "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                      "OrderQuantity) "
+                                      "OrderQuantity,Alias) "
                                       "VALUES (:PortfolioType, :TraderID, :Status,"
                                       ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
                                       ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
                                       ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                      ":OrderQuantity)");
+                                      ":OrderQuantity,:Alias)");
                         query.bindValue(":PortfolioType", data.algo_type);
                         query.bindValue(":TraderID", data.user_id);
                         query.bindValue(":Status", data.Algo_Status);
@@ -3152,6 +3155,8 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                         query.bindValue(":SellTotalQuantity", 0);
                         query.bindValue(":SellTradedQuantity", 0);
                         query.bindValue(":OrderQuantity", 0);
+                        query.bindValue(":Alias", data.Alias);
+
 
                     }
 
@@ -3161,12 +3166,12 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                       "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
                                       ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
                                       "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                      "OrderQuantity,ModifyType) "
+                                      "OrderQuantity,ModifyType,Alias) "
                                       "VALUES (:PortfolioType, :TraderID, :Status,"
                                       ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
                                       ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
                                       ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                      ":OrderQuantity,:ModifyType)");
+                                      ":OrderQuantity,:ModifyType,:Alias)");
                         query.bindValue(":PortfolioType", data.algo_type);
                         query.bindValue(":TraderID", data.user_id);
                         query.bindValue(":Status", data.Algo_Status);
@@ -3181,6 +3186,8 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                         query.bindValue(":SellTradedQuantity", 0);
                         query.bindValue(":OrderQuantity", 0);
                         query.bindValue(":ModifyType", 1);
+                        query.bindValue(":Alias", data.Alias);
+
 
                     }
                     //BOX
@@ -3189,12 +3196,12 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                       "Leg1TokenNo, Leg2TokenNo, Leg3TokenNo, Leg4TokenNo, Leg5TokenNo"
                                       ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
                                       "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                      "OrderQuantity,AdditionalData1,AdditionalData2,AdditionalData3) "
+                                      "OrderQuantity,AdditionalData1,AdditionalData2,AdditionalData3,Alias) "
                                       "VALUES (:PortfolioType, :TraderID, :Status, "
                                       ":Leg1TokenNo, :Leg2TokenNo, :Leg3TokenNo, :Leg4TokenNo, :Leg5TokenNo,"
                                       ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
                                       ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                      ":OrderQuantity, :AdditionalData1, :AdditionalData2, :AdditionalData3)");
+                                      ":OrderQuantity, :AdditionalData1, :AdditionalData2, :AdditionalData3,:Alias)");
                         query.bindValue(":PortfolioType", data.algo_type);
                         query.bindValue(":TraderID", data.user_id);
                         query.bindValue(":Status", data.Algo_Status);
@@ -3212,8 +3219,8 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                         query.bindValue(":OrderQuantity", 0);
                         query.bindValue(":AdditionalData1", "CE");
                         query.bindValue(":AdditionalData2", "PE");
-                        query.bindValue(":AdditionalData3", data.option_type);
-
+                        query.bindValue(":AdditionalData3", data.option_type);                        
+                        query.bindValue(":Alias", data.Alias);
 
                     }
                     //OPEN_BY
@@ -3222,12 +3229,12 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                       "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
                                       ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
                                       "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                      "OrderQuantity,Leg1Ratio,Leg2Ratio,Leg3Ratio) "
+                                      "OrderQuantity,Leg1Ratio,Leg2Ratio,Leg3Ratio,Alias) "
                                       "VALUES (:PortfolioType, :TraderID, :Status,"
                                       ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
                                       ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
                                       ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                      ":OrderQuantity,:Leg1Ratio,:Leg2Ratio,:Leg3Ratio)");
+                                      ":OrderQuantity,:Leg1Ratio,:Leg2Ratio,:Leg3Ratio,:Alias)");
                         query.bindValue(":PortfolioType", data.algo_type);
                         query.bindValue(":TraderID", data.user_id);
                         query.bindValue(":Status", data.Algo_Status);
@@ -3244,6 +3251,8 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                         query.bindValue(":Leg1Ratio", data.Leg1Ratio);
                         query.bindValue(":Leg2Ratio", data.Leg2Ratio);
                         query.bindValue(":Leg3Ratio", data.Leg3Ratio);
+                        query.bindValue(":Alias", data.Alias);
+
 
                     }
                     //OPEN BOX
@@ -3252,12 +3261,12 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                       "Leg1TokenNo, Leg2TokenNo, Leg3TokenNo, Leg4TokenNo, Leg5TokenNo"
                                       ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
                                       "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                      "OrderQuantity,AdditionalData1,AdditionalData2,AdditionalData3,Leg1Ratio,Leg2Ratio,Leg3Ratio,Leg4Ratio) "
+                                      "OrderQuantity,AdditionalData1,AdditionalData2,AdditionalData3,Leg1Ratio,Leg2Ratio,Leg3Ratio,Leg4Ratio,Alias) "
                                       "VALUES (:PortfolioType, :TraderID, :Status, "
                                       ":Leg1TokenNo, :Leg2TokenNo, :Leg3TokenNo, :Leg4TokenNo, :Leg5TokenNo,"
                                       ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
                                       ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                      ":OrderQuantity, :AdditionalData1, :AdditionalData2, :AdditionalData3,:Leg1Ratio,:Leg2Ratio,:Leg3Ratio,:Leg4Ratio)");
+                                      ":OrderQuantity, :AdditionalData1, :AdditionalData2, :AdditionalData3,:Leg1Ratio,:Leg2Ratio,:Leg3Ratio,:Leg4Ratio,:Alias)");
                         query.bindValue(":PortfolioType", data.algo_type);
                         query.bindValue(":TraderID", data.user_id);
                         query.bindValue(":Status", data.Algo_Status);
@@ -3280,7 +3289,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                         query.bindValue(":Leg2Ratio", data.Leg2Ratio);
                         query.bindValue(":Leg3Ratio", data.Leg3Ratio);
                         query.bindValue(":Leg4Ratio", data.Leg4Ratio);
-
+                        query.bindValue(":Alias", data.Alias);
                     }
                     //BFLY_BID
                     else if(data.algo_type==QString::number(PortfolioType::BFLY_BID)){
@@ -3288,12 +3297,12 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                       "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo"
                                       ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
                                       "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                      "OrderQuantity,ModifyType) "
+                                      "OrderQuantity,ModifyType,Alias) "
                                       "VALUES (:PortfolioType, :TraderID, :Status,"
                                       ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo"
                                       ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
                                       ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                      ":OrderQuantity,:ModifyType)");
+                                      ":OrderQuantity,:ModifyType,:Alias)");
                         query.bindValue(":PortfolioType", data.algo_type);
                         query.bindValue(":TraderID", data.user_id);
                         query.bindValue(":Status", data.Algo_Status);
@@ -3308,6 +3317,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                         query.bindValue(":SellTradedQuantity", 0);
                         query.bindValue(":OrderQuantity", 0);
                         query.bindValue(":ModifyType", 1);
+                        query.bindValue(":Alias", data.Alias);
 
                     }
 
@@ -3317,12 +3327,12 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                       "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo,Leg4TokenNo"
                                       ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
                                       "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                      "OrderQuantity,ModifyType) "
+                                      "OrderQuantity,ModifyType,Alias) "
                                       "VALUES (:PortfolioType, :TraderID, :Status,"
                                       ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo,:Leg4TokenNo"
                                       ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
                                       ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                      ":OrderQuantity,:ModifyType)");
+                                      ":OrderQuantity,:ModifyType,:Alias)");
                         query.bindValue(":PortfolioType", data.algo_type);
                         query.bindValue(":TraderID", data.user_id);
                         query.bindValue(":Status", data.Algo_Status);
@@ -3338,6 +3348,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                         query.bindValue(":SellTradedQuantity", 0);
                         query.bindValue(":OrderQuantity", 0);
                         query.bindValue(":ModifyType", 1);
+                        query.bindValue(":Alias", data.Alias);
 
                     }
 
@@ -3347,12 +3358,12 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                                       "Leg1TokenNo, Leg2TokenNo,Leg3TokenNo,Leg4TokenNo"
                                       ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
                                       "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                                      "OrderQuantity) "
+                                      "OrderQuantity,Alias) "
                                       "VALUES (:PortfolioType, :TraderID, :Status,"
                                       ":Leg1TokenNo, :Leg2TokenNo,:Leg3TokenNo,:Leg4TokenNo"
                                       ",:BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
                                       ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                                      ":OrderQuantity)");
+                                      ":OrderQuantity,:Alias)");
                         query.bindValue(":PortfolioType", data.algo_type);
                         query.bindValue(":TraderID", data.user_id);
                         query.bindValue(":Status", data.Algo_Status);
@@ -3367,7 +3378,7 @@ algo_data_insert_status mysql_conn::insertToAlgoTable(algo_data_to_insert data,i
                         query.bindValue(":SellTotalQuantity", 0);
                         query.bindValue(":SellTradedQuantity", 0);
                         query.bindValue(":OrderQuantity", 0);
-
+                        query.bindValue(":Alias", data.Alias);
                     }
 
                     if(query.exec()){
