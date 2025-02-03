@@ -136,15 +136,24 @@ void add_algo_con_rev::selectedAction(){
                        const auto& contract = sharedData->contract_table_hash[Fut_Tokens[i]];
 
                        unsigned int unix_time= contract.Expiry;
-                       QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-                       dt = dt.addYears(10);
-                       int targetYear = dt.date().year();
-                       bool isLeapYear = QDate::isLeapYear(targetYear);
+//                       QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//                       dt = dt.addYears(10);
+//                       int targetYear = dt.date().year();
+//                       bool isLeapYear = QDate::isLeapYear(targetYear);
 
-                       // If it is a leap year, and the date is after Feb 29, subtract one day
-                       if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-                           dt = dt.addDays(-1);
-                       }
+//                       // If it is a leap year, and the date is after Feb 29, subtract one day
+//                       if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//                           dt = dt.addDays(-1);
+//                       }
+                       QDateTime dt;
+                       dt.setOffsetFromUtc(0);
+                       dt.setDate(QDate(1980, 1, 1));
+                       dt.setTime(QTime(0, 0, 0));
+                       dt = dt.addSecs(unix_time);
+                       QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
+                       dt1 = dt1.addYears(10);
+                       QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+                       dt.setDate(newDate);
                        QString Expiry=dt.toString("MMM dd yyyy").toUpper();
 
                        QStandardItem *itemFut = new QStandardItem;
@@ -205,15 +214,24 @@ void add_algo_con_rev::create_AutoFillModel_StartStrike(){
 
     QString Instr_Name = sharedData->contract_table_hash[key].InstrumentName;
 
-    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[key].Expiry);
-    dt1 = dt1.addYears(10);
-    int targetYear = dt1.date().year();
-    bool isLeapYear = QDate::isLeapYear(targetYear);
+//    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[key].Expiry);
+//    dt1 = dt1.addYears(10);
+//    int targetYear = dt1.date().year();
+//    bool isLeapYear = QDate::isLeapYear(targetYear);
 
-    // If it is a leap year, and the date is after Feb 29, subtract one day
-    if (isLeapYear && dt1.date() > QDate(targetYear, 2, 29)) {
-        dt1 = dt1.addDays(-1);
-    }
+//    // If it is a leap year, and the date is after Feb 29, subtract one day
+//    if (isLeapYear && dt1.date() > QDate(targetYear, 2, 29)) {
+//        dt1 = dt1.addDays(-1);
+//    }
+    QDateTime dt1;
+    dt1.setOffsetFromUtc(0);
+    dt1.setDate(QDate(1980, 1, 1));
+    dt1.setTime(QTime(0, 0, 0));
+    dt1 = dt1.addSecs(sharedData->contract_table_hash[key].Expiry);
+    QDateTime dt11 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[key].Expiry);
+    dt11 = dt11.addYears(10);
+    QDate newDate = QDate(dt11.date().year(), dt1.date().month(), dt1.date().day());
+    dt1.setDate(newDate);
 
     QString ExpirySlected=dt1.toString("MMM dd yyyy").toUpper();
 
@@ -222,15 +240,15 @@ void add_algo_con_rev::create_AutoFillModel_StartStrike(){
     for(int i=0;i<CON_REV_Tokens.length();i++) {
         contract_table tmp = sharedData->contract_table_hash[CON_REV_Tokens[i]];
         unsigned int unix_time= tmp.Expiry;
-        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-        dt = dt.addYears(10);
-        int targetYear = dt.date().year();
-        bool isLeapYear = QDate::isLeapYear(targetYear);
-
-        // If it is a leap year, and the date is after Feb 29, subtract one day
-        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-            dt = dt.addDays(-1);
-        }
+        QDateTime dt;
+        dt.setOffsetFromUtc(0);
+        dt.setDate(QDate(1980, 1, 1));
+        dt.setTime(QTime(0, 0, 0));
+        dt = dt.addSecs(unix_time);
+        QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
+        dt1 = dt1.addYears(10);
+        QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+        dt.setDate(newDate);
 
         QString ExpiryTmp=dt.toString("MMM dd yyyy").toUpper();
 
@@ -294,15 +312,15 @@ void add_algo_con_rev::startStrikeEditFinishedAction(){
             continue;
         if(tmp.InstrumentName==Instr_Name&&tmp.OptionType=="PE"&&Expiry==tmp.Expiry){
             unsigned int unix_time= tmp.Expiry;
-            QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-            dt = dt.addYears(10);
-            int targetYear = dt.date().year();
-            bool isLeapYear = QDate::isLeapYear(targetYear);
-
-            // If it is a leap year, and the date is after Feb 29, subtract one day
-            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-                dt = dt.addDays(-1);
-            }
+            QDateTime dt;
+            dt.setOffsetFromUtc(0);
+            dt.setDate(QDate(1980, 1, 1));
+            dt.setTime(QTime(0, 0, 0));
+            dt = dt.addSecs(unix_time);
+            QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
+            dt1 = dt1.addYears(10);
+            QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+            dt.setDate(newDate);
             QString ExpiryTmp=dt.toString("MMM dd yyyy").toUpper();
             QString algo_combination = tmp.InstrumentName+" "+ExpiryTmp+" "+QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);//+" "+tmp.OptionType;
             QStandardItem *item = new QStandardItem;
@@ -375,15 +393,15 @@ void add_algo_con_rev::generateAlgo(){
     int Leg1_Strike =  sharedData->contract_table_hash[keyFut].StrikePrice;
     //
     unsigned int unix_time= sharedData->contract_table_hash[keyFut].Expiry;
-    QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-    dt = dt.addYears(10);
-    int targetYear = dt.date().year();
-    bool isLeapYear = QDate::isLeapYear(targetYear);
-
-    // If it is a leap year, and the date is after Feb 29, subtract one day
-    if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-        dt = dt.addDays(-1);
-    }
+    QDateTime dt;
+    dt.setOffsetFromUtc(0);
+    dt.setDate(QDate(1980, 1, 1));
+    dt.setTime(QTime(0, 0, 0));
+    dt = dt.addSecs(unix_time);
+    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
+    dt1 = dt1.addYears(10);
+    QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+    dt.setDate(newDate);
     QString Leg1_val=dt.toString("MMM dd yyyy").toUpper();
 
 
@@ -425,27 +443,45 @@ void add_algo_con_rev::generateAlgo(){
             int leg2 = sharedData->contract_table_hash[filteredKeys[i]].StrikePrice;
             for(int j=i+1;j<filteredKeys.length();j++){
                 if(leg2==sharedData->contract_table_hash[filteredKeys[j]].StrikePrice&&sharedData->contract_table_hash[filteredKeys[j]].OptionType=="PE"){
-                    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
-                    dt1 = dt1.addYears(10);
-                    int target_Year = dt1.date().year();
-                    bool isLeap_Year = QDate::isLeapYear(targetYear);
+//                    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
+//                    dt1 = dt1.addYears(10);
+//                    int target_Year = dt1.date().year();
+//                    bool isLeap_Year = QDate::isLeapYear(target_Year);
 
-                    // If it is a leap year, and the date is after Feb 29, subtract one day
-                    if (isLeapYear && dt1.date() > QDate(targetYear, 2, 29)) {
-                        dt1 = dt1.addDays(-1);
-                    }
+//                    // If it is a leap year, and the date is after Feb 29, subtract one day
+//                    if (isLeap_Year && dt1.date() > QDate(target_Year, 2, 29)) {
+//                        dt1 = dt1.addDays(-1);
+//                    }
+QDateTime dt1;
+dt1.setOffsetFromUtc(0);
+dt1.setDate(QDate(1980, 1, 1));
+dt1.setTime(QTime(0, 0, 0));
+dt1 = dt1.addSecs(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
+QDateTime dt11 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
+dt11 = dt11.addYears(10);
+QDate newDate = QDate(dt11.date().year(), dt1.date().month(), dt1.date().day());
+dt1.setDate(newDate);
                     QString Leg2_date=dt1.toString("MMM dd yyyy").toUpper();
                     QString leg2=Leg2_date+" "+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" CE";
 
-                    QDateTime dt3 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
-                    dt3 = dt3.addYears(10);
-                    int targetYear = dt3.date().year();
-                    bool isLeapYear = QDate::isLeapYear(targetYear);
+//                    QDateTime dt3 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
+//                    dt3 = dt3.addYears(10);
+//                    int targetYear = dt3.date().year();
+//                    bool isLeapYear = QDate::isLeapYear(targetYear);
 
-                    // If it is a leap year, and the date is after Feb 29, subtract one day
-                    if (isLeapYear && dt3.date() > QDate(targetYear, 2, 29)) {
-                        dt3 = dt3.addDays(-1);
-                    }
+//                    // If it is a leap year, and the date is after Feb 29, subtract one day
+//                    if (isLeapYear && dt3.date() > QDate(targetYear, 2, 29)) {
+//                        dt3 = dt3.addDays(-1);
+//                    }
+                    QDateTime dt3;
+                    dt3.setOffsetFromUtc(0);
+                    dt3.setDate(QDate(1980, 1, 1));
+                    dt3.setTime(QTime(0, 0, 0));
+                    dt3 = dt3.addSecs(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
+                    QDateTime dt13 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
+                    dt13 = dt13.addYears(10);
+                    QDate newDatee = QDate(dt13.date().year(), dt3.date().month(), dt3.date().day());
+                    dt3.setDate(newDatee);
                     QString Leg3_date=dt3.toString("MMM dd yyyy").toUpper();
                     QString leg3=Leg3_date+" "+QString::number(sharedData->contract_table_hash[filteredKeys[j]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" PE";
 
@@ -489,28 +525,47 @@ void add_algo_con_rev::generateAlgo(){
             int leg3 = sharedData->contract_table_hash[filteredKeys[i]].StrikePrice;
             for(int j=i+1;j<filteredKeys.length();j++){
                 if(leg3==sharedData->contract_table_hash[filteredKeys[j]].StrikePrice&&sharedData->contract_table_hash[filteredKeys[j]].OptionType=="CE"){
-                    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
-                    dt1 = dt1.addYears(10);
-                    int target_Year = dt1.date().year();
-                    bool isLeap_Year = QDate::isLeapYear(targetYear);
+//                    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
+//                    dt1 = dt1.addYears(10);
+//                    int target_Year = dt1.date().year();
+//                    bool isLeap_Year = QDate::isLeapYear(target_Year);
 
-                    // If it is a leap year, and the date is after Feb 29, subtract one day
-                    if (isLeapYear && dt1.date() > QDate(targetYear, 2, 29)) {
-                        dt1 = dt1.addDays(-1);
-                    }
+//                    // If it is a leap year, and the date is after Feb 29, subtract one day
+//                    if (isLeap_Year && dt1.date() > QDate(target_Year, 2, 29)) {
+//                        dt1 = dt1.addDays(-1);
+//                    }
+                    QDateTime dt1;
+                    dt1.setOffsetFromUtc(0);
+                    dt1.setDate(QDate(1980, 1, 1));
+                    dt1.setTime(QTime(0, 0, 0));
+                    dt1 = dt1.addSecs(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
+                    QDateTime dt11 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
+                    dt11 = dt11.addYears(10);
+                    QDate newDate = QDate(dt11.date().year(), dt1.date().month(), dt1.date().day());
+                    dt1.setDate(newDate);
 
                     QString Leg2_date=dt1.toString("MMM dd yyyy").toUpper();
                     QString leg2=Leg2_date+" "+QString::number(sharedData->contract_table_hash[filteredKeys[j]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" CE";
 
-                    QDateTime dt3 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
-                    dt3 = dt3.addYears(10);
-                    int targetYear = dt3.date().year();
-                    bool isLeapYear = QDate::isLeapYear(targetYear);
+//                    QDateTime dt3 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
+//                    dt3 = dt3.addYears(10);
+//                    int targetYear = dt3.date().year();
+//                    bool isLeapYear = QDate::isLeapYear(targetYear);
 
-                    // If it is a leap year, and the date is after Feb 29, subtract one day
-                    if (isLeapYear && dt3.date() > QDate(targetYear, 2, 29)) {
-                        dt3 = dt3.addDays(-1);
-                    }
+//                    // If it is a leap year, and the date is after Feb 29, subtract one day
+//                    if (isLeapYear && dt3.date() > QDate(targetYear, 2, 29)) {
+//                        dt3 = dt3.addDays(-1);
+//                    }
+
+                    QDateTime dt3;
+                    dt3.setOffsetFromUtc(0);
+                    dt3.setDate(QDate(1980, 1, 1));
+                    dt3.setTime(QTime(0, 0, 0));
+                    dt3 = dt3.addSecs(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
+                    QDateTime dt13 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
+                    dt13 = dt13.addYears(10);
+                    QDate newDatee = QDate(dt13.date().year(), dt3.date().month(), dt3.date().day());
+                    dt3.setDate(newDatee);
                     QString Leg3_date=dt3.toString("MMM dd yyyy").toUpper();
                     QString leg3=Leg3_date+" "+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" PE";
 

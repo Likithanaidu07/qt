@@ -201,6 +201,7 @@ int table_portfolios_custom::findNextEditableCell(int currentColIdx, nav_directi
         PortfolioData_Idx::_BuyTotalQuantity,
         PortfolioData_Idx::_OrderQuantity,
         PortfolioData_Idx::_MaxLoss,
+        PortfolioData_Idx::_Depth,
     };
 
     QHeaderView *headerView = this->horizontalHeader();

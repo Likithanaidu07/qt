@@ -111,16 +111,25 @@ void convert_to_algo_bs1221_1331::selectedAction(PortfolioType _Portfolio_Type){
                // if(contract.OptionType=="PE")
                 //    continue;
                 unsigned int unix_time= contract.Expiry;
-                QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-                dt = dt.addYears(10);
-                // Check if the target year is a leap year
-                int targetYear = dt.date().year();
-                bool isLeapYear = QDate::isLeapYear(targetYear);
+//                QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//                dt = dt.addYears(10);
+//                // Check if the target year is a leap year
+//                int targetYear = dt.date().year();
+//                bool isLeapYear = QDate::isLeapYear(targetYear);
 
-                // If it is a leap year, and the date is after Feb 29, subtract one day
-                if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-                    dt = dt.addDays(-1);
-                }
+//                // If it is a leap year, and the date is after Feb 29, subtract one day
+//                if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//                    dt = dt.addDays(-1);
+//                }
+                QDateTime dt;
+                dt.setOffsetFromUtc(0);
+                dt.setDate(QDate(1980, 1, 1));
+                dt.setTime(QTime(0, 0, 0));
+                dt = dt.addSecs(unix_time);
+                QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
+                dt1 = dt1.addYears(10);
+                QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+                dt.setDate(newDate);
 
                 QString Expiry = dt.toString("MMM dd yyyy").toUpper();
 
@@ -223,15 +232,24 @@ void convert_to_algo_bs1221_1331::createEndStrikeModelAndPopulateListView(){
                 continue;
 
             unsigned int unix_time= tmp.Expiry;
-            QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-            dt = dt.addYears(10);
-            int targetYear = dt.date().year();
-            bool isLeapYear = QDate::isLeapYear(targetYear);
+//            QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//            dt = dt.addYears(10);
+//            int targetYear = dt.date().year();
+//            bool isLeapYear = QDate::isLeapYear(targetYear);
 
-            // If it is a leap year, and the date is after Feb 29, subtract one day
-            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-                dt = dt.addDays(-1);
-            }
+//            // If it is a leap year, and the date is after Feb 29, subtract one day
+//            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//                dt = dt.addDays(-1);
+//            }
+            QDateTime dt;
+            dt.setOffsetFromUtc(0);
+            dt.setDate(QDate(1980, 1, 1));
+            dt.setTime(QTime(0, 0, 0));
+            dt = dt.addSecs(unix_time);
+            QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
+            dt1 = dt1.addYears(10);
+            QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+            dt.setDate(newDate);
             QString ExpiryTmp=dt.toString("MMM dd yyyy").toUpper();
             QString strik_price = QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
             QString algo_combination = tmp.InstrumentName+" "+ ExpiryTmp+" " +strik_price+" " +Option_Type;
@@ -569,15 +587,15 @@ void convert_to_algo_bs1221_1331::generateAlgo()
     float startStrike =  sharedData->contract_table_hash[keyStart].StrikePrice; // will be in paise so converted to Rs
     float endStrike = sharedData->contract_table_hash[keyEnd].StrikePrice;// will be in paise so converted to Rs
     long long Start_Strike_Expiry= sharedData->contract_table_hash[keyStart].Expiry;
-    QDateTime dt = QDateTime::fromSecsSinceEpoch(Start_Strike_Expiry);
-    dt = dt.addYears(10);
-    int targetYear = dt.date().year();
-    bool isLeapYear = QDate::isLeapYear(targetYear);
-
-    // If it is a leap year, and the date is after Feb 29, subtract one day
-    if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-        dt = dt.addDays(-1);
-    }
+    QDateTime dt;
+    dt.setOffsetFromUtc(0);
+    dt.setDate(QDate(1980, 1, 1));
+    dt.setTime(QTime(0, 0, 0));
+    dt = dt.addSecs(Start_Strike_Expiry);
+    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(Start_Strike_Expiry);
+    dt1 = dt1.addYears(10);
+    QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+    dt.setDate(newDate);
     QString ExpiryTime=dt.toString("MMM dd yyyy").toUpper();
 
 

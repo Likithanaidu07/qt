@@ -727,6 +727,25 @@ QString ContractDetail::GetOptionType(QString token)
 }
 
 
+QString ContractDetail::GetExpiryLeapYearFixed(int token, QString format, int type){
+
+    if (token == 0)
+        return "-";
+    QString key = QString::number(token);
+    unsigned int unix_time= m_ContractDetails_Hash[key].Expiry;
+    QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+    dt = dt.addYears(10);
+    int targetYear = dt.date().year();
+    bool isLeapYear = QDate::isLeapYear(targetYear);
+
+    // If it is a leap year, and the date is after Feb 29, subtract one day
+    if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+        dt = dt.addDays(-1);
+    }
+    QString ExpiryTmp=dt.toString(format).toUpper();
+    return ExpiryTmp;
+}
+
 QString ContractDetail::GetExpiry(int token, QString format, int type)
 {
     if (token == 0)

@@ -53,7 +53,7 @@ private:
                           "BAvg","BDiff","BTQ",
                           "BTTQ","BRQ","SRate",
                           "SAvg", "SDiff","STQ",
-                          "STTQ","SRQ","Odr Qty","Bid Price","Expiry 1", /*"Expiry 2",*/
+                          "STTQ","SRQ","Odr Qty","Bid Price","Depth","Expiry 1", /*"Expiry 2",*/
                           "Cost" ,"Qty Ratio",
                           "Bid Leg", "Fut Price"};
 

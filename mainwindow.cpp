@@ -1,4 +1,4 @@
- #include "mainwindow.h"
+#include "mainwindow.h"
 #include "ui_mainwindow.h"
 #include <QCheckBox>
 #include <QEvent>
@@ -30,6 +30,10 @@
 #include "TradePosition/tradetable_searchfilterproxymodel.h"
 #include <algorithm>
 #include "MissedTrades/missed_trades_headerview.h"
+#include "OpenPosition/open_position_model.h"
+#include "OpenPosition/open_position_delegate.h"
+#include "OpenPosition/open_position_headerview.h"
+#include "MissedTrades/missed_trade_table_delegate.h"
 
 //#define ENABLE_BACKEND_DEBUG_MSG
 
@@ -134,10 +138,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->toolButtonAlgorithm->setPopupMode(QToolButton::InstantPopup);
     ui->toolButtonAlgorithm->setStyleSheet(toolButtonStyle);
 
-
     QMenu *menuPosition = new QMenu(this);
     menuPosition->addAction("Net Position", this, &MainWindow::on_Positions_Button_clicked);
     menuPosition->addAction("Algo Position", this, &MainWindow::on_Liners_Button_clicked);
+    menuPosition->addAction("Open Position", this, &MainWindow::on_OpenPosition_Button_clicked);
     menuPosition->addAction("Historical Position", this, &MainWindow::on_HP_Button_clicked);
     ui->toolButtonPostion->setMenu(menuPosition);
     ui->toolButtonPostion->setPopupMode(QToolButton::InstantPopup);
@@ -1285,6 +1289,93 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     /************Historical Positions********************************/
 
 
+    /************Open Positions Window********************************/
+    //QPixmap pixmapdock_hp_close(":/dock_close.png");
+
+    dock_win_Open_position =  new CDockWidget(tr("Open Positions"));
+
+    connect(dock_win_Open_position, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOpenDockWidgetVisiblityChanged(bool)));
+    //dock_win_combined_tracker->setAllowedAreas(Qt::AllDockWidgetAreas );
+    dock_win_Open_position->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
+    dock_win_Open_position->setMinimumSize(200,150);
+    const auto autoHideContainer_tracker = DockManagerMainPanel->addAutoHideDockWidget(SideBarLocation::SideBarLeft, dock_win_Open_position);
+    //    autoHideContainer_tracker->setSize(480);
+
+    //create a titlebar
+    QWidget *open_titlebar=new QWidget;
+    open_titlebar->setStyleSheet(DockTitleBar_Style);
+    QHBoxLayout *position_open_layout=new QHBoxLayout(open_titlebar);
+    position_open_layout->setSpacing(10);
+    position_open_layout->setContentsMargins(17,8,10,6);
+    QLabel *open_label=new QLabel("Open Positions");
+    QFont font_open_label=open_label->font();
+    font_open_label.setFamily("Work Sans");
+    open_label->setFont(font_open_label);
+    open_label->setStyleSheet("color: #495057;font-size: 16px;font-style: normal;font-weight: 700;line-height: normal;");
+    QSpacerItem* open_spacer=new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+    QLineEdit* line_edit_open = new QLineEdit;
+    line_edit_open->setMaximumWidth(160);
+    line_edit_open->setStyleSheet(lineedit_dock_SS);
+    QToolButton* open_close=new QToolButton();
+    connect(open_close, &QToolButton::clicked, [=](){ dock_win_combined_tracker->close(); });
+    open_close->setIcon(pixmapdock_hp_close);
+    open_close->setIconSize(QSize(14, 14));
+    position_open_layout->addWidget(open_label);
+    position_open_layout->addSpacerItem(open_spacer);
+    position_open_layout->addWidget(line_edit_open);
+    position_open_layout->addWidget(open_close);
+    //dock_win_combined_tracker->setTitleBarWidget(hp_titlebar);
+
+
+
+    //subWindow->addDockWidget(Qt::RightDockWidgetArea, dock_win_combined_tracker);
+
+    open_position = new QTableView(dock_win_Open_position);
+    open_position->setObjectName("Open_Position");
+
+    open_position->setStyleSheet(tableview_SS);
+    open_position->horizontalHeader()->setFixedHeight(32);
+    open_position->horizontalHeader()->setFont(headerfont);
+    open_position->setShowGrid(false);
+    open_position->setAlternatingRowColors(true);
+
+
+    open_position_headerview* open_headerViewrs = new open_position_headerview(Qt::Horizontal, liners_table);
+    open_headerViewrs->setFixedHeight(32);
+    open_headerViewrs->setFont(headerfont);
+    open_headerViewrs->setStyleSheet(
+        "   background: #495867;"
+        "   border: none;"
+        "   color: #FFF; "
+        "   text-align: center; "
+        "   font-size: 12px; "
+        "   font-style: normal; "
+        "   font-weight: 600; "
+        "   line-height: normal;"
+        );
+   // connect(headerViewrs, &QHeaderView::sectionMoved, this, &MainWindow::onLinersTableHeader_Rearranged);
+    liners_table->setHorizontalHeader(headerViewrs);
+
+
+    OpenPositionmodel = new open_position_model();
+    open_position->setModel(OpenPositionmodel);
+
+    open_position_delegate* open_delegate =new open_position_delegate;
+    open_position->setModel(OpenPositionmodel);
+    open_position->setItemDelegate(open_delegate);
+
+    open_position->horizontalHeader()->setStretchLastSection(false);
+    open_position->verticalHeader()->setVisible(false);
+    open_position->setSelectionBehavior(QAbstractItemView::SelectRows);
+    open_position->setSelectionMode(QAbstractItemView::SingleSelection);
+    // connect(open_position->horizontalHeader(), &QHeaderView::sectionMoved, this, &MainWindow::onCombined_tracker_tableHeader_Rearranged,Qt::UniqueConnection);
+    dock_win_Open_position->setWidget(open_position);
+    open_position->show();
+    restoreTableViewColumnState(open_position);
+
+    /************Open Positions********************************/
+
+
 
     /************Missed Trades Window********************************/
     QPixmap pixmapdock_mt_close(":/dock_close.png");
@@ -1327,6 +1418,10 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
 
     missed_trade_table = new QTableView(dock_win_missed_trades);
     missed_trade_table->setObjectName("missed_trade_table");
+
+    missed_trade_table_delegate* missed_delegate =new missed_trade_table_delegate;
+    missed_trade_table->setModel(missed_trade_model);
+    missed_trade_table->setItemDelegate(missed_delegate);
 
     missed_trade_table->setStyleSheet(tableview_SS);
     missed_trade_table->horizontalHeader()->setFixedHeight(32);
@@ -2129,6 +2224,12 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     }
                     break;
 
+                    case PortfolioData_Idx::_Depth:{
+                        updateQueryList.append("DepthConfigured='"+valStr+"'");
+                        logMsg = logMsg+"Depth ["+valStr+"], ";
+                    }
+                    break;
+
                     case PortfolioData_Idx::_MaxLoss:{
                         double val = valStr.toDouble();
                         int valInt = val*devicer;
@@ -2518,7 +2619,7 @@ void MainWindow::loadDataAndUpdateTable(int table){
 
     case T_Table::NET_POS:{
         //QHash<QString,int> PortFoliosLotSizeHash = T_Portfolio_Model->getPortFoliosLotSize();
-        db_conn->getNetPosTableData(BuyValue_summary,SellValue,Profit,BuyQty_summary,SellQty_summary,NetQty,net_pos_model,QString::number(userData.UserId));
+        db_conn->getNetPosTableData(BuyValue_summary,SellValue,Profit,BuyQty_summary,SellQty_summary,NetQty,net_pos_model,OpenPositionmodel,QString::number(userData.UserId));
         emit data_loded_signal(T_Table::NET_POS);
         updateSummaryLabels();
         break;
@@ -2990,6 +3091,14 @@ void MainWindow::on_Liners_Button_clicked()
    // ui->Liners_Close->setVisible(true);
 }
 
+void MainWindow::on_OpenPosition_Button_clicked()
+{
+    //10
+    dock_win_Open_position->toggleView(true);
+    // ui->Liners_Widget->setStyleSheet(stylesheetvis);
+    // ui->Liners_Close->setVisible(true);
+}
+
 
 
 
@@ -3336,6 +3445,14 @@ void MainWindow::OnHPDockWidgetVisiblityChanged(bool p_Visible)
     else
         ui->HP_Widget->setStyleSheet("");*/
    // ui->HP_Close->setVisible(p_Visible);
+}
+void MainWindow::OnOpenDockWidgetVisiblityChanged(bool p_Visible)
+{
+  /*  if(p_Visible)
+        ui->HP_Widget->setStyleSheet(stylesheetvis);
+    else
+        ui->HP_Widget->setStyleSheet("");*/
+  // ui->HP_Close->setVisible(p_Visible);
 }
 
 void MainWindow::OnMTDockWidgetVisiblityChanged(bool p_Visible)

@@ -1769,7 +1769,6 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     break;
                 }
 
-
                 default:
                     break;
                 }
@@ -1785,6 +1784,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     if(!algosToDisable.contains(Algo_ID))
                         algosToDisable.append(Algo_ID);
                     algosToDisable.append(Algo_ID);
+
                 }
  //               QString BidLeg = ContractDetail::getInstance().GetStockName(leg2_token_number,portfolio_type)+ " "+"["+(QString::number(Leg2_Total_Volume/lotSize))+"]";
                 //int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
@@ -2060,7 +2060,7 @@ void mysql_conn::getLinersTableData(Liners_Model *model,QString user_id,QHash<QS
 
 void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue, double &Profit_summary,
                                     double &BuyQty_summary, double &SellQty_summary, double &NetQty_summary,
-                                    Net_Position_Table_Model *model, QString user_id)
+                                    Net_Position_Table_Model *model,open_position_model*openpos_model, QString user_id)
 {
     QMutexLocker lock(&mutex);
     BuyValue_summary = 0;
@@ -2073,6 +2073,8 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
     QString msg;
     QList<QStringList> netPos_data_listTmp;
     QHash<QString, net_pos_data_> net_pos_dataList;
+    QList <QStringList> openPos_data_listTmp;
+    QHash<QString, open_pos_data> open_position_data_list;
     QHash<QString, int> spanHash;
     SlowData slowData;
     QHash<QString, MBP_Data_Struct>  MBP_Data_Hash = slowData.getMBP_Data_Hash();
@@ -2354,6 +2356,37 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
                  rowList.append(QString::number((data.lotSize))); //lotSize
                  rowList.append(tokenNo); // TokenNo as the last element
                  netPos_data_listTmp.append(rowList);
+
+                 if(data.Buy_Total_Lot-data.Sell_Total_Lot!=0){
+
+                        QString buySell = "Buy";
+                        QString openAvg = fixDecimal(data.Buy_Avg_Price, decimal_precision);
+                        if(data.Buy_Total_Lot-data.Sell_Total_Lot>0){
+                            buySell = "Sell";
+                            openAvg = fixDecimal(data.Sell_Avg_Price, decimal_precision);
+                        }
+                        QString openLot = QString::number(qAbs((data.Buy_Total_Lot - data.Sell_Total_Lot) / data.lotSize));
+
+
+
+
+
+                        QStringList rowListOpenPostion;
+                        rowListOpenPostion.append(data.Stock_Name);
+                        rowListOpenPostion.append(buySell);
+                        rowListOpenPostion.append(openLot);
+                        rowListOpenPostion.append(openAvg);
+                        rowListOpenPostion.append("00:00:00");
+                        rowListOpenPostion.append(" ");
+                        rowListOpenPostion.append(tokenNo);
+
+
+
+
+                        openPos_data_listTmp.append(rowListOpenPostion);
+
+
+                 }
             }
 
             // Sort the data based on StockName (first column in rowList)
@@ -2363,6 +2396,7 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
 
             // Set sorted data to the model
             model->setDataList(netPos_data_listTmp);
+            openpos_model->setDataList(openPos_data_listTmp);
         }
     }
 }
@@ -2392,14 +2426,14 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
 
 
                 QString  OrderId =  query.value(rec.indexOf("localOrderID")).toString();
-                 long long DateTime = query.value(rec.indexOf("DateTime")).toLongLong();
-                 QDateTime dt = QDateTime::fromSecsSinceEpoch(DateTime);
-                 dt = dt.toUTC();
+                long long DateTime = query.value(rec.indexOf("DateTime")).toLongLong();
+                QDateTime dt = QDateTime::fromSecsSinceEpoch(DateTime);
+                dt = dt.toUTC();
 
-                 // Add 5 hours (18000 seconds) and 30 minutes (1800 seconds)
-                 dt = dt.addSecs(19800);
+                // Add 5 hours (18000 seconds) and 30 minutes (1800 seconds)
+                dt = dt.addSecs(19800);
 
-                 QString DateTimeStr = dt.toString("hh:mm:ss");
+                QString DateTimeStr = dt.toString("hh:mm:ss");
 
 
 
@@ -2418,7 +2452,7 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
 
 
                 int Quantity = query.value(rec.indexOf("Quantity")).toInt();
-                 int lotsize = ContractDetail::getInstance().GetLotSize(token_number,0);
+                int lotsize = ContractDetail::getInstance().GetLotSize(token_number,0);
                 int Portfolio = query.value(rec.indexOf("Portfolio")).toInt();
                 double Price = query.value(rec.indexOf("Price")).toDouble();
                 Price = Price/devicer;
@@ -2439,12 +2473,9 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                 rowList.append(Message);
                 rowList.append(PriceStr);
                 rowList.append(DateTimeStr);
-
-
              missed_trade_list.append(rowList);
             }
             model->setDataList(missed_trade_list);
-
         }
     }
 }
@@ -2464,7 +2495,9 @@ void mysql_conn::getNetPosTableData_BackUp(double &BuyValue_summary,double &Sell
     //Qury: SELECT TokenNo, (sum(TradedPrice * TotalVolume) / sum(TotalVolume)) /10000000  as AvgPrice, sum(TotalVolume) as Qty, BuySellIndicator FROM Trades where TraderId = 1 group by TokenNo, BuySellIndicator;
     QString msg;
     QList <QStringList> netPos_data_listTmp;
+    QList <QStringList> openPos_data_listTmp;
     QHash<QString, net_pos_data_> net_pos_dataList;
+    QHash<QString, net_pos_data_> openpos_dataList;
 
     bool ok = checkDBOpened(msg);
     if(ok){
@@ -2582,12 +2615,17 @@ void mysql_conn::getNetPosTableData_BackUp(double &BuyValue_summary,double &Sell
                 rowList.append("-");
                 rowList.append(TokenNo); // this should be the last one
                 netPos_data_listTmp.append(rowList);
-                c++;
+
+                //get open postion data
+               c++;
 
             }
 
 
             model->setDataList(netPos_data_listTmp);
+
+
+            //
         }
     }
 }

@@ -29,6 +29,7 @@ public:
     QString AlgoName; // new column added on Qt
     QString Alias;
     double MaxLoss;
+    int Depth;
     double SellPriceDifferenceAsDouble;
     double SellMarketRate; //"-MR";
     QString SellAveragePrice; //"-APD"

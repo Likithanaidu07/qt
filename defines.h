@@ -72,6 +72,7 @@ enum PortfolioData_Idx
     _SellRemainingQuantity,
     _OrderQuantity,
     _MaxLoss,
+    _Depth,
     _ExpiryDateTime,
     _Cost, //currently up to this the data is displayed on portfolio table in the same order as the enum
     _QuantityRatio,
@@ -180,6 +181,16 @@ enum Missed_Trades_Idx{
     Price,
     DateTime
 
+};
+
+enum Open_Position_Idx{
+   StockName=0,
+    Buy_Sell,
+    Open_Lot,
+    open_Avg,
+    Time,
+    Square_Off,
+   TokenNo,
 };
 
 enum NET_POS
