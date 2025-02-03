@@ -284,12 +284,15 @@ private:
      void restoreTableViewColumnState(QTableView *tableView);
      void saveTableViewColumnState(QTableView *tableView);
       void initializeGlobalHotKeys();
-      QHash<QString, QShortcut*> HotKeyShortcutObjects;
+      QHash<QString, QAction*> HotKeyShortcutObjects;
+
       QModelIndexList  getSelectedPortFolioIndexs();
       void instilizeWatchUIOnTopBar();
       void updateWatchDataCard(Indices_Data_Struct data);
       int getWatchWindowChildWidth(QHBoxLayout* layout);
       void adjustTopBarLayout();
+      void updateHotKeysAction(QString action,QAction *shortcutAction);
+
 public slots:
 
     void addWatchDataCard_TO_UI(Indices_Data_Struct data);
