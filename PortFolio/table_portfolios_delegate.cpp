@@ -133,6 +133,13 @@ QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOp
         editor->installEventFilter(const_cast<Table_Portfolios_Delegate *>(this));
         return editor;
     }
+    else if( c == PortfolioData_Idx::_Depth ){
+        QLineEdit *editor = new QLineEdit(parent);
+        editor->setValidator(new QIntValidator(0, 10));
+        editor->setObjectName("portfolioTableCell_"+QString::number(c));
+        editor->installEventFilter(const_cast<Table_Portfolios_Delegate *>(this));
+        return editor;
+    }
     else if(c == PortfolioData_Idx::_SellPriceDifference ||
              c == PortfolioData_Idx::_BuyPriceDifference ){
         QLineEdit *editor = new QLineEdit(parent);
@@ -173,7 +180,8 @@ void Table_Portfolios_Delegate::setEditorData(QWidget *editor, const QModelIndex
         c==PortfolioData_Idx::_BuyTotalQuantity ||
         c==PortfolioData_Idx::_OrderQuantity ||
         c==PortfolioData_Idx::_Alias||
-        c==PortfolioData_Idx::_MaxLoss)
+        c==PortfolioData_Idx::_MaxLoss||
+        c==PortfolioData_Idx::_Depth)
     {
         QString value = index.model()->data(index, Qt::EditRole).toString();
         // qDebug()<<"Table_Portfolios_Delegate::setEditorData: "<<value;
@@ -265,7 +273,8 @@ void Table_Portfolios_Delegate::setModelData(QWidget *editor, QAbstractItemModel
         c == PortfolioData_Idx::_SellTotalQuantity ||
         c == PortfolioData_Idx::_BuyTotalQuantity ||
         c == PortfolioData_Idx::_OrderQuantity ||
-        c == PortfolioData_Idx::_MaxLoss)
+        c == PortfolioData_Idx::_MaxLoss||
+        c == PortfolioData_Idx::_Depth)
     {
         if (QLineEdit *lineEdit = qobject_cast<QLineEdit *>(editor)) {
             bool ok;
@@ -308,7 +317,8 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
             PortfolioData_Idx::_SellTotalQuantity,
             PortfolioData_Idx::_BuyTotalQuantity,
             PortfolioData_Idx::_OrderQuantity,
-            PortfolioData_Idx::_MaxLoss
+            PortfolioData_Idx::_MaxLoss,
+            PortfolioData_Idx::_Depth,
         };
 
         if (editableIDx.contains(currentColIdx)) {
@@ -694,7 +704,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
              || c==PortfolioData_Idx::_AdditionalData1
              || c==PortfolioData_Idx::_PortfolioType
              || c==PortfolioData_Idx::_Price
-             //   || c==PortfolioData_Idx::_SkipMarketStrike
+             || c==PortfolioData_Idx::_Depth
              || c==PortfolioData_Idx::_QuantityRatio
              || c==PortfolioData_Idx::_BidLeg
              || c==PortfolioData_Idx:: _FuturePrice)
@@ -739,6 +749,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
 
         if (option.state & QStyle::State_Selected && option.state & QStyle::State_Active &&  (c==PortfolioData_Idx::_AlgoName ||
                                                       c==PortfolioData_Idx::_MaxLoss||
+                                                      c==PortfolioData_Idx::_Depth||
                                                       c==PortfolioData_Idx::_ExpiryDateTime ||
                                                       c==PortfolioData_Idx::_Cost||
                                                       c==PortfolioData_Idx::_QuantityRatio||

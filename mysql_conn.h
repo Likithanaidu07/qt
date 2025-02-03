@@ -23,6 +23,7 @@
 #include "PortFolio/portfoliocustomsorting.h"
 #include "MissedTrades/missed_trade_table_model.h"
 #include "Order_F1_F2/order_f1_f2_model.h"
+#include "OpenPosition/open_position_model.h"
 
 struct net_pos_data_{
     QString  token_number;
@@ -46,6 +47,15 @@ struct net_pos_data_{
     int Span;
 
     //QString MTM;
+};
+
+struct open_pos_data{
+    QString  Stock_Name;
+    double Buy_Total_Lot;
+    double Sell_Total_Lot;
+    double Buy_Avg_Price;
+    double Sell_Avg_Price;
+    double Net_Qty;
 };
 struct Liners_Data{
     QString algoID;
@@ -99,7 +109,7 @@ public:
     bool resetPassword(const QString &new_password,QString user_id,QString &msg);
     QString get_Algo_Name(int algo_type,int leg1_token_number,int leg2_token_number,int leg3_token_number,double devicer,int decimal_precision);
     void  getTradeTableData(int &TraderCount,Trade_Table_Model *model,Order_F1_F2_Model * f1f2_order_table_model,Liners_Model *liners_model ,QString user_id,QHash<QString, PortFolioData_Less> PortFolioTypeHash,QStringList &algosToDisable/*,QStringList TradeTableHilightExcludeList*/);
-    void  getNetPosTableData(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id);
+    void  getNetPosTableData(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model, open_position_model* openpos_model, QString user_id);
     void  getNetPosTableData_BackUp(double &BuyValue_summary,double &SellValue,double &Profit_summary,double &BuyQty_summary,double &SellQty_summary,double &NetQty_summary,Net_Position_Table_Model* model,QString user_id,QHash<QString,int> PortFoliosLotSizeHash);
     void getMissedTradeData(Missed_Trade_Table_Model* model,QString user_id);
 

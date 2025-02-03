@@ -35,11 +35,15 @@ SOURCES += \
     Liners/liners_delegate.cpp \
     Liners/liners_model.cpp \
     Liners/linersheaderview.cpp \
+    MissedTrades/missed_trade_table_delegate.cpp \
     MissedTrades/missed_trade_table_model.cpp \
     MissedTrades/missed_trades_headerview.cpp \
     NetPosition/net_position_table_delegate.cpp \
     NetPosition/net_position_table_headerview.cpp \
     NetPosition/net_position_table_model.cpp \
+    OpenPosition/open_position_delegate.cpp \
+    OpenPosition/open_position_headerview.cpp \
+    OpenPosition/open_position_model.cpp \
     OrderBook/table_orderbook_delegate.cpp \
     Order_F1_F2/order_f1_f2_delegate.cpp \
     Order_F1_F2/order_f1_f2_model.cpp \
@@ -106,11 +110,15 @@ HEADERS += \
     Liners/liners_delegate.h \
     Liners/liners_model.h \
     Liners/linersheaderview.h \
+    MissedTrades/missed_trade_table_delegate.h \
     MissedTrades/missed_trade_table_model.h \
     MissedTrades/missed_trades_headerview.h \
     NetPosition/net_position_table_delegate.h \
     NetPosition/net_position_table_headerview.h \
     NetPosition/net_position_table_model.h \
+    OpenPosition/open_position_delegate.h \
+    OpenPosition/open_position_headerview.h \
+    OpenPosition/open_position_model.h \
     OrderBook/table_orderbook_delegate.h \
     Order_F1_F2/order_f1_f2_delegate.h \
     Order_F1_F2/order_f1_f2_model.h \

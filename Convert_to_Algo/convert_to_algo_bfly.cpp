@@ -128,22 +128,31 @@ void add_algo_btfly::selectedAction(){
 
                 /**********Create model for BFLY *************************/
                 unsigned int unix_time= contract.Expiry;
-                QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-                dt = dt.addYears(10);
-                int targetYear = dt.date().year();
-                bool isLeapYear = QDate::isLeapYear(targetYear);
-                QString instrument_name = contract.InstrumentName;
+//                QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//                dt = dt.addYears(10);
+//                int targetYear = dt.date().year();
+//                bool isLeapYear = QDate::isLeapYear(targetYear);
+//                QString instrument_name = contract.InstrumentName;
 
-                // If it is a leap year, and the date is after Feb 29, subtract one day
-                if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-                    dt = dt.addDays(-1);
-                }
+//                // If it is a leap year, and the date is after Feb 29, subtract one day
+//                if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//                    dt = dt.addDays(-1);
+//                }
+                QDateTime dt;
+                dt.setOffsetFromUtc(0);
+                dt.setDate(QDate(1980, 1, 1));
+                dt.setTime(QTime(0, 0, 0));
+                dt = dt.addSecs(unix_time);
+                QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
+                dt1 = dt1.addYears(10);
+                QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+                dt.setDate(newDate);
                 QString Expiry=dt.toString("MMM dd yyyy").toUpper();
                 QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" "+contract.OptionType;
                 QStandardItem *itemBFLY = new QStandardItem;
                 itemBFLY->setText(algo_combination);
                 itemBFLY->setData(contract.TokenNumber, Qt::UserRole + 1);
-                QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd") + "-" + QString::number(contract.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
+                QString compositeKey = contract.InstrumentName + "-" + dt.toString("yyyyMMdd") + "-" + QString::number(contract.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
                 // Set the composite key as data for sorting
                 itemBFLY->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
 
@@ -223,15 +232,24 @@ void add_algo_btfly::startStrikeEditFinishedAction()
                 continue;
 
             unsigned int unix_time= tmp.Expiry;
-            QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-            dt = dt.addYears(10);
-            int targetYear = dt.date().year();
-            bool isLeapYear = QDate::isLeapYear(targetYear);
+//            QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//            dt = dt.addYears(10);
+//            int targetYear = dt.date().year();
+//            bool isLeapYear = QDate::isLeapYear(targetYear);
 
-            // If it is a leap year, and the date is after Feb 29, subtract one day
-            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-                dt = dt.addDays(-1);
-            }
+//            // If it is a leap year, and the date is after Feb 29, subtract one day
+//            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//                dt = dt.addDays(-1);
+//            }
+            QDateTime dt;
+            dt.setOffsetFromUtc(0);
+            dt.setDate(QDate(1980, 1, 1));
+            dt.setTime(QTime(0, 0, 0));
+            dt = dt.addSecs(unix_time);
+            QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
+            dt1 = dt1.addYears(10);
+            QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+            dt.setDate(newDate);
             QString ExpiryTmp=dt.toString("MMM dd yyyy").toUpper();
             QString algo_combination = tmp.InstrumentName+" "+ExpiryTmp+" "+QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" "+tmp.OptionType;
             QStandardItem *item = new QStandardItem;
@@ -287,15 +305,24 @@ void add_algo_btfly::generateAlgo()
     float startStrike =  sharedData->contract_table_hash[keyStart].StrikePrice/sharedData->strike_price_devider; // will be in paise so converted to Rs
     float endStrike = sharedData->contract_table_hash[keyEnd].StrikePrice/sharedData->strike_price_devider;// will be in paise so converted to Rs
     unsigned int unix_time= sharedData->contract_table_hash[keyStart].Expiry;
-    QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-    dt = dt.addYears(10);
-    int targetYear = dt.date().year();
-    bool isLeapYear = QDate::isLeapYear(targetYear);
+//    QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//    dt = dt.addYears(10);
+//    int targetYear = dt.date().year();
+//    bool isLeapYear = QDate::isLeapYear(targetYear);
 
-    // If it is a leap year, and the date is after Feb 29, subtract one day
-    if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-        dt = dt.addDays(-1);
-    }
+//    // If it is a leap year, and the date is after Feb 29, subtract one day
+//    if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//        dt = dt.addDays(-1);
+//    }
+    QDateTime dt;
+    dt.setOffsetFromUtc(0);
+    dt.setDate(QDate(1980, 1, 1));
+    dt.setTime(QTime(0, 0, 0));
+    dt = dt.addSecs(unix_time);
+    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
+    dt1 = dt1.addYears(10);
+    QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+    dt.setDate(newDate);
     QString ExpiryTime=dt.toString("MMM dd yyyy").toUpper();
 
 

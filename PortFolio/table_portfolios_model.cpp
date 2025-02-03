@@ -200,7 +200,8 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
              //    c == PortfolioData_Idx::_SkipMarketStrike||
                  c == PortfolioData_Idx::_BidLeg ||
                    c == PortfolioData_Idx::_Alias||
-                c == PortfolioData_Idx::_MaxLoss){
+                c == PortfolioData_Idx::_MaxLoss||
+                   c==PortfolioData_Idx::_Depth){
 
             return font;
         }
@@ -253,6 +254,9 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
             return Qt::AlignCenter;
         }
         else if(index.column()==PortfolioData_Idx::_MaxLoss){
+            return Qt::AlignCenter;
+        }
+        else if(index.column()==PortfolioData_Idx::_Depth){
             return Qt::AlignCenter;
         }
 
@@ -320,6 +324,9 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         }
         else if (index.column() == PortfolioData_Idx::_BuyRemainingQuantity) {
             return portfolio->BuyRemainingQuantity;
+        }
+        else if (index.column() == PortfolioData_Idx::_Depth) {
+            return portfolio->Depth;
         }
         else if (index.column() == PortfolioData_Idx::_OrderQuantity) {
             return portfolio->OrderQuantity;
@@ -408,6 +415,10 @@ case Qt::EditRole:{
     else if(c==PortfolioData_Idx::_SellTotalQuantity){
         emit edit_Started(r,c);
         return portfolio->SellTotalQuantity;
+    }
+    else if(c==PortfolioData_Idx::_Depth){
+        emit edit_Started(r,c);
+        return portfolio->Depth;
     }
     else if(c==PortfolioData_Idx::_BuyTotalQuantity){
       //  qDebug()<<"editStarted";
@@ -581,6 +592,23 @@ bool Table_Portfolios_Model::setData(const QModelIndex &index, const QVariant &v
             emit dataChanged(index, index);
 #ifdef MUTEX_DEBUG_LOG
         qDebug()<<"Exiting---setData";
+#endif
+
+            return true;
+
+        }
+        else if(c==PortfolioData_Idx::_Depth){
+            //store data to editing hash if it not equal to previous value
+
+
+            if(P_Obj->Depth != value.toInt()){
+                editingDataHash[c].prevVal = QString::number(P_Obj->Depth);
+                editingDataHash[c].newVal = value.toString();
+            }
+            portfolio_data_list[index.row()]->Depth = value.toInt();
+            emit dataChanged(index, index);
+#ifdef MUTEX_DEBUG_LOG
+            qDebug()<<"Exiting---setData";
 #endif
 
             return true;
@@ -931,7 +959,8 @@ Qt::ItemFlags Table_Portfolios_Model::flags(const QModelIndex &index) const
         c==PortfolioData_Idx::_BuyTotalQuantity ||
         c==PortfolioData_Idx::_OrderQuantity ||
         c==PortfolioData_Idx::_Alias||
-        c==PortfolioData_Idx::_MaxLoss)
+        c==PortfolioData_Idx::_MaxLoss||
+        c==PortfolioData_Idx::_Depth)
     {
         return Qt::ItemIsEditable | Qt::ItemIsSelectable | Qt::ItemIsEnabled;
     }
@@ -1283,6 +1312,11 @@ void Table_Portfolios_Model::editCancelled(int row) {
 
                  case PortfolioData_Idx::_Alias:{
                     portfolio_data_list[row]->Alias = editingDataHash[PortfolioData_Idx::_Alias].prevVal;
+                 }
+                 break;
+
+                 case PortfolioData_Idx::_Depth:{
+                    portfolio_data_list[row]->Depth = editingDataHash[PortfolioData_Idx::_Depth].prevVal.toInt();
                  }
                  break;
 

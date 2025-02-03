@@ -65,6 +65,7 @@
 #include "Order_F1_F2/order_f1_f2_delegate.h"
 #include "Order_F1_F2/order_f1_f2_model.h"
 #include "Order_F1_F2/order_f1_f2_tableheaderview.h"
+#include "OpenPosition/open_position_model.h"
 #include "cache_file_io.h"
 #include <QApplication>
 using namespace ads;
@@ -211,6 +212,10 @@ private:
     Liners_Model *liners_model;
     CDockWidget *dock_win_liners;
 
+    QTableView *open_position;
+    open_position_model *OpenPositionmodel;
+    CDockWidget *dock_win_Open_position;
+
     QTableView *combined_tracker_table;
     Combined_Tracker_Table_Model *combined_tracker_model;
     CDockWidget *dock_win_combined_tracker;
@@ -353,6 +358,7 @@ private slots:
     void on_Positions_Button_clicked();
   //  void on_Positions_Close_clicked();
     void on_Liners_Button_clicked();
+    void on_OpenPosition_Button_clicked();
   //  void on_Liners_Close_clicked();
     void on_HP_Button_clicked();
  //   void on_HP_Close_clicked();
@@ -375,6 +381,7 @@ private slots:
 
     void OnPositionsDockWidgetVisiblityChanged(bool p_Visible);
     void OnHPDockWidgetVisiblityChanged(bool p_Visible);
+    void OnOpenDockWidgetVisiblityChanged(bool p_Visible);
     void OnMTDockWidgetVisiblityChanged(bool p_Visible);
     void OnLinersDockWidgetVisiblityChanged(bool p_Visible);
     void on_Algorithms_Button_clicked();

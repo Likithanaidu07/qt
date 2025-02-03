@@ -32,9 +32,9 @@ void add_algo_cr_jelly_bid::copyUIElement(QDialog *parentWidget,QTableWidget *ta
     lineEdit_Fut = lineEdit_Fut_;
     tableWidget = tableWidget_;
     addButton = addButton_;
-//    startStrikeListView = sView;
-//    endStrikeListView = eView;
-//    futListView = fView;
+    //    startStrikeListView = sView;
+    //    endStrikeListView = eView;
+    //    futListView = fView;
 
 
 
@@ -58,53 +58,53 @@ void add_algo_cr_jelly_bid::copyUIElement(QDialog *parentWidget,QTableWidget *ta
 
 
 
-     endStrikeListView = new QListView(parentWidget);
-     connect(endStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
-     endStrikeListView->setSizePolicy(sizePolicy);
-     endStrikeListView->setFixedSize(230, 200);
-     endStrikeListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
-     // Set the position of the QListView just below lineEdit_EndStrike
-     endStrikeListView->hide();
+    endStrikeListView = new QListView(parentWidget);
+    connect(endStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
+    endStrikeListView->setSizePolicy(sizePolicy);
+    endStrikeListView->setFixedSize(230, 200);
+    endStrikeListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    // Set the position of the QListView just below lineEdit_EndStrike
+    endStrikeListView->hide();
 
-     startStrikeListView->hide();
-     endStrikeListView->hide();
-     futListView->hide();
+    startStrikeListView->hide();
+    endStrikeListView->hide();
+    futListView->hide();
 
-     // Install event filter on the QLineEdit and QListView
-      eventFilterFUT = new EventFilter(lineEdit_Fut, futListView);
-      connect(eventFilterFUT, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedFut(QModelIndex)));
-      lineEdit_Fut->installEventFilter(eventFilterFUT);
-      futListView->installEventFilter(eventFilterFUT);
+    // Install event filter on the QLineEdit and QListView
+    eventFilterFUT = new EventFilter(lineEdit_Fut, futListView);
+    connect(eventFilterFUT, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedFut(QModelIndex)));
+    lineEdit_Fut->installEventFilter(eventFilterFUT);
+    futListView->installEventFilter(eventFilterFUT);
 
-      eventFilterStart = new EventFilter(lineEdit_Start_strike, startStrikeListView);
-      connect(eventFilterStart, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedStartStrike(QModelIndex)));
-      lineEdit_Start_strike->installEventFilter(eventFilterStart);
-      startStrikeListView->installEventFilter(eventFilterStart);
+    eventFilterStart = new EventFilter(lineEdit_Start_strike, startStrikeListView);
+    connect(eventFilterStart, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedStartStrike(QModelIndex)));
+    lineEdit_Start_strike->installEventFilter(eventFilterStart);
+    startStrikeListView->installEventFilter(eventFilterStart);
 
-      eventFilterEnd = new EventFilter(lineEdit_EndStrike, endStrikeListView);
-      connect(eventFilterEnd, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
-      lineEdit_EndStrike->installEventFilter(eventFilterEnd);
-      endStrikeListView->installEventFilter(eventFilterEnd);
-
-
-
-      //model_Fut_CR_JELLY_BID =   ContractDetail::getInstance().Get_model_FUT_CON_REV();
-      CustomSearchWidget *futCustomWidget = new CustomSearchWidget(futListView,model_Fut_CR_JELLY_BID);
-      connect(lineEdit_Fut, SIGNAL(textEdited(QString)),futCustomWidget, SLOT(filterItems(QString)));
-
-
-      connect(lineEdit_Start_strike, SIGNAL(textEdited(QString)),this, SLOT(slotStartHide(QString)));
-      connect(lineEdit_EndStrike, SIGNAL(textEdited(QString)),this, SLOT(slotEndHide(QString)));
-      connect(lineEdit_Fut, SIGNAL(textEdited(QString)),this, SLOT(slotFutHide(QString)));
+    eventFilterEnd = new EventFilter(lineEdit_EndStrike, endStrikeListView);
+    connect(eventFilterEnd, SIGNAL(signalItemSelected(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
+    lineEdit_EndStrike->installEventFilter(eventFilterEnd);
+    endStrikeListView->installEventFilter(eventFilterEnd);
 
 
 
+    //model_Fut_CR_JELLY_BID =   ContractDetail::getInstance().Get_model_FUT_CON_REV();
+    CustomSearchWidget *futCustomWidget = new CustomSearchWidget(futListView,model_Fut_CR_JELLY_BID);
+    connect(lineEdit_Fut, SIGNAL(textEdited(QString)),futCustomWidget, SLOT(filterItems(QString)));
 
-      CustomSearchWidget *startstrikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_CR_JELLY_BID);
-      connect(lineEdit_Start_strike, SIGNAL(textEdited(QString)),startstrikeCustomWidget, SLOT(filterItems(QString)));
 
-      CustomSearchWidget *endstrikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike_CR_JELLY_BID);
-      connect(lineEdit_EndStrike, SIGNAL(textEdited(QString)),endstrikeCustomWidget, SLOT(filterItems(QString)));
+    connect(lineEdit_Start_strike, SIGNAL(textEdited(QString)),this, SLOT(slotStartHide(QString)));
+    connect(lineEdit_EndStrike, SIGNAL(textEdited(QString)),this, SLOT(slotEndHide(QString)));
+    connect(lineEdit_Fut, SIGNAL(textEdited(QString)),this, SLOT(slotFutHide(QString)));
+
+
+
+
+    CustomSearchWidget *startstrikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_CR_JELLY_BID);
+    connect(lineEdit_Start_strike, SIGNAL(textEdited(QString)),startstrikeCustomWidget, SLOT(filterItems(QString)));
+
+    CustomSearchWidget *endstrikeCustomWidget = new CustomSearchWidget(endStrikeListView,model_end_strike_CR_JELLY_BID);
+    connect(lineEdit_EndStrike, SIGNAL(textEdited(QString)),endstrikeCustomWidget, SLOT(filterItems(QString)));
 
 }
 
@@ -129,39 +129,38 @@ void add_algo_cr_jelly_bid::selectedAction(){
     model_Fut_CR_JELLY_BID->clear();
 
     // Create a lambda function for processing in the background
-        QFuture<void> future = QtConcurrent::run([=]() {
+    QFuture<void> future = QtConcurrent::run([=]() {
         QElapsedTimer timer1;
         timer1.start();
         emit progressSignal(true,"Loading...");
         qDebug()<<"Fut_Tokens: "<<Fut_Tokens.size();
         for(int i=0;i<Fut_Tokens.length();i++){
-                /**********Create model for model_Fut_CR_JELLY_BID*************************/
-                const auto& contract = sharedData->contract_table_hash[Fut_Tokens[i]];
-                unsigned int unix_time= contract.Expiry;
-                QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-                dt = dt.addYears(10);
-                int targetYear = dt.date().year();
-                int targetYear_cr = dt.date().year();
-                bool isLeapYear = QDate::isLeapYear(targetYear);
+            /**********Create model for model_Fut_CR_JELLY_BID*************************/
+            const auto& contract = sharedData->contract_table_hash[Fut_Tokens[i]];
+            unsigned int unix_time= contract.Expiry;
+            QDateTime dt;
+            dt.setOffsetFromUtc(0);
+            dt.setDate(QDate(1980, 1, 1));
+            dt.setTime(QTime(0, 0, 0));
+            dt = dt.addSecs(unix_time);
+            QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
+            dt1 = dt1.addYears(10);
+            QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+            dt.setDate(newDate);
+            QString Expiry=dt.toString("MMM dd yyyy").toUpper();
 
-                // If it is a leap year, and the date is after Feb 29, subtract one day
-                if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-                    dt = dt.addDays(-1);
-                }
-                QString Expiry=dt.toString("MMM dd yyyy").toUpper();
-
-                QStandardItem *itemFut = new QStandardItem;
-                itemFut->setText(contract.InstrumentName+" "+Expiry);
-                itemFut->setData(contract.TokenNumber, Qt::UserRole + 1);
-                QString compositeKey = contract.InstrumentName + "-" + dt.toString("yyyyMMdd");
-                // Set the composite key as data for sorting
-                itemFut->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
-                QMetaObject::invokeMethod(this, [=]() {
+            QStandardItem *itemFut = new QStandardItem;
+            itemFut->setText(contract.InstrumentName+" "+Expiry);
+            itemFut->setData(contract.TokenNumber, Qt::UserRole + 1);
+            QString compositeKey = contract.InstrumentName + "-" + dt.toString("yyyyMMdd");
+            // Set the composite key as data for sorting
+            itemFut->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+            QMetaObject::invokeMethod(this, [=]() {
                     model_Fut_CR_JELLY_BID->appendRow(itemFut);
                 }, Qt::QueuedConnection);
 
-                /********************************************************************/
-       }
+            /********************************************************************/
+        }
         emit progressSignal(false,"");
         qDebug() << "model_Fut_CR_JELLY_BID  Time:" << timer1.elapsed() << "milliseconds";
 
@@ -211,8 +210,8 @@ void add_algo_cr_jelly_bid::create_AutoFillModel_StartStrike(){
 
     QString Instr_Name = sharedData->contract_table_hash[key].InstrumentName;
 
-    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[key].Expiry);
-    dt1 = dt1.addYears(10);
+    QDateTime dt10 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[key].Expiry);
+    dt10 = dt10.addYears(10);
 
 
     model_start_strike_CR_JELLY_BID->clear();
@@ -220,19 +219,28 @@ void add_algo_cr_jelly_bid::create_AutoFillModel_StartStrike(){
     for(int i=0;i<CR_JELLY_BID_Tokens.length();i++) {
         contract_table tmp = sharedData->contract_table_hash[CR_JELLY_BID_Tokens[i]];
         unsigned int unix_time= tmp.Expiry;
-        QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-        dt = dt.addYears(10);
-        int targetYear = dt1.date().year();
-        bool isLeapYear = QDate::isLeapYear(targetYear);
+   //     QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+  //      dt = dt.addYears(10);
+//        int targetYear = dt1.date().year();
+//        bool isLeapYear = QDate::isLeapYear(targetYear);
 
-        // If it is a leap year, and the date is after Feb 29, subtract one day
-        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-            dt = dt.addDays(-1);
-        }
+//        // If it is a leap year, and the date is after Feb 29, subtract one day
+//        if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//            dt = dt.addDays(-1);
+//        }
+        QDateTime dt;
+        dt.setOffsetFromUtc(0);
+        dt.setDate(QDate(1980, 1, 1));
+        dt.setTime(QTime(0, 0, 0));
+        dt = dt.addSecs(unix_time);
+        QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
+        dt1 = dt1.addYears(10);
+        QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+        dt.setDate(newDate);
         QString ExpiryTmp=dt.toString("MMM dd yyyy").toUpper();
 
 
-        if(tmp.InstrumentName==Instr_Name&&tmp.OptionType=="CE"&&checkDateIn2MonthRange(dt1,dt)==true){
+        if(tmp.InstrumentName==Instr_Name&&tmp.OptionType=="CE"&&checkDateIn2MonthRange(dt10,dt)==true){
             QString algo_combination = tmp.InstrumentName+" "+ExpiryTmp+" "+QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);//+" "+tmp.OptionType;
             QStandardItem *item = new QStandardItem;
             item->setText(algo_combination);
@@ -246,7 +254,7 @@ void add_algo_cr_jelly_bid::create_AutoFillModel_StartStrike(){
         }
     }
 
-  /*  custom_q_completer *end_strike_combination_Completer = new custom_q_completer(this);
+    /*  custom_q_completer *end_strike_combination_Completer = new custom_q_completer(this);
     end_strike_combination_Completer->setModel(model_start_strike_CR);
     end_strike_combination_Completer->setCaseSensitivity(Qt::CaseInsensitive);
     end_strike_combination_Completer->setCompletionMode(QCompleter::PopupCompletion);
@@ -290,28 +298,37 @@ void add_algo_cr_jelly_bid::startStrikeEditFinishedAction(){
             continue;
         if(tmp.InstrumentName==Instr_Name&&tmp.OptionType=="PE"&&Expiry==tmp.Expiry){
             unsigned int unix_time= tmp.Expiry;
-            QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-            dt = dt.addYears(10);
-            int targetYear = dt.date().year();
-            bool isLeapYear = QDate::isLeapYear(targetYear);
+//            QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//            dt = dt.addYears(10);
+//            int targetYear = dt.date().year();
+//            bool isLeapYear = QDate::isLeapYear(targetYear);
 
-            // If it is a leap year, and the date is after Feb 29, subtract one day
-            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-                dt = dt.addDays(-1);
-            }
+//            // If it is a leap year, and the date is after Feb 29, subtract one day
+//            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//                dt = dt.addDays(-1);
+//            }
+            QDateTime dt;
+            dt.setOffsetFromUtc(0);
+            dt.setDate(QDate(1980, 1, 1));
+            dt.setTime(QTime(0, 0, 0));
+            dt = dt.addSecs(unix_time);
+            QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
+            dt1 = dt1.addYears(10);
+            QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+            dt.setDate(newDate);
             QString ExpiryTmp=dt.toString("MMM dd yyyy").toUpper();
             QString algo_combination = tmp.InstrumentName+" "+ExpiryTmp+" "+QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);//+" "+tmp.OptionType;
             QStandardItem *item = new QStandardItem;
             item->setText(algo_combination);
             item->setData(tmp.TokenNumber, Qt::UserRole + 1);
             QString compositeKey = tmp.InstrumentName + "-" + dt.toString("yyyyMMdd") + "-" + QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
-              // Set the composite key as data for sorting
+                // Set the composite key as data for sorting
             item->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
             model_end_strike_CR_JELLY_BID->appendRow(item);
 
         }
     }
-   /* custom_q_completer *end_strike_combination_Completer = new custom_q_completer(this);
+    /* custom_q_completer *end_strike_combination_Completer = new custom_q_completer(this);
     end_strike_combination_Completer->setModel(model_end_strike);
     end_strike_combination_Completer->setCaseSensitivity(Qt::CaseInsensitive);
     end_strike_combination_Completer->setCompletionMode(QCompleter::PopupCompletion);
@@ -371,15 +388,24 @@ void add_algo_cr_jelly_bid::generateAlgo(){
     int Leg1_Strike =  sharedData->contract_table_hash[keyFut].StrikePrice;
     //
     unsigned int unix_time= sharedData->contract_table_hash[keyFut].Expiry;
-    QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-    dt = dt.addYears(10);
-    int targetYear = dt.date().year();
-    bool isLeapYear = QDate::isLeapYear(targetYear);
+//    QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//    dt = dt.addYears(10);
+//    int targetYear = dt.date().year();
+//    bool isLeapYear = QDate::isLeapYear(targetYear);
 
-    // If it is a leap year, and the date is after Feb 29, subtract one day
-    if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-        dt = dt.addDays(-1);
-    }
+//    // If it is a leap year, and the date is after Feb 29, subtract one day
+//    if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//        dt = dt.addDays(-1);
+//    }
+    QDateTime dt;
+    dt.setOffsetFromUtc(0);
+    dt.setDate(QDate(1980, 1, 1));
+    dt.setTime(QTime(0, 0, 0));
+    dt = dt.addSecs(unix_time);
+    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
+    dt1 = dt1.addYears(10);
+    QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+    dt.setDate(newDate);
     QString Leg1_val=dt.toString("MMM dd yyyy").toUpper();
 
 
@@ -421,27 +447,46 @@ void add_algo_cr_jelly_bid::generateAlgo(){
             int leg2 = sharedData->contract_table_hash[filteredKeys[i]].StrikePrice;
             for(int j=i+1;j<filteredKeys.length();j++){
                 if(leg2==sharedData->contract_table_hash[filteredKeys[j]].StrikePrice&&sharedData->contract_table_hash[filteredKeys[j]].OptionType=="PE"){
-                    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
-                    dt1 = dt1.addYears(10);
-                    int target_Year = dt1.date().year();
-                    bool isLeapYear = QDate::isLeapYear(targetYear);
+//                    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
+//                    dt1 = dt1.addYears(10);
+//                    int target_Year = dt1.date().year();
+//                    bool isLeapYear = QDate::isLeapYear(targetYear);
 
-                    // If it is a leap year, and the date is after Feb 29, subtract one day
-                    if (isLeapYear && dt1.date() > QDate(targetYear, 2, 29)) {
-                        dt1 = dt1.addDays(-1);
-                    }
+//                    // If it is a leap year, and the date is after Feb 29, subtract one day
+//                    if (isLeapYear && dt1.date() > QDate(targetYear, 2, 29)) {
+//                        dt1 = dt1.addDays(-1);
+//                    }
+QDateTime dt1;
+dt1.setOffsetFromUtc(0);
+dt1.setDate(QDate(1980, 1, 1));
+dt1.setTime(QTime(0, 0, 0));
+dt1 = dt1.addSecs(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
+QDateTime dt11 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
+dt11 = dt11.addYears(10);
+QDate newDate = QDate(dt11.date().year(), dt1.date().month(), dt1.date().day());
+dt1.setDate(newDate);
                     QString Leg2_date=dt1.toString("MMM dd yyyy").toUpper();
                     QString leg2=Leg2_date+" "+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" CE";
 
-                    QDateTime dt3 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
-                    dt3 = dt3.addYears(10);
-                    int targetYear = dt3.date().year();
-                    bool isLeap_Year = QDate::isLeapYear(targetYear);
+//                    QDateTime dt3 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
+//                    dt3 = dt3.addYears(10);
+//                    int targetYear = dt3.date().year();
+//                    bool isLeap_Year = QDate::isLeapYear(targetYear);
 
-                    // If it is a leap year, and the date is after Feb 29, subtract one day
-                    if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-                        dt3 = dt3.addDays(-1);
-                    }
+//                    // If it is a leap year, and the date is after Feb 29, subtract one day
+//                    if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//                        dt3 = dt3.addDays(-1);
+//                    }
+//                    QString Leg3_date=dt3.toString("MMM dd yyyy").toUpper();
+                    QDateTime dt3;
+                    dt3.setOffsetFromUtc(0);
+                    dt3.setDate(QDate(1980, 1, 1));
+                    dt3.setTime(QTime(0, 0, 0));
+                    dt3 = dt3.addSecs(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
+                    QDateTime dt4 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
+                    dt4 = dt4.addYears(10);
+                    QDate newDates = QDate(dt4.date().year(), dt3.date().month(), dt3.date().day());
+                    dt3.setDate(newDates);
                     QString Leg3_date=dt3.toString("MMM dd yyyy").toUpper();
                     QString leg3=Leg3_date+" "+QString::number(sharedData->contract_table_hash[filteredKeys[j]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" PE";
 
@@ -453,20 +498,20 @@ void add_algo_cr_jelly_bid::generateAlgo(){
                     Leg3_list.append(leg3);
                     //Con-Rev- EURUSD 24 JUN 1.005 CE - 0.005 - EURUSD 23 AUG PE.
 
-//                    QString Algo_Name ="Con-Rev- "+Instr_Name+" "+dt1.toString("yyyy MMM").toUpper()+" "+
-//                                        QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)
-//                                        +" "+optionType+" - "+QString::number(((endStrike-startStrike)/sharedData->strike_price_devider),'f',sharedData->decimal_precision)+" - "
-//                                        +" "+Instr_Name+" "+dt3.toString("yyyy MMM").toUpper();
-//                    Algo_Name = "CR-";
-//                    //            QString StockName = ContractDetail::getInstance().GetStockName(leg2_token_number);
-//                    //            StockName.chop(2);
-//                    Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM")+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number);
+                    //                    QString Algo_Name ="Con-Rev- "+Instr_Name+" "+dt1.toString("yyyy MMM").toUpper()+" "+
+                    //                                        QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)
+                    //                                        +" "+optionType+" - "+QString::number(((endStrike-startStrike)/sharedData->strike_price_devider),'f',sharedData->decimal_precision)+" - "
+                    //                                        +" "+Instr_Name+" "+dt3.toString("yyyy MMM").toUpper();
+                    //                    Algo_Name = "CR-";
+                    //                    //            QString StockName = ContractDetail::getInstance().GetStockName(leg2_token_number);
+                    //                    //            StockName.chop(2);
+                    //                    Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM")+"-"+ContractDetail::getInstance().GetStrikePrice(leg2_token_number);
 
-//                    QString Algo_Name ="CR-"+Instr_Name+"-"+dt.toString("ddMMM").toUpper()+"-"+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+"-"+dt2.toString("ddMMM").toUpper();
-//                    Algo_Name_list.append(Algo_Name);
+                    //                    QString Algo_Name ="CR-"+Instr_Name+"-"+dt.toString("ddMMM").toUpper()+"-"+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+"-"+dt2.toString("ddMMM").toUpper();
+                    //                    Algo_Name_list.append(Algo_Name);
 
 
-                   /* QString Algo_Name ="CRJELLY- "+Instr_Name+" "+dt1.toString("yyyy MMM").toUpper()+" "+
+                    /* QString Algo_Name ="CRJELLY- "+Instr_Name+" "+dt1.toString("yyyy MMM").toUpper()+" "+
                                         QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)
                                         +" "+optionType+" - "+QString::number(((endStrike-startStrike)/sharedData->strike_price_devider),'f',sharedData->decimal_precision)+" - "
                                         +" "+Instr_Name+" "+dt3.toString("yyyy MMM").toUpper();*/
@@ -485,28 +530,47 @@ void add_algo_cr_jelly_bid::generateAlgo(){
             int leg3 = sharedData->contract_table_hash[filteredKeys[i]].StrikePrice;
             for(int j=i+1;j<filteredKeys.length();j++){
                 if(leg3==sharedData->contract_table_hash[filteredKeys[j]].StrikePrice&&sharedData->contract_table_hash[filteredKeys[j]].OptionType=="CE"){
-                    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
-                    dt1 = dt1.addYears(10);
-                    int target_Year = dt1.date().year();
-                    bool isLeap_Year = QDate::isLeapYear(targetYear);
+//                    QDateTime dt1 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
+//                    dt1 = dt1.addYears(10);
+//                    int target_Year = dt1.date().year();
+//                    bool isLeap_Year = QDate::isLeapYear(targetYear);
 
-                    // If it is a leap year, and the date is after Feb 29, subtract one day
-                    if (isLeapYear && dt1.date() > QDate(targetYear, 2, 29)) {
-                        dt1 = dt1.addDays(-1);
-                    }
+//                    // If it is a leap year, and the date is after Feb 29, subtract one day
+//                    if (isLeapYear && dt1.date() > QDate(targetYear, 2, 29)) {
+//                        dt1 = dt1.addDays(-1);
+//                    }
+                    QDateTime dt1;
+                    dt1.setOffsetFromUtc(0);
+                    dt1.setDate(QDate(1980, 1, 1));
+                    dt1.setTime(QTime(0, 0, 0));
+                    dt1 = dt1.addSecs(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
+                    QDateTime dt11 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
+                    dt11 = dt11.addYears(10);
+                    QDate newDate = QDate(dt11.date().year(), dt1.date().month(), dt1.date().day());
+                    dt.setDate(newDate);
 
                     QString Leg2_date=dt1.toString("MMM dd yyyy").toUpper();
                     QString leg2=Leg2_date+" "+QString::number(sharedData->contract_table_hash[filteredKeys[j]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" CE";
 
-                    QDateTime dt3 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
-                    dt3 = dt3.addYears(10);
-                    int targetYear = dt3.date().year();
-                    bool isLeapYear = QDate::isLeapYear(targetYear);
+//                    QDateTime dt3 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[i]].Expiry);
+//                    dt3 = dt3.addYears(10);
+//                    int targetYear = dt3.date().year();
+//                    bool isLeapYear = QDate::isLeapYear(targetYear);
 
-                    // If it is a leap year, and the date is after Feb 29, subtract one day
-                    if (isLeapYear && dt3.date() > QDate(targetYear, 2, 29)) {
-                        dt3 = dt3.addDays(-1);
-                    }
+//                    // If it is a leap year, and the date is after Feb 29, subtract one day
+//                    if (isLeapYear && dt3.date() > QDate(targetYear, 2, 29)) {
+//                        dt3 = dt3.addDays(-1);
+//                    }
+//                    QString Leg3_date=dt3.toString("MMM dd yyyy").toUpper();
+                    QDateTime dt3;
+                    dt3.setOffsetFromUtc(0);
+                    dt3.setDate(QDate(1980, 1, 1));
+                    dt3.setTime(QTime(0, 0, 0));
+                    dt3 = dt3.addSecs(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
+                    QDateTime dt4 = QDateTime::fromSecsSinceEpoch(sharedData->contract_table_hash[filteredKeys[j]].Expiry);
+                    dt4 = dt4.addYears(10);
+                    QDate newDates = QDate(dt4.date().year(), dt3.date().month(), dt3.date().day());
+                    dt3.setDate(newDates);
                     QString Leg3_date=dt3.toString("MMM dd yyyy").toUpper();
                     QString leg3=Leg3_date+" "+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+" PE";
 
@@ -516,7 +580,7 @@ void add_algo_cr_jelly_bid::generateAlgo(){
                     Leg3_strike_list.append(QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice));
                     Leg2_list.append(leg2);
                     Leg3_list.append(leg3);
-                   // QString Algo_Name ="CRJELLY-"+Instr_Name+"-"+dt.toString("ddMMM").toUpper()+"-"+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+"-"+dt3.toString("ddMMM").toUpper();
+                    // QString Algo_Name ="CRJELLY-"+Instr_Name+"-"+dt.toString("ddMMM").toUpper()+"-"+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)+"-"+dt3.toString("ddMMM").toUpper();
                     QString Algo_Name = "CRJELLY-"+Instr_Name+"-"+dt1.toString("ddMMM")+"-"+QString::number(sharedData->contract_table_hash[filteredKeys[i]].StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision);
 
                     Algo_Name_list.append(Algo_Name);
@@ -531,10 +595,10 @@ void add_algo_cr_jelly_bid::generateAlgo(){
     }
 
     //populate table and algo data.
-//    unsigned int unix_time= sharedData->contract_table_hash[keyFut].Expiry;
-//    QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-//    dt = dt.addYears(10);
-//    QString Leg1_val=dt.toString("MMM dd yyyy").toUpper();
+    //    unsigned int unix_time= sharedData->contract_table_hash[keyFut].Expiry;
+    //    QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+    //    dt = dt.addYears(10);
+    //    QString Leg1_val=dt.toString("MMM dd yyyy").toUpper();
 
     QStringList duplicateList;
     for(int i=0;i<Leg2_list.size();i++){
@@ -613,13 +677,13 @@ void add_algo_cr_jelly_bid::generateAlgo(){
         c3->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 3, c3);
 
-//        QTableWidgetItem *c4 = new QTableWidgetItem("NA");
-//        c4->setFlags(c4->flags() ^ Qt::ItemIsEditable);
-//        tableWidget->setItem(tableWidget->rowCount()-1, 4, c4);
+        //        QTableWidgetItem *c4 = new QTableWidgetItem("NA");
+        //        c4->setFlags(c4->flags() ^ Qt::ItemIsEditable);
+        //        tableWidget->setItem(tableWidget->rowCount()-1, 4, c4);
 
-//        QTableWidgetItem *c5 = new QTableWidgetItem("NA");
-//        c5->setFlags(c5->flags() ^ Qt::ItemIsEditable);
-//        tableWidget->setItem(tableWidget->rowCount()-1, 5, c5);
+        //        QTableWidgetItem *c5 = new QTableWidgetItem("NA");
+        //        c5->setFlags(c5->flags() ^ Qt::ItemIsEditable);
+        //        tableWidget->setItem(tableWidget->rowCount()-1, 5, c5);
 
 
         QTableWidgetItem *c4 = new QTableWidgetItem("To be Uploaded");
@@ -796,4 +860,3 @@ void add_algo_cr_jelly_bid::slotFutHide(QString)
     endStrikeListView->hide();
     endStrikeListView->hide();
 }
-

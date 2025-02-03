@@ -105,7 +105,7 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         obj.Alias = query.value("Alias").toString();
         if(obj.Alias=="")
             obj.Alias="-";
-
+        obj.Depth = query.value("DepthConfigured").toInt();
         obj.MaxLoss = query.value("MaxLoss").toDouble()/devicer_;
         totalQty = query.value("BuyTotalQuantity").toInt() / lotSize;
         obj.BuyPriceDifference = query.value("BuyPriceDifference").toDouble()/devicer_;// convert->ToRupees(query.value("BuyPriceDifference").toDouble());
