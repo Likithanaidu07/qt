@@ -3529,10 +3529,10 @@ void MainWindow::Delete_clicked_slot()
    // If no rows are selected, show the "Please select a portfolio" message and return
    if (selected.count() == 0)
    {
-//        QMessageBox msgBox;
-//        msgBox.setText("Please select a Algo.");
-//        msgBox.setIcon(QMessageBox::Warning);
-//        msgBox.exec();
+       QMessageBox msgBox;
+       msgBox.setText("Please select a Algo.");
+       msgBox.setIcon(QMessageBox::Warning);
+       msgBox.exec();
         return;
    }
 
@@ -3591,25 +3591,26 @@ void MainWindow::Delete_clicked_slot()
        } else {
            QMessageBox::StandardButton reply;
            reply = QMessageBox::question(this, "Delete Portfolio From Database?", "Delete  portfolios ["+portFoliosToDelete.join(",")+"] from DB?",  QMessageBox::Yes|QMessageBox::No);
+           if (reply == QMessageBox::Yes) {
+               // Delete from model and refresh the entire table
+               T_Portfolio_Model->removeRowsByIndices(portFolioIdxToDelete);
+               triggerImmediate_refreshTables();
 
-           // Delete from model and refresh the entire table
-           T_Portfolio_Model->removeRowsByIndices(portFolioIdxToDelete);
-           triggerImmediate_refreshTables();
+               // Send notification to backend server
+               quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+               const unsigned char dataBytes[] = { 0xFF, 0xFF };
+               QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
+               QByteArray bckend_msg = backend_comm->createPacket(command, data);
+               backend_comm->insertData(bckend_msg);
 
-           // Send notification to backend server
-           quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
-           const unsigned char dataBytes[] = { 0xFF, 0xFF };
-           QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
-           QByteArray bckend_msg = backend_comm->createPacket(command, data);
-           backend_comm->insertData(bckend_msg);
+               db_conn->logToDB("Deleted portfolios [" + portFoliosToDelete.join(",") + "] from DB");
 
-           db_conn->logToDB("Deleted portfolios [" + portFoliosToDelete.join(",") + "] from DB");
-
-           QMessageBox msgBox(this);
-           msgBox.setWindowTitle("Algo Delete");
-           msgBox.setText(msg);
-           msgBox.setIcon(QMessageBox::Information);
-           msgBox.exec();
+               QMessageBox msgBox(this);
+               msgBox.setWindowTitle("Algo Delete");
+               msgBox.setText(msg);
+               msgBox.setIcon(QMessageBox::Information);
+               msgBox.exec();
+           }
        }
 
        deletingPortFolioFlg.storeRelaxed(0);
@@ -4552,6 +4553,9 @@ void MainWindow::updateHotKeysAction(QString action,QAction* shortcutAction){
     }
     else if (action == "DISABLE_ALL_ALGO") {
         connect(shortcutAction, &QAction::triggered, this, &MainWindow::stopall_Button_clicked);
+    }
+    else if (action == "DELETE_SELECTED_ALGO") {
+        connect(shortcutAction, &QAction::triggered, this, &MainWindow::Delete_clicked_slot);
     }
     /*******************************************************/
     /*************Trade Win Hotkey ****************************/
