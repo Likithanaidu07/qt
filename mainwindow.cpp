@@ -1354,11 +1354,11 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
         "   line-height: normal;"
         );
    // connect(headerViewrs, &QHeaderView::sectionMoved, this, &MainWindow::onLinersTableHeader_Rearranged);
-    liners_table->setHorizontalHeader(headerViewrs);
+    open_position->setHorizontalHeader(open_headerViewrs);
 
 
     OpenPositionmodel = new open_position_model();
-    open_position->setModel(OpenPositionmodel);
+    //open_position->setModel(OpenPositionmodel);
 
     open_position_delegate* open_delegate =new open_position_delegate;
     open_position->setModel(OpenPositionmodel);
