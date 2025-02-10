@@ -130,15 +130,24 @@ F1_F2_BuySell::F1_F2_BuySell(QWidget *parent, double devicer, double decimal_pre
             contract_table contract = ContractDetail::getInstance().GetDetail(F1_F2_Tokens[i].toInt());
 
             unsigned int unix_time= contract.Expiry;
-            QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-            dt = dt.addYears(10);
-            int targetYear = dt.date().year();
-            bool isLeapYear = QDate::isLeapYear(targetYear);
+//            QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+//            dt = dt.addYears(10);
+//            int targetYear = dt.date().year();
+//            bool isLeapYear = QDate::isLeapYear(targetYear);
 
-            // If it is a leap year, and the date is after Feb 29, subtract one day
-            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-                dt = dt.addDays(-1);
-            }
+//            // If it is a leap year, and the date is after Feb 29, subtract one day
+//            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+//                dt = dt.addDays(-1);
+//            }
+            QDateTime dt;
+            dt.setOffsetFromUtc(0);
+            dt.setDate(QDate(1980, 1, 1));
+            dt.setTime(QTime(0, 0, 0));
+            dt = dt.addSecs(unix_time);
+            QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
+            dt1 = dt1.addYears(10);
+            QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+            dt.setDate(newDate);
             QString Expiry=dt.toString("MMM dd yyyy").toUpper();
             QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/devicer,'f',decimal_precision)+" "+contract.OptionType;
             QStandardItem *itemF1_F2 = new QStandardItem;

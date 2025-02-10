@@ -1340,12 +1340,12 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
             "    WHEN O.PortfolioNumber > 1500000 THEN O.PortfolioNumber - 1500000 "
             "    ELSE O.PortfolioNumber "
             "END = P.PortfolioNumber "
-            "WHERE O.Trader_ID='2' "
+            "WHERE O.Trader_ID='" + user_id + "' "
             "AND (O.Leg1_OrderState IN (7, 8) OR "
             "     O.Leg2_OrderState IN (7, 8) OR "
             "     O.Leg3_OrderState IN (7, 8) OR "
             "     O.Leg4_OrderState IN (7, 8)) "
-            "ORDER BY O.Trader_Data DESC;";
+            "ORDER BY O.Trader_Data DESC;" ;
 
 
 
@@ -2358,7 +2358,6 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
                  netPos_data_listTmp.append(rowList);
 
                  if(data.Buy_Total_Lot-data.Sell_Total_Lot!=0){
-
                         QString buySell = "Buy";
                         QString openAvg = fixDecimal(data.Buy_Avg_Price, decimal_precision);
                         if(data.Buy_Total_Lot-data.Sell_Total_Lot>0){
@@ -2366,10 +2365,6 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
                             openAvg = fixDecimal(data.Sell_Avg_Price, decimal_precision);
                         }
                         QString openLot = QString::number(qAbs((data.Buy_Total_Lot - data.Sell_Total_Lot) / data.lotSize));
-
-
-
-
 
                         QStringList rowListOpenPostion;
                         rowListOpenPostion.append(data.Stock_Name);
@@ -2423,8 +2418,6 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
             QSqlRecord rec = query.record();
             while (query.next()) {
 
-
-
                 QString  OrderId =  query.value(rec.indexOf("localOrderID")).toString();
                 long long DateTime = query.value(rec.indexOf("DateTime")).toLongLong();
                 QDateTime dt = QDateTime::fromSecsSinceEpoch(DateTime);
@@ -2434,9 +2427,6 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                 dt = dt.addSecs(19800);
 
                 QString DateTimeStr = dt.toString("hh:mm:ss");
-
-
-
 
                 QString BuySellIndicator = query.value(rec.indexOf("BuySellIndicator")).toString();
                 if(BuySellIndicator=="1")
@@ -2449,8 +2439,6 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                 QString StockName = ContractDetail::getInstance().GetStockName(token_number,0);
                 QString Message = query.value(rec.indexOf("Message")).toString();
 
-
-
                 int Quantity = query.value(rec.indexOf("Quantity")).toInt();
                 int lotsize = ContractDetail::getInstance().GetLotSize(token_number,0);
                 int Portfolio = query.value(rec.indexOf("Portfolio")).toInt();
@@ -2460,8 +2448,6 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                 QString PriceStr = fixDecimal(Price,decimal_precision);
                 QString QuantityStr = QString::number(Quantity/lotsize);
                 QString PortfolioStr = QString::number(Portfolio);
-
-
 
                 QStringList rowList;
                 rowList.append(OrderId);

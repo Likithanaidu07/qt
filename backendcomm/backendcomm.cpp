@@ -169,9 +169,7 @@ QByteArray BackendComm::createPacket(quint16 command, QByteArray message)
     retStream << qint16(command);
     ret = ret+message;
     // ret.resize(64);
-
     return ret;
-
 }
 
 QByteArray BackendComm::intToByteArray(int value)
@@ -277,10 +275,11 @@ void BackendComm::readSocket()
 
            switch (command) {
                case BACKEND_CMD_TYPE::CMD_ID_TRADE_UPDATED_200:
-                        emit socketData("TRADE_UPDATED",SocketDataType::BACKEND_COMM_SOCKET_DATA);
-
+                        emit socketData("CMD_ID_TRADE_UPDATED_200",SocketDataType::BACKEND_COMM_SOCKET_DATA);
                         break;
-
+               case BACKEND_CMD_TYPE::CMD_ID_TRADE_UPDATED_CMD_300:
+                        emit socketData("CMD_ID_TRADE_UPDATED_CMD_300",SocketDataType::BACKEND_COMM_SOCKET_DATA);
+                        break;
                default:
                     break;
            }

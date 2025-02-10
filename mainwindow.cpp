@@ -151,7 +151,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     QMenu *menuOrders = new QMenu(this);
     menuOrders->addAction("Executed Orders", this, &MainWindow::on_OrderBook_Button_clicked);
-    menuOrders->addAction("Aborted Orders", this, &MainWindow::on_MissedTrade_Button_clicked);
+    menuOrders->addAction("Skipped Orders", this, &MainWindow::on_MissedTrade_Button_clicked);
     menuOrders->addAction("Manaual Orders", this, &MainWindow::on_F1F2Trade_Button_clicked);
     ui->toolButtonOrders->setMenu(menuOrders);
     ui->toolButtonOrders->setPopupMode(QToolButton::InstantPopup);
@@ -1368,7 +1368,7 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     open_position->verticalHeader()->setVisible(false);
     open_position->setSelectionBehavior(QAbstractItemView::SelectRows);
     open_position->setSelectionMode(QAbstractItemView::SingleSelection);
-    // connect(open_position->horizontalHeader(), &QHeaderView::sectionMoved, this, &MainWindow::onCombined_tracker_tableHeader_Rearranged,Qt::UniqueConnection);
+    connect(open_position->horizontalHeader(), &QHeaderView::sectionMoved, this, &MainWindow::onOpen_Position_tableHeader_Rearranged,Qt::UniqueConnection);
     dock_win_Open_position->setWidget(open_position);
     open_position->show();
     restoreTableViewColumnState(open_position);
@@ -1380,7 +1380,7 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     /************Missed Trades Window********************************/
     QPixmap pixmapdock_mt_close(":/dock_close.png");
 
-    dock_win_missed_trades =  new CDockWidget(tr("Aborted Orders"));
+    dock_win_missed_trades =  new CDockWidget(tr("Skipped Orders"));
     connect(dock_win_missed_trades, SIGNAL(visibilityChanged(bool)), this, SLOT(OnMTDockWidgetVisiblityChanged(bool)));
     dock_win_missed_trades->setMinimumSizeHintMode(CDockWidget::MinimumSizeHintFromDockWidget);
     dock_win_missed_trades->setMinimumSize(200,150);
@@ -1393,7 +1393,7 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     QHBoxLayout *position_mt_layout=new QHBoxLayout(mt_titlebar);
     position_mt_layout->setSpacing(10);
    position_mt_layout->setContentsMargins(17,8,10,6);
-    QLabel *mt_label=new QLabel("Aborted Orders");
+    QLabel *mt_label=new QLabel("Skipped Orders");
     QFont font_mt_label=mt_label->font();
     font_mt_label.setFamily("Work Sans");
     mt_label->setFont(font_mt_label);
@@ -2426,10 +2426,18 @@ void MainWindow::refreshTables(){
             loadDataAndUpdateTable(T_Table::MISSED_TRADE);
             refresh_entire_table.storeRelaxed(0);
         }
-        else{
+        else if(refresh_entire_table.loadRelaxed()==200) {
+            loadDataAndUpdateTable(T_Table::PORTFOLIO);
             loadDataAndUpdateTable(T_Table::TRADE);
-            //qDebug()<<"Refreshing TRADE table.....";
-
+            loadDataAndUpdateTable(T_Table::NET_POS);
+            loadDataAndUpdateTable(T_Table::SUMMARY);
+            refresh_entire_table.storeRelaxed(0);
+           }
+        else if(refresh_entire_table.loadRelaxed()==300) {
+            loadDataAndUpdateTable(T_Table::MISSED_TRADE);
+            loadDataAndUpdateTable(T_Table::NET_POS);
+            loadDataAndUpdateTable(T_Table::SUMMARY);
+            refresh_entire_table.storeRelaxed(0);
         }
 
 
@@ -2769,9 +2777,23 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 
     }
     else if(msgType == SocketDataType::BACKEND_COMM_SOCKET_DATA){
-        if(msg == "TRADE_UPDATED"){
+        if(msg == "CMD_ID_TRADE_UPDATED_200"){
             //refresh all table from here.
-            triggerImmediate_refreshTables();
+            refresh_entire_table.storeRelaxed(200);
+
+            // Lock the mutex, wake the condition, then unlock
+            DataLoadMutex.lock();
+            waitConditionDataLoadThread.wakeAll();
+            DataLoadMutex.unlock();
+        }
+        else if(msg == "CMD_ID_TRADE_UPDATED_CMD_300"){
+            //refresh all table from here.
+            refresh_entire_table.storeRelaxed(300);
+
+            // Lock the mutex, wake the condition, then unlock
+            DataLoadMutex.lock();
+            waitConditionDataLoadThread.wakeAll();
+            DataLoadMutex.unlock();
         }
     }
 
@@ -3033,6 +3055,7 @@ void MainWindow::add_logs(QString str){
     ui->label_5->setWordWrap(true);
     ui->label_5->setText(str);
     ui->label_5->setStyleSheet("font-family: 'Work Sans'; font-size: 8pt; /*color: white;*/");
+     ui->label_5->setStyleSheet("color: white;");
 
 }
 
@@ -3503,7 +3526,6 @@ void MainWindow::onPortfolioAdded(){
     QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
     QByteArray msg = backend_comm->createPacket(command, data);
     backend_comm->insertData(msg);
-
     triggerImmediate_refreshTables();
 }
 
@@ -3586,7 +3608,7 @@ void MainWindow::Delete_clicked_slot()
        QString msg;
        bool ret = db_conn->deleteNonTradedAlgos(portFoliosToDelete, msg);
 
-        if (!ret) {
+         if (!ret) {
            QMessageBox::warning(this, "Error", "Executed Trades cannot be deleted: " + portFoliosToDelete.join(","));
        } else {
            QMessageBox::StandardButton reply;
@@ -4128,6 +4150,9 @@ void MainWindow::onLinersTableHeader_Rearranged(int logicalIndex, int oldVisualI
 
 void MainWindow::onCombined_tracker_tableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
      saveTableViewColumnState(combined_tracker_table);
+}
+void MainWindow::onOpen_Position_tableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
+     saveTableViewColumnState(open_position);
 }
 void MainWindow::onMissed_trade_tableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex) {
      saveTableViewColumnState(missed_trade_table);
