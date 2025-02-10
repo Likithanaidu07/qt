@@ -2634,7 +2634,7 @@ void MainWindow::loadDataAndUpdateTable(int table){
 
     case T_Table::MISSED_TRADE:{
         db_conn->getMissedTradeData(missed_trade_model,QString::number(userData.UserId));
-        emit data_loded_signal(T_Table::NET_POS);
+        emit data_loded_signal(T_Table::MISSED_TRADE);
         break;
     }
 
