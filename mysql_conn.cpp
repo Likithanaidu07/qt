@@ -2443,14 +2443,13 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                 int Quantity = query.value(rec.indexOf("Quantity")).toInt();
                 int lotsize = ContractDetail::getInstance().GetLotSize(token_number,0);
                 int Portfolio = query.value(rec.indexOf("Portfolio")).toInt();
-                int Id = query.value(rec.indexOf("Id")).toInt();
+                QString Id = query.value(rec.indexOf("Id")).toString();
                 double Price = query.value(rec.indexOf("Price")).toDouble();
                 Price = Price/devicer;
 
                 QString PriceStr = fixDecimal(Price,decimal_precision);
                 QString QuantityStr = QString::number(Quantity/lotsize);
                 QString PortfolioStr = QString::number(Portfolio);
-                QString Missed_IdStr =  QString::number(Id);
 
                 QStringList rowList;
                 rowList.append(OrderId);
@@ -2462,8 +2461,8 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                 rowList.append(Message);
                 rowList.append(PriceStr);
                 rowList.append(DateTimeStr);
-                rowList.append(Missed_IdStr);
-             missed_trade_list.append(rowList);
+                rowList.append(Id);
+                missed_trade_list.append(rowList);
             }
             model->setDataList(missed_trade_list);
         }

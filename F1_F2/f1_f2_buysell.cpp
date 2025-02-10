@@ -339,6 +339,17 @@ void F1_F2_BuySell::on_pushButtonSubmit_clicked()
         msgBox.exec();
         return;
     }
+
+    if(ui->doubleSpinBox_price->value()==0){
+        QMessageBox msgBox;
+        msgBox.setWindowTitle("Cannot Add ");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.setText("Price value cannot be 0 !.");
+        msgBox.exec();
+        return;
+    }
+
+
     QString sellprice="0";
     QString sellqty="0";
     QString buyprice="0";

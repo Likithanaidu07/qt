@@ -101,7 +101,7 @@ void Missed_Trade_Table_Model::setDataList(QList <QStringList> missed_trade_data
         for(int i=0;i<missed_trade_data_list.length();i++){
             bool deletRow = true;
             for(int j=0;j<missed_trade_data_listNew.length();j++){
-                int unique_id_idx = 0; // portfolio numebr will be unique
+                int unique_id_idx = Missed_Trades_Idx::Missed_Trade_Id;  // Id will be unique
                 if(missed_trade_data_list[i][unique_id_idx]==missed_trade_data_listNew[j][unique_id_idx]){ // token_numebr(last element in array)---this will be unique for row
                     deletRow=false; //the id is there in new and old data so do not remove this row.
                 }
