@@ -84,7 +84,6 @@ public:
     QString GetOptionType(QString token);
 
     QString GetExpiry(int token, QString format, int type);
-    QString GetExpiryLeapYearFixed(int token, QString format, int type);
 
     QString GetExpiry(QString format, long long Expiry) const;
     QDateTime GetExpiryDate(int token, int type);

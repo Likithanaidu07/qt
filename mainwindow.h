@@ -341,7 +341,7 @@ public slots:
 
     void onCombined_tracker_tableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
     void onMissed_trade_tableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
-
+    void onOpen_Position_tableHeader_Rearranged(int logicalIndex, int oldVisualIndex, int newVisualIndex);
     void onSummaryActionTriggered();
     void onChangepasswordActionTriggered();
     void onWatchActionTriggered();

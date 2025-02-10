@@ -27,7 +27,7 @@ public:
 
 private:
     int col_count;
-    QStringList header={"StockName","Buy/Sell","Open Lot","Open Avg","Time","Square Off"/*,"Profit"*/};
+    QStringList header={"StockName","Buy/Sell","Open Lot","Open Avg","LTP","Square Off"/*,"Profit"*/};
     mutable  QMutex mutex;
      double devicer;
 };

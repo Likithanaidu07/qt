@@ -121,7 +121,15 @@ void open_position_delegate::paint(QPainter *painter, const QStyleOptionViewItem
     }*/ else {
         QColor color("#E0F1FF");
         QColor HighlightColor("#42A5F5");
-        painter->fillRect(option.rect, color);
+        if(option.state & QStyle::State_Active)
+            op.palette.setColor(QPalette::Highlight, HighlightColor);
+        else
+            op.palette.setColor(QPalette::Highlight, color);
+
+        if (option.state & QStyle::State_Selected)
+            painter->fillRect(option.rect, HighlightColor);
+        else
+            painter->fillRect(option.rect, color);
     }
         QStyledItemDelegate::paint(painter, op, index);
 
