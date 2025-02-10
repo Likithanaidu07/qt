@@ -179,7 +179,8 @@ enum Missed_Trades_Idx{
     Symbol,
     Message,
     Price,
-    DateTime
+    DateTime,
+    Missed_Trade_Id
 
 };
 

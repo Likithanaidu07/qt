@@ -77,7 +77,7 @@ void Missed_Trade_Table_Model::setDataList(QList <QStringList> missed_trade_data
         for(int i=0;i<missed_trade_data_listNew.length();i++){
             bool newData = true;
             for(int j=0;j<missed_trade_data_list.length();j++){
-                int unique_id_idx = 0;  // portfolio numebr will be unique
+                int unique_id_idx = Missed_Trades_Idx::Missed_Trade_Id;  // Id will be unique
 
                 if(missed_trade_data_listNew[i][unique_id_idx]==missed_trade_data_list[j][unique_id_idx]){
                     newData = false;
