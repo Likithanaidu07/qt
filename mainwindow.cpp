@@ -840,6 +840,9 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     lay_Trade_Window->addWidget(trade_table, 1, 0, 1, 3);
 
     trade_model = new Trade_Table_Model();
+    QObject::connect(trade_table->selectionModel(), &QItemSelectionModel::selectionChanged,
+                     trade_model, &Trade_Table_Model::selectionChangedSlot, Qt::QueuedConnection);
+
     trade_table->setObjectName("trade_table");
     Table_OrderBook_Delegate* trade_delegate=new Table_OrderBook_Delegate;
     trade_table->setModel(trade_model);
@@ -2563,11 +2566,11 @@ void MainWindow::loadDataAndUpdateTable(int table){
     case T_Table::TRADE:{
 //        OutputDebugStringA("Test1 \n");
         //QHash<QString, PortFolioData_Less> PortFolioHash = T_Portfolio_Model->getPortFolioDataLess();
-     //   QStringList TradeTableHighlight_ExcludeList = trade_model->getTradeTableHighlight_ExcludeList();
+       QStringList ExecutedTableHilightExcludeList = trade_model->getExecutedTableHighlight_ExcludeList();
 
 
        // algosToDisableOnExchangePriceLimit.clear();
-        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,algosToDisableOnExchangePriceLimit/*,TradeTableHighlight_ExcludeList*/);
+        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,algosToDisableOnExchangePriceLimit,ExecutedTableHilightExcludeList);
         emit data_loded_signal(T_Table::TRADE);
         updateSummaryLabels();
 

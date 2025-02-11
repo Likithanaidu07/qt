@@ -231,20 +231,20 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
 
 
         //order_list
-//        if(order_list[TradeTable_Hihglight_OB]=="1"){
-//            QColor color("#cfc0ce");
-//            if (option.state & QStyle::State_Selected && option.state & QStyle::State_Active)
-//                painter->fillRect(option.rect, HighlightColor);
-//            else
-//                painter->fillRect(option.rect, color);
-//            QPoint p1= option.rect.bottomLeft();
-//            QPoint p2= option.rect.bottomRight();
-//            p1.setX(p1.x()-5);
-//            p2.setX(p2.x()+5);
-//            painter->drawLine(p1,p2);
+        if(order_list[TradeTable_Hihglight_OB]=="1"){
+            QColor color("#cfc0ce");
+            if (option.state & QStyle::State_Selected && option.state & QStyle::State_Active)
+                painter->fillRect(option.rect, HighlightColor);
+            else
+                painter->fillRect(option.rect, color);
+            QPoint p1= option.rect.bottomLeft();
+            QPoint p2= option.rect.bottomRight();
+            p1.setX(p1.x()-5);
+            p2.setX(p2.x()+5);
+            painter->drawLine(p1,p2);
 
 
-//        }
+        }
 
     } else {
         QColor color("#E0F1FF");

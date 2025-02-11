@@ -26,10 +26,11 @@ public:
     void setColumnWidths(QTableView *tableView) const;
     QList<QHash<QString,QString>> getTradedPortFolioListForAlgoID(QString algoID);
 
-//    QStringList getTradeTableHighlight_ExcludeList();
-//    QStringList  TradeTableHighlight_ExcludeList;
+    QStringList getExecutedTableHighlight_ExcludeList();
+    QStringList  ExecutedTableHighlight_ExcludeList;
 public slots:
     //void selectionChangedSlot(int currentIdx);
+    void selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected);
 
 private:
     int col_count;

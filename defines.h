@@ -130,7 +130,7 @@ enum OrderBook_Idx{
     BuyorSell_OB,
     LotSize_OB,
     TraderData_OB,
-    //TradeTable_Hihglight_OB
+    TradeTable_Hihglight_OB
 };
 
 

@@ -1280,7 +1280,7 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
     return tradeData;
 
 }
-void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_table, Order_F1_F2_Model *f1f2_order_table_model,Liners_Model *liners_model ,QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash,QStringList &algosToDisable)
+void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_table, Order_F1_F2_Model *f1f2_order_table_model,Liners_Model *liners_model ,QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash,QStringList &algosToDisable,QStringList ExecutedTableHilightExcludeList)
 {
     QMutexLocker lock(&mutex);
 
@@ -1369,10 +1369,10 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 QString traderData =  query.value(rec.indexOf("Trader_Data")).toString();
                 int Algo_ID_Int = query.value(rec.indexOf("PortfolioNumber")).toInt();
 
-//                QString TradeTable_highlight = "1";
-//                if (TradeTableHilightExcludeList.contains(traderData)) {
-//                    TradeTable_highlight = "0";
-//                }
+                QString TradeTable_highlight = "1";
+                if (ExecutedTableHilightExcludeList.contains(traderData)) {
+                    TradeTable_highlight = "0";
+                }
 
                 if(Algo_ID_Int>1500000){
                     Buy_Sell = "Buy";
@@ -1855,7 +1855,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 rowList.append(Buy_Sell);
                 rowList.append(QString::number(lotSize));
                 rowList.append(traderData);
-                //rowList.append(TradeTable_highlight);
+                rowList.append(TradeTable_highlight);
 
 
 //                rowList.append(Leg1_OrderState); // this should be the 4th last data inserted to the row
