@@ -14,6 +14,7 @@
 #include <QTreeView>
 #include <QStandardItemModel>
 #include <QLabel>
+#include <QToolTip>
 #include "contractdetail.h"
 #include "OrderBook/table_orderbook_delegate.h"
 #include "mysql_conn.h"
@@ -2254,9 +2255,18 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     }
                     break;
 
-                    case PortfolioData_Idx::_Depth:{
-                        updateQueryList.append("DepthConfigured='"+valStr+"'");
-                        logMsg = logMsg+"Depth ["+valStr+"], ";
+                    case PortfolioData_Idx::_Depth: {
+                        double depth = editedCellData[_Depth].newVal.toDouble();
+                        double oldDepth = editedCellData[_Depth].prevVal.toDouble(); // Retrieve old value
+
+                        if (depth > 5) {
+                       oq_btq_stq_msg.append("Depth  cannot be greater than 5 ");
+                        depth = oldDepth; // Restore old value
+
+                        }
+
+                        updateQueryList.append("DepthConfigured=" + QString::number(depth));
+                        logMsg = logMsg + "DepthConfigured [" + QString::number(depth) + "], ";
                     }
                     break;
 
