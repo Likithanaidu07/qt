@@ -111,12 +111,19 @@ void Missed_Trade_Table_Model::setDataList(QList <QStringList> missed_trade_data
         }
 
         //remove rows
-        for(int i=0;i<rowsToRemove.length();i++){
+        /*for(int i=0;i<rowsToRemove.length();i++){
             int rowIndex = rowsToRemove[i];
             beginRemoveRows(QModelIndex(), rowIndex, rowIndex);
             missed_trade_data_list.removeAt(rowIndex); //
             endRemoveRows();
 
+        }*/
+        //remove rows
+        for (int i = rowsToRemove.length() - 1; i >= 0; i--) {
+            int rowIndex = rowsToRemove[i];
+            beginRemoveRows(QModelIndex(), rowIndex, rowIndex);
+            missed_trade_data_list.removeAt(rowIndex); // use removeAt to remove the row by index
+            endRemoveRows();
         }
     }
 

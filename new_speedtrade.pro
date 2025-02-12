@@ -151,6 +151,7 @@ HEADERS += \
     cache_file_io.h \
     contractdetail.h \
     customDelegate.h \
+    custom_double_SpinBox.h \
     custom_grid_table/gridtableheadermodel.h \
     custom_grid_table/gridtableheaderview.h \
     custom_grid_table/gridtableview.h \

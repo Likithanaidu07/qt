@@ -29,8 +29,7 @@ public:
     QStringList getExecutedTableHighlight_ExcludeList();
     QStringList  ExecutedTableHighlight_ExcludeList;
 public slots:
-    //void selectionChangedSlot(int currentIdx);
-    void selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected);
+    void selectionChangedSlot(const QModelIndex &index);
 
 private:
     int col_count;

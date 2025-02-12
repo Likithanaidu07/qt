@@ -78,7 +78,7 @@
     </widget>
    </item>
    <item row="7" column="0" colspan="2">
-    <widget class="QDoubleSpinBox" name="doubleSpinBox_price">
+    <widget class="CustomDoubleSpinBox" name="doubleSpinBox_price">
      <property name="minimumSize">
       <size>
        <width>100</width>
@@ -428,6 +428,13 @@
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>CustomDoubleSpinBox</class>
+   <extends>QDoubleSpinBox</extends>
+   <header location="global">custom_double_SpinBox.h</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>comboBoxBuySell</tabstop>
   <tabstop>lineEdit_Stockname</tabstop>

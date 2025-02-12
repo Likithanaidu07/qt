@@ -338,16 +338,10 @@ QVariant Trade_Table_Model::headerData(int section, Qt::Orientation orientation,
 //}
 //}
 
-void Trade_Table_Model::selectionChangedSlot(const QItemSelection &selected, const QItemSelection &deselected) {
-    Q_UNUSED(deselected); // Ignore if not needed
+void Trade_Table_Model::selectionChangedSlot(const QModelIndex &index) {
 
 
-    int currentIdx = -1;
-    //int prevRow = -1;
-    QModelIndexList indexes = selected.indexes();
-    if (!indexes.isEmpty())
-        currentIdx= indexes.last().row();
-
+    int currentIdx = index.row();
     if (currentIdx != -1) {
         if (trade_data_list[currentIdx][TradeTable_Hihglight_OB] == "1") {
             trade_data_list[currentIdx][TradeTable_Hihglight_OB] = "0";

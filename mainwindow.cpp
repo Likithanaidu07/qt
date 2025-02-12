@@ -809,6 +809,7 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     trade_table = new QTableView();
     connect(trade_table, &QTableView::doubleClicked, this, &MainWindow::trade_table_cellDoubleClicked);
 
+
   //  trade_table->setStyleSheet(tableview_SS);
     trade_table->horizontalHeader()->setFixedHeight(32);
     trade_table->horizontalHeader()->setFont(headerfont);
@@ -840,12 +841,19 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     lay_Trade_Window->addWidget(trade_table, 1, 0, 1, 3);
 
     trade_model = new Trade_Table_Model();
-    QObject::connect(trade_table->selectionModel(), &QItemSelectionModel::selectionChanged,
-                     trade_model, &Trade_Table_Model::selectionChangedSlot, Qt::QueuedConnection);
+    connect(trade_table, &QTableView::clicked, trade_model, &Trade_Table_Model::selectionChangedSlot);
+
 
     trade_table->setObjectName("trade_table");
     Table_OrderBook_Delegate* trade_delegate=new Table_OrderBook_Delegate;
     trade_table->setModel(trade_model);
+   // QObject::connect(trade_table->selectionModel(), &QItemSelectionModel::selectionChanged,
+    //                 trade_model, &Trade_Table_Model::selectionChangedSlot, Qt::QueuedConnection);
+
+   // QObject::connect(trade_table->selectionModel(), &QItemSelectionModel::selectionChanged,
+     //                trade_model, &Trade_Table_Model::selectionChangedSlot); // Qt::AutoConnection is sufficient here
+
+
     trade_table->setItemDelegate(trade_delegate);
     //T_order_Delegate =  new trade_table_delegate();
     //trade_table->setItemDelegate(T_order_Delegate);

@@ -38,7 +38,9 @@ private slots:
     void on_comboBoxBuySell_currentTextChanged(const QString &arg1);
      void keyPressEvent(QKeyEvent *event) override;
 
-public slots:
+
+
+ public slots:
     void slotstockNameListViewHide(QString);
     void itemSelectedStockName(QModelIndex index);
     void adjustValue();
