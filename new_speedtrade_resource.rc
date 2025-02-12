@@ -1,10 +1,10 @@
 #include <windows.h>
 
-IDI_ICON1	ICON	"C:\\Users\\USER\\Documents\\gitui\\ui\\ui-qt\\Resources\\logo.ico"
+IDI_ICON1	ICON	"C:\\Users\\USER\\Documents\\gitui\\ui\\ui-qt - 19-09-24\\Resources\\logo.ico"
 
 VS_VERSION_INFO VERSIONINFO
-	FILEVERSION 1,0,0,0
-	PRODUCTVERSION 1,0,0,0
+	FILEVERSION 0,0,0,0
+	PRODUCTVERSION 0,0,0,0
 	FILEFLAGSMASK 0x3fL
 #ifdef _DEBUG
 	FILEFLAGS VS_FF_DEBUG
@@ -21,11 +21,11 @@ VS_VERSION_INFO VERSIONINFO
 			BEGIN
 				VALUE "CompanyName", "\0"
 				VALUE "FileDescription", "\0"
-				VALUE "FileVersion", "1.0.0.0\0"
+				VALUE "FileVersion", "0.0.0.0\0"
 				VALUE "LegalCopyright", "\0"
 				VALUE "OriginalFilename", "new_speedtrade.exe\0"
 				VALUE "ProductName", "new_speedtrade\0"
-				VALUE "ProductVersion", "1.0.0.0\0"
+				VALUE "ProductVersion", "0.0.0.0\0"
 				VALUE "InternalName", "\0"
 				VALUE "Comments", "\0"
 				VALUE "LegalTrademarks", "\0"

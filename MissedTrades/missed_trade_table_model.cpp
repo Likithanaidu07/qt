@@ -64,6 +64,64 @@ QVariant Missed_Trade_Table_Model::data(const QModelIndex &index, int role) cons
 
 }
 
+//void Missed_Trade_Table_Model::setDataList(QList <QStringList> missed_trade_data_listNew){
+//    if(missed_trade_data_list.size()==0){
+//        Missed_Trade_Table_Model::beginResetModel();
+//        missed_trade_data_list.clear();
+//        for(int i=0;i<missed_trade_data_listNew.length();i++){
+//            missed_trade_data_list.append(missed_trade_data_listNew.at(i));
+//        }
+//        Missed_Trade_Table_Model::endResetModel();
+//    }
+//    else{
+//        for(int i=0;i<missed_trade_data_listNew.length();i++){
+//            bool newData = true;
+//            for(int j=0;j<missed_trade_data_list.length();j++){
+//                int unique_id_idx = Missed_Trades_Idx::Missed_Trade_Id;  // Id will be unique
+
+//                if(missed_trade_data_listNew[i][unique_id_idx]==missed_trade_data_list[j][unique_id_idx]){
+//                    newData = false;
+//                    for(int k=0;k<missed_trade_data_listNew[i].size();k++){
+//                        if(missed_trade_data_listNew[i][k]!=missed_trade_data_list[j][k]){
+//                            missed_trade_data_list[j][k] = missed_trade_data_listNew[i][k];
+//                            emit dataChanged(index(j, k), index(j, k));
+//                        }
+//                    }
+//                }
+//            }
+//            if(newData){
+//                beginInsertRows(QModelIndex(), i, i);
+//                missed_trade_data_list.insert(i,missed_trade_data_listNew[i]);
+//                endInsertRows();
+//            }
+//        }
+
+//        //check some row is removed
+//        QList<int> rowsToRemove;
+//        for(int i=0;i<missed_trade_data_list.length();i++){
+//            bool deletRow = true;
+//            for(int j=0;j<missed_trade_data_listNew.length();j++){
+//                int unique_id_idx = Missed_Trades_Idx::Missed_Trade_Id;  // Id will be unique
+//                if(missed_trade_data_list[i][unique_id_idx]==missed_trade_data_listNew[j][unique_id_idx]){ // token_numebr(last element in array)---this will be unique for row
+//                    deletRow=false; //the id is there in new and old data so do not remove this row.
+//                }
+//            }
+//            if(deletRow)
+//                rowsToRemove.append(i); // store the index of the row to be removed
+//        }
+
+//        //remove rows
+//        for(int i=0;i<rowsToRemove.length();i++){
+//            int rowIndex = rowsToRemove[i];
+//            beginRemoveRows(QModelIndex(), rowIndex, rowIndex);
+//            missed_trade_data_list.removeAt(rowIndex); //
+//            endRemoveRows();
+//        }
+//    }
+
+//}
+
+
 void Missed_Trade_Table_Model::setDataList(QList <QStringList> missed_trade_data_listNew){
     if(missed_trade_data_list.size()==0){
         Missed_Trade_Table_Model::beginResetModel();
@@ -77,9 +135,7 @@ void Missed_Trade_Table_Model::setDataList(QList <QStringList> missed_trade_data
         for(int i=0;i<missed_trade_data_listNew.length();i++){
             bool newData = true;
             for(int j=0;j<missed_trade_data_list.length();j++){
-                int unique_id_idx = Missed_Trades_Idx::Missed_Trade_Id;  // Id will be unique
-
-                if(missed_trade_data_listNew[i][unique_id_idx]==missed_trade_data_list[j][unique_id_idx]){
+                if(missed_trade_data_listNew[i][Missed_Trades_Idx::Missed_Trade_Id]==missed_trade_data_list[j][Missed_Trades_Idx::Missed_Trade_Id]){ // TraderData_OB---this will be unique for row
                     newData = false;
                     for(int k=0;k<missed_trade_data_listNew[i].size();k++){
                         if(missed_trade_data_listNew[i][k]!=missed_trade_data_list[j][k]){
@@ -101,8 +157,7 @@ void Missed_Trade_Table_Model::setDataList(QList <QStringList> missed_trade_data
         for(int i=0;i<missed_trade_data_list.length();i++){
             bool deletRow = true;
             for(int j=0;j<missed_trade_data_listNew.length();j++){
-                int unique_id_idx = Missed_Trades_Idx::Missed_Trade_Id;  // Id will be unique
-                if(missed_trade_data_list[i][unique_id_idx]==missed_trade_data_listNew[j][unique_id_idx]){ // token_numebr(last element in array)---this will be unique for row
+                if(missed_trade_data_list[i][Missed_Trades_Idx::Missed_Trade_Id]==missed_trade_data_listNew[j][Missed_Trades_Idx::Missed_Trade_Id]){ // TraderData_OB---this will be unique for row
                     deletRow=false; //the id is there in new and old data so do not remove this row.
                 }
             }
@@ -110,14 +165,6 @@ void Missed_Trade_Table_Model::setDataList(QList <QStringList> missed_trade_data
                 rowsToRemove.append(i); // store the index of the row to be removed
         }
 
-        //remove rows
-        /*for(int i=0;i<rowsToRemove.length();i++){
-            int rowIndex = rowsToRemove[i];
-            beginRemoveRows(QModelIndex(), rowIndex, rowIndex);
-            missed_trade_data_list.removeAt(rowIndex); //
-            endRemoveRows();
-
-        }*/
         //remove rows
         for (int i = rowsToRemove.length() - 1; i >= 0; i--) {
             int rowIndex = rowsToRemove[i];

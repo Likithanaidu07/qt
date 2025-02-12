@@ -7,7 +7,7 @@
 #include "QColor"
 #include "qtableview.h"
 
-class Trade_Table_Model : public QAbstractTableModel
+    class Trade_Table_Model : public QAbstractTableModel
 {
     Q_OBJECT
 public:

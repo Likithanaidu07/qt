@@ -2437,7 +2437,7 @@ void MainWindow::refreshTables(){
             loadDataAndUpdateTable(T_Table::MISSED_TRADE);
             refresh_entire_table.storeRelaxed(0);
         }
-        else if(refresh_entire_table.loadRelaxed()==200) {
+        else {/*if(refresh_entire_table.loadRelaxed()==200) {
             loadDataAndUpdateTable(T_Table::PORTFOLIO);
             loadDataAndUpdateTable(T_Table::TRADE);
             loadDataAndUpdateTable(T_Table::NET_POS);
@@ -2448,7 +2448,7 @@ void MainWindow::refreshTables(){
             loadDataAndUpdateTable(T_Table::MISSED_TRADE);
             loadDataAndUpdateTable(T_Table::NET_POS);
             loadDataAndUpdateTable(T_Table::SUMMARY);
-            refresh_entire_table.storeRelaxed(0);
+            refresh_entire_table.storeRelaxed(0);*/
         }
 
 
@@ -2789,6 +2789,7 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
     }
     else if(msgType == SocketDataType::BACKEND_COMM_SOCKET_DATA){
         if(msg == "CMD_ID_TRADE_UPDATED_200"){
+
             //refresh all table from here.
             refresh_entire_table.storeRelaxed(200);
 
@@ -2796,6 +2797,8 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
             DataLoadMutex.lock();
             waitConditionDataLoadThread.wakeAll();
             DataLoadMutex.unlock();
+
+           //log here
         }
         else if(msg == "CMD_ID_TRADE_UPDATED_CMD_300"){
             //refresh all table from here.
@@ -2805,6 +2808,8 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
             DataLoadMutex.lock();
             waitConditionDataLoadThread.wakeAll();
             DataLoadMutex.unlock();
+
+            //log here
         }
     }
 
