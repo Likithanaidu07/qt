@@ -64,6 +64,20 @@ MainWindow::MainWindow(QWidget *parent)
   //  setWindowFlags(Qt::Window | Qt::FramelessWindowHint);-
     setWindowFlags(Qt::Window | Qt::CustomizeWindowHint);
 
+
+#ifdef BACKEND_LOG
+    // Generate log file name with timestamp
+       QString logFileName = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/logs/"+QString("Backend_log_%1.txt").arg(QDateTime::currentDateTime().toString("yyyyMMdd_HHmmss"));
+       // Open the log file
+       backend_logFile.setFileName(logFileName);
+       if (backend_logFile.open(QIODevice::WriteOnly | QIODevice::Text)) {
+           backend_logStream.setDevice(&backend_logFile);
+           write_backend_Log("Log started");
+       } else {
+           qDebug() << "Failed to open backend log file.";
+       }
+#endif
+
     //ui->sidePanel->setVisible(false);
     ui->Algorithms_Close->setVisible(false);
     newIndicesData = false;
@@ -1632,10 +1646,17 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
 
 MainWindow::~MainWindow()
 {
-    delete ui;
     if (sortWin) {
         delete sortWin; // Ensure the window is deleted
     }
+#ifdef BACKEND_LOG
+
+    write_backend_Log("Log closed");
+       if (backend_logFile.isOpen()) {
+           backend_logFile.close();
+       }
+#endif
+       delete ui;
 }
 
 void MainWindow::update_ui_slot(int type){
@@ -2436,23 +2457,27 @@ void MainWindow::refreshTables(){
             loadDataAndUpdateTable(T_Table::MISSED_TRADE);
             refresh_entire_table.storeRelaxed(0);
         }
-        else {/*if(refresh_entire_table.loadRelaxed()==200) {
+        else if(refresh_entire_table.loadRelaxed()==200) {
+#ifdef BACKEND_LOG
+            write_backend_Log("Refreshing Entire table...");
+#endif
             loadDataAndUpdateTable(T_Table::PORTFOLIO);
             loadDataAndUpdateTable(T_Table::TRADE);
             loadDataAndUpdateTable(T_Table::NET_POS);
             loadDataAndUpdateTable(T_Table::SUMMARY);
-            refresh_entire_table.storeRelaxed(0);
-           }
-        else if(refresh_entire_table.loadRelaxed()==300) {
             loadDataAndUpdateTable(T_Table::MISSED_TRADE);
-            loadDataAndUpdateTable(T_Table::NET_POS);
-            loadDataAndUpdateTable(T_Table::SUMMARY);
-            refresh_entire_table.storeRelaxed(0);*/
+            refresh_entire_table.storeRelaxed(0);
+
+
         }
-
-
-
-
+        else if(refresh_entire_table.loadRelaxed()==300) {
+#ifdef BACKEND_LOG
+            write_backend_Log("Refreshing MISSED_TRADE and TRADE table...");
+#endif
+            loadDataAndUpdateTable(T_Table::MISSED_TRADE);
+            loadDataAndUpdateTable(T_Table::TRADE);
+            refresh_entire_table.storeRelaxed(0);
+        }
 
         // Calculate the remaining time to wait
         int elapsed = timer.elapsed();
@@ -2788,8 +2813,11 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
     }
     else if(msgType == SocketDataType::BACKEND_COMM_SOCKET_DATA){
         if(msg == "CMD_ID_TRADE_UPDATED_200"){
-
+#ifdef BACKEND_LOG
+            write_backend_Log("Backend CMD 200 Received...");
+#endif
             //refresh all table from here.
+
             refresh_entire_table.storeRelaxed(200);
 
             // Lock the mutex, wake the condition, then unlock
@@ -2800,13 +2828,21 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
            //log here
         }
         else if(msg == "CMD_ID_TRADE_UPDATED_CMD_300"){
-            //refresh all table from here.
+#ifdef BACKEND_LOG
+            write_backend_Log("Backend CMD 300 Received...");
+#endif
+           //refresh trade table and missed trade table from here.
             refresh_entire_table.storeRelaxed(300);
 
             // Lock the mutex, wake the condition, then unlock
             DataLoadMutex.lock();
             waitConditionDataLoadThread.wakeAll();
             DataLoadMutex.unlock();
+
+            //trigger after 5 second as DB might not get updated fully when backend command receved.
+            QTimer::singleShot(5000, this, [this]() {
+                refresh_entire_table.storeRelaxed(300);
+            });
 
             //log here
         }
@@ -5127,4 +5163,12 @@ void MainWindow::export_Action(){
             QMessageBox::warning(nullptr, "Failed","No File selected!.");
         }
 }
-
+#ifdef BACKEND_LOG
+void MainWindow::write_backend_Log(const QString &message) {
+    if (backend_logFile.isOpen()) {
+        QString timestamp = QDateTime::currentDateTime().toString("yyyy-MM-dd HH:mm:ss");
+        backend_logStream << timestamp << " - " << message << "\n";
+        backend_logStream.flush();
+    }
+}
+#endif
