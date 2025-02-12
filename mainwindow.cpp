@@ -2159,7 +2159,6 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                     oq_btq_stq_msg.append("OrderQuantity cannot be greater than "+ QString::number(order_qty_limit));
                 }
             }
-            ///----------------------------------------------------------------------
 
             ///------only _BuyTotalQuantity edited-------------
             else if(editedCellData.contains(PortfolioData_Idx::_BuyTotalQuantity)){

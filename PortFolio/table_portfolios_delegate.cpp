@@ -351,7 +351,8 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                             // Skip rounding for price differences and MaxLoss
                             if (currentColIdx != PortfolioData_Idx::_SellPriceDifference &&
                                 currentColIdx != PortfolioData_Idx::_BuyPriceDifference &&
-                                currentColIdx != PortfolioData_Idx::_MaxLoss) {
+                                currentColIdx != PortfolioData_Idx::_MaxLoss &&
+                                currentColIdx == PortfolioData_Idx::_Depth) {
                                 // Round to nearest 0.05 (or appropriate precision)
                                 incValue = std::round(incValue * 20.0) / 20.0;
                             }
@@ -359,7 +360,8 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                             // Ensure certain values do not go below their respective thresholds
                             if (currentColIdx == PortfolioData_Idx::_BuyTotalQuantity ||
                                 currentColIdx == PortfolioData_Idx::_SellTotalQuantity ||
-                                currentColIdx == PortfolioData_Idx::_MaxLoss) {
+                                currentColIdx == PortfolioData_Idx::_MaxLoss ||
+                                currentColIdx == PortfolioData_Idx::_Depth) {
                                 if (incValue < 0) incValue = 0;
                             }
 
