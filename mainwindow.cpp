@@ -2826,6 +2826,12 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
             waitConditionDataLoadThread.wakeAll();
             DataLoadMutex.unlock();
 
+            //trigger after 1 second as DB might not get updated fully when backend command receved.
+            QTimer::singleShot(1000, this, [this]() {
+                refresh_entire_table.storeRelaxed(200);
+            });
+
+
            //log here
         }
         else if(msg == "CMD_ID_TRADE_UPDATED_CMD_300"){
@@ -2840,8 +2846,8 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
             waitConditionDataLoadThread.wakeAll();
             DataLoadMutex.unlock();
 
-            //trigger after 5 second as DB might not get updated fully when backend command receved.
-            QTimer::singleShot(5000, this, [this]() {
+            //trigger after 1 second as DB might not get updated fully when backend command receved.
+            QTimer::singleShot(1000, this, [this]() {
                 refresh_entire_table.storeRelaxed(300);
             });
 
