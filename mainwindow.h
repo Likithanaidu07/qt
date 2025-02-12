@@ -70,6 +70,9 @@
 #include <QApplication>
 using namespace ads;
 
+
+#define BACKEND_LOG
+
 class mysql_conn;
 QT_BEGIN_NAMESPACE
 namespace Ui { class MainWindow; }
@@ -127,6 +130,14 @@ private:
   //  QTimer* TableRefreshTimer;
     QStringList summarydatList;
     bool newIndicesData;
+
+
+#ifdef BACKEND_LOG
+    QFile backend_logFile;
+    QTextStream backend_logStream;
+
+    void write_backend_Log(const QString &message);
+#endif
 
    // QTimer* Trade_TableRefreshTimer;
 
