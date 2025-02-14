@@ -5230,6 +5230,7 @@ void MainWindow::onRetryButtonClickedMissedTrade(int row){
       QString token_number = data[Missed_Trades_Idx::Token_No];
       int lotSize=ContractDetail::getInstance().GetLotSize(token_number.toInt(),PortfolioType::F1_F2);
       QString orderID = data[Missed_Trades_Idx::OrderId];
+      QString ID = data[Missed_Trades_Idx::Missed_Trade_Id];
 
       if(BuySell=="Buy"){
           buyprice = QString::number(data[Missed_Trades_Idx::Price].toDouble()* devicer);
@@ -5253,12 +5254,12 @@ void MainWindow::onRetryButtonClickedMissedTrade(int row){
 
        if (reply == QMessageBox::Yes) {
            mysql_conn *db_conn = new mysql_conn(0, "add_algo_db_conn");
-           algo_data_insert_status status = db_conn->retry_F1F2_Order(orderID,QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,true);
+           algo_data_insert_status status = db_conn->retry_F1F2_Order(orderID,ID,QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,true);
            if(status == algo_data_insert_status::EXIST){
                 QMessageBox::StandardButton reply;
                 reply = QMessageBox::question(this, "Duplicate record!", "Record already exist for selected Order Id!. Do you want to proceed?",QMessageBox::Yes | QMessageBox::No);
                 if (reply == QMessageBox::Yes) {
-                    algo_data_insert_status status1 = db_conn->retry_F1F2_Order(orderID,QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,false);
+                    algo_data_insert_status status1 = db_conn->retry_F1F2_Order(orderID,ID,QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,false);
                     if(status1 == algo_data_insert_status::INSERTED){
                             sendBackendCommandOnAddPortfolio();
                             QMessageBox msgBox;
