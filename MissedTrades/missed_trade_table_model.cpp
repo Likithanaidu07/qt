@@ -176,6 +176,12 @@ void Missed_Trade_Table_Model::setDataList(QList <QStringList> missed_trade_data
 
 }
 
+QStringList Missed_Trade_Table_Model::getDataForPlacingOrder(int idx) {
+    if (idx >= 0 && idx < missed_trade_data_list.size()) {
+        return QStringList(missed_trade_data_list[idx]);  // Explicit deep copy
+    }
+    return QStringList();  // Return an empty list for invalid index
+}
 
 
 QVariant Missed_Trade_Table_Model::headerData(int section, Qt::Orientation orientation,   int role) const

@@ -21,6 +21,7 @@ public:
     void setDataList(QList <QStringList> missed_trade_list);
     QVariant headerData(int section, Qt::Orientation ,   int role) const override;
     QList <QStringList> missed_trade_data_list;
+    QStringList getDataForPlacingOrder(int idx);
 
 private:
     int col_count;
@@ -32,7 +33,8 @@ private:
                           "StockName",
                           "Message",
                           "Price",
-                          "Time"};
+                          "Time",
+                          "Place Order"};
 
 
 signals:

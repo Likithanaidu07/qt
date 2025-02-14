@@ -303,6 +303,7 @@ private:
       int getWatchWindowChildWidth(QHBoxLayout* layout);
       void adjustTopBarLayout();
       void updateHotKeysAction(QString action,QAction *shortcutAction);
+      void sendBackendCommandOnAddPortfolio();
 
 public slots:
 
@@ -422,6 +423,8 @@ private slots:
 
     void import_Action();
     void export_Action();
+
+    void onRetryButtonClickedMissedTrade(int row);
 
 protected:
     virtual void closeEvent(QCloseEvent* event) override;

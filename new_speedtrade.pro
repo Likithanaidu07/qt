@@ -11,7 +11,7 @@ DEFINES += QT_MESSAGELOGCONTEXT
 CONFIG += c++17
 
 #manually Increment Version Before Build
-VERSION = 1.0.3
+VERSION = 1.0.5
 TARGET = New_Speedtrade_$${VERSION}
 
 

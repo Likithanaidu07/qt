@@ -176,12 +176,13 @@ enum Missed_Trades_Idx{
     Type,
     Lot,
     AlgoNo,
-    Symbol,
+    Stock_Name,
     Message,
     Price,
     DateTime,
-    Missed_Trade_Id
-
+    Retry_Order_Bt,
+    Token_No,
+    Missed_Trade_Id,
 };
 
 enum Open_Position_Idx{

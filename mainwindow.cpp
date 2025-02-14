@@ -1445,6 +1445,8 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     missed_trade_table->setObjectName("missed_trade_table");
 
     missed_trade_table_delegate* missed_delegate =new missed_trade_table_delegate;
+    connect(missed_delegate, &missed_trade_table_delegate::retryButtonClicked, this, &MainWindow::onRetryButtonClickedMissedTrade);
+
     missed_trade_table->setItemDelegate(missed_delegate);
 
     missed_trade_table->setStyleSheet(tableview_SS);
@@ -1657,6 +1659,7 @@ MainWindow::~MainWindow()
        }
 #endif
        delete ui;
+
 }
 
 void MainWindow::update_ui_slot(int type){
@@ -2377,6 +2380,9 @@ void MainWindow::start_dataLoadingThread(){
 void MainWindow::stop_dataLoadingThread(){
 
     quit_db_data_load_thread.storeRelaxed(1); // this will quit the data loding thread.
+    DataLoadMutex.lock();
+       waitConditionDataLoadThread.wakeAll();
+       DataLoadMutex.unlock();
     futureBackGroundDBThread.waitForFinished();
 }
 /*
@@ -2442,7 +2448,7 @@ void MainWindow::refreshTables(){
 
     QElapsedTimer timer;
 
-    int data_load_interval = 2000; // in m-sec
+    int data_load_interval = 60000; // in m-sec
     while(1){
 
 
@@ -2461,6 +2467,7 @@ void MainWindow::refreshTables(){
 #ifdef BACKEND_LOG
             write_backend_Log("Refreshing Entire table...");
 #endif
+            qDebug()<<"Refreshing Entire table...";
             loadDataAndUpdateTable(T_Table::PORTFOLIO);
             loadDataAndUpdateTable(T_Table::TRADE);
             loadDataAndUpdateTable(T_Table::NET_POS);
@@ -2474,6 +2481,7 @@ void MainWindow::refreshTables(){
 #ifdef BACKEND_LOG
             write_backend_Log("Refreshing MISSED_TRADE and TRADE table...");
 #endif
+            qDebug()<<"Refreshing MISSED_TRADE and TRADE table...";
             loadDataAndUpdateTable(T_Table::MISSED_TRADE);
             loadDataAndUpdateTable(T_Table::TRADE);
             refresh_entire_table.storeRelaxed(0);
@@ -2508,7 +2516,6 @@ void MainWindow::refreshTables(){
 void MainWindow::triggerImmediate_refreshTables() {
 
     refresh_entire_table.storeRelaxed(1);
-
     // Lock the mutex, wake the condition, then unlock
     DataLoadMutex.lock();
     waitConditionDataLoadThread.wakeAll();
@@ -2828,6 +2835,9 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
             //trigger after 1 second as DB might not get updated fully when backend command receved.
             QTimer::singleShot(1000, this, [this]() {
                 refresh_entire_table.storeRelaxed(200);
+                DataLoadMutex.lock();
+                waitConditionDataLoadThread.wakeAll();
+                DataLoadMutex.unlock();
             });
 
 
@@ -2848,6 +2858,9 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
             //trigger after 1 second as DB might not get updated fully when backend command receved.
             QTimer::singleShot(1000, this, [this]() {
                 refresh_entire_table.storeRelaxed(300);
+                DataLoadMutex.lock();
+                waitConditionDataLoadThread.wakeAll();
+                DataLoadMutex.unlock();
             });
 
             //log here
@@ -3578,6 +3591,10 @@ void MainWindow::ConvertAlgo_button_clicked(){
 
 void MainWindow::onPortfolioAdded(){
 
+    sendBackendCommandOnAddPortfolio();
+}
+
+void MainWindow::sendBackendCommandOnAddPortfolio(){
     quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
     const unsigned char dataBytes[] = { 0x01};
     QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
@@ -5169,6 +5186,111 @@ void MainWindow::export_Action(){
             QMessageBox::warning(nullptr, "Failed","No File selected!.");
         }
 }
+void MainWindow::onRetryButtonClickedMissedTrade(int row){
+    if (!missed_trade_table) {
+           return;  // Safety check
+       }
+
+       // Set the current index to the first column of the clicked row
+       QModelIndex index = missed_trade_table->model()->index(row, 0);
+       missed_trade_table->setCurrentIndex(index);
+
+       // Select the entire row
+       missed_trade_table->selectionModel()->select(index, QItemSelectionModel::Select | QItemSelectionModel::Rows);
+
+      QStringList data =  missed_trade_model->getDataForPlacingOrder(row);
+      if(data.size()==0){
+          QMessageBox msgBox;
+          msgBox.setWindowTitle("Failed.");
+          msgBox.setIcon(QMessageBox::Warning);
+          msgBox.setText("Cannot to get data for selected row.");
+          msgBox.exec();
+          return;
+      }
+
+      QString sellprice="0";
+      QString sellqty="0";
+      QString buyprice="0";
+      QString buyqty="0";
+      QString orderQunatity = "0";
+      QString msg="0";
+      QString confirmationMsg ="";
+      QString Stockname = data[Missed_Trades_Idx::Stock_Name];
+      QString BuySell = data[Missed_Trades_Idx::BuySell];
+      QString token_number = data[Missed_Trades_Idx::Token_No];
+      int lotSize=ContractDetail::getInstance().GetLotSize(token_number.toInt(),PortfolioType::F1_F2);
+      QString orderID = data[Missed_Trades_Idx::OrderId];
+
+      if(BuySell=="Buy"){
+          buyprice = QString::number(data[Missed_Trades_Idx::Price].toDouble()* devicer);
+          buyqty = QString::number(data[Missed_Trades_Idx::Lot].toInt()* lotSize);
+          orderQunatity = buyqty;
+
+          confirmationMsg ="Buy "+Stockname+" @ "+data[Missed_Trades_Idx::Price]+" for "+data[Missed_Trades_Idx::Lot]+" lot. Would you like to proceed?";
+      }
+      else{
+          sellprice = QString::number(data[Missed_Trades_Idx::Price].toDouble()* devicer);
+          sellqty = QString::number(data[Missed_Trades_Idx::Lot].toInt()* lotSize);
+          orderQunatity = sellqty;
+          confirmationMsg ="Sell "+Stockname+" @ "+data[Missed_Trades_Idx::Price]+" for "+data[Missed_Trades_Idx::Lot]+" lot. Would you like to proceed?";
+
+      }
+
+
+
+       QMessageBox::StandardButton reply;
+       reply = QMessageBox::question(this, "Add Manual Order?", confirmationMsg,QMessageBox::Yes | QMessageBox::No);
+
+       if (reply == QMessageBox::Yes) {
+           mysql_conn *db_conn = new mysql_conn(0, "add_algo_db_conn");
+           algo_data_insert_status status = db_conn->retry_F1F2_Order(orderID,QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,true);
+           if(status == algo_data_insert_status::EXIST){
+                QMessageBox::StandardButton reply;
+                reply = QMessageBox::question(this, "Duplicate record!", "Record already exist for selected Order Id!. Do you want to proceed?",QMessageBox::Yes | QMessageBox::No);
+                if (reply == QMessageBox::Yes) {
+                    algo_data_insert_status status1 = db_conn->retry_F1F2_Order(orderID,QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,false);
+                    if(status1 == algo_data_insert_status::INSERTED){
+                            sendBackendCommandOnAddPortfolio();
+                            QMessageBox msgBox;
+                            msgBox.setWindowTitle("Success");
+                            msgBox.setIcon(QMessageBox::Information);
+                            msgBox.setText("Order placed successfully.");
+                            msgBox.exec();
+                        }
+                        else{
+                            QMessageBox msgBox;
+                            msgBox.setWindowTitle("Failed.");
+                            msgBox.setIcon(QMessageBox::Warning);
+                            msgBox.setText(msg);
+                            msgBox.exec();
+                        }
+                }
+           }
+           else if(status == algo_data_insert_status::INSERTED){
+               sendBackendCommandOnAddPortfolio();
+               QMessageBox msgBox;
+               msgBox.setWindowTitle("Success");
+               msgBox.setIcon(QMessageBox::Information);
+               msgBox.setText("Order placed successfully.");
+               msgBox.exec();
+           }
+           else{
+               QMessageBox msgBox;
+               msgBox.setWindowTitle("Failed");
+               msgBox.setIcon(QMessageBox::Warning);
+               msgBox.setText(msg);
+               msgBox.exec();
+           }
+
+           delete db_conn;
+       }
+
+       qDebug() << "Retry button clicked for row:" << row;
+
+}
+
+
+
 #ifdef BACKEND_LOG
 void MainWindow::write_backend_Log(const QString &message) {
     if (backend_logFile.isOpen()) {

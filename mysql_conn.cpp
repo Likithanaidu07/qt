@@ -2461,6 +2461,8 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                 rowList.append(Message);
                 rowList.append(PriceStr);
                 rowList.append(DateTimeStr);
+                rowList.append("Retry");
+                rowList.append(QString::number(token_number));
                 rowList.append(Id);
                 missed_trade_list.append(rowList);
             }
@@ -3557,3 +3559,86 @@ algo_data_insert_status mysql_conn::place_F1F2_Order(QString userID,QString Leg1
     return ret;
 }
 
+algo_data_insert_status mysql_conn::retry_F1F2_Order( QString  OrderId, QString userID,QString Leg1TokenNumber,QString sellprice,QString sellqty,QString buyprice,QString buyqty,int MaxPortfolioCount,QString orderQty,QString &msg,bool checkDuplicateExist){
+    QMutexLocker lock(&mutex);
+
+    QString ClientID = "0";
+    QString IsBroker = "1";
+    algo_data_insert_status ret = algo_data_insert_status::FAILED;
+    {
+        bool ok = checkDBOpened(msg);
+        if(ok){
+            QSqlQuery query(db);
+
+
+            if(checkDuplicateExist){
+                QString str = "SELECT COUNT(*) FROM Portfolios WHERE Leg1TokenNo="+Leg1TokenNumber+" and TraderID="+userID+" and PortfolioType="+QString::number(PortfolioType::F1_F2)+" and AdditionalData1="+OrderId;
+                query.prepare(str);
+
+                if( !query.exec() ){
+                    msg = query.lastError().text();
+                    qDebug()<<query.lastError().text();
+                    return ret;
+                }
+
+                if (query.next() && query.value(0).toInt() > 0) {
+                    ret = algo_data_insert_status::EXIST;
+                    msg = "Record already exists in DB";
+                    return ret;
+                }
+            }
+
+            query.prepare("INSERT INTO Portfolios (PortfolioType, TraderID,ClientID,IsBroker, Status, "
+                          "Leg1TokenNo, Leg2TokenNo, Leg3TokenNo, Leg4TokenNo, Leg5TokenNo, Leg6TokenNo"
+                          ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
+                          "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
+                          "OrderQuantity,AdditionalData1) "
+                          "VALUES (:PortfolioType, :TraderID,:ClientID,:IsBroker, :Status, "
+                          ":Leg1TokenNo, :Leg2TokenNo, :Leg3TokenNo, :Leg4TokenNo, :Leg5TokenNo, :Leg6TokenNo,"
+                          ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
+                          ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
+                          ":OrderQuantity,:AdditionalData1)");
+            query.bindValue(":PortfolioType", QString::number(PortfolioType::F1_F2));
+            query.bindValue(":TraderID",userID);
+            query.bindValue(":ClientID",ClientID);
+            query.bindValue(":IsBroker",IsBroker);
+            query.bindValue(":Status", "Active");
+            query.bindValue(":Leg1TokenNo", Leg1TokenNumber);
+            query.bindValue(":Leg2TokenNo", 0);
+            query.bindValue(":Leg3TokenNo", 0);
+            query.bindValue(":Leg4TokenNo", 0);
+            query.bindValue(":Leg5TokenNo", 0);
+            query.bindValue(":Leg6TokenNo", 0);
+            query.bindValue(":BuyPriceDifference", buyprice);
+            query.bindValue(":BuyTotalQuantity", buyqty);
+            query.bindValue(":BuyTradedQuantity", 0);
+            query.bindValue(":SellPriceDifference", sellprice);
+            query.bindValue(":SellTotalQuantity", sellqty);
+            query.bindValue(":SellTradedQuantity", 0);
+            query.bindValue(":OrderQuantity", orderQty);
+            query.bindValue(":AdditionalData1", OrderId);
+
+
+
+            if(query.exec()){
+                msg="Add record to DB successfully";
+                ret = algo_data_insert_status::INSERTED;
+            }
+            else{
+                msg="Failed to insert record to DB";
+                ret = algo_data_insert_status::FAILED;
+                qDebug() << "Executed Query: " << query.lastQuery();
+
+                qDebug()<<"query.lastError: "+query.lastError().text();
+            }
+
+
+        }
+        else{
+            qDebug()<<"Cannot connect Database: "+db.lastError().text();
+            msg="Cannot connect Database: "+db.lastError().text();
+        }
+
+    }
+    return ret;
+}
