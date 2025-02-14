@@ -1444,11 +1444,13 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
 
     missed_trade_table = new QTableView(dock_win_missed_trades);
     missed_trade_table->setObjectName("missed_trade_table");
+    connect(missed_trade_table, &QTableView::doubleClicked, this, &MainWindow::Skipped_Trades_cellDoubleClicked);
 
     missed_trade_table_delegate* missed_delegate =new missed_trade_table_delegate;
     connect(missed_delegate, &missed_trade_table_delegate::retryButtonClicked, this, &MainWindow::onRetryButtonClickedMissedTrade);
 
     missed_trade_table->setItemDelegate(missed_delegate);
+
 
     missed_trade_table->setStyleSheet(tableview_SS);
     missed_trade_table->horizontalHeader()->setFixedHeight(32);
@@ -3773,6 +3775,34 @@ void MainWindow::trade_table_cellDoubleClicked(const QModelIndex &index){
     }
 
 }
+void MainWindow::highlightRowInF1F2Order(int row) {
+    QModelIndex rowIndex = f1f2_order_table->model()->index(row, 0);
+    f1f2_order_table->setCurrentIndex(rowIndex);
+    f1f2_order_table->selectionModel()->select(rowIndex,
+    QItemSelectionModel::Select | QItemSelectionModel::Rows);
+
+    // Scroll to the highlighted row for visibility
+    f1f2_order_table->scrollTo(rowIndex);
+}
+
+
+void MainWindow::Skipped_Trades_cellDoubleClicked(const QModelIndex &index) {
+    if (!index.isValid()) return; // Ensure valid index
+
+    int col = index.column();
+    if (col == Missed_Trades_Idx::Stock_Name) {
+        dock_win_f1f2_order->toggleView(true);
+
+        int row = index.row();  // Get the clicked row
+        int orderId = missed_trade_model->getSingleOrderId(row);  // Fetch OrderId
+
+        if (orderId != -1) {  // Ensure valid OrderId
+            highlightRowInF1F2Order(orderId);
+        }
+    }
+}
+
+
 
 void MainWindow::f1f2_order_table_cellDoubleClicked(const QModelIndex &index){
 

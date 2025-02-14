@@ -30,6 +30,8 @@ public:
     QMutex mutex;
     QHash<QString, MBP_Data_Struct> localMBP_Data;
     void refreshMarketDataTable();
+
+      void highlightRowInF1F2Order(int orderId);
 protected:
     void showEvent(QShowEvent *event) override;
 

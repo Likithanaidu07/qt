@@ -182,6 +182,14 @@ QStringList Missed_Trade_Table_Model::getDataForPlacingOrder(int idx) {
     }
     return QStringList();  // Return an empty list for invalid index
 }
+int Missed_Trade_Table_Model::getSingleOrderId(int idx) {
+    if (idx >= 0 && idx < missed_trade_data_list.size()) {
+        return missed_trade_data_list[idx].at(OrderId).toInt();
+    }
+    return -1;  // Return -1 for invalid index
+}
+
+
 
 
 QVariant Missed_Trade_Table_Model::headerData(int section, Qt::Orientation orientation,   int role) const

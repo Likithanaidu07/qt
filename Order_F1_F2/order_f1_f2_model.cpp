@@ -122,3 +122,11 @@ QVariant Order_F1_F2_Model::headerData(int section, Qt::Orientation orientation,
         return QString::number(section);
 
 }
+bool Order_F1_F2_Model::containsOrderId(int orderId) {
+    for (int row = 0; row < f1f2_order_data_list.size(); ++row) {
+        if (f1f2_order_data_list[row].at(OrderId).toInt() == orderId) {
+            return true;
+        }
+    }
+    return false;
+}

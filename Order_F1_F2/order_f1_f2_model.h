@@ -22,7 +22,7 @@ public:
     QVariant headerData(int section, Qt::Orientation ,   int role) const override;
     QList <QStringList> f1f2_order_data_list;
 
-
+    bool containsOrderId(int orderId);
 private:
     int col_count;
 

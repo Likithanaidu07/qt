@@ -22,6 +22,7 @@ public:
     QVariant headerData(int section, Qt::Orientation ,   int role) const override;
     QList <QStringList> missed_trade_data_list;
     QStringList getDataForPlacingOrder(int idx);
+    int getSingleOrderId(int idx);
 
 private:
     int col_count;
