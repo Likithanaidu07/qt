@@ -2398,6 +2398,7 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
 
 
 void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user_id){
+
     QMutexLocker lock(&mutex);
 
     QList <QStringList> missed_trade_list;
@@ -2407,7 +2408,15 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
     bool ok = checkDBOpened(msg);
     if(ok)
     {
-        QString query_str = "SELECT * FROM MissedTrades WHERE TraderID='"+user_id+"'";
+       // QString query_str = "SELECT * FROM MissedTrades WHERE TraderID='"+user_id+"'";
+        QString query_str = "SELECT m.*, "
+                            "CASE WHEN p.AdditionalData1 IS NOT NULL AND p.AdditionalData2 IS NOT NULL THEN 1 ELSE 0 END AS retried "
+                            "FROM MissedTrades m "
+                            "LEFT JOIN portfolios p ON m.localOrderID = p.AdditionalData1 "
+                            "AND m.Id = p.AdditionalData2 "
+                            "AND p.TraderID = '" + user_id + "' "
+                            "WHERE m.TraderID = '" + user_id + "'";
+
         QSqlQuery query(query_str,db);
         if( !query.exec() )
         {
@@ -2445,6 +2454,9 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                 int Portfolio = query.value(rec.indexOf("Portfolio")).toInt();
                 QString Id = query.value(rec.indexOf("Id")).toString();
                 double Price = query.value(rec.indexOf("Price")).toDouble();
+
+                QString retried = query.value(rec.indexOf("retried")).toString();
+
                 Price = Price/devicer;
 
                 QString PriceStr = fixDecimal(Price,decimal_precision);
@@ -2461,7 +2473,7 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                 rowList.append(Message);
                 rowList.append(PriceStr);
                 rowList.append(DateTimeStr);
-                rowList.append("Retry");
+                rowList.append(retried);
                 rowList.append(QString::number(token_number));
                 rowList.append(Id);
                 missed_trade_list.append(rowList);
@@ -3559,7 +3571,7 @@ algo_data_insert_status mysql_conn::place_F1F2_Order(QString userID,QString Leg1
     return ret;
 }
 
-algo_data_insert_status mysql_conn::retry_F1F2_Order( QString  OrderId, QString userID,QString Leg1TokenNumber,QString sellprice,QString sellqty,QString buyprice,QString buyqty,int MaxPortfolioCount,QString orderQty,QString &msg,bool checkDuplicateExist){
+algo_data_insert_status mysql_conn::retry_F1F2_Order( QString  OrderId, QString ID, QString userID,QString Leg1TokenNumber,QString sellprice,QString sellqty,QString buyprice,QString buyqty,int MaxPortfolioCount,QString orderQty,QString &msg,bool checkDuplicateExist){
     QMutexLocker lock(&mutex);
 
     QString ClientID = "0";
@@ -3572,7 +3584,7 @@ algo_data_insert_status mysql_conn::retry_F1F2_Order( QString  OrderId, QString 
 
 
             if(checkDuplicateExist){
-                QString str = "SELECT COUNT(*) FROM Portfolios WHERE Leg1TokenNo="+Leg1TokenNumber+" and TraderID="+userID+" and PortfolioType="+QString::number(PortfolioType::F1_F2)+" and AdditionalData1="+OrderId;
+                QString str = "SELECT COUNT(*) FROM Portfolios WHERE Leg1TokenNo="+Leg1TokenNumber+" and TraderID="+userID+" and PortfolioType="+QString::number(PortfolioType::F1_F2)+" and AdditionalData1="+OrderId+" and AdditionalData2="+ID;
                 query.prepare(str);
 
                 if( !query.exec() ){
@@ -3592,12 +3604,12 @@ algo_data_insert_status mysql_conn::retry_F1F2_Order( QString  OrderId, QString 
                           "Leg1TokenNo, Leg2TokenNo, Leg3TokenNo, Leg4TokenNo, Leg5TokenNo, Leg6TokenNo"
                           ",BuyPriceDifference,BuyTotalQuantity,BuyTradedQuantity,"
                           "SellPriceDifference,SellTotalQuantity,SellTradedQuantity,"
-                          "OrderQuantity,AdditionalData1) "
+                          "OrderQuantity,AdditionalData1,AdditionalData2) "
                           "VALUES (:PortfolioType, :TraderID,:ClientID,:IsBroker, :Status, "
                           ":Leg1TokenNo, :Leg2TokenNo, :Leg3TokenNo, :Leg4TokenNo, :Leg5TokenNo, :Leg6TokenNo,"
                           ":BuyPriceDifference,:BuyTotalQuantity,:BuyTradedQuantity,"
                           ":SellPriceDifference,:SellTotalQuantity,:SellTradedQuantity,"
-                          ":OrderQuantity,:AdditionalData1)");
+                          ":OrderQuantity,:AdditionalData1,:AdditionalData2)");
             query.bindValue(":PortfolioType", QString::number(PortfolioType::F1_F2));
             query.bindValue(":TraderID",userID);
             query.bindValue(":ClientID",ClientID);
@@ -3617,6 +3629,7 @@ algo_data_insert_status mysql_conn::retry_F1F2_Order( QString  OrderId, QString 
             query.bindValue(":SellTradedQuantity", 0);
             query.bindValue(":OrderQuantity", orderQty);
             query.bindValue(":AdditionalData1", OrderId);
+            query.bindValue(":AdditionalData2", ID);
 
 
 

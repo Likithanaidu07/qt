@@ -180,7 +180,7 @@ enum Missed_Trades_Idx{
     Message,
     Price,
     DateTime,
-    Retry_Order_Bt,
+    Retry_Order_Bt, // if it is 1 alreadye retried.
     Token_No,
     Missed_Trade_Id,
 };

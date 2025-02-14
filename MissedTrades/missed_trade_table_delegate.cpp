@@ -12,33 +12,38 @@ missed_trade_table_delegate::missed_trade_table_delegate(QObject *parent)  : QSt
 
 QWidget *missed_trade_table_delegate::createEditor(QWidget *parent, const QStyleOptionViewItem & option , const QModelIndex & index ) const
 {
-    int c = index.column();
-    int row = index.row();
-    if (c == Missed_Trades_Idx::Retry_Order_Bt)
-    {
-        QPushButton *editor = new QPushButton("Retry", parent);
-        connect(editor, &QPushButton::clicked, [=]() {
-            emit retryButtonClicked(row);
-        });
-        return editor;
+
+    if (index.column() == Missed_Trades_Idx::Retry_Order_Bt) {
+        QVariant value = index.data(Qt::EditRole);
+        if (value.toInt() == 0) {  // Show button only if value is 0
+            QPushButton *editor = new QPushButton("Retry", parent);
+            connect(editor, &QPushButton::clicked, [=]() {
+                emit retryButtonClicked(index.row());
+            });
+            return editor;
+        }
     }
 }
 
-
 bool missed_trade_table_delegate::editorEvent(QEvent *event, QAbstractItemModel *model, const QStyleOptionViewItem &option, const QModelIndex &index) {
     if (index.column() == Missed_Trades_Idx::Retry_Order_Bt) {
-        if (event->type() == QEvent::MouseButtonPress) {
+        QVariant value = index.data(Qt::DisplayRole);
+
+        // Only allow click if value is 0
+        if (value.toInt() == 0 && event->type() == QEvent::MouseButtonPress) {
             QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
             if (option.rect.contains(mouseEvent->pos())) {
-                // Get the view from the parent of the model
-
                 emit retryButtonClicked(index.row());
                 return true;
             }
         }
+
+        return false; // Ignore the event when value is not 0
     }
+
     return QStyledItemDelegate::editorEvent(event, model, option, index);
 }
+
 void missed_trade_table_delegate::paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const {
 
     auto c = index.column();
@@ -125,7 +130,7 @@ void missed_trade_table_delegate::paint(QPainter *painter, const QStyleOptionVie
 
 
     }*/
-    else if (index.column() == Missed_Trades_Idx::Retry_Order_Bt)
+    /*else if (index.column() == Missed_Trades_Idx::Retry_Order_Bt)
     {
 
 
@@ -140,6 +145,30 @@ void missed_trade_table_delegate::paint(QPainter *painter, const QStyleOptionVie
 
         painter->drawPixmap(option.rect.topLeft(), pixmap);
         painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
+    }*/
+
+      else if  (index.column() == Missed_Trades_Idx::Retry_Order_Bt) {
+        QVariant value = index.data(Qt::DisplayRole);
+
+        if (value.toInt() == 0) {
+            // Draw button-like appearance
+            QPushButton button("Retry");
+            button.setStyleSheet("background-color: #E0F1FF; border: 1px solid black;");
+            button.resize(option.rect.size());
+
+            QPixmap pixmap(option.rect.size());
+            button.render(&pixmap);
+            painter->drawPixmap(option.rect.topLeft(), pixmap);
+        } else {
+            QColor color("#E0F1FF");
+            // Draw text instead of button
+            painter->fillRect(option.rect, color);
+            painter->setPen(Qt::black);
+            painter->drawText(option.rect, Qt::AlignCenter, "Retried");
+
+        }
+
+
     }
 
     else {
@@ -169,15 +198,8 @@ void missed_trade_table_delegate::paint(QPainter *painter, const QStyleOptionVie
         QPoint p2= option.rect.bottomRight();
         p1.setX(p1.x()-x_add);
         p2.setX(p2.x()+x_add);
-
-
         painter->drawLine(p1,p2);
-
         painter->setPen(pen);
         painter->drawLine(option.rect.bottomLeft(), option.rect.bottomRight());
-
-
-
-
 
 }
