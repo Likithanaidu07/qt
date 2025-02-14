@@ -135,7 +135,7 @@ QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOp
     }
     else if( c == PortfolioData_Idx::_Depth ){
         QLineEdit *editor = new QLineEdit(parent);
-        editor->setValidator(new QIntValidator(0, 10));
+        editor->setValidator(new QIntValidator(1, 10));
         editor->setObjectName("portfolioTableCell_"+QString::number(c));
         editor->installEventFilter(const_cast<Table_Portfolios_Delegate *>(this));
         return editor;
