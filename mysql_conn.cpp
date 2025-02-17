@@ -2412,7 +2412,7 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
         QString query_str = "SELECT m.*, "
                             "CASE WHEN p.AdditionalData1 IS NOT NULL AND p.AdditionalData2 IS NOT NULL THEN 1 ELSE 0 END AS retried "
                             "FROM MissedTrades m "
-                            "LEFT JOIN portfolios p ON m.localOrderID = p.AdditionalData1 "
+                            "LEFT JOIN Portfolios p ON m.localOrderID = p.AdditionalData1 "
                             "AND m.Id = p.AdditionalData2 "
                             "AND p.TraderID = '" + user_id + "' "
                             "WHERE m.TraderID = '" + user_id + "'";
