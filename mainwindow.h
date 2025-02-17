@@ -241,6 +241,7 @@ private:
     QTableView *missed_trade_table;
     Missed_Trade_Table_Model *missed_trade_model;
     CDockWidget *dock_win_missed_trades;
+      QSortFilterProxyModel *SkippedproxyModel;
 
 
 
@@ -335,6 +336,8 @@ public slots:
     void T_Portfolio_Table_cellClicked(const QItemSelection&, const QItemSelection&);
     void T_Portfolio_Table_cellDoubleClicked(const QModelIndex &index);
     void trade_table_cellDoubleClicked(const QModelIndex &index);
+    void highlightRowInF1F2Order(int row);
+     void Skipped_Trades_cellDoubleClicked(const QModelIndex &index);
     void f1f2_order_table_cellDoubleClicked(const QModelIndex &index);
     void slotAddLogForAddAlgoRecord(QString str);
     void slotHideProgressBar();
