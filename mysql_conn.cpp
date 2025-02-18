@@ -1666,7 +1666,13 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
 
                 switch (portfolio_type) {
                 case PortfolioType::F2F:{
-
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
+                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13)) {
+                        disableThisAlgo = true;
+                    }
+                    else if (Leg1_OrderState == 7 && Leg2_OrderState == 7) {
+                        traded = true;
+                    }
                     if(Leg1BuySellIndicator==1){
                         Exch_Price_val = static_cast<double>((leg2Price - leg1Price) * 1.0) / devicer;
                     }
@@ -1676,6 +1682,14 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     break;
                 }
                 case PortfolioType::BY:{
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
+                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) &&
+                        (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13)) {
+                        disableThisAlgo = true;
+                    }
+                    else if (Leg1_OrderState == 7 && Leg2_OrderState == 7 && Leg3_OrderState == 7) {
+                        traded = true;
+                    }
                     if(Leg1BuySellIndicator==1){
                         Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
                     }
@@ -1686,6 +1700,14 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     break;
                 }
                 case PortfolioType::CR:{
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
+                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) &&
+                        (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13)) {
+                        disableThisAlgo = true;
+                    }
+                    else if (Leg1_OrderState == 7 && Leg2_OrderState == 7 && Leg3_OrderState == 7) {
+                        traded = true;
+                    }
                     int strikePrice = ContractDetail::getInstance().GetStrikePrice(leg2_token_number,portfolio_type).toInt();
                     strikePrice = strikePrice * devicer; // GetStrikePrice function will return strikePrice devided by devicer, and in below eqution again devide by devicer, to prevent it multipley it with debvicer
                     if(Leg1BuySellIndicator==1){
@@ -1701,6 +1723,14 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     break;
                 }
                 case PortfolioType::CR_JELLY:{
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
+                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) &&
+                        (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13)) {
+                        disableThisAlgo = true;
+                    }
+                    else if (Leg1_OrderState == 7 && Leg2_OrderState == 7 && Leg3_OrderState == 7) {
+                        traded = true;
+                    }
                     int strikePrice = ContractDetail::getInstance().GetStrikePrice(leg2_token_number,portfolio_type).toInt();
                     strikePrice = strikePrice * devicer; // GetStrikePrice function will return strikePrice devided by devicer, and in below eqution again devide by devicer, to prevent it multipley it with debvicer
                     if(Leg1BuySellIndicator==1){
@@ -1716,6 +1746,14 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     break;
                 }
                 case PortfolioType::BFLY_BID:{
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
+                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) &&
+                        (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13)) {
+                        disableThisAlgo = true;
+                    }
+                    else if (Leg1_OrderState == 7 && Leg2_OrderState == 7 && Leg3_OrderState == 7) {
+                        traded = true;
+                    }
                     if(Leg1BuySellIndicator==1){
                         Exch_Price_val = static_cast<double>((2.0 * leg2Price - (leg1Price + leg3Price)) * 1.0) / devicer;
                     }
@@ -1727,6 +1765,15 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     break;
                 }
                 case PortfolioType::BX_BID: {
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
+                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) &&
+                        (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13) &&
+                        (Leg4_OrderState == 6 || Leg4_OrderState == 5 || Leg4_OrderState == 13)) {
+                        disableThisAlgo = true;
+                    }
+                    else if (Leg1_OrderState == 7 && Leg2_OrderState == 7 && Leg3_OrderState == 7 && Leg4_OrderState == 7) {
+                        traded = true;
+                    }
                     int strikePriceLeg3 = ContractDetail::getInstance().GetStrikePrice(leg3_token_number, portfolio_type).toInt() * devicer;
 
                     int strikePriceLeg1 = ContractDetail::getInstance().GetStrikePrice(leg1_token_number, portfolio_type).toInt()* devicer;
@@ -1755,6 +1802,15 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 }
 
                 case PortfolioType::BS1221: {
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
+                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) &&
+                        (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13) &&
+                        (Leg4_OrderState == 6 || Leg4_OrderState == 5 || Leg4_OrderState == 13)) {
+                        disableThisAlgo = true;
+                    }
+                    else if (Leg1_OrderState == 7 && Leg2_OrderState == 7 && Leg3_OrderState == 7 && Leg4_OrderState == 7) {
+                        traded = true;
+                    }
                     if (Leg1BuySellIndicator == 1) {
                         Exch_Price_val = static_cast<double>(leg2Price * 2 + leg4Price - leg1Price - leg3Price * 2) / devicer;
                     } else {
@@ -1765,6 +1821,15 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     break;
                 }
                 case PortfolioType::BS1331: {
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
+                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) &&
+                        (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13) &&
+                        (Leg4_OrderState == 6 || Leg4_OrderState == 5 || Leg4_OrderState == 13)) {
+                        disableThisAlgo = true;
+                    }
+                    else if (Leg1_OrderState == 7 && Leg2_OrderState == 7 && Leg3_OrderState == 7 && Leg4_OrderState == 7) {
+                        traded = true;
+                    }
                     if (Leg1BuySellIndicator == 1) {
                         Exch_Price_val = static_cast<double>(leg2Price * 3 + leg4Price - leg1Price - leg3Price * 3) / devicer;
                     } else {
@@ -3552,7 +3617,7 @@ algo_data_insert_status mysql_conn::place_F1F2_Order(QString userID,QString Leg1
     QMutexLocker lock(&mutex);
 
     QString ClientID = "0";
-    QString IsBroker = "1";
+    QString IsBroker = "0";
     algo_data_insert_status ret = algo_data_insert_status::FAILED;
     {
         bool ok = checkDBOpened(msg);
@@ -3650,7 +3715,7 @@ algo_data_insert_status mysql_conn::retry_F1F2_Order( QString  OrderId, QString 
     QMutexLocker lock(&mutex);
 
     QString ClientID = "0";
-    QString IsBroker = "1";
+    QString IsBroker = "0";
     algo_data_insert_status ret = algo_data_insert_status::FAILED;
     {
         bool ok = checkDBOpened(msg);
