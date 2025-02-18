@@ -9,9 +9,9 @@ cache_file_io::cache_file_io(QObject *parent)
 }
 
 
-void cache_file_io::writeFile_ExludedAlgos_ExchangePriceLimit(const QStringList &list)
+void cache_file_io::over_writeTradedDataList_DisabledOn_MaxLoss_Thr_Reach(const QStringList &list)
 {
-    const QString &filePath = appDataPath+"/exludedAlgos_ExchangePriceLimit.dat";
+    const QString &filePath = appDataPath+"/tradedDataList_DisabledOn_MaxLoss_Thr_Reach.dat";
     QFile file(filePath);
     if (file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QTextStream out(&file);
@@ -19,13 +19,13 @@ void cache_file_io::writeFile_ExludedAlgos_ExchangePriceLimit(const QStringList 
         file.close();
     }
     else{
-        qDebug()<<"writeFile_ExludedAlgos_ExchangePriceLimit: error opening file!";
+        qDebug()<<"writeTradedDataList_DisabledOn_MaxLoss_Thr_Reach: error opening file!";
     }
 }
 
-QStringList cache_file_io::readFile_ExludedAlgos_ExchangePriceLimit()
+QStringList cache_file_io::readTradedDataList_DisabledOn_MaxLoss_Thr_Reach()
 {
-    const QString &filePath = appDataPath+"/exludedAlgos_ExchangePriceLimit.dat";
+    const QString &filePath = appDataPath+"/tradedDataList_DisabledOn_MaxLoss_Thr_Reach.dat";
 
 
 
@@ -42,7 +42,7 @@ QStringList cache_file_io::readFile_ExludedAlgos_ExchangePriceLimit()
            list = line.split(",");        // Split by commas
            file.close();
        } else {
-           qDebug()<<"readFile_ExludedAlgos_ExchangePriceLimit: error opening file! "<<filePath;
+           qDebug()<<"readTradedDataList_DisabledOn_MaxLoss_Thr_Reach: error opening file! "<<filePath;
 
        }
 

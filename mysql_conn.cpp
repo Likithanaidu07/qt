@@ -1282,7 +1282,7 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
 }
 void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_table,
                                    Order_F1_F2_Model *f1f2_order_table_model,Liners_Model *liners_model ,QString user_id,
-                                   QHash<QString, PortFolioData_Less> PortFolioTypeHash,QStringList &algosToDisable,QStringList ExecutedTableHilightExcludeList,double maxLossThr)
+                                   QHash<QString, PortFolioData_Less> PortFolioTypeHash,QStringList &algosToDisable,QStringList ExecutedTableHilightExcludeList)
 {
     QMutexLocker lock(&mutex);
 
@@ -1330,6 +1330,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
         QString query_str =
             "SELECT O.*, "
             "P.PortfolioType, "
+            "P.MaxLoss, "
             "P.Leg1TokenNo, "
             "P.Leg2TokenNo, "
             "P.Leg3TokenNo, "
@@ -1368,8 +1369,10 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 QString Algo_ID = ""; // same as PortfolioNumber
                 QString Buy_Sell = "";
 
-                QString traderData =  query.value(rec.indexOf("Trader_Data")).toString();
                 int Algo_ID_Int = query.value(rec.indexOf("PortfolioNumber")).toInt();
+
+                QString traderData =  query.value(rec.indexOf("Trader_Data")).toString();
+                double maxLossThr = query.value(rec.indexOf("MaxLoss")).toDouble();
 
                 QString TradeTable_highlight = "1";
                 if (ExecutedTableHilightExcludeList.contains(traderData)) {
@@ -1413,7 +1416,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
 //                if(skipRecord==true)
 //                  continue;
 
-                QString Volant_No = query.value(rec.indexOf("Trader_Data")).toString();
+                QString Trader_Data = query.value(rec.indexOf("Trader_Data")).toString();
                 int leg1_token_number = query.value(rec.indexOf("Leg1TokenNo")).toInt();
                 int leg2_token_number = query.value(rec.indexOf("Leg2TokenNo")).toInt();
                 int leg3_token_number = query.value(rec.indexOf("Leg3TokenNo")).toInt();
@@ -1786,11 +1789,11 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 QString Jackpot = QString::number(JackpotVal,'f',decimal_precision);
 
                 if(traded){
-                    maxLossThr = maxLossThr/100.0;
-                    if(Exch_Price_val<userPriceVal*maxLossThr){
-                        if(!algosToDisable.contains(Algo_ID))
-                            algosToDisable.append(Algo_ID);
-
+                    //maxLossThr = maxLossThr/100.0;
+                   // if(Exch_Price_val<userPriceVal*maxLossThr){
+                    if(Exch_Price_val<maxLossThr){
+                        if(!algosToDisable.contains(Algo_ID+":"+Trader_Data))
+                            algosToDisable.append(Algo_ID+":"+Trader_Data);
                     }
                 }
 

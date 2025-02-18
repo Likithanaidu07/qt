@@ -11,8 +11,8 @@ class cache_file_io : public QObject
 public:
     explicit cache_file_io(QObject *parent = nullptr);
 
-    QStringList readFile_ExludedAlgos_ExchangePriceLimit();
-    void writeFile_ExludedAlgos_ExchangePriceLimit(const QStringList &list);
+    QStringList readTradedDataList_DisabledOn_MaxLoss_Thr_Reach();
+    void over_writeTradedDataList_DisabledOn_MaxLoss_Thr_Reach(const QStringList &list);
 
 signals:
 

@@ -1645,7 +1645,7 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
                      });
     //Read
     CacheFileIO = new cache_file_io();
-    algosToDisableOnExchangePriceLimitExludedList = CacheFileIO->readFile_ExludedAlgos_ExchangePriceLimit(); // this list contain algos whcih will excluded while autmatic disable on  ExchangePriceLimit reach
+    tradedDataListDisabledOnMaxLoss_Thr_Reach = CacheFileIO->readTradedDataList_DisabledOn_MaxLoss_Thr_Reach(); // this list contain algos whcih will excluded while autmatic disable on  ExchangePriceLimit reach
 }
 
 
@@ -2265,7 +2265,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                         double oldDepth = editedCellData[_Depth].prevVal.toDouble(); // Retrieve old value
 
                         if (depth > 5) {
-                       oq_btq_stq_msg.append("Depth  cannot be greater than 5 ");
+                       oq_btq_stq_msg.append("Depth  cannot be greater than 5");
                         depth = oldDepth; // Restore old value
 
                         }
@@ -2619,37 +2619,43 @@ void MainWindow::loadDataAndUpdateTable(int table){
         //QHash<QString, PortFolioData_Less> PortFolioHash = T_Portfolio_Model->getPortFolioDataLess();
        QStringList ExecutedTableHilightExcludeList = trade_model->getExecutedTableHighlight_ExcludeList();
 
-        QStringList algoToDisable;
        // algosToDisableOnExchangePriceLimit.clear();
-        double maxLostPerc = 20;
-        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,algosToDisableOnExchangePriceLimit,ExecutedTableHilightExcludeList,maxLostPerc);
+       QStringList algosToDisableOnExchangePriceLimit; //will contin list of "algoNo:TraderData" to disable
+        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,algosToDisableOnExchangePriceLimit,ExecutedTableHilightExcludeList);
         emit data_loded_signal(T_Table::TRADE);
         updateSummaryLabels();
 
 
-#ifdef DISABLE_ALGO_ON_EXCHANGE_PRICE_LIMIT
+//#ifdef DISABLE_ALGO_ON_EXCHANGE_PRICE_LIMIT
         //check algosToDisableOnExchangePriceLimit included in algosExludeListFromExchangePriceDisable, if so remove
-        for (auto it = algosToDisableOnExchangePriceLimit.begin(); it != algosToDisableOnExchangePriceLimit.end(); ) {
+       // algosToDisableOnExchangePriceLimit will contin list of "algoNo:TraderData"
+        /*for (auto it = algosToDisableOnExchangePriceLimit.begin(); it != algosToDisableOnExchangePriceLimit.end(); ) {
             if (algosToDisableOnExchangePriceLimitExludedList.contains(*it)) {
                 it = algosToDisableOnExchangePriceLimit.erase(it);  // Remove element and update iterator
             }
             else {
                 ++it;  // Move to the next element
             }
-        }
+        }*/
 
         QStringList portfoliosToDisable;
         // Remove items from algosToDisable that are not in enabledPortfolios( this check is for, no need to disable already disabled one)
         QStringList enabledPortfolios = T_Portfolio_Model->getActivatedPortfolios();
-        for (const QString &algo : algosToDisableOnExchangePriceLimit) {
-            if (enabledPortfolios.contains(algo)) {
-                portfoliosToDisable.append(algo);
+        QStringList traderDataList;
+        for (const QString &arry : algosToDisableOnExchangePriceLimit) {
+            QStringList list =  arry.split(":");
+            QString algo = list.at(0);
+            QString traderData = list.at(1);
+            if(!tradedDataListDisabledOnMaxLoss_Thr_Reach.contains(traderData)){ // check it's already on disabled  previously
+                traderDataList.append(traderData);
+                if (enabledPortfolios.contains(algo)) {
+                    if(!portfoliosToDisable.contains(algo))
+                        portfoliosToDisable.append(algo);
+                }
             }
         }
 
         if(portfoliosToDisable.length()>0){
-
-
           // Create a comma-separated string from the QStringList
           QString portfolioNumberStr = portfoliosToDisable.join(", ");
 
@@ -2659,15 +2665,26 @@ void MainWindow::loadDataAndUpdateTable(int table){
           bool success = db_conn->updateDB_Table(Query, msg);
           if(success){
               triggerImmediate_refreshTables();
-              qDebug()<<QString("Exchange Price is greater than 20%, disabled the follwing portfolios: (%1)").arg(portfolioNumberStr);
+              // Send deactivation command to backend
+              quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+              const unsigned char dataBytes[] = { 0x00 };
+              QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 1);
+              QByteArray msg = backend_comm->createPacket(command, data);
+              backend_comm->insertData(msg);
+              db_conn->logToDB(QString("Disabled portfolios [" + portfolioNumberStr + "] on maxLossThr"));
+              qDebug()<<QString("Disabled portfolios [" + portfolioNumberStr + "] on maxLossThr");
+              QStringList combinedList = tradedDataListDisabledOnMaxLoss_Thr_Reach + traderDataList; // Concatenate using + operator
+              CacheFileIO->over_writeTradedDataList_DisabledOn_MaxLoss_Thr_Reach(combinedList);
           }
           else{
               QMetaObject::invokeMethod(this, "showError", Qt::QueuedConnection,
                                         Q_ARG(QString, "Disable failed for portfolios (%1), Exchange Price greater than 20% check Error: " + msg));
               qDebug()<<QString("Disable failed for portfolios (%1), Exchange Price  greater than 20% check. Error: "+msg).arg(portfolioNumberStr);
           }
+
+
         }
-        #endif
+//        #endif
 
         break;
     }
@@ -2986,13 +3003,6 @@ void MainWindow::updatePortFolioStatus(QModelIndex index) {
                 QByteArray msg = backend_comm->createPacket(command, data);
                 backend_comm->insertData(msg);
 
-
-
-                //check the PortfolioNumber numebr exist in algosToDisableOnExchangePriceLimit, if exist theren writerto the cache file. So autmatic disable will not happend
-                if(algosToDisableOnExchangePriceLimit.contains(PortfolioNumber)){
-                  algosToDisableOnExchangePriceLimitExludedList.append(PortfolioNumber);
-                  CacheFileIO->writeFile_ExludedAlgos_ExchangePriceLimit(algosToDisableOnExchangePriceLimitExludedList);
-                }
             }
             else{
                 T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::DisabledByUser));

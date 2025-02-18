@@ -165,8 +165,7 @@ private:
  //  ads::CDockManager *DockManagerSidePanel;
 
     cache_file_io *CacheFileIO;
-    QStringList algosToDisableOnExchangePriceLimit; //algo id to disable when ExchangePrice cross 20% of userPrice
-    QStringList algosToDisableOnExchangePriceLimitExludedList; //algo id should exclude from ExchangePrice disable. This will load from tmpe file
+    QStringList tradedDataListDisabledOnMaxLoss_Thr_Reach; //This will contiain the Trader_Data from TradeTableBid if it dsiabled on MaxThr_Limit
 
 
 
