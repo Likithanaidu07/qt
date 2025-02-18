@@ -1861,6 +1861,10 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                             algosToDisable.append(Algo_ID+":"+Trader_Data);
                     }
                 }
+                if(disableThisAlgo){
+                    if(!algosToDisable.contains(Algo_ID+":"+Trader_Data))
+                        algosToDisable.append(Algo_ID+":"+Trader_Data);
+                }
 
 
                 //
