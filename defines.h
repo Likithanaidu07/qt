@@ -171,7 +171,8 @@ enum Liners_Idx{
 };
 
 enum Missed_Trades_Idx{
-    OrderId=0,
+    Missed_Trade_Id=0,
+    OrderId,
     BuySell,
     Type,
     Lot,
@@ -181,8 +182,10 @@ enum Missed_Trades_Idx{
     Price,
     DateTime,
     Retry_Order_Bt, // if it is 1 alreadye retried.
+    Traded_Price,
+    Traded_Lot,
     Token_No,
-    Missed_Trade_Id,
+
 };
 
 enum Open_Position_Idx{

@@ -1280,7 +1280,9 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
     return tradeData;
 
 }
-void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_table, Order_F1_F2_Model *f1f2_order_table_model,Liners_Model *liners_model ,QString user_id, QHash<QString, PortFolioData_Less> PortFolioTypeHash,QStringList &algosToDisable,QStringList ExecutedTableHilightExcludeList)
+void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_table,
+                                   Order_F1_F2_Model *f1f2_order_table_model,Liners_Model *liners_model ,QString user_id,
+                                   QHash<QString, PortFolioData_Less> PortFolioTypeHash,QStringList &algosToDisable,QStringList ExecutedTableHilightExcludeList,double maxLossThr)
 {
     QMutexLocker lock(&mutex);
 
@@ -1659,9 +1661,12 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
 
                 QString Exch_Price = "0";
                 double Exch_Price_val  = 0;
+                bool disableThisAlgo = false;
+                bool traded = false;
 
                 switch (portfolio_type) {
                 case PortfolioType::F2F:{
+
                     if(Leg1BuySellIndicator==1){
                         Exch_Price_val = static_cast<double>((leg2Price - leg1Price) * 1.0) / devicer;
                     }
@@ -1780,12 +1785,20 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 double JackpotVal =(Exch_Price_val-userPriceVal);
                 QString Jackpot = QString::number(JackpotVal,'f',decimal_precision);
 
-                if(Exch_Price_val<userPriceVal*0.2){
-                    if(!algosToDisable.contains(Algo_ID))
-                        algosToDisable.append(Algo_ID);
-                    algosToDisable.append(Algo_ID);
+                if(traded){
+                    maxLossThr = maxLossThr/100.0;
+                    if(Exch_Price_val<userPriceVal*maxLossThr){
+                        if(!algosToDisable.contains(Algo_ID))
+                            algosToDisable.append(Algo_ID);
 
+                    }
                 }
+
+
+                //
+
+
+
  //               QString BidLeg = ContractDetail::getInstance().GetStockName(leg2_token_number,portfolio_type)+ " "+"["+(QString::number(Leg2_Total_Volume/lotSize))+"]";
                 //int lotSize =  ContractDetail::getInstance().GetLotSize(leg1_token_number,portfolio_type);
 
@@ -2409,13 +2422,42 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
     if(ok)
     {
        // QString query_str = "SELECT * FROM MissedTrades WHERE TraderID='"+user_id+"'";
-        QString query_str = "SELECT m.*, "
-                            "CASE WHEN p.AdditionalData1 IS NOT NULL AND p.AdditionalData2 IS NOT NULL THEN 1 ELSE 0 END AS retried "
-                            "FROM MissedTrades m "
-                            "LEFT JOIN Portfolios p ON m.localOrderID = p.AdditionalData1 "
-                            "AND m.Id = p.AdditionalData2 "
-                            "AND p.TraderID = '" + user_id + "' "
-                            "WHERE m.TraderID = '" + user_id + "'";
+//        QString query_str = "SELECT m.*, "
+//                            "CASE WHEN p.AdditionalData1 IS NOT NULL AND p.AdditionalData2 IS NOT NULL THEN 1 ELSE 0 END AS retried "
+//                            "FROM MissedTrades m "
+//                            "LEFT JOIN Portfolios p ON m.localOrderID = p.AdditionalData1 "
+//                            "AND m.Id = p.AdditionalData2 "
+//                            "AND p.TraderID = '" + user_id + "' "
+//                            "WHERE m.TraderID = '" + user_id + "'";
+
+
+        QString query_str = QString(R"(
+                    SELECT m.*,
+                           CASE
+                               WHEN p.AdditionalData1 IS NOT NULL AND p.AdditionalData2 IS NOT NULL
+                               THEN 1
+                               ELSE 0
+                           END AS retried,
+                           CASE
+                               WHEN p.AdditionalData1 IS NOT NULL AND p.AdditionalData2 IS NOT NULL
+                               THEN p.PortfolioNumber
+                               ELSE 0
+                           END AS retry_PortfolioNumber,
+                           otb.Leg1_Price AS retry_Leg1_Price,
+                           otb.Leg1_Total_Volume AS retry_Leg1_Total_Volume,
+                           otb.Leg1_OrderState AS retry_Leg1_OrderState,
+                           otb.Leg1_Tok_No AS retry_Leg1_Tok_No
+                    FROM MissedTrades m
+                    LEFT JOIN Portfolios p
+                        ON m.localOrderID = p.AdditionalData1
+                        AND m.Id = p.AdditionalData2
+                        AND p.TraderID = '%1'
+                    LEFT JOIN Order_Table_Bid otb
+                        ON (p.PortfolioNumber = otb.PortfolioNumber OR p.PortfolioNumber + 1500000 = otb.PortfolioNumber)
+                        AND p.PortfolioNumber > 0
+                    WHERE m.TraderID = '%1';
+                )").arg(user_id);
+
 
         QSqlQuery query(query_str,db);
         if( !query.exec() )
@@ -2455,7 +2497,9 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                 QString Id = query.value(rec.indexOf("Id")).toString();
                 double Price = query.value(rec.indexOf("Price")).toDouble();
 
-                QString retried = query.value(rec.indexOf("retried")).toString();
+
+
+
 
                 Price = Price/devicer;
 
@@ -2463,7 +2507,36 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                 QString QuantityStr = QString::number(Quantity/lotsize);
                 QString PortfolioStr = QString::number(Portfolio);
 
+                QString retry_price = "-";
+                QString retry_lot = "-";
+
+                QString retried = query.value(rec.indexOf("retried")).toString();
+
+               // int retry_Portfolio_number = query.value(rec.indexOf("retry_PortfolioNumber")).toInt();
+                int retry_leg1_tkno = query.value(rec.indexOf("retry_Leg1_Tok_No")).toInt();
+
+                if(retry_leg1_tkno>0){
+
+                    int retry_Leg1_orderstate = query.value(rec.indexOf("retry_Leg1_OrderState")).toInt();
+                    if(retry_Leg1_orderstate==7){
+                            int lotsize_retry = ContractDetail::getInstance().GetLotSize(retry_leg1_tkno,0);
+                            double retry_price_val = query.value(rec.indexOf("retry_Leg1_Price")).toDouble();
+                            retry_price_val = retry_price_val/devicer;
+                            double retry_lot_val = query.value(rec.indexOf("retry_Leg1_Total_Volume")).toDouble();
+                            retry_lot_val = retry_lot_val/lotsize_retry;
+                            retry_lot = QString::number(retry_lot_val);
+                            retry_price = QString::number(retry_price_val);
+                            retried = "Traded";
+                    }
+
+                }
+
+
+
+
                 QStringList rowList;
+
+                rowList.append(Id);
                 rowList.append(OrderId);
                 rowList.append(BuySellIndicator);
                 rowList.append(Type);
@@ -2474,8 +2547,10 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                 rowList.append(PriceStr);
                 rowList.append(DateTimeStr);
                 rowList.append(retried);
+                rowList.append(retry_price);
+                rowList.append(retry_lot);
                 rowList.append(QString::number(token_number));
-                rowList.append(Id);
+
                 missed_trade_list.append(rowList);
             }
             model->setDataList(missed_trade_list);

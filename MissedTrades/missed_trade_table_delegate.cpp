@@ -30,7 +30,7 @@ bool missed_trade_table_delegate::editorEvent(QEvent *event, QAbstractItemModel 
         QVariant value = index.data(Qt::DisplayRole);
 
         // Only allow click if value is 0
-        if (value.toInt() == 0 && event->type() == QEvent::MouseButtonPress) {
+        if (value.toString() == "0" && event->type() == QEvent::MouseButtonPress) {
             QMouseEvent *mouseEvent = static_cast<QMouseEvent*>(event);
             if (option.rect.contains(mouseEvent->pos())) {
                 emit retryButtonClicked(index.row());
@@ -150,7 +150,7 @@ void missed_trade_table_delegate::paint(QPainter *painter, const QStyleOptionVie
       else if  (index.column() == Missed_Trades_Idx::Retry_Order_Bt) {
         QVariant value = index.data(Qt::DisplayRole);
 
-        if (value.toInt() == 0) {
+        if (value.toString() == "0") {
             // Draw button-like appearance
             QPushButton button("Retry");
             button.setStyleSheet("background-color: #E0F1FF; border: 1px solid black;");
@@ -159,13 +159,21 @@ void missed_trade_table_delegate::paint(QPainter *painter, const QStyleOptionVie
             QPixmap pixmap(option.rect.size());
             button.render(&pixmap);
             painter->drawPixmap(option.rect.topLeft(), pixmap);
-        } else {
+        }
+        else if(value.toString() == "1"){
             QColor color("#E0F1FF");
             // Draw text instead of button
             painter->fillRect(option.rect, color);
             painter->setPen(Qt::black);
             painter->drawText(option.rect, Qt::AlignCenter, "Retried");
 
+        }
+        else{
+            QColor color("#E0F1FF");
+            // Draw text instead of button
+            painter->fillRect(option.rect, color);
+            painter->setPen(Qt::black);
+            painter->drawText(option.rect, Qt::AlignCenter, value.toString());
         }
 
 

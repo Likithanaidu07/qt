@@ -2619,9 +2619,10 @@ void MainWindow::loadDataAndUpdateTable(int table){
         //QHash<QString, PortFolioData_Less> PortFolioHash = T_Portfolio_Model->getPortFolioDataLess();
        QStringList ExecutedTableHilightExcludeList = trade_model->getExecutedTableHighlight_ExcludeList();
 
-
+        QStringList algoToDisable;
        // algosToDisableOnExchangePriceLimit.clear();
-        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,algosToDisableOnExchangePriceLimit,ExecutedTableHilightExcludeList);
+        double maxLostPerc = 20;
+        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,algosToDisableOnExchangePriceLimit,ExecutedTableHilightExcludeList,maxLostPerc);
         emit data_loded_signal(T_Table::TRADE);
         updateSummaryLabels();
 

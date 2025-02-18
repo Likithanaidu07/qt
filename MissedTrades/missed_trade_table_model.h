@@ -26,7 +26,8 @@ public:
 
 private:
     int col_count;
-    QStringList header={  "Order Id",
+    QStringList header={  "SNo",
+                          "Order Id",
                           "B/S",
                           "Type",
                           "Lot",
@@ -35,7 +36,9 @@ private:
                           "Message",
                           "Price",
                           "Time",
-                          "Place Order"};
+                          "Place Order",
+                          "Traded Price",
+                          "Traded Lot"};
 
 
 signals:

@@ -348,8 +348,8 @@ void Trade_Table_Model::selectionChangedSlot(const QModelIndex &index) {
     if (currentIdx != -1) {
         if (trade_data_list[currentIdx][TradeTable_Hihglight_OB] == "1") {
             trade_data_list[currentIdx][TradeTable_Hihglight_OB] = "0";
-            if (!ExecutedTableHighlight_ExcludeList.contains(trade_data_list[currentIdx][TradeTable_Hihglight_OB])) {
-                ExecutedTableHighlight_ExcludeList.append(trade_data_list[currentIdx][TradeTable_Hihglight_OB]);
+            if (!ExecutedTableHighlight_ExcludeList.contains(trade_data_list[currentIdx][TraderData_OB])) {
+                ExecutedTableHighlight_ExcludeList.append(trade_data_list[currentIdx][TraderData_OB]);
                 QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
                 QSettings settings(appDataPath + "/ExecutedTableHighlight_ExcludeList.dat", QSettings::IniFormat);
                 settings.setValue("ExecutedTableHighlight_ExcludeList", ExecutedTableHighlight_ExcludeList);
