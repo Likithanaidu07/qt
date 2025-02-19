@@ -164,9 +164,9 @@ private:
     ads::CDockManager* DockManagerMainPanel;
  //  ads::CDockManager *DockManagerSidePanel;
 
-    cache_file_io *CacheFileIO;
-    QStringList tradedDataListDisabledOnMaxLoss_Thr_Reach; //This will contiain the Trader_Data from TradeTableBid if it dsiabled on MaxThr_Limit
-
+ //   cache_file_io *CacheFileIO;
+  //  QStringList tradedDataListDisabledOnMaxLoss_Thr_Reach; //This will contiain the Trader_Data from TradeTableBid if it dsiabled on MaxThr_Limit
+    int traderData_ID_OnAppStart; // This will be used to disable alogo on  MaxThr_Limit, all the traderData greater than this will be considered, and this will be load when app start.
 
 
     void createINIFileIfNotExist();
