@@ -1644,8 +1644,8 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
 
                      });
     //Read
-    CacheFileIO = new cache_file_io();
-    tradedDataListDisabledOnMaxLoss_Thr_Reach = CacheFileIO->readTradedDataList_DisabledOn_MaxLoss_Thr_Reach(); // this list contain algos whcih will excluded while autmatic disable on  ExchangePriceLimit reach
+    //CacheFileIO = new cache_file_io();
+    //tradedDataListDisabledOnMaxLoss_Thr_Reach = CacheFileIO->readTradedDataList_DisabledOn_MaxLoss_Thr_Reach(); // this list contain algos whcih will excluded while autmatic disable on  ExchangePriceLimit reach
 }
 
 
@@ -2614,14 +2614,29 @@ void MainWindow::loadDataAndUpdateTable(int table){
         updateSummaryLabels();
         break;
 
+
+    case T_Table::NET_POS:{
+        //QHash<QString,int> PortFoliosLotSizeHash = T_Portfolio_Model->getPortFoliosLotSize();
+        db_conn->getNetPosTableData(BuyValue_summary,SellValue,Profit,BuyQty_summary,SellQty_summary,NetQty,net_pos_model,OpenPositionmodel,QString::number(userData.UserId));
+        emit data_loded_signal(T_Table::NET_POS);
+        updateSummaryLabels();
+        break;
+    }
+
+    case T_Table::MISSED_TRADE:{
+        db_conn->getMissedTradeData(missed_trade_model,QString::number(userData.UserId));
+        emit data_loded_signal(T_Table::MISSED_TRADE);
+        break;
+    }
+
     case T_Table::TRADE:{
 //        OutputDebugStringA("Test1 \n");
         //QHash<QString, PortFolioData_Less> PortFolioHash = T_Portfolio_Model->getPortFolioDataLess();
        QStringList ExecutedTableHilightExcludeList = trade_model->getExecutedTableHighlight_ExcludeList();
 
        // algosToDisableOnExchangePriceLimit.clear();
-       QStringList algosToDisableOnExchangePriceLimit; //will contin list of "algoNo:TraderData" to disable
-        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,algosToDisableOnExchangePriceLimit,ExecutedTableHilightExcludeList);
+       QStringList algosToDisableOnMaxLossLimit; //will contin list of "algoNo:TraderData" to disable
+        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,algosToDisableOnMaxLossLimit,ExecutedTableHilightExcludeList,traderData_ID_OnAppStart);
         emit data_loded_signal(T_Table::TRADE);
         updateSummaryLabels();
 
@@ -2641,18 +2656,18 @@ void MainWindow::loadDataAndUpdateTable(int table){
         QStringList portfoliosToDisable;
         // Remove items from algosToDisable that are not in enabledPortfolios( this check is for, no need to disable already disabled one)
         QStringList enabledPortfolios = T_Portfolio_Model->getActivatedPortfolios();
-        QStringList traderDataList;
-        for (const QString &arry : algosToDisableOnExchangePriceLimit) {
-            QStringList list =  arry.split(":");
-            QString algo = list.at(0);
-            QString traderData = list.at(1);
-            if(!tradedDataListDisabledOnMaxLoss_Thr_Reach.contains(traderData)){ // check it's already on disabled  previously
-                traderDataList.append(traderData);
-                if (enabledPortfolios.contains(algo)) {
-                    if(!portfoliosToDisable.contains(algo))
-                        portfoliosToDisable.append(algo);
-                }
+       // QStringList traderDataList;
+        for (const QString &algo : algosToDisableOnMaxLossLimit) {
+            //QStringList list =  arry.split(":");
+           //QString algo = list.at(0);
+           // QString traderData = list.at(1);
+           // if(!tradedDataListDisabledOnMaxLoss_Thr_Reach.contains(traderData)){ // check it's already on disabled  previously
+           // traderDataList.append(traderData);
+            if (enabledPortfolios.contains(algo)) {
+                if(!portfoliosToDisable.contains(algo))
+                  portfoliosToDisable.append(algo);
             }
+            //}
         }
 
         if(portfoliosToDisable.length()>0){
@@ -2664,7 +2679,6 @@ void MainWindow::loadDataAndUpdateTable(int table){
           QString msg;
           bool success = db_conn->updateDB_Table(Query, msg);
           if(success){
-              triggerImmediate_refreshTables();
               // Send deactivation command to backend
               quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
               const unsigned char dataBytes[] = { 0x00 };
@@ -2673,8 +2687,13 @@ void MainWindow::loadDataAndUpdateTable(int table){
               backend_comm->insertData(msg);
               db_conn->logToDB(QString("Disabled portfolios [" + portfolioNumberStr + "] on maxLossThr"));
               qDebug()<<QString("Disabled portfolios [" + portfolioNumberStr + "] on maxLossThr");
-              QStringList combinedList = tradedDataListDisabledOnMaxLoss_Thr_Reach + traderDataList; // Concatenate using + operator
-              CacheFileIO->over_writeTradedDataList_DisabledOn_MaxLoss_Thr_Reach(combinedList);
+              //QStringList combinedList = tradedDataListDisabledOnMaxLoss_Thr_Reach + traderDataList; // Concatenate using + operator
+              //CacheFileIO->over_writeTradedDataList_DisabledOn_MaxLoss_Thr_Reach(combinedList);
+              //tradedDataListDisabledOnMaxLoss_Thr_Reach.clear();
+              //tradedDataListDisabledOnMaxLoss_Thr_Reach = combinedList;
+              //triggerImmediate_refreshTables();
+              QTimer::singleShot(2000, this, &MainWindow::triggerImmediate_refreshTables);
+
           }
           else{
               QMetaObject::invokeMethod(this, "showError", Qt::QueuedConnection,
@@ -2684,6 +2703,8 @@ void MainWindow::loadDataAndUpdateTable(int table){
 
 
         }
+
+        /***************************************************************************************/
 //        #endif
 
         break;
@@ -2696,19 +2717,6 @@ void MainWindow::loadDataAndUpdateTable(int table){
          break;
     }*/
 
-    case T_Table::NET_POS:{
-        //QHash<QString,int> PortFoliosLotSizeHash = T_Portfolio_Model->getPortFoliosLotSize();
-        db_conn->getNetPosTableData(BuyValue_summary,SellValue,Profit,BuyQty_summary,SellQty_summary,NetQty,net_pos_model,OpenPositionmodel,QString::number(userData.UserId));
-        emit data_loded_signal(T_Table::NET_POS);
-        updateSummaryLabels();
-        break;
-    }
-
-    case T_Table::MISSED_TRADE:{
-        db_conn->getMissedTradeData(missed_trade_model,QString::number(userData.UserId));
-        emit data_loded_signal(T_Table::MISSED_TRADE);
-        break;
-    }
 
 
 
@@ -3087,6 +3095,8 @@ void MainWindow::loggedInSucessful(userInfo userData)
                   (height() - loadingDataWinodw->height()) / 2 + pos().y());
 
     loadingDataWinodw->show();
+
+    traderData_ID_OnAppStart  = db_conn->getLastestTradetData_ID_FromTradeTable(QString::number(userData.UserId));
 
     //loading data
     loadCurrentDayLogs();

@@ -1282,7 +1282,7 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
 }
 void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_table,
                                    Order_F1_F2_Model *f1f2_order_table_model,Liners_Model *liners_model ,QString user_id,
-                                   QHash<QString, PortFolioData_Less> PortFolioTypeHash,QStringList &algosToDisable,QStringList ExecutedTableHilightExcludeList)
+                                   QHash<QString, PortFolioData_Less> PortFolioTypeHash,QStringList &algosToDisable,QStringList ExecutedTableHilightExcludeList,int &traderData_ID_OnAppStart)
 {
     QMutexLocker lock(&mutex);
 
@@ -1853,17 +1853,23 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 double JackpotVal =(Exch_Price_val-userPriceVal);
                 QString Jackpot = QString::number(JackpotVal,'f',decimal_precision);
 
-                if(traded){
-                    //maxLossThr = maxLossThr/100.0;
-                   // if(Exch_Price_val<userPriceVal*maxLossThr){
-                    if(Exch_Price_val<maxLossThr){
-                        if(!algosToDisable.contains(Algo_ID+":"+Trader_Data))
-                            algosToDisable.append(Algo_ID+":"+Trader_Data);
+                //disable only for the lastest trade,
+                if(traderData.toInt()> traderData_ID_OnAppStart){
+                    if(traded){
+                        traderData_ID_OnAppStart = traderData.toInt();
+                        //maxLossThr = maxLossThr/100.0;
+                       // if(Exch_Price_val<userPriceVal*maxLossThr){
+                        maxLossThr = maxLossThr/devicer;
+                        if (JackpotVal < 0 && JackpotVal <= -maxLossThr){
+                           if(!algosToDisable.contains(Algo_ID))
+                                algosToDisable.append(Algo_ID);
+                        }
                     }
-                }
-                if(disableThisAlgo){
-                    if(!algosToDisable.contains(Algo_ID+":"+Trader_Data))
-                        algosToDisable.append(Algo_ID+":"+Trader_Data);
+                    if(disableThisAlgo){
+                        traderData_ID_OnAppStart = traderData.toInt();
+                        if(!algosToDisable.contains(Algo_ID))
+                            algosToDisable.append(Algo_ID);
+                    }
                 }
 
 
@@ -3802,3 +3808,33 @@ algo_data_insert_status mysql_conn::retry_F1F2_Order( QString  OrderId, QString 
     }
     return ret;
 }
+
+
+int mysql_conn::getLastestTradetData_ID_FromTradeTable(QString user_id)
+{
+    QMutexLocker lock(&mutex);
+    int traderDataID = -1;
+    QString msg;
+
+    if (checkDBOpened(msg))
+    {
+        QSqlQuery query(db);
+        query.prepare("SELECT Trader_Data FROM Order_Table_Bid WHERE Trader_ID = ? ORDER BY Trader_Data DESC LIMIT 1;");
+        query.addBindValue(user_id);
+
+        if (!query.exec())
+        {
+            qDebug() << "Query Error:" << query.lastError().text();
+        }
+        else if (query.next())  // Only one row is expected
+        {
+            traderDataID = query.value(0).toInt(); // Use column index directly
+        }
+    }
+    else{
+        qDebug() << "Connection error:" << msg;
+    }
+
+    return traderDataID;
+}
+
