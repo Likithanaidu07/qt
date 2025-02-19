@@ -1860,9 +1860,13 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                         //maxLossThr = maxLossThr/100.0;
                        // if(Exch_Price_val<userPriceVal*maxLossThr){
                         maxLossThr = maxLossThr/devicer;
-                        if (JackpotVal < 0 && JackpotVal <= -maxLossThr){
+
+                        double range = userPriceVal - maxLossThr;
+                        if (Exch_Price_val<=range){
                            if(!algosToDisable.contains(Algo_ID))
                                 algosToDisable.append(Algo_ID);
+
+                           qDebug()<<"Disablig porfolio:  userPriceVal="<<userPriceVal<<" maxLossThr="<<maxLossThr<<"  range="<<range<<" Exch_Price_val="<<Exch_Price_val;
                         }
                     }
                     if(disableThisAlgo){
