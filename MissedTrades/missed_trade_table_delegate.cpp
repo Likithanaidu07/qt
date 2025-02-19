@@ -168,6 +168,17 @@ void missed_trade_table_delegate::paint(QPainter *painter, const QStyleOptionVie
             painter->drawText(option.rect, Qt::AlignCenter, "Retried");
 
         }
+        else if (value.toString() == "Traded") {
+            QColor color("#106B9A");  // Dark blue background
+            painter->fillRect(option.rect, color);
+
+            QFont font = painter->font();
+            font.setBold(true);  // Make text bold
+            painter->setFont(font);
+
+            painter->setPen(Qt::white);  // White text color
+            painter->drawText(option.rect, Qt::AlignCenter, "Traded");
+        }
         else{
             QColor color("#E0F1FF");
             // Draw text instead of button
