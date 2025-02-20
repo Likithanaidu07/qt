@@ -1853,6 +1853,8 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 double JackpotVal =(Exch_Price_val-userPriceVal);
                 QString Jackpot = QString::number(JackpotVal,'f',decimal_precision);
 
+                qDebug()<<"traderData_ID_OnAppStart: " <<traderData_ID_OnAppStart<<"  traderData: "<<traderData<<"  userPriceVal="<<userPriceVal<<" maxLossThr="<<maxLossThr<<" Exch_Price_val="<<Exch_Price_val;
+
                 //disable only for the lastest trade,
                 if(traderData.toInt()> traderData_ID_OnAppStart){
                     if(traded){
@@ -1866,7 +1868,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                            if(!algosToDisable.contains(Algo_ID))
                                 algosToDisable.append(Algo_ID);
 
-                           qDebug()<<"Disablig porfolio:  userPriceVal="<<userPriceVal<<" maxLossThr="<<maxLossThr<<"  range="<<range<<" Exch_Price_val="<<Exch_Price_val;
+                           qDebug()<<"Disablig porfolio: "<<Algo_ID<<"  userPriceVal="<<userPriceVal<<" maxLossThr="<<maxLossThr<<"  range="<<range<<" Exch_Price_val="<<Exch_Price_val;
                         }
                     }
                     if(disableThisAlgo){
