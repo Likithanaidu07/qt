@@ -169,16 +169,47 @@ void missed_trade_table_delegate::paint(QPainter *painter, const QStyleOptionVie
 
         }
         else if (value.toString() == "Traded") {
-            QColor color("#106B9A");  // Dark blue background
-            painter->fillRect(option.rect, color);
+            QColor backgroundColor("#E0F1FF");  // Light blue background
+            painter->fillRect(option.rect, backgroundColor);
 
             QFont font = painter->font();
             font.setBold(true);  // Make text bold
             painter->setFont(font);
 
-            painter->setPen(Qt::white);  // White text color
+            painter->setPen(QColor(0, 128, 0));  // Text color
             painter->drawText(option.rect, Qt::AlignCenter, "Traded");
         }
+        else if (value.toString() == "Rejected") {
+            QColor backgroundColor("#E0F1FF");  // Light blue background
+            painter->fillRect(option.rect, backgroundColor);
+
+            QFont font = painter->font();
+            font.setBold(true);  // Make text bold
+            painter->setFont(font);
+            painter->setPen(QColor(203, 5, 5));  // Red text
+            painter->drawText(option.rect, Qt::AlignCenter, "Rejected");
+        }
+        else if (value.toString() == "Partial Trade") {
+            QColor backgroundColor("#E0F1FF");  // Light blue background
+            painter->fillRect(option.rect, backgroundColor);
+
+            QFont font = painter->font();
+            font.setBold(true);  // Make text bold
+            painter->setFont(font);
+            painter->setPen(QColor("#0D587D"));  // Green text
+            painter->drawText(option.rect, Qt::AlignCenter, "Partial Trade");
+        }
+        else if (value.toString() == "Cancelled") {
+            QColor backgroundColor("#E0F1FF");  // Light blue background
+            painter->fillRect(option.rect, backgroundColor);
+
+            QFont font = painter->font();
+            font.setBold(true);  // Make text bold
+            painter->setFont(font);
+            painter->setPen(QColor(203, 5, 5));  // Red text
+            painter->drawText(option.rect, Qt::AlignCenter, "Cancelled");
+        }
+
         else{
             QColor color("#E0F1FF");
             // Draw text instead of button

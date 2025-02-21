@@ -1327,7 +1327,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
 //                        "     O.Leg4_OrderState IN (7, 8)) "
 //                        "ORDER BY O.Trader_Data DESC";
 
-        QString query_str =
+        /*QString query_str =
             "SELECT O.*, "
             "P.PortfolioType, "
             "P.MaxLoss, "
@@ -1348,8 +1348,37 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
             "     O.Leg2_OrderState IN (7, 8) OR "
             "     O.Leg3_OrderState IN (7, 8) OR "
             "     O.Leg4_OrderState IN (7, 8)) "
-            "ORDER BY O.Trader_Data DESC;" ;
+            "ORDER BY O.Trader_Data DESC;" ;*/
 
+        QString query_str =
+            "SELECT O.*, "
+            "       P.PortfolioType, "
+            "       P.MaxLoss, "
+            "       P.Leg1TokenNo, "
+            "       P.Leg2TokenNo, "
+            "       P.Leg3TokenNo, "
+            "       P.Leg4TokenNo, "
+            "       P.Leg5TokenNo, "
+            "       P.Leg6TokenNo "
+            "FROM Order_Table_Bid O "
+            "INNER JOIN Portfolios P "
+            "ON CASE "
+            "    WHEN O.PortfolioNumber > 1500000 THEN O.PortfolioNumber - 1500000 "
+            "    ELSE O.PortfolioNumber "
+            "END = P.PortfolioNumber "
+            "WHERE O.Trader_ID = '" + user_id + "' "
+            "AND ("
+            "    (P.PortfolioType IN (208, 207) AND O.Leg1_OrderState IN (5, 6, 7, 8, 13)) "
+            "    OR "
+            "    (P.PortfolioType NOT IN (208, 207) AND O.Leg1_OrderState IN (7, 8)) "
+            "    OR "
+            "    O.Leg2_OrderState IN (7, 8) "
+            "    OR "
+            "    O.Leg3_OrderState IN (7, 8) "
+            "    OR "
+            "    O.Leg4_OrderState IN (7, 8)"
+            ") "
+            "ORDER BY O.Trader_Data DESC;";
 
 
 
@@ -1669,7 +1698,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
 
                 switch (portfolio_type) {
                 case PortfolioType::F2F:{
-                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) ||
                         (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13)) {
                         disableThisAlgo = true;
                     }
@@ -1685,8 +1714,8 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     break;
                 }
                 case PortfolioType::BY:{
-                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
-                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) &&
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) ||
+                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) ||
                         (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13)) {
                         disableThisAlgo = true;
                     }
@@ -1703,8 +1732,8 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     break;
                 }
                 case PortfolioType::CR:{
-                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
-                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) &&
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) ||
+                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) ||
                         (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13)) {
                         disableThisAlgo = true;
                     }
@@ -1726,8 +1755,8 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     break;
                 }
                 case PortfolioType::CR_JELLY:{
-                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
-                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) &&
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) ||
+                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) ||
                         (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13)) {
                         disableThisAlgo = true;
                     }
@@ -1749,8 +1778,8 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     break;
                 }
                 case PortfolioType::BFLY_BID:{
-                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
-                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) &&
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) ||
+                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) ||
                         (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13)) {
                         disableThisAlgo = true;
                     }
@@ -1768,9 +1797,9 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     break;
                 }
                 case PortfolioType::BX_BID: {
-                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
-                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) &&
-                        (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13) &&
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) ||
+                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) ||
+                        (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13) ||
                         (Leg4_OrderState == 6 || Leg4_OrderState == 5 || Leg4_OrderState == 13)) {
                         disableThisAlgo = true;
                     }
@@ -1805,9 +1834,9 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 }
 
                 case PortfolioType::BS1221: {
-                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
-                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) &&
-                        (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13) &&
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) ||
+                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) ||
+                        (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13) ||
                         (Leg4_OrderState == 6 || Leg4_OrderState == 5 || Leg4_OrderState == 13)) {
                         disableThisAlgo = true;
                     }
@@ -1824,9 +1853,9 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                     break;
                 }
                 case PortfolioType::BS1331: {
-                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) &&
-                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) &&
-                        (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13) &&
+                    if ((Leg1_OrderState == 6 || Leg1_OrderState == 5 || Leg1_OrderState == 13) ||
+                        (Leg2_OrderState == 6 || Leg2_OrderState == 5 || Leg2_OrderState == 13) ||
+                        (Leg3_OrderState == 6 || Leg3_OrderState == 5 || Leg3_OrderState == 13) ||
                         (Leg4_OrderState == 6 || Leg4_OrderState == 5 || Leg4_OrderState == 13)) {
                         disableThisAlgo = true;
                     }
@@ -2611,6 +2640,22 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                             retry_lot = QString::number(retry_lot_val);
                             retry_price = QString::number(retry_price_val);
                             retried = "Traded";
+                    }
+                    else if(retry_Leg1_orderstate==6){
+                            retried = "Rejected";
+                    }
+                    else if(retry_Leg1_orderstate==8){
+                            int lotsize_retry = ContractDetail::getInstance().GetLotSize(retry_leg1_tkno,0);
+                            double retry_price_val = query.value(rec.indexOf("retry_Leg1_Price")).toDouble();
+                            retry_price_val = retry_price_val/devicer;
+                            double retry_lot_val = query.value(rec.indexOf("retry_Leg1_Total_Volume")).toDouble();
+                            retry_lot_val = retry_lot_val/lotsize_retry;
+                            retry_lot = QString::number(retry_lot_val);
+                            retry_price = QString::number(retry_price_val);
+                            retried = "Partial Trade";
+                    }
+                    else if(retry_Leg1_orderstate==5||retry_Leg1_orderstate==13){
+                            retried = "Cancelled";
                     }
 
                 }

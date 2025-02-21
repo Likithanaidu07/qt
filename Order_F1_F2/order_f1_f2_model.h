@@ -34,7 +34,8 @@ private:
                           "Exch Price",
                           "Traded Lot",
 //                          "Remaining Lot",
-                          "Time"};
+                          "Time",
+                          "Status"};
 
 };
 

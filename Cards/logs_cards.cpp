@@ -21,13 +21,14 @@ Logs_cards::~Logs_cards()
 
 void Logs_cards::logDataSignal_Slot(QStringList data)
 {
-
     ui->textEdit->clear();
-    for (int i = 0; i < data.length(); i++) {
-        ui->textEdit->append(data[i]);
+    QString logsContent;
 
-        //htmlLogsContent.prepend(data[i]);
-       // ui->textEdit->setText(htmlLogsContent);
+    for (int i = data.length() - 1; i >= 0; i--) {
+        logsContent.append(data[i] + "\n"); // Collect logs in reverse order
     }
+
+    ui->textEdit->setText(logsContent);
 }
+
 
