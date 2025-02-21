@@ -2477,8 +2477,11 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
                  rowList.append(QString::number(data.Net_Qty / data.lotSize)); // Net Qty
                  double Profit = (data.Buy_Price - data.Sell_Price); // Example profit calculation
                  rowList.append(fixDecimal(Profit, decimal_precision)); // Profit
-                 rowList.append(fixDecimal(data.M2M, decimal_precision)); // M2M
-                 rowList.append(QString::number((data.MarginUsed))); // MarginUsed
+
+                 rowList.append("-");
+                 rowList.append("-");
+                 //rowList.append(fixDecimal(data.M2M, decimal_precision)); // M2M temporarily disabled
+                 //rowList.append(QString::number((data.MarginUsed))); // MarginUsed temporarily disabled
                  rowList.append(QString::number((data.lotSize))); //lotSize
                  rowList.append(tokenNo); // TokenNo as the last element
                  netPos_data_listTmp.append(rowList);

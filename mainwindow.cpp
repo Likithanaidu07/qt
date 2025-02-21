@@ -2167,6 +2167,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
             ///----------------------------------------------------------------------
 
             ///----------------_OrderQuantity  only edited-------------
+
             else if(editedCellData.contains(PortfolioData_Idx::_OrderQuantity)){
 
                 double OQ = editedCellData[_OrderQuantity].newVal.toDouble();
@@ -2636,6 +2637,8 @@ void MainWindow::loadDataAndUpdateTable(int table){
 
        // algosToDisableOnExchangePriceLimit.clear();
        QStringList algosToDisableOnMaxLossLimit; //will contin list of "algoNo:TraderData" to disable
+
+       //QHash(QString, Qstring) algosToDisableOnMaxLossLimit;
         db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,algosToDisableOnMaxLossLimit,ExecutedTableHilightExcludeList,traderData_ID_OnAppStart);
         emit data_loded_signal(T_Table::TRADE);
         updateSummaryLabels();
@@ -2846,6 +2849,7 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 #endif
         ui->label_3->setText("Status :"  "Connection Error");
         ui->label_3->setStyleSheet("color: red;");
+        backendConn_Status = false;
     }
     //ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(255, 32, 36);border-radius:6px;color:#000;");
     else if(msgType == SocketDataType::BACKEND_COMM_SOCKET_CONNECTED){
@@ -2854,8 +2858,20 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 #endif
         ui->label_3->setText("Status :""Connected");
         ui->label_3->setStyleSheet("color: #013220;");
-
+        backendConn_Status = true;
     }
+#ifdef BACKEND_LOG
+
+    else if( msgType == BACKEND_COMM_SEND_SUCCESS){
+        write_backend_Log(msg);
+    }
+    else if( msgType == BACKEND_COMM_SEND_FAILED){
+        write_backend_Log(msg);
+    }
+#endif
+
+
+
     else if(msgType == SocketDataType::BACKEND_COMM_SOCKET_DATA){
         if(msg == "CMD_ID_TRADE_UPDATED_200"){
 #ifdef BACKEND_LOG
@@ -2903,6 +2919,8 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 
             //log here
         }
+
+
     }
 
 
@@ -5248,8 +5266,17 @@ void MainWindow::export_Action(){
         }
 }
 void MainWindow::onRetryButtonClickedMissedTrade(int row){
-    if (!missed_trade_table) {
+       if (!missed_trade_table) {
            return;  // Safety check
+       }
+
+       if(backendConn_Status==false){
+           QMessageBox msgBox;
+           msgBox.setWindowTitle("Failed.");
+           msgBox.setIcon(QMessageBox::Warning);
+           msgBox.setText("Unable to connect the Server");
+           msgBox.exec();
+           return;
        }
 
        // Set the current index to the first column of the clicked row
