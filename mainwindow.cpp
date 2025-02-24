@@ -713,12 +713,12 @@ MainWindow::MainWindow(QWidget *parent)
     T_Portfolio_Table->horizontalHeader()->setSectionResizeMode(PortfolioData_Idx::_Status, QHeaderView::Fixed);
     T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_Status, 60);
     T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_AlgoName, 250);
-    T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_BidLeg, 180);
+   // T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_BidLeg, 180);
 
     int Portfolio_columnCount = T_Portfolio_Table->model()->columnCount();
 
     for (int col = 0; col < Portfolio_columnCount; ++col) {
-        if (col != PortfolioData_Idx::_Status && col != PortfolioData_Idx::_AlgoName && col != PortfolioData_Idx::_BidLeg) {
+        if (col != PortfolioData_Idx::_Status && col != PortfolioData_Idx::_AlgoName /*&& col != PortfolioData_Idx::_BidLeg*/) {
             // Set all other columns to 70 pixels
             T_Portfolio_Table->setColumnWidth(col, 70);
         }

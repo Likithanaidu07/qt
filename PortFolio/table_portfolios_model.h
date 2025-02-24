@@ -56,7 +56,7 @@ private:
                           "SAvg", "SDiff","STQ",
                           "STTQ","SRQ","Odr Qty","Max Loss","Depth","Expiry 1", /*"Expiry 2",*/
                           "Cost" ,"Qty Ratio",
-                          "Bid Leg", "Fut Price"};
+                          /*"Bid Leg",*/ "Fut Price"};
 
 
 

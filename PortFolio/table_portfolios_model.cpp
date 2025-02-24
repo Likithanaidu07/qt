@@ -197,7 +197,7 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
                  c == PortfolioData_Idx::_FuturePrice||
                  c == PortfolioData_Idx::_QuantityRatio ||
              //    c == PortfolioData_Idx::_SkipMarketStrike||
-                 c == PortfolioData_Idx::_BidLeg ||
+               // c == PortfolioData_Idx::_BidLeg ||
                    c == PortfolioData_Idx::_Alias||
                 c == PortfolioData_Idx::_MaxLoss||
                    c==PortfolioData_Idx::_Depth){
@@ -239,9 +239,9 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
         else if(index.column()==PortfolioData_Idx::_FuturePrice){
             return Qt::AlignCenter;
         }
-        else if(index.column()==PortfolioData_Idx::_BidLeg){
-            return Qt::AlignCenter;
-        }
+//        else if(index.column()==PortfolioData_Idx::_BidLeg){
+//            return Qt::AlignCenter;
+//        }
         else if(index.column()==PortfolioData_Idx::_QuantityRatio){
             return Qt::AlignCenter;
 
@@ -360,10 +360,10 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
 //            return portfolio->SkipMarketStrike;
 
 //        }
-        else if (index.column() == PortfolioData_Idx::_BidLeg) {
-            return portfolio->BidLeg;
+//        else if (index.column() == PortfolioData_Idx::_BidLeg) {
+//            return portfolio->BidLeg;
 
-        }
+//        }
         else if (index.column() == PortfolioData_Idx::_FuturePrice) {
             return portfolio->FuturePrice;
 

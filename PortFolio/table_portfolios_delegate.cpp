@@ -709,7 +709,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
              || c==PortfolioData_Idx::_Price
              || c==PortfolioData_Idx::_Depth
              || c==PortfolioData_Idx::_QuantityRatio
-             || c==PortfolioData_Idx::_BidLeg
+//             || c==PortfolioData_Idx::_BidLeg
              || c==PortfolioData_Idx:: _FuturePrice)
     {
         QStyleOptionViewItem op(option);
@@ -756,7 +756,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
                                                       c==PortfolioData_Idx::_ExpiryDateTime ||
                                                       c==PortfolioData_Idx::_Cost||
                                                       c==PortfolioData_Idx::_QuantityRatio||
-                                                      c==PortfolioData_Idx::_BidLeg||
+//                                                      c==PortfolioData_Idx::_BidLeg||
                                                       c==PortfolioData_Idx::_FuturePrice)){
             painter->fillRect(option.rect, HighlightColor);
         }
@@ -821,7 +821,7 @@ void Table_Portfolios_Delegate::paint(QPainter *painter, const QStyleOptionViewI
                                                       c==PortfolioData_Idx::_ExpiryDateTime ||
                                                       c==PortfolioData_Idx::_Cost||
                                                       c==PortfolioData_Idx::_QuantityRatio||
-                                                      c==PortfolioData_Idx::_BidLeg||
+                                                     // c==PortfolioData_Idx::_BidLeg||
                                                       c==PortfolioData_Idx::_MaxLoss||
                                                       c==PortfolioData_Idx::_FuturePrice)){
             painter->setPen(opt.palette.color(QPalette::Light));  // Set the text color
