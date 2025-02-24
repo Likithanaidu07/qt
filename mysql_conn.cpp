@@ -1282,10 +1282,11 @@ QList<QHash<QString,QString>>  mysql_conn::getTradePopUPData(QString user_id, QS
 }
 void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_table,
                                    Order_F1_F2_Model *f1f2_order_table_model,Liners_Model *liners_model ,QString user_id,
-                                   QHash<QString, PortFolioData_Less> PortFolioTypeHash,QStringList &algosToDisable,QStringList ExecutedTableHilightExcludeList,int &traderData_ID_OnAppStart)
+                                   QHash<QString, PortFolioData_Less> PortFolioTypeHash,QStringList &algosToDisable,
+                                   QStringList ExecutedTableHilightExcludeList,int &traderData_ID_OnAppStart,
+                                   QStringList &newlyTradeAlgos)
 {
     QMutexLocker lock(&mutex);
-
     QList <QStringList> trade_data_listTmp;
     QList <QStringList> f1f2_trade_data_listTmp;
 
@@ -1899,6 +1900,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
 
                            qDebug()<<"Disablig porfolio: "<<Algo_ID<<"  userPriceVal="<<userPriceVal<<" maxLossThr="<<maxLossThr<<"  range="<<range<<" Exch_Price_val="<<Exch_Price_val;
                         }
+                        newlyTradeAlgos.append(Algo_ID);
                     }
                     if(disableThisAlgo){
                         traderData_ID_OnAppStart = traderData.toInt();

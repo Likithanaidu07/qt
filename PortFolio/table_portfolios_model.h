@@ -31,6 +31,7 @@ public:
     void updatePortFolioStatusValue(int row,QString statusVal);
     QStringList getAllPortfolioNumbers();
     QStringList getActivatedPortfolios();
+    void updateNewleyTradeHilgiht(QStringList newleyTraderAlgos);
 
     PortfolioObject * getPortFolioAt(int idx) const ;
 
