@@ -2635,10 +2635,12 @@ void MainWindow::loadDataAndUpdateTable(int table){
        QStringList ExecutedTableHilightExcludeList = trade_model->getExecutedTableHighlight_ExcludeList();
 
        // algosToDisableOnExchangePriceLimit.clear();
+       QStringList newlyTradeAlgos;
        QStringList algosToDisableOnMaxLossLimit; //will contin list of "algoNo:TraderData" to disable
-        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,algosToDisableOnMaxLossLimit,ExecutedTableHilightExcludeList,traderData_ID_OnAppStart);
+        db_conn->getTradeTableData(TraderCount,trade_model,f1f2_order_table_model,liners_model,QString::number(userData.UserId),PortFolioHashLessHash,algosToDisableOnMaxLossLimit,ExecutedTableHilightExcludeList,traderData_ID_OnAppStart,newlyTradeAlgos);
         emit data_loded_signal(T_Table::TRADE);
         updateSummaryLabels();
+        T_Portfolio_Model->updateNewleyTradeHilgiht(newlyTradeAlgos);
 
 
 //#ifdef DISABLE_ALGO_ON_EXCHANGE_PRICE_LIMIT

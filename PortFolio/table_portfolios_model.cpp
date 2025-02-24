@@ -31,11 +31,24 @@ Table_Portfolios_Model::Table_Portfolios_Model(QObject *parent) : QAbstractTable
 
     slowDataPriceUpdateTimer.start();  // Start the timer initially
 
+    // QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
+    // QSettings settings(appDataPath + "/tradedHighlight_ExcludeList.dat", QSettings::IniFormat);
+    // TradedHighlight_ExcludeList = settings.value("tradedHighlight_ExcludeList").toStringList();
+
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-    QSettings settings(appDataPath + "/tradedHighlight_ExcludeList.dat", QSettings::IniFormat);
+    QString filePath = appDataPath + "/tradedHighlight_ExcludeList.dat";
+
+    QFileInfo fileInfo(filePath);
+    QDate today = QDate::currentDate();
+
+    // Check if file exists and compare creation date
+    if (fileInfo.exists() && fileInfo.birthTime().date() != today) {
+        QFile::remove(filePath); // Delete the file
+    }
+
+    // Create or open the settings file
+    QSettings settings(filePath, QSettings::IniFormat);
     TradedHighlight_ExcludeList = settings.value("tradedHighlight_ExcludeList").toStringList();
-
-
 }
 
 void Table_Portfolios_Model::loadSettings(){
@@ -1157,6 +1170,40 @@ void Table_Portfolios_Model::updatePortFolioStatusValue(int row,QString statusVa
 #ifdef MUTEX_DEBUG_LOG
     qDebug()<<"Exiting---updatePortFolioStatusValue";
 #endif
+}
+
+void Table_Portfolios_Model::updateNewleyTradeHilgiht(QStringList newleyTraderAlgos){
+
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Entering---updateNewleyTradeHilgiht";
+#endif
+    QMutexLocker locker(&mutex); // Lock the mutex automatically
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Setting Mutex---updateNewleyTradeHilgiht";
+#endif
+
+
+
+
+#ifdef MUTEX_DEBUG_LOG
+    qDebug()<<"Exiting---updateNewleyTradeHilgiht";
+#endif
+
+    for(int i=0;i<portfolio_data_list.length();i++){
+        for(int j=0;j<newleyTraderAlgos.length();j++){
+            if(TradedHighlight_ExcludeList.contains(newleyTraderAlgos[j]))
+                TradedHighlight_ExcludeList.removeOne(newleyTraderAlgos[j]);
+            if(portfolio_data_list[i]->TradedHighlight == false&&portfolio_data_list[i]->PortfolioNumber == newleyTraderAlgos[j].toInt()){
+                portfolio_data_list[i]->TradedHighlight = true; // make this flag true to hilgiht newly traded data
+                emit dataChanged(index(i,0), index(i, header.count()));
+
+            }
+        }
+    }
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
+    QSettings settings(appDataPath + "/tradedHighlight_ExcludeList.dat", QSettings::IniFormat);
+    settings.setValue("tradedHighlight_ExcludeList", TradedHighlight_ExcludeList);
+
 }
 
 void Table_Portfolios_Model::setEditingFlg(int row,int val) {
