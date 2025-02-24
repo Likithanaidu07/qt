@@ -661,7 +661,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     //QObject::connect(T_Portfolio_Table, &table_portfolios_custom::spaceKeySignal, this, &MainWindow::updatePortFolioStatus);
-    QObject::connect(T_Portfolio_Table, &table_portfolios_custom::portFolioDeleteKeyPressed, this, &MainWindow::Delete_clicked_slot);
+   // QObject::connect(T_Portfolio_Table, &table_portfolios_custom::portFolioDeleteKeyPressed, this, &MainWindow::Delete_clicked_slot);
 
 
     //QObject::connect(T_Portfolio_Model, &Table_Portfolios_Model::resizePortFolioTableColWidth, this, &MainWindow::resizePortFolioTableColWidthSlot);
@@ -4612,10 +4612,20 @@ void MainWindow::initializeGlobalHotKeys(){
            // Store the QShortcut object in the hash for future updates
            QAction *shortcutAction = new QAction(this);
            shortcutAction->setShortcut(QKeySequence(hotKey.shortcut));
-           shortcutAction->setShortcutContext(Qt::ApplicationShortcut);
            shortcutAction->setEnabled(hotKey.enabled); // Set initial state
-           updateHotKeysAction(action,shortcutAction);
-           addAction(shortcutAction);
+           if (action == "DELETE_SELECTED_ALGO"){
+               shortcutAction->setShortcutContext(Qt::WidgetShortcut);
+               updateHotKeysAction(action,shortcutAction);
+               T_Portfolio_Table->addAction(shortcutAction);
+
+           }
+           else{
+               shortcutAction->setShortcutContext(Qt::ApplicationShortcut);
+               updateHotKeysAction(action,shortcutAction);
+               this->addAction(shortcutAction);
+           }
+
+
            HotKeyShortcutObjects.insert(action, shortcutAction);
        }
 

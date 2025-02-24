@@ -82,10 +82,10 @@ void table_portfolios_custom::keyPressEvent(QKeyEvent *event)
     {
         nextColumn = findNextEditableCell(currentColumn, nav_direction::nav_backward);
     }
-    else if (event->key() == Qt::Key_Delete)
+    /*else if (event->key() == Qt::Key_Delete)
     {
         emit portFolioDeleteKeyPressed();
-    }
+    }*/
     else
     {
         QTableView::keyPressEvent(event); // Call the base class implementation for other keys
