@@ -31,24 +31,10 @@ Table_Portfolios_Model::Table_Portfolios_Model(QObject *parent) : QAbstractTable
 
     slowDataPriceUpdateTimer.start();  // Start the timer initially
 
-    // QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-    // QSettings settings(appDataPath + "/tradedHighlight_ExcludeList.dat", QSettings::IniFormat);
-    // TradedHighlight_ExcludeList = settings.value("tradedHighlight_ExcludeList").toStringList();
-
     QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-    QString filePath = appDataPath + "/tradedHighlight_ExcludeList.dat";
-
-    QFileInfo fileInfo(filePath);
-    QDate today = QDate::currentDate();
-
-    // Check if file exists and compare creation date
-    if (fileInfo.exists() && fileInfo.birthTime().date() != today) {
-        QFile::remove(filePath); // Delete the file
-    }
-
-    // Create or open the settings file
-    QSettings settings(filePath, QSettings::IniFormat);
+    QSettings settings(appDataPath + "/tradedHighlight_ExcludeList.dat", QSettings::IniFormat);
     TradedHighlight_ExcludeList = settings.value("tradedHighlight_ExcludeList").toStringList();
+
 }
 
 void Table_Portfolios_Model::loadSettings(){
@@ -96,7 +82,7 @@ void Table_Portfolios_Model::selectionChangedSlot(int currentIdx){
             if(!TradedHighlight_ExcludeList.contains(QString::number(portfolio_data_list[currentIdx]->PortfolioNumber))){
                 TradedHighlight_ExcludeList.append(QString::number(portfolio_data_list[currentIdx]->PortfolioNumber));
                 QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + "/Data";
-                QSettings settings(appDataPath + "/tradedHighlight_ExcludeList.dat", QSettings::IniFormat);
+                QSettings settings(appDataPath + "/portfolio_tradedHighlight_ExcludeList.dat", QSettings::IniFormat);
                 settings.setValue("tradedHighlight_ExcludeList", TradedHighlight_ExcludeList);
             }
         }
@@ -348,7 +334,9 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
             return portfolio->Alias;
         }
         else if (index.column() == PortfolioData_Idx::_MaxLoss) {
-                return double_to_Human_Readable(portfolio->MaxLoss,decimal_precision);
+             if(portfolio->MaxLoss<0)
+                return "-";
+            return double_to_Human_Readable(portfolio->MaxLoss,decimal_precision);
         }
         else if (index.column() == PortfolioData_Idx::_ExpiryDateTime) {
             QString ExpiryDateTimeStr = "-";

@@ -107,7 +107,7 @@ public:
     QString foo_token_number_end_strike;// this for start strike input of F2F
     // QDockWidget *T_Algorithm_DockWin;
     // ContractDetail* contracts;
-
+    bool backendConn_Status = false;
     QString fixDecimal(double num,int decimal_precision);
 signals:
     void data_loded_signal(int table);

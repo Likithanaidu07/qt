@@ -58,9 +58,22 @@ void BackendComm::sendDataSlot(QByteArray byteArray){
 
                 if (socket->waitForBytesWritten()) {
                     // qDebug() << "Backend Data sent successfully.";
+                    quint16 command;
+                    memcpy(&command, byteArray.constData(), sizeof(quint16)); // Extract command
+                    if (command != BACKEND_CMD_TYPE::CMD_ID_KEEP_ALIVE) {
+                        emit socketData("Backend Data sent successfully. command = " + QString::number(command), SocketDataType::BACKEND_COMM_SEND_SUCCESS);
+                    }
+
+
                 }
                 else {
                     // qDebug() << "Failed to send Backend data:" << socket->errorString();
+                    quint16 command;
+                    memcpy(&command, byteArray.constData(), sizeof(quint16)); // Extract command
+                    if (command != BACKEND_CMD_TYPE::CMD_ID_KEEP_ALIVE) {
+                        emit socketData("Backend Data sent failed.... command = " + QString::number(command), SocketDataType::BACKEND_COMM_SEND_FAILED);
+                    }
+
                 }
 
                 //  QDataStream socketStream(socket);

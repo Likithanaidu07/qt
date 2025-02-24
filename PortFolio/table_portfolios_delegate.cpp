@@ -109,6 +109,7 @@ bool Table_Portfolios_Delegate::editorEvent(QEvent *event, QAbstractItemModel *m
 
 QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOptionViewItem & option , const QModelIndex & index ) const
 {
+    QFont font("Work Sans");
     int c = index.column();
     if ( c == PortfolioData_Idx::_OrderQuantity)
     {
@@ -135,7 +136,7 @@ QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOp
     }
     else if( c == PortfolioData_Idx::_Depth ){
         QLineEdit *editor = new QLineEdit(parent);
-        editor->setValidator(new QIntValidator(1, 10));
+        editor->setValidator(new IntDiffValidator(1, 5,editor));
         editor->setObjectName("portfolioTableCell_"+QString::number(c));
         editor->installEventFilter(const_cast<Table_Portfolios_Delegate *>(this));
         return editor;
@@ -360,12 +361,12 @@ bool Table_Portfolios_Delegate::eventFilter(QObject *obj, QEvent *event)
                             // Ensure certain values do not go below their respective thresholds
                             if (currentColIdx == PortfolioData_Idx::_BuyTotalQuantity ||
                                 currentColIdx == PortfolioData_Idx::_SellTotalQuantity ||
-                                currentColIdx == PortfolioData_Idx::_MaxLoss ||
-                                currentColIdx == PortfolioData_Idx::_Depth) {
+                                currentColIdx == PortfolioData_Idx::_MaxLoss ) {
                                 if (incValue < 0) incValue = 0;
                             }
 
-                            if(currentIndex.column() == PortfolioData_Idx::_OrderQuantity){
+                            if(currentIndex.column() == PortfolioData_Idx::_OrderQuantity||
+                                currentColIdx == PortfolioData_Idx::_Depth){
                                 if(incValue < 1)
                                     incValue = 1;
                             }
