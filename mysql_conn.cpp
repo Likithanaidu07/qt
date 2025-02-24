@@ -1893,7 +1893,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                         maxLossThr = maxLossThr/devicer;
 
                         double range = userPriceVal - maxLossThr;
-                        if (Exch_Price_val<=range){
+                        if (Exch_Price_val<range){
                            if(!algosToDisable.contains(Algo_ID))
                                 algosToDisable.append(Algo_ID);
 

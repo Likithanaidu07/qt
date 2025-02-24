@@ -3680,7 +3680,7 @@ void MainWindow::Delete_clicked_slot()
        msgBox.setText("Please select a Algo.");
        msgBox.setIcon(QMessageBox::Warning);
        msgBox.exec();
-        return;
+       return;
    }
 
 
@@ -5315,13 +5315,13 @@ void MainWindow::onRetryButtonClickedMissedTrade(int row){
           buyqty = QString::number(data[Missed_Trades_Idx::Lot].toInt()* lotSize);
           orderQunatity = buyqty;
 
-          confirmationMsg ="Buy "+Stockname+" @ "+data[Missed_Trades_Idx::Price]+" for "+data[Missed_Trades_Idx::Lot]+" lot. Would you like to proceed?";
+          confirmationMsg ="Buy "+Stockname+/*" @ "+data[Missed_Trades_Idx::Price]+*/" for "+data[Missed_Trades_Idx::Lot]+" lot. Would you like to proceed?";
       }
       else{
           sellprice = QString::number(data[Missed_Trades_Idx::Price].toDouble()* devicer);
           sellqty = QString::number(data[Missed_Trades_Idx::Lot].toInt()* lotSize);
           orderQunatity = sellqty;
-          confirmationMsg ="Sell "+Stockname+" @ "+data[Missed_Trades_Idx::Price]+" for "+data[Missed_Trades_Idx::Lot]+" lot. Would you like to proceed?";
+          confirmationMsg ="Sell "+Stockname/*+" @ "+data[Missed_Trades_Idx::Price]*/+" for "+data[Missed_Trades_Idx::Lot]+" lot. Would you like to proceed?";
 
       }
 
