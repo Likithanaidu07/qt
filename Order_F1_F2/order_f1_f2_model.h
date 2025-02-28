@@ -21,14 +21,13 @@ public:
     void setDataList(QList <QStringList> alog_data_list);
     QVariant headerData(int section, Qt::Orientation ,   int role) const override;
     QList <QStringList> f1f2_order_data_list;
-
     bool containsOrderId(int orderId);
 private:
     int col_count;
 
 
     QStringList header={  /*"Algo No",*/
-                          "Order Id",
+                          "SNo",
                           "StockName",
                           "User Price",
                           "Exch Price",

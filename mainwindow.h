@@ -39,6 +39,7 @@
 #include "trade_details_popup.h"
 #include "Liners/liners_model.h"
 #include "Liners/linersheaderview.h"
+#include "NetPosition/netpos_searchfilterproxymodel.h"
 
 
 #include "DockManager.h"
@@ -217,6 +218,7 @@ private:
     QTableView *net_pos_table;
     Net_Position_Table_Model *net_pos_model;
     CDockWidget *dock_win_net_pos;
+     QSortFilterProxyModel *netposproxyModel;
 
     QTableView *liners_table;
     Liners_Model *liners_model;

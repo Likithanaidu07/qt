@@ -26,9 +26,10 @@ public:
     explicit net_position_table_delegate(QObject *parent = nullptr);
     void paint(QPainter *painter, const QStyleOptionViewItem &option, const QModelIndex &index) const override;
     //   QList<OrderBookObject*> OrderBook_Data_List;
+      void setHighlightText(const QString &text);
 private:
 
-
+ QString m_highlightText;
     double price_diff_incrementer = 0.01;
     double quantity_incrementer = 1.0;
     QString market_type;

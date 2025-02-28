@@ -11,7 +11,7 @@ DEFINES += QT_MESSAGELOGCONTEXT
 CONFIG += c++17
 
 #manually Increment Version Before Build
-VERSION = 1.0.9
+VERSION = 1.0.11
 TARGET = New_Speedtrade_$${VERSION}
 
 
@@ -46,6 +46,7 @@ SOURCES += \
     NetPosition/net_position_table_delegate.cpp \
     NetPosition/net_position_table_headerview.cpp \
     NetPosition/net_position_table_model.cpp \
+    NetPosition/netpos_searchfilterproxymodel.cpp \
     OpenPosition/open_position_delegate.cpp \
     OpenPosition/open_position_headerview.cpp \
     OpenPosition/open_position_model.cpp \
@@ -121,6 +122,7 @@ HEADERS += \
     NetPosition/net_position_table_delegate.h \
     NetPosition/net_position_table_headerview.h \
     NetPosition/net_position_table_model.h \
+    NetPosition/netpos_searchfilterproxymodel.h \
     OpenPosition/open_position_delegate.h \
     OpenPosition/open_position_headerview.h \
     OpenPosition/open_position_model.h \

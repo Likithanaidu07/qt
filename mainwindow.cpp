@@ -35,6 +35,7 @@
 #include "OpenPosition/open_position_delegate.h"
 #include "OpenPosition/open_position_headerview.h"
 #include "MissedTrades/missed_trade_table_delegate.h"
+#include "NetPosition/netpos_searchfilterproxymodel.h"
 
 //#define ENABLE_BACKEND_DEBUG_MSG
 
@@ -54,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent)
      logs(nullptr)
 
 {
-
+    //ui->lineEditSearch->hide();
     QFontDatabase::addApplicationFont(":/WorkSans-Bold.ttf");
     QFontDatabase::addApplicationFont(":/WorkSans-ExtraBold.ttf");
 
@@ -79,7 +80,6 @@ MainWindow::MainWindow(QWidget *parent)
        }
 #endif
 
-    //ui->sidePanel->setVisible(false);
     ui->Algorithms_Close->setVisible(false);
     newIndicesData = false;
 
@@ -183,18 +183,18 @@ MainWindow::MainWindow(QWidget *parent)
 
 
 
-    ui->lineEditSearch->setPlaceholderText("Search Algo");
-    QAction* search_action = new QAction(QIcon(":/search.png"), "", ui->lineEditSearch);
+//    ui->lineEditSearch->setPlaceholderText("Search Algo");
+//    QAction* search_action = new QAction(QIcon(":/search.png"), "", ui->lineEditSearch);
 
-    // Add the action to the QLineEdit
-    ui->lineEditSearch->addAction(search_action, QLineEdit::LeadingPosition);
-    ui->lineEditSearch->setStyleSheet(
-        "QLineEdit {"
-        "    font-family: 'Work Sans';"
-        "    font-size: 10pt;"
-        "    border-radius: 15px;"      // Use 15px for a curved effect
-        "}"
-        );
+//    // Add the action to the QLineEdit
+//    ui->lineEditSearch->addAction(search_action, QLineEdit::LeadingPosition);
+//    ui->lineEditSearch->setStyleSheet(
+//        "QLineEdit {"
+//        "    font-family: 'Work Sans';"
+//        "    font-size: 10pt;"
+//        "    border-radius: 15px;"      // Use 15px for a curved effect
+//        "}"
+//        );   --temporarily disabled for now it is not in use
 
 
 
@@ -230,6 +230,7 @@ MainWindow::MainWindow(QWidget *parent)
       ui->Liners_Widget->setVisible(false);
       ui->F1F2Trade_widget->setVisible(false);
       ui->Algorithms_Widget->setVisible(false);
+      ui->lineEditSearch->setVisible(false);
 
     //ui->widget_3->setVisible(false);
       ui->widget_5->setVisible(true);
@@ -364,15 +365,15 @@ MainWindow::MainWindow(QWidget *parent)
             lay->setRowStretch(0, 0); //set minimum hieght for first row
             lay->setRowStretch(1, 1);//set maximum hieght for second row table
 
-//            QLineEdit* line_edit_trade_search = new QLineEdit;
-//            line_edit_trade_search->setMaximumWidth(360);
-//            line_edit_trade_search->setMaximumHeight(1500);
-//            line_edit_trade_search->setPlaceholderText("Search Algo");
-//            QAction* search_action = new QAction(QIcon(":/search.png"), "", line_edit_trade_search);
+            QLineEdit* line_edit_trade_search = new QLineEdit;
+            line_edit_trade_search->setMaximumWidth(360);
+            line_edit_trade_search->setMaximumHeight(1500);
+            line_edit_trade_search->setPlaceholderText("Search Algo");
+            QAction* search_action = new QAction(QIcon(":/search.png"), "", line_edit_trade_search);
 
-//            // Add the action to the QLineEdit
-//            line_edit_trade_search->addAction(search_action, QLineEdit::LeadingPosition);
-//            line_edit_trade_search->setStyleSheet(lineedit_dock_SS);
+            // Add the action to the QLineEdit
+            line_edit_trade_search->addAction(search_action, QLineEdit::LeadingPosition);
+            line_edit_trade_search->setStyleSheet(lineedit_dock_SS);
 
             QToolButton *ConvertAlgo_button = new QToolButton();
             connect(ConvertAlgo_button, SIGNAL(clicked()), this, SLOT(ConvertAlgo_button_clicked()));
@@ -607,7 +608,7 @@ MainWindow::MainWindow(QWidget *parent)
                 internalLayout->addWidget(button3);
                 internalLayout->addWidget(button6);
                 internalLayout->addWidget(button5);
-
+                internalLayout->addWidget(line_edit_trade_search);
 
                 internalLayout->addSpacerItem(spc);
                 //internalLayout->addWidget(button5);
@@ -685,17 +686,22 @@ MainWindow::MainWindow(QWidget *parent)
     T_Portfolio_ProxyModel->setSourceModel(T_Portfolio_Model);
     T_Portfolio_ProxyModel->setFilterKeyColumn(-1);  // Search across all columns
 
-    connect(ui->lineEditSearch, &QLineEdit::textChanged, this, [=](const QString &text) {
-        // Check if the relevant window or widget is open/visible
-       // if (T_Portfolio_Table->isVisible()) { // Replace 'this' with the specific window or widget if needed
-            T_Portfolio_ProxyModel->setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
-            T_Portfolio_Delegate->setHighlightText(text);
-            T_Portfolio_Table->viewport()->update();  // Redraw the view to apply the highlight
-       // }
-//        else{
+//    connect(ui->lineEditSearch, &QLineEdit::textChanged, this, [=](const QString &text) {
+//        // Check if the relevant window or widget is open/visible
+//       // if (T_Portfolio_Table->isVisible()) { // Replace 'this' with the specific window or widget if needed
+//            T_Portfolio_ProxyModel->setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
 //            T_Portfolio_Delegate->setHighlightText(text);
-//        }
-    });
+//            T_Portfolio_Table->viewport()->update();  // Redraw the view to apply the highlight
+//       // }
+////        else{
+////            T_Portfolio_Delegate->setHighlightText(text);
+////        }
+//    });
+        connect(line_edit_trade_search, &QLineEdit::textChanged, this, [=](const QString &text) {
+                T_Portfolio_ProxyModel->setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
+                T_Portfolio_Delegate->setHighlightText(text);
+                T_Portfolio_Table->viewport()->update();  // Redraw the view to apply the highlight
+              });
 
 
     T_Portfolio_Table->setModel(T_Portfolio_ProxyModel);
@@ -819,8 +825,26 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
 //    connect(line_edit_trade, &QLineEdit::textChanged, this, &MainWindow::tradeTableSerachTxtChanged);
 
 
+    QLineEdit* line_edit_Executed_search = new QLineEdit;
+    line_edit_Executed_search->setMaximumWidth(360);
+    line_edit_Executed_search->setMaximumHeight(1500);
+    line_edit_Executed_search->setPlaceholderText("Search Algo");
+    QAction* search_actiontrades = new QAction(QIcon(":/search.png"), "", line_edit_Executed_search);
 
+    // Add the action to the QLineEdit
+    line_edit_Executed_search->addAction(search_actiontrades, QLineEdit::LeadingPosition);
+    line_edit_trade_search->setStyleSheet(lineedit_dock_SS);
 
+    QWidget *test1=new QWidget;
+    const char lays[]="background: #E9ECEF;";
+    test1->setStyleSheet(lays);
+    QHBoxLayout *internalLayouttrades = new QHBoxLayout(test1);
+    test1->setLayout(internalLayouttrades);
+    internalLayouttrades->setContentsMargins(10,-1,-1,-1);
+    QSpacerItem* spcr = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    internalLayouttrades->addWidget(line_edit_Executed_search);
+  lay_Trade_Window->addWidget(test1, 0, 0);
     trade_table = new QTableView();
     connect(trade_table, &QTableView::doubleClicked, this, &MainWindow::trade_table_cellDoubleClicked);
 
@@ -877,7 +901,7 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     tradetableproxyModel->setSourceModel(trade_model);
     tradetableproxyModel->setFilterKeyColumn(-1);  // Search across all columns
 
-    connect(ui->lineEditSearch, &QLineEdit::textChanged, this, [=](const QString &text) {
+    connect(/*ui->lineEditSearch*/line_edit_Executed_search, &QLineEdit::textChanged, this, [=](const QString &text) {
         // proxyModel->setFilterRegularExpression(QRegExp(text, Qt::CaseInsensitive, QRegularExpression::FixedString));
         tradetableproxyModel->setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
         trade_delegate->setHighlightText(text);
@@ -892,10 +916,11 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     trade_table->verticalHeader()->setVisible(false);
     // trade_table->setStyleSheet("QHeaderView { background-color: #111111;} QHeaderView::section { background-color:#555555;color:#eeeeee;font-weight: 400; }");
     trade_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
+
     trade_table->setSelectionBehavior(QAbstractItemView::SelectRows);
     trade_table->setSelectionMode(QAbstractItemView::SingleSelection);
     /*trade_table->setStyleSheet("QTableView {selection-background-color: #EFB37F;"
-                                            "selection-color: #4D4D4D;"
+                                            2"selection-color: #4D4D4D;"
                                             "color:#3D3D3D;"
                                             "} "
                                             "QHeaderView { background-color: #C0AAE5;color:#3D3D3D;} QHeaderView::section { background-color:#C0AAE5;color:#3D3D3D;font-weight: 400; }");*/
@@ -903,7 +928,7 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     trade_table->show();
     // Restore the previous state of the table view if any
     restoreTableViewColumnState(trade_table);
-    trade_table->setColumnWidth(OrderBook_Idx::AlgoName_OB, 200);
+    trade_table->setColumnWidth(OrderBook_Idx::AlgoName_OB, 250);
     int Trade_columnCount = trade_table->model()->columnCount();
     for (int col = 0; col < Trade_columnCount; ++col) {
         if (col != OrderBook_Idx::AlgoName_OB) {
@@ -1090,6 +1115,35 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     //dock_win_net_pos->setTitleBarWidget(position_titlebar);
 
 
+    QWidget* container_net_pos = new QWidget;
+    dock_win_net_pos->setWidget(container_net_pos);
+    QGridLayout *lay_netpos_Window = new QGridLayout(container_net_pos);
+    lay_netpos_Window->setContentsMargins(0, 0, 0, 0);
+    lay_netpos_Window->setSpacing(3);
+    lay_netpos_Window->setRowStretch(0, 0); //set minimum hieght for first row
+    lay_netpos_Window->setRowStretch(1, 1);//set maximum hieght for second row table
+
+    QLineEdit* line_edit_net_pos_search = new QLineEdit;
+    line_edit_net_pos_search->setMaximumWidth(360);
+    line_edit_net_pos_search->setMaximumHeight(1500);
+    line_edit_net_pos_search->setPlaceholderText("Search Algo");
+    QAction* search_action_netpos = new QAction(QIcon(":/search.png"), "", line_edit_net_pos_search);
+
+    // Add the action to the QLineEdit
+    line_edit_net_pos_search->addAction(search_action_netpos, QLineEdit::LeadingPosition);
+    line_edit_net_pos_search->setStyleSheet(lineedit_dock_SS);
+
+    QWidget *testnetpos=new QWidget;
+    const char laysnetpos[]="background: #E9ECEF;";
+    testnetpos->setStyleSheet(laysnetpos);
+    QHBoxLayout *internalLayoutnetpos = new QHBoxLayout(testnetpos);
+    testnetpos->setLayout(internalLayoutnetpos);
+    internalLayoutnetpos->setContentsMargins(10,-1,-1,-1);
+    QSpacerItem* spcrr = new QSpacerItem(0, 0, QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    internalLayoutnetpos->addWidget(line_edit_net_pos_search);
+    lay_netpos_Window->addWidget(testnetpos, 0, 0);
+
 
 
     net_pos_table = new QTableView(dock_win_net_pos);
@@ -1116,6 +1170,7 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
         );
     connect(headerView_netpos, &QHeaderView::sectionMoved, this, &MainWindow::onNetposTableHeader_Rearranged);
     net_pos_table->setHorizontalHeader(headerView_netpos);
+     lay_netpos_Window->addWidget(net_pos_table, 1, 0, 1, 3);
 
     net_pos_model = new Net_Position_Table_Model();
     net_pos_table->setObjectName("netpos_table");
@@ -1135,8 +1190,22 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     net_pos_table->setSelectionMode(QAbstractItemView::SingleSelection);
     net_position_table_delegate* netpos_delegate=new net_position_table_delegate;
     net_pos_table->setItemDelegate(netpos_delegate);
+
+    netposproxyModel = new QSortFilterProxyModel(this);
+    netposproxyModel->setSourceModel(net_pos_model);
+    netposproxyModel->setFilterKeyColumn(-1);  // Search across all columns
+
+    connect(/*ui->lineEditSearch*/line_edit_net_pos_search, &QLineEdit::textChanged, this, [=](const QString &text) {
+        // proxyModel->setFilterRegularExpression(QRegExp(text, Qt::CaseInsensitive, QRegularExpression::FixedString));
+        netposproxyModel->setFilterRegularExpression(QRegularExpression(text, QRegularExpression::CaseInsensitiveOption));
+        netpos_delegate->setHighlightText(text);
+        net_pos_table->viewport()->update();  // Redraw the view to apply the highlight
+    });
+    net_pos_table->setModel(netposproxyModel);
+
    net_pos_table->horizontalHeader()->setStretchLastSection(false);
-    dock_win_net_pos->setWidget(net_pos_table);
+   // dock_win_net_pos->setWidget(net_pos_table);
+
     net_pos_table->show();
     restoreTableViewColumnState(net_pos_table);
     net_pos_table->setColumnWidth(NET_POS::StockName_NP, 170);
@@ -2302,7 +2371,7 @@ void MainWindow::profolioTableEditFinshedSlot(QString valStr,QModelIndex index){
                                 " WHERE PortfolioNumber=" + PortfolioNumber;
                 bool success = db_conn->updateDB_Table(Query,msg);
                 if(success){
-                    db_conn->logToDB(logMsg+ " updated for Algo No="+PortfolioNumber);
+                    db_conn->logToDB( "Algo No="+PortfolioNumber+" "+"Updated With"+" "+logMsg);
 
                     //send notifcation to backend server
                     quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
@@ -2847,7 +2916,7 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 #ifdef ENABLE_BACKEND_DEBUG_MSG
         qDebug()<<"Backend Data: Backend Socket Error"<<msg;
 #endif
-        ui->label_3->setText("Status :"  "Connection Error");
+        ui->label_3->setText("Server Status :"  "Stopped");
         ui->label_3->setStyleSheet("color: red;");
         backendConn_Status = false;
     }
@@ -2856,7 +2925,7 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 #ifdef ENABLE_BACKEND_DEBUG_MSG
         qDebug()<<"Backend Data: Backend Socket Connected"<<msg;
 #endif
-        ui->label_3->setText("Status :""Connected");
+        ui->label_3->setText("Server Status :" "Started");
         ui->label_3->setStyleSheet("color: #013220;");
         backendConn_Status = true;
     }
@@ -2990,19 +3059,23 @@ void MainWindow::updatePortFolioStatus(QModelIndex index) {
             QStringList activatedPortFolios = T_Portfolio_Model->getActivatedPortfolios();
             if (activatedPortFolios.size() >= userData.MaxActiveCount) {
                 // Show warning message
-                QMessageBox msgBox;
-                msgBox.setText("Maximum Active Portfolio Limit Reached. Cannot activate more portfolios.");
-                msgBox.setIcon(QMessageBox::Warning);
-                msgBox.exec();
+
 
                 qDebug() << "updatePortFolioStatus: Maximum active portfolio limit reached, ActivatedPortFolios ="
                          << activatedPortFolios.size() << ", Limit=" << userData.MaxActiveCount;
+
+                T_Portfolio_Model->updatePortFolioStatusValue(index.row(), QString::number(portfolio_status::DisabledByUser));
 
                 // Ensure the UI remains consistent by refreshing the table to restore the button's visibility
                 T_Portfolio_Table->viewport()->update();
 
                 // Prevent further database updates
                 portfolio_table_updating_db.storeRelaxed(0);
+
+                QMessageBox msgBox;
+                msgBox.setText("Maximum Active Portfolio Limit Reached. Cannot activate more portfolios.");
+                msgBox.setIcon(QMessageBox::Warning);
+                msgBox.exec();
                 return;
             }
 
@@ -3090,7 +3163,7 @@ void MainWindow::loggedIn(){
         QFont font = ui->label_6->font();
         font.setBold(true);
         ui->label_6->setFont(font);
-        ui->label_6->setStyleSheet("color: white;");
+      ui->label_6->setStyleSheet("color: white; font-size: 10pt;");
 
         start_slowdata_worker();
         start_slowdata_indices_worker();
@@ -3719,46 +3792,58 @@ void MainWindow::Delete_clicked_slot()
 
 
    //if (reply == QMessageBox::Yes) {
-       if (!activeAlgoList.empty()) {
-           db_conn->logToDB("Portfolios [" + activeAlgoList.join(",") + "] are Active, cannot delete from DB");
+   if (!activeAlgoList.empty()) {
+       db_conn->logToDB("Portfolios [" + activeAlgoList.join(",") + "] are Active, cannot delete from DB");
 
-           QMessageBox msgBox;
-           msgBox.setText("Active algo cannot be deleted.\nDisable the algo No. " + activeAlgoList.join(",") + " and then try again.");
+       QMessageBox msgBox;
+       msgBox.setText("Active algo cannot be deleted.\nDisable the algo No. " + activeAlgoList.join(",") + " and then try again.");
+       msgBox.setIcon(QMessageBox::Information);
+       msgBox.exec();
+
+       // Remove active portfolios from deletion list
+       for (const QString &activeAlgo : activeAlgoList) {
+           portFoliosToDelete.removeAll(activeAlgo);
+       }
+
+       // If no portfolios remain for deletion, exit
+       if (portFoliosToDelete.isEmpty()) {
+           return;
+       }
+   }
+
+   deletingPortFolioFlg.storeRelaxed(1);
+   QString msg;
+   bool ret = db_conn->deleteNonTradedAlgos(portFoliosToDelete, msg);
+
+   if (!ret) {
+       QMessageBox::warning(this, "Error", "Executed Trades cannot be deleted: " + portFoliosToDelete.join(","));
+   } else {
+       QMessageBox::StandardButton reply;
+       reply = QMessageBox::question(this, "Delete Portfolio From Database?",
+                                     "Delete portfolios [" + portFoliosToDelete.join(",") + "] from DB?",
+                                     QMessageBox::Yes | QMessageBox::No);
+       if (reply == QMessageBox::Yes) {
+           // Delete from model and refresh the entire table
+           T_Portfolio_Model->removeRowsByIndices(portFolioIdxToDelete);
+           triggerImmediate_refreshTables();
+
+           // Send notification to backend server
+           quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
+           const unsigned char dataBytes[] = { 0xFF, 0xFF };
+           QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
+           QByteArray bckend_msg = backend_comm->createPacket(command, data);
+           backend_comm->insertData(bckend_msg);
+
+           db_conn->logToDB("Deleted portfolios [" + portFoliosToDelete.join(",") + "] from DB");
+
+           QMessageBox msgBox(this);
+           msgBox.setWindowTitle("Algo Delete");
+           msgBox.setText(msg);
            msgBox.setIcon(QMessageBox::Information);
            msgBox.exec();
-
-           return;  // Exit early, as no further processing is needed
        }
-       deletingPortFolioFlg.storeRelaxed(1);
-       QString msg;
-       bool ret = db_conn->deleteNonTradedAlgos(portFoliosToDelete, msg);
+   }
 
-         if (!ret) {
-           QMessageBox::warning(this, "Error", "Executed Trades cannot be deleted: " + portFoliosToDelete.join(","));
-       } else {
-           QMessageBox::StandardButton reply;
-           reply = QMessageBox::question(this, "Delete Portfolio From Database?", "Delete  portfolios ["+portFoliosToDelete.join(",")+"] from DB?",  QMessageBox::Yes|QMessageBox::No);
-           if (reply == QMessageBox::Yes) {
-               // Delete from model and refresh the entire table
-               T_Portfolio_Model->removeRowsByIndices(portFolioIdxToDelete);
-               triggerImmediate_refreshTables();
-
-               // Send notification to backend server
-               quint16 command = BACKEND_CMD_TYPE::CMD_ID_PORTTFOLIO_NEW_1;
-               const unsigned char dataBytes[] = { 0xFF, 0xFF };
-               QByteArray data = QByteArray::fromRawData(reinterpret_cast<const char*>(dataBytes), 2);
-               QByteArray bckend_msg = backend_comm->createPacket(command, data);
-               backend_comm->insertData(bckend_msg);
-
-               db_conn->logToDB("Deleted portfolios [" + portFoliosToDelete.join(",") + "] from DB");
-
-               QMessageBox msgBox(this);
-               msgBox.setWindowTitle("Algo Delete");
-               msgBox.setText(msg);
-               msgBox.setIcon(QMessageBox::Information);
-               msgBox.exec();
-           }
-       }
 
        deletingPortFolioFlg.storeRelaxed(0);
    }
@@ -3890,7 +3975,13 @@ void MainWindow::slotAddLogForAddAlgoRecord(QString str)
     logsdata.append(str);
     emit logDataSignal(logsdata);
     ui->label_5->setWordWrap(true);
-    ui->label_5->setText(str);
+
+    if(logsdata.size()>1){
+        ui->label_5->setText("logs:"+logsdata[logsdata.size()-2]+logsdata[logsdata.size()-1]);
+    }
+    else
+        ui->label_5->setText("logs:"+str);
+
     ui->label_5->setStyleSheet("color: white;");
 
 }
