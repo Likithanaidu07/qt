@@ -366,9 +366,15 @@ MainWindow::MainWindow(QWidget *parent)
             lay->setRowStretch(1, 1);//set maximum hieght for second row table
 
             QLineEdit* line_edit_trade_search = new QLineEdit;
-            line_edit_trade_search->setMaximumWidth(360);
-            line_edit_trade_search->setMaximumHeight(1500);
-            line_edit_trade_search->setPlaceholderText("Search Algo");
+            line_edit_trade_search->setFixedWidth(360);
+            line_edit_trade_search->setFixedHeight(30);
+
+            QFont font("Work Sans");
+            font.setPointSize(9);
+            font.setBold(true);
+            line_edit_trade_search->setFont(font);
+
+            line_edit_trade_search->setPlaceholderText("Search...");
             QAction* search_action = new QAction(QIcon(":/search.png"), "", line_edit_trade_search);
 
             // Add the action to the QLineEdit
@@ -718,7 +724,7 @@ MainWindow::MainWindow(QWidget *parent)
     //This will make first column fixed size
     T_Portfolio_Table->horizontalHeader()->setSectionResizeMode(PortfolioData_Idx::_Status, QHeaderView::Fixed);
     T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_Status, 60);
-    T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_AlgoName, 250);
+    T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_AlgoName, 260);
    // T_Portfolio_Table->setColumnWidth(PortfolioData_Idx::_BidLeg, 180);
 
     int Portfolio_columnCount = T_Portfolio_Table->model()->columnCount();
@@ -826,14 +832,23 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
 
 
     QLineEdit* line_edit_Executed_search = new QLineEdit;
-    line_edit_Executed_search->setMaximumWidth(360);
-    line_edit_Executed_search->setMaximumHeight(1500);
-    line_edit_Executed_search->setPlaceholderText("Search Algo");
+    line_edit_Executed_search->setFixedWidth(360);
+    line_edit_Executed_search->setFixedHeight(30);
+
+    QFont fontexe("Work Sans");
+    fontexe.setPointSize(9);
+    fontexe.setBold(true);
+    line_edit_Executed_search->setFont(fontexe);
+
+    line_edit_Executed_search->setPlaceholderText("Search...");
+
     QAction* search_actiontrades = new QAction(QIcon(":/search.png"), "", line_edit_Executed_search);
+
+
 
     // Add the action to the QLineEdit
     line_edit_Executed_search->addAction(search_actiontrades, QLineEdit::LeadingPosition);
-    line_edit_trade_search->setStyleSheet(lineedit_dock_SS);
+    line_edit_Executed_search->setStyleSheet(lineedit_dock_SS);
 
     QWidget *test1=new QWidget;
     const char lays[]="background: #E9ECEF;";
@@ -928,7 +943,7 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     trade_table->show();
     // Restore the previous state of the table view if any
     restoreTableViewColumnState(trade_table);
-    trade_table->setColumnWidth(OrderBook_Idx::AlgoName_OB, 250);
+    trade_table->setColumnWidth(OrderBook_Idx::AlgoName_OB, 270);
     int Trade_columnCount = trade_table->model()->columnCount();
     for (int col = 0; col < Trade_columnCount; ++col) {
         if (col != OrderBook_Idx::AlgoName_OB) {
@@ -1061,7 +1076,7 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
 
     f1f2_order_table->show();
     restoreTableViewColumnState(f1f2_order_table);
-    f1f2_order_table->setColumnWidth(F1F2_Order_Data_Idx::AlgoName_F1F2, 250);
+    f1f2_order_table->setColumnWidth(F1F2_Order_Data_Idx::AlgoName_F1F2, 270);
     int f1f2_order_columnCount = f1f2_order_table->model()->columnCount();
     for (int col = 0; col < f1f2_order_columnCount; ++col) {
         if (col != F1F2_Order_Data_Idx::AlgoName_F1F2) {
@@ -1124,9 +1139,15 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     lay_netpos_Window->setRowStretch(1, 1);//set maximum hieght for second row table
 
     QLineEdit* line_edit_net_pos_search = new QLineEdit;
-    line_edit_net_pos_search->setMaximumWidth(360);
-    line_edit_net_pos_search->setMaximumHeight(1500);
-    line_edit_net_pos_search->setPlaceholderText("Search Algo");
+    line_edit_net_pos_search->setFixedWidth(360);
+    line_edit_net_pos_search->setFixedHeight(30);
+
+    QFont fontnet("Work Sans");
+    fontnet.setPointSize(9);
+    fontnet.setBold(true);
+    line_edit_net_pos_search->setFont(fontnet);
+
+    line_edit_net_pos_search->setPlaceholderText("Search...");
     QAction* search_action_netpos = new QAction(QIcon(":/search.png"), "", line_edit_net_pos_search);
 
     // Add the action to the QLineEdit
@@ -1208,7 +1229,7 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
 
     net_pos_table->show();
     restoreTableViewColumnState(net_pos_table);
-    net_pos_table->setColumnWidth(NET_POS::StockName_NP, 170);
+    net_pos_table->setColumnWidth(NET_POS::StockName_NP, 190);
     int netpos_columnCount = net_pos_table->model()->columnCount();
     for (int col = 0; col < netpos_columnCount; ++col) {
         if (col !=NET_POS::StockName_NP) {
@@ -1301,7 +1322,7 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     dock_win_liners->setWidget(liners_table);
     liners_table->show();
     restoreTableViewColumnState(liners_table);
-    liners_table->setColumnWidth(Liners_Idx::AlgoName, 250);
+    liners_table->setColumnWidth(Liners_Idx::AlgoName, 270);
 
     int liners_columnCount = liners_table->model()->columnCount();
     for (int col = 0; col < liners_columnCount; ++col) {
@@ -1467,6 +1488,7 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     dock_win_Open_position->setWidget(open_position);
     open_position->show();
     restoreTableViewColumnState(open_position);
+    open_position->setColumnWidth(Open_Position_Idx::StockName, 190);
 
     /************Open Positions********************************/
 
@@ -1555,6 +1577,7 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
     dock_win_missed_trades->setWidget(missed_trade_table);
     missed_trade_table->show();
     restoreTableViewColumnState(missed_trade_table);
+    missed_trade_table->setColumnWidth(Missed_Trades_Idx::Stock_Name, 190);
 
 //    int missedtrades_columnCount = missed_trade_table->model()->columnCount();
 //    for (int col = 0; col < missedtrades_columnCount; ++col) {

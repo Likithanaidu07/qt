@@ -518,7 +518,7 @@ QHash<QString,PortFolioData_Less> mysql_conn::getPortfoliosTableData(QAtomicInt 
                "t.PortfolioNumber, "
                "(SUM(t.TradedPrice * (t.TotalVolume / c.LotSize)) * 1.0 / SUM(t.TotalVolume / c.LotSize)) / "+QString::number(devicer)+" AS AvgPrice, "
                "t.TokenNo, "
-               "t.BuySellIndicator "
+               "t.BuySellIndicator " 0
            "FROM "
               " Trades t "
            "JOIN "
