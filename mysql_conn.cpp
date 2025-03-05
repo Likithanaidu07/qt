@@ -511,7 +511,7 @@ QHash<QString,PortFolioData_Less> mysql_conn::getPortfoliosTableData(QAtomicInt 
 
     bool ok = checkDBOpened(msg);
     if(ok){
-       QString sqlquery = "SELECT PortfolioNumber, (sum(TradedPrice*TotalVolume) * 1.0 / sum(TotalVolume))/"+QString::number(devicer)+" as AvgPrice, TokenNo, BuySellIndicator from Trades WHERE TraderID='"+user_id+"' group by PortfolioNumber, TokenNo, BuySellIndicator ";
+      // QString sqlquery = "SELECT PortfolioNumber, (sum(TradedPrice*TotalVolume) * 1.0 / sum(TotalVolume))/"+QString::number(devicer)+" as AvgPrice, TokenNo, BuySellIndicator from Trades WHERE TraderID='"+user_id+"' group by PortfolioNumber, TokenNo, BuySellIndicator ";
 
 
        /*QString sqlquery = "SELECT "
@@ -530,6 +530,29 @@ QHash<QString,PortFolioData_Less> mysql_conn::getPortfoliosTableData(QAtomicInt 
                "t.TokenNo, "
                "t.BuySellIndicator; ";*/
 
+     //  QString traderID = "2";  // Replace with actual value
+      // double divisor = 100;    // Replace with actual value
+
+       QString sqlquery = QString(
+                              "SELECT "
+                              "    t.PortfolioNumber, "
+                              "    p.PortfolioType, "
+                              "    (SUM(t.TradedPrice * t.TotalVolume) * 1.0 / SUM(t.TotalVolume)) / %1 AS AvgPrice, "
+                              "    t.TokenNo, "
+                              "    t.BuySellIndicator, "
+                              "    o.Leg1_OrderState, "
+                              "    o.Leg2_OrderState, "
+                              "    o.Leg3_OrderState, "
+                              "    o.Leg4_OrderState  "
+                              "FROM Trades t "
+                              "LEFT JOIN Portfolios p ON "
+                              "    (CASE WHEN t.PortfolioNumber > 1500000 THEN t.PortfolioNumber - 1500000 ELSE t.PortfolioNumber END) = p.PortfolioNumber "
+                              "LEFT JOIN Order_Table_Bid o ON t.LocalOrderNumber = o.Trader_Data "
+                              "WHERE t.TraderID = '%2' "
+                              "GROUP BY t.PortfolioNumber, p.PortfolioType, t.TokenNo, t.BuySellIndicator, o.Leg1_OrderState, o.Leg2_OrderState, o.Leg3_OrderState, o.Leg4_OrderState;"
+                              ).arg(devicer).arg(user_id);
+
+
        QSqlQuery queryAvgPrice(sqlquery, db);
         if(!queryAvgPrice.exec())
         {
@@ -541,6 +564,93 @@ QHash<QString,PortFolioData_Less> mysql_conn::getPortfoliosTableData(QAtomicInt 
             while (queryAvgPrice.next()) {
                 int portfolioNumber =queryAvgPrice.value(rec.indexOf("PortfolioNumber")).toInt();
                 int token = queryAvgPrice.value(rec.indexOf("TokenNo")).toInt();
+                int  portfoliotype = queryAvgPrice.value(rec.indexOf("PortfolioType")).toInt();
+                int Leg1_OrderState = queryAvgPrice.value(rec.indexOf("Leg1_OrderState")).toInt();
+                int Leg2_OrderState = queryAvgPrice.value(rec.indexOf("Leg2_OrderState")).toInt();
+                int Leg3_OrderState = queryAvgPrice.value(rec.indexOf("Leg3_OrderState")).toInt();
+                int Leg4_OrderState = queryAvgPrice.value(rec.indexOf("Leg4_OrderState")).toInt();
+                bool traded = false;
+
+
+
+                switch (portfoliotype) {
+                case PortfolioType::F2F:{
+                     if (Leg1_OrderState == 7 && Leg2_OrderState == 7) {
+                        traded = true;
+                    }
+
+                    break;
+                }
+                case PortfolioType::BY:{
+                    if (Leg1_OrderState == 7 && Leg2_OrderState == 7 && Leg3_OrderState == 7) {
+                        traded = true;
+                    }
+
+                    break;
+                }
+                case PortfolioType::CR:{
+                    if (Leg1_OrderState == 7 && Leg2_OrderState == 7 && Leg3_OrderState == 7) {
+                        traded = true;
+                    }
+
+                    break;
+                }
+                case PortfolioType::CR_JELLY:{
+                   if (Leg1_OrderState == 7 && Leg2_OrderState == 7 && Leg3_OrderState == 7) {
+                        traded = true;
+                    }
+
+                    break;
+                }
+                case PortfolioType::BFLY_BID:{
+                    if (Leg1_OrderState == 7 && Leg2_OrderState == 7 && Leg3_OrderState == 7) {
+                        traded = true;
+                    }
+
+                    break;
+                }
+                case PortfolioType::BX_BID: {
+                    if (Leg1_OrderState == 7 && Leg2_OrderState == 7 && Leg3_OrderState == 7 && Leg4_OrderState == 7) {
+                        traded = true;
+                    }
+
+                    break;
+                }
+//                case PortfolioType::F1_F2: {
+
+//                    int strikePriceLeg1 = ContractDetail::getInstance().GetStrikePrice(leg1_token_number, portfolio_type).toInt()* devicer;
+//                    if (Leg1BuySellIndicator == 1) {
+//                        Exch_Price_val = static_cast<double>(leg1Price ) / devicer;
+//                    } else {
+//                        Exch_Price_val = static_cast<double>(leg1Price) / devicer;
+
+//                    }
+
+//                    break;
+              //  }
+
+                case PortfolioType::BS1221: {
+
+                if (Leg1_OrderState == 7 && Leg2_OrderState == 7 && Leg3_OrderState == 7 && Leg4_OrderState == 7) {
+                        traded = true;
+                }
+                    break;
+                }
+                case PortfolioType::BS1331: {
+                   if (Leg1_OrderState == 7 && Leg2_OrderState == 7 && Leg3_OrderState == 7 && Leg4_OrderState == 7) {
+                        traded = true;
+                    }
+
+                    break;
+                }
+
+                default:
+                    break;
+                }
+
+                if (!traded)
+                    continue;
+
                 QString key = QString::number(portfolioNumber)+"_"+QString::number(token);
                 if(!averagePriceList.contains(key)){
                     PortfolioAvgPrice avgPrice;
