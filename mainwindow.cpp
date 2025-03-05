@@ -5433,72 +5433,96 @@ void MainWindow::onRetryButtonClickedMissedTrade(int row){
       int lotSize=ContractDetail::getInstance().GetLotSize(token_number.toInt(),PortfolioType::F1_F2);
       QString orderID = data[Missed_Trades_Idx::OrderId];
       QString ID = data[Missed_Trades_Idx::Missed_Trade_Id];
+      QHash<QString, MBP_Data_Struct>  MBP_Data_Hash = slowData->getMBP_Data_Hash();
+      double lastTradedPrice = 0;
+      if(MBP_Data_Hash.contains(token_number)){
+          contract_table c = ContractDetail::getInstance().GetDetail(token_number.toInt());
+          MBP_Data_Struct mbpData = MBP_Data_Hash[token_number];
+          lastTradedPrice = mbpData.lastTradedPrice.toDouble();
+          double offeset = 5*devicer;// in paise
+          if(BuySell=="Buy"){
+              lastTradedPrice = lastTradedPrice+offeset;
+              if(lastTradedPrice<c.MinimumSpread)
+                  lastTradedPrice = c.MinimumSpread;
 
-      if(BuySell=="Buy"){
-          buyprice = QString::number(data[Missed_Trades_Idx::Price].toDouble()* devicer);
-          buyqty = QString::number(data[Missed_Trades_Idx::Lot].toInt()* lotSize);
-          orderQunatity = buyqty;
+              buyprice = QString::number(lastTradedPrice);
+              buyqty = QString::number(data[Missed_Trades_Idx::Lot].toInt()* lotSize);
+              orderQunatity = buyqty;
+              confirmationMsg ="Buy "+Stockname+/*" @ "+data[Missed_Trades_Idx::Price]+*/" for "+data[Missed_Trades_Idx::Lot]+" lot. Would you like to proceed?";
+              qDebug()<<"Retry order ---> LTP:"<<mbpData.lastTradedPrice.toDouble()<<" buyprice: "<<buyprice<<" MinimumSpread:"<<c.MinimumSpread;
+          }
+          else{
+             // sellprice = QString::number(data[Missed_Trades_Idx::Price].toDouble()* devicer);
+              lastTradedPrice = lastTradedPrice-offeset;
+              if(lastTradedPrice<c.MinimumSpread)
+                  lastTradedPrice = c.MinimumSpread;
+              sellprice = QString::number(lastTradedPrice);
+              sellqty = QString::number(data[Missed_Trades_Idx::Lot].toInt()* lotSize);
+              orderQunatity = sellqty;
+              confirmationMsg ="Sell "+Stockname/*+" @ "+data[Missed_Trades_Idx::Price]*/+" for "+data[Missed_Trades_Idx::Lot]+" lot. Would you like to proceed?";
+              qDebug()<<"Retry order Sell ---> LTP:"<<mbpData.lastTradedPrice.toDouble()<<" sellprice: "<<sellprice<<" MinimumSpread:"<<c.MinimumSpread;
 
-          confirmationMsg ="Buy "+Stockname+/*" @ "+data[Missed_Trades_Idx::Price]+*/" for "+data[Missed_Trades_Idx::Lot]+" lot. Would you like to proceed?";
+          }
+
+
+
+           QMessageBox::StandardButton reply;
+           reply = QMessageBox::question(this, "Add Manual Order?", confirmationMsg,QMessageBox::Yes | QMessageBox::No);
+
+           if (reply == QMessageBox::Yes) {
+               mysql_conn *db_conn = new mysql_conn(0, "add_algo_db_conn");
+               algo_data_insert_status status = db_conn->retry_F1F2_Order(orderID,ID,QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,true);
+               if(status == algo_data_insert_status::EXIST){
+                    QMessageBox::StandardButton reply;
+                    reply = QMessageBox::question(this, "Duplicate record!", "Record already exist for selected Order Id!. Do you want to proceed?",QMessageBox::Yes | QMessageBox::No);
+                    if (reply == QMessageBox::Yes) {
+                        algo_data_insert_status status1 = db_conn->retry_F1F2_Order(orderID,ID,QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,false);
+                        if(status1 == algo_data_insert_status::INSERTED){
+                                sendBackendCommandOnAddPortfolio();
+                                QMessageBox msgBox;
+                                msgBox.setWindowTitle("Success");
+                                msgBox.setIcon(QMessageBox::Information);
+                                msgBox.setText("Order placed successfully.");
+                                msgBox.exec();
+                            }
+                            else{
+                                QMessageBox msgBox;
+                                msgBox.setWindowTitle("Failed.");
+                                msgBox.setIcon(QMessageBox::Warning);
+                                msgBox.setText(msg);
+                                msgBox.exec();
+                            }
+                    }
+               }
+               else if(status == algo_data_insert_status::INSERTED){
+                   sendBackendCommandOnAddPortfolio();
+                   QMessageBox msgBox;
+                   msgBox.setWindowTitle("Success");
+                   msgBox.setIcon(QMessageBox::Information);
+                   msgBox.setText("Order placed successfully.");
+                   msgBox.exec();
+               }
+               else{
+                   QMessageBox msgBox;
+                   msgBox.setWindowTitle("Failed");
+                   msgBox.setIcon(QMessageBox::Warning);
+                   msgBox.setText(msg);
+                   msgBox.exec();
+               }
+
+               delete db_conn;
+           }
+
       }
       else{
-          sellprice = QString::number(data[Missed_Trades_Idx::Price].toDouble()* devicer);
-          sellqty = QString::number(data[Missed_Trades_Idx::Lot].toInt()* lotSize);
-          orderQunatity = sellqty;
-          confirmationMsg ="Sell "+Stockname/*+" @ "+data[Missed_Trades_Idx::Price]*/+" for "+data[Missed_Trades_Idx::Lot]+" lot. Would you like to proceed?";
-
+          qDebug()<<"LTP cannot find with the token number "<<token_number<<" , skipping retry!";
+          QMessageBox msgBox;
+          msgBox.setWindowTitle("Cannot Retry Order.");
+          msgBox.setIcon(QMessageBox::Warning);
+          msgBox.setText("LTP cannot find with the token number in Contract, please try manually");
+          msgBox.exec();
       }
 
-
-
-       QMessageBox::StandardButton reply;
-       reply = QMessageBox::question(this, "Add Manual Order?", confirmationMsg,QMessageBox::Yes | QMessageBox::No);
-
-       if (reply == QMessageBox::Yes) {
-           mysql_conn *db_conn = new mysql_conn(0, "add_algo_db_conn");
-           algo_data_insert_status status = db_conn->retry_F1F2_Order(orderID,ID,QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,true);
-           if(status == algo_data_insert_status::EXIST){
-                QMessageBox::StandardButton reply;
-                reply = QMessageBox::question(this, "Duplicate record!", "Record already exist for selected Order Id!. Do you want to proceed?",QMessageBox::Yes | QMessageBox::No);
-                if (reply == QMessageBox::Yes) {
-                    algo_data_insert_status status1 = db_conn->retry_F1F2_Order(orderID,ID,QString::number(userData.UserId),token_number, sellprice, sellqty, buyprice, buyqty,userData.MaxPortfolioCount,orderQunatity,msg,false);
-                    if(status1 == algo_data_insert_status::INSERTED){
-                            sendBackendCommandOnAddPortfolio();
-                            QMessageBox msgBox;
-                            msgBox.setWindowTitle("Success");
-                            msgBox.setIcon(QMessageBox::Information);
-                            msgBox.setText("Order placed successfully.");
-                            msgBox.exec();
-                        }
-                        else{
-                            QMessageBox msgBox;
-                            msgBox.setWindowTitle("Failed.");
-                            msgBox.setIcon(QMessageBox::Warning);
-                            msgBox.setText(msg);
-                            msgBox.exec();
-                        }
-                }
-           }
-           else if(status == algo_data_insert_status::INSERTED){
-               sendBackendCommandOnAddPortfolio();
-               QMessageBox msgBox;
-               msgBox.setWindowTitle("Success");
-               msgBox.setIcon(QMessageBox::Information);
-               msgBox.setText("Order placed successfully.");
-               msgBox.exec();
-           }
-           else{
-               QMessageBox msgBox;
-               msgBox.setWindowTitle("Failed");
-               msgBox.setIcon(QMessageBox::Warning);
-               msgBox.setText(msg);
-               msgBox.exec();
-           }
-
-           delete db_conn;
-       }
-
-       qDebug() << "Retry button clicked for row:" << row;
 
 }
 
