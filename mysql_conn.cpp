@@ -1993,7 +1993,7 @@ void mysql_conn::getTradeTableData(int &TraderCount,Trade_Table_Model *trade_tab
                 double JackpotVal =(Exch_Price_val-userPriceVal);
                 QString Jackpot = QString::number(JackpotVal,'f',decimal_precision);
 
-                qDebug()<<"traderData_ID_OnAppStart: " <<traderData_ID_OnAppStart<<"  traderData: "<<traderData<<"  userPriceVal="<<userPriceVal<<" maxLossThr="<<maxLossThr<<" Exch_Price_val="<<Exch_Price_val;
+               // qDebug()<<"traderData_ID_OnAppStart: " <<traderData_ID_OnAppStart<<"  traderData: "<<traderData<<"  userPriceVal="<<userPriceVal<<" maxLossThr="<<maxLossThr<<" Exch_Price_val="<<Exch_Price_val;
 
                 //disable only for the lastest trade,
                 if(traderData.toInt()> traderData_ID_OnAppStart){
@@ -2657,6 +2657,9 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
             sumRowList.append(QString::number(profitSum));
             sumRowList.append("-");
             sumRowList.append("-");
+            sumRowList.append("-"); // TokenNo as the last element
+            sumRowList.append("dummy_token_no"); // dummy TokenNo as the last element, for comparing the row, and should be unique
+
 
             netPos_data_listTmp.append(sumRowList);
             // Set sorted data to the model

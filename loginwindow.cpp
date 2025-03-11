@@ -18,11 +18,11 @@ loginwindow::loginwindow(QWidget *parent) :
     ui->setupUi(this);
 
 //#ifdef QT_DEBUG
-//#ifndef RELEASE_BUILD
-    ui->lineEditUsername->setText("stm102");
+#ifndef RELEASE_BUILD
+    ui->lineEditUsername->setText("JNK82");
     ui->lineEdit_Password->setText("123");
     ui->pushButtonlogin->click();
-//#endif
+#endif
 
  //   MainWindowObj = (MainWindow*) parent;
     QFontDatabase::addApplicationFont(":/RacingSansOne-Regular.ttf");

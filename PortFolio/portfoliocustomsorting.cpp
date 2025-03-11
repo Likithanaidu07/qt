@@ -10,6 +10,148 @@ portfolioCustomSorting::portfolioCustomSorting(QObject *parent,QString conne_nam
     //loadSortConfig();
 }
 
+#ifdef SORTING_NEW
+
+
+void portfolioCustomSorting::loadSortConfig(){
+        QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)+"/Data";
+        QSettings settings(appDataPath+"/sort_data.dat", QSettings::IniFormat);
+        if (settings.contains("portfolio_sort_data"))
+        {
+           sortRule =  settings.value("portfolio_sort_data").toString();
+        }
+}
+// Helper function to extract fields from the input string
+QMap<QString, QString> portfolioCustomSorting::extractFields(const QString& input) {
+    QMap<QString, QString> fields;
+    QStringList parts = input.split("-");
+    fields["Status"] = parts[0];
+    fields["AlgoType"] = parts[1];
+    fields["InstrumentName"] = parts[2];
+    fields["Expiry"] = parts[3];
+    fields["MiddleStrike"] = parts[4];
+    fields["StrikeDifference"] = parts[5];
+    fields["OptionType"] = parts[6];
+    return fields;
+}
+
+// Helper function to convert expiry string (e.g., "13MAR") to QDate
+QDate portfolioCustomSorting::parseExpiry(const QString& expiry) {
+    QString format = "ddMMMyyyy"; // Format for dates like "13MAR"
+    return QDate::fromString(expiry, format);
+}
+
+bool portfolioCustomSorting::do_compare(const QString& a, const QString& b, const QStringList& sortRules) {
+    QMap<QString, QString> fieldsA = extractFields(a);
+    QMap<QString, QString> fieldsB = extractFields(b);
+
+    for (const QString& rule : sortRules) {
+        QStringList ruleParts = rule.split(":");
+        QString key = ruleParts[0];
+        QString order = ruleParts[1];
+
+        if (key == "Instrument Name") {
+            if (fieldsA["InstrumentName"] != fieldsB["InstrumentName"]) {
+                return (order == "Ascending") ? fieldsA["InstrumentName"] < fieldsB["InstrumentName"] : fieldsA["InstrumentName"] > fieldsB["InstrumentName"];
+            }
+        } else if (key == "Option Type") {
+            QString optionTypeA = fieldsA["OptionType"];
+            QString optionTypeB = fieldsB["OptionType"];
+
+            // Handle ZE (always comes last)
+            if (optionTypeA == "ZE" && optionTypeB != "ZE") {
+                return false; // ZE comes after CE/PE
+            }
+            if (optionTypeB == "ZE" && optionTypeA != "ZE") {
+                return true; // CE/PE comes before ZE
+            }
+
+            // Handle CE and PE based on the order
+            if (optionTypeA != optionTypeB) {
+                if (order == "PE") {
+                    return (optionTypeA == "PE"); // PE comes first if order is PE
+                } else {
+                    return (optionTypeA == "CE"); // CE comes first if order is CE
+                }
+            }
+        } else if (key == "Middle Strike") {
+            if (fieldsA["MiddleStrike"] != fieldsB["MiddleStrike"]) {
+                return (order == "Ascending") ? fieldsA["MiddleStrike"].toInt() < fieldsB["MiddleStrike"].toInt() : fieldsA["MiddleStrike"].toInt() > fieldsB["MiddleStrike"].toInt();
+            }
+        } else if (key == "Algo Status") {
+            if (fieldsA["Status"] != fieldsB["Status"]) {
+                return (order == "Enabled") ? fieldsA["Status"] == "1" : fieldsA["Status"] != "1";
+            }
+        } else if (key == "Algo Type") {
+            if (fieldsA["AlgoType"] != fieldsB["AlgoType"]) {
+                return (order == "Ascending") ? fieldsA["AlgoType"] < fieldsB["AlgoType"] : fieldsA["AlgoType"] > fieldsB["AlgoType"];
+            }
+        } else if (key == "Expiry") {
+            QDate dateA = parseExpiry(fieldsA["Expiry"]);
+            QDate dateB = parseExpiry(fieldsB["Expiry"]);
+            if (dateA != dateB) {
+                return (order == "Sort by Far Date") ? dateA > dateB : dateA < dateB;
+            }
+        } else if (key == "Strike Difference") {
+            if (fieldsA["StrikeDifference"] != fieldsB["StrikeDifference"]) {
+                return (order == "Ascending") ? fieldsA["StrikeDifference"].toInt() < fieldsB["StrikeDifference"].toInt() : fieldsA["StrikeDifference"].toInt() > fieldsB["StrikeDifference"].toInt();
+            }
+        }
+    }
+    return false;
+}
+
+// Main function to sort the input data based on the sortRule
+QStringList portfolioCustomSorting::sortData(const QStringList& inputData, const QString& sortRule) {
+   // QStringList sortRules = sortRule.split(";");
+    QStringList sortRules = sortRule.split(";", Qt::SkipEmptyParts);
+
+    QStringList sortedData = inputData;
+
+    std::sort(sortedData.begin(), sortedData.end(), [this, &sortRules](const QString& a, const QString& b) {
+        return this->do_compare(a, b, sortRules);
+    });
+
+    return sortedData;
+}
+
+
+// Function to return the rank of each item in the original list
+QVector<int> portfolioCustomSorting::sortPortFolio(const QStringList& list) {
+    QVector<int> ranks(list.size()); // Vector to store ranks
+    if (sortRule.isEmpty() || sortRule == "") {
+        // If sortRule is empty, assign ranks in the order of the original list
+        for (int i = 0; i < list.size(); ++i) {
+            ranks[i] = i; // Assign ranks as 0, 1, 2, ...
+        }
+        return ranks;
+    }
+
+    QStringList sortedList = sortData(list, sortRule); // Sort the list
+
+    // Create a map to store the index of each item in the sorted list
+    QMultiMap<QString, int> sortedIndexMap;
+    for (int i = 0; i < sortedList.size(); ++i) {
+        sortedIndexMap.insert(sortedList[i], i);
+    }
+
+    // Assign ranks based on the original list
+    for (int i = 0; i < list.size(); ++i) {
+        QString item = list[i];
+        QList<int> indices = sortedIndexMap.values(item);
+        if (!indices.isEmpty()) {
+            ranks[i] = indices.takeFirst(); // Assign the first available rank
+            sortedIndexMap.remove(item, ranks[i]); // Remove the assigned rank from the map
+        }
+    //    qDebug()<<"input: "<<list[i]<<" rank: "<<ranks[i];
+
+
+    }
+
+    return ranks;
+}
+
+#else
 void portfolioCustomSorting::loadSortConfig(){
 
     priorityColumnIdxs.clear();
@@ -254,3 +396,4 @@ QVector<int> portfolioCustomSorting::sortPortFolio(const QStringList &list) {
 
         return ranks;
 }
+#endif
