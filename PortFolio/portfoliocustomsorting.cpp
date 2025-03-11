@@ -27,7 +27,7 @@ void portfolioCustomSorting::loadSortConfig(){
               if(tok.length()==2){
 
                   QString columnToSort = tok[0]; //"Algo Status","Algo Name", "Strategy","Expiry","Start Strike","End Strike","Option Type"
-                  QString order = tok[1]; // Ascending or Descending or
+                  QString order = tok[1]; // Ascending or Descending or0000000000000000
                   int idx = columnNameToIDx(columnToSort);
                   if(idx!=-1){
                      priorityColumnIdxs.append(idx);
@@ -39,6 +39,7 @@ void portfolioCustomSorting::loadSortConfig(){
               }
               else{
                   qDebug()<<"Error: portfolio_sort_data reade error, "<<saveStrList[i];
+
               }
 
           }
@@ -151,7 +152,6 @@ bool portfolioCustomSorting::customComparator(const QString &a, const QString &b
 
             }
 
-
             //CE should come first so sort Ascending order
             /*if (order == "CE") {
                 if (aParts[colIndex] < bParts[colIndex]) {
@@ -171,21 +171,21 @@ bool portfolioCustomSorting::customComparator(const QString &a, const QString &b
 
 
             // CE should come first (Ascending order)
-                        if (order == "CE") {
-                            if (aVal < bVal) {
-                                return true;
-                            } else if (aVal > bVal) {
-                                return false;
-                            }
-                        }
-                        // PE should come first (Descending order)
-                        else if (order == "PE") {
-                            if (aVal > bVal) {
-                                return true;
-                            } else if (aVal < bVal) {
-                                return false;
-                            }
-                        }
+//                        if (order == "CE") {
+//                            if (aVal < bVal) {
+//                                return true;
+//                            } else if (aVal > bVal) {
+//                                return false;
+//                            }
+//                        }
+//                        // PE should come first (Descending order)
+//                        else if (order == "PE") {
+//                            if (aVal > bVal) {
+//                                return true;
+//                            } else if (aVal < bVal) {
+//                                return false;
+//                            }
+//                        }
 
 
 
