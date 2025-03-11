@@ -2572,7 +2572,14 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
 
 
            QList<QStringList> netPos_data_listTmp; // Assuming this is declared as a list of QStringList
-
+            double bLotSum=0.0;
+            double sLotSum=0.0;
+            double bvalueSum=0.0;
+            double svalueSum=0.0;
+            double bavgSum=0.0;
+            double savgSum=0.0;
+            double netlotSum=0.0;
+            double profitSum=0.0;
            for (auto it = net_pos_dataList.constBegin(); it != net_pos_dataList.constEnd(); ++it) {
                  QString tokenNo = it.key();              // TokenNo (key in QHash)
                  const net_pos_data_& data = it.value();  // Access the net_pos_data_ object
@@ -2597,6 +2604,15 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
                  rowList.append(QString::number((data.lotSize))); //lotSize
                  rowList.append(tokenNo); // TokenNo as the last element
                  netPos_data_listTmp.append(rowList);
+
+                 bLotSum =bLotSum+data.Buy_Total_Lot / data.lotSize;
+                 sLotSum=sLotSum+data.Sell_Total_Lot/ data.lotSize;
+                 bvalueSum=bvalueSum+data.Buy_Price;
+                 svalueSum=svalueSum+data.Sell_Price;
+                 bavgSum=bavgSum+data.Buy_Avg_Price;
+                 savgSum=savgSum+data.Sell_Avg_Price;
+                 netlotSum=netlotSum+data.Net_Qty / data.lotSize;
+                 profitSum= profitSum + Profit;
 
                  if(data.Buy_Total_Lot-data.Sell_Total_Lot!=0){
                         QString buySell = "Buy";
@@ -2629,7 +2645,20 @@ void mysql_conn::getNetPosTableData(double &BuyValue_summary, double &SellValue,
             std::sort(netPos_data_listTmp.begin(), netPos_data_listTmp.end(), [](const QStringList &a, const QStringList &b) {
                 return a[0] < b[0]; // Sort by StockName
             });
+            QStringList sumRowList;
+            sumRowList.append("Total");
+            sumRowList.append(QString::number(bLotSum));
+            sumRowList.append(QString::number(sLotSum));
+            sumRowList.append(fixDecimal(bvalueSum, decimal_precision));
+            sumRowList.append(fixDecimal(svalueSum, decimal_precision));
+            sumRowList.append(fixDecimal(bavgSum, decimal_precision));
+            sumRowList.append(fixDecimal(savgSum, decimal_precision));
+            sumRowList.append(QString::number(netlotSum));
+            sumRowList.append(QString::number(profitSum));
+            sumRowList.append("-");
+            sumRowList.append("-");
 
+            netPos_data_listTmp.append(sumRowList);
             // Set sorted data to the model
             model->setDataList(netPos_data_listTmp);
             openpos_model->setDataList(openPos_data_listTmp);
@@ -2726,7 +2755,12 @@ void mysql_conn::getMissedTradeData(Missed_Trade_Table_Model* model,QString user
                 double Price = query.value(rec.indexOf("Price")).toDouble();
 
 
-
+                if (Type == "RejectedByExchange") {
+                    Type = "Rejected";
+                }
+                else if (Type == "CancelledByExchange") {
+                    Type = "Cancelled";
+                }
 
 
                 Price = Price/devicer;

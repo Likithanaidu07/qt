@@ -97,9 +97,20 @@ MainWindow::MainWindow(QWidget *parent)
     /*************************************************/
 
     /***********************Main Menu Section**********************************/
-    QMenu *mainMenu = new QMenu("Tool", this);
+
+    QString MenuStyle =  "QToolButton {"
+                              "    color: white;"
+                              "    font-family: 'Work Sans';"
+                              "    font-weight: bold;"
+
+                              // "    padding-right: 10px;"  // Add padding for spacing
+                              // "   border: 0px solid #4F5D75;"
+                              "}";
+    QMenu *mainMenu = new QMenu("Settings", this);
     ui->menu->setMenu(mainMenu);
     ui->menu->setPopupMode(QToolButton::InstantPopup);
+    ui->menu->setStyleSheet(MenuStyle);
+    ui->menu->setText("Settings");
 
     // Create reset password actions
     QAction *changepasswordAction = new QAction("ChangePassword", this);
@@ -114,7 +125,7 @@ MainWindow::MainWindow(QWidget *parent)
 
 
     // Create setting window actions
-    QAction *openSettWinAction = new QAction("Settings", this);
+    QAction *openSettWinAction = new QAction("Hot Keys", this);
     mainMenu->addAction(openSettWinAction);// Add actions to the Card menu
     connect(openSettWinAction, &QAction::triggered, this, &MainWindow::openSettingsWindow);// Create a ToolButton to act as the menu title on ui->card
 
@@ -295,9 +306,12 @@ MainWindow::MainWindow(QWidget *parent)
     loggedInFlg.storeRelaxed(0);
 
 
-    QPixmap pixmapclose(":/close_window_icon.png");
-    QPixmap pixmapminimize(":/minimize_window_icon.png");
-    QPixmap pixmapmaximize(":/maximize_window_icon.png");
+   // QPixmap pixmapclose(":/close_window_icon.png");
+    //QPixmap pixmapminimize(":/minimize_window_icon.png");
+    QPixmap pixmapclose = style()->standardPixmap(QStyle::SP_TitleBarCloseButton);
+    QPixmap pixmapmaximize = style()->standardPixmap(QStyle::SP_TitleBarMaxButton);
+    QPixmap pixmapminimize = style()->standardPixmap(QStyle::SP_TitleBarMinButton);
+    //QPixmap pixmapmaximize(":/maximize_window_icon.png");
     QFont headerfont("Work Sans");
 
 
@@ -1598,8 +1612,12 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
 
     //logo at the top left
     QPixmap pixmaplogo(":/Am Logomark - Standard.png");
-    pixmaplogo = pixmaplogo.scaled(ui->label->width(),ui->label->height(),Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    int labelWidth = ui->label->width();
+    int labelHeight = ui->label->height();
+    pixmaplogo = pixmaplogo.scaled(labelWidth * 0.9, labelHeight * 0.9, Qt::KeepAspectRatio, Qt::SmoothTransformation);
     ui->label->setPixmap(pixmaplogo);
+    ui->label->setAlignment(Qt::AlignCenter); // Ensure it's centered
+
 
 
 
@@ -1630,14 +1648,17 @@ connect(dock_win_trade, SIGNAL(visibilityChanged(bool)), this, SLOT(OnOrderBookD
 //                                           "font-size: 12px;"
 //                                           "font-weight: 400;"
 //                                           );
-    QPixmap pixmapmenu(":/menu.png");
+    //QPixmap pixmapmenu(":/resized_image1.png");
+    //QPixmap pixmapmenu = style()->standardPixmap(QStyle::SP_FileDialogDetailedView);
+
     ui->close->setIcon(pixmapclose);
     ui->minimize->setIcon(pixmapminimize);
     ui->maximize->setIcon(pixmapmaximize);
-    ui->menu->setIcon(pixmapmenu);
+    //ui->menu->setIcon(pixmapmenu);
 
     //setting icons for top window widget
-    QPixmap pixmapbuttonclose(":/button_close.png");
+       //QPixmap pixmapbuttonclose = style()->standardPixmap(QStyle::SP_TitleBarCloseButton);
+    QPixmap pixmapbuttonclose(":/dock_close.png");
    // ui->Algorithms_Close->setIcon(pixmapbuttonclose);
    // ui->OrderBook_Close->setIcon(pixmapbuttonclose);
   //  ui->Positions_Close->setIcon(pixmapbuttonclose);
@@ -2939,8 +2960,8 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 #ifdef ENABLE_BACKEND_DEBUG_MSG
         qDebug()<<"Backend Data: Backend Socket Error"<<msg;
 #endif
-        ui->label_3->setText("Server Status :"  "Stopped");
-        ui->label_3->setStyleSheet("color: red;");
+        ui->label_3->setText("   Server Status :"  "Stopped");
+        ui->label_3->setStyleSheet("color: red; font-weight: bold;");
         backendConn_Status = false;
     }
     //ui->toolButton_BackendServer->setStyleSheet("background-color: rgb(255, 32, 36);border-radius:6px;color:#000;");
@@ -2948,8 +2969,8 @@ void MainWindow::backend_comm_Data_Slot(QString msg,SocketDataType msgType){
 #ifdef ENABLE_BACKEND_DEBUG_MSG
         qDebug()<<"Backend Data: Backend Socket Connected"<<msg;
 #endif
-        ui->label_3->setText("Server Status :" "Started");
-        ui->label_3->setStyleSheet("color: #013220;");
+        ui->label_3->setText("  Server Status :" "Started");
+        ui->label_3->setStyleSheet("color: #013220;font-weight: bold;");
         backendConn_Status = true;
     }
 #ifdef BACKEND_LOG
@@ -3186,7 +3207,7 @@ void MainWindow::loggedIn(){
         QFont font = ui->label_6->font();
         font.setBold(true);
         ui->label_6->setFont(font);
-      ui->label_6->setStyleSheet("color: white; font-size: 10pt;");
+      ui->label_6->setStyleSheet("color: black; font-size: 10pt;");
 
         start_slowdata_worker();
         start_slowdata_indices_worker();
@@ -3272,7 +3293,7 @@ void MainWindow::add_logs(QString str){
     ui->label_5->setWordWrap(true);
     ui->label_5->setText(str);
     ui->label_5->setStyleSheet("font-family: 'Work Sans'; font-size: 8pt; /*color: white;*/");
-     ui->label_5->setStyleSheet("color: white;");
+     ui->label_5->setStyleSheet("color: black;");
 
 }
 
@@ -3991,10 +4012,10 @@ void MainWindow::T_Portfolio_Table_cellClicked(const QItemSelection &selected, c
 
 void MainWindow::slotAddLogForAddAlgoRecord(QString str)
 {
-    // To show the latest log at top
+//    To show the latest log at top
 //    htmlLogsContent.prepend(str);
-//     ui->textEdit->setText(htmlLogsContent);
-   //  emit logDataSignal(str);
+//    ui->textEdit->setText(htmlLogsContent);
+//    emit logDataSignal(str);
     logsdata.append(str);
     emit logDataSignal(logsdata);
     ui->label_5->setWordWrap(true);
@@ -4005,7 +4026,7 @@ void MainWindow::slotAddLogForAddAlgoRecord(QString str)
     else
         ui->label_5->setText("logs:"+str);
 
-    ui->label_5->setStyleSheet("color: white;");
+    ui->label_5->setStyleSheet("color: black;font-weight: bold;");
 
 }
 
@@ -4433,7 +4454,7 @@ void MainWindow::saveTableViewColumnState(QTableView *tableView){
 
     // Save the state of the table view headers
    settings.setValue(key,tableView->horizontalHeader()->saveState());
-  // qDebug()<<"Saving table state  for "<<tableView->objectName();
+   qDebug()<<"Saving table state  for "<<tableView->objectName();
 }
 
 void MainWindow::restoreTableViewColumnState(QTableView *tableView){
@@ -4445,7 +4466,7 @@ void MainWindow::restoreTableViewColumnState(QTableView *tableView){
      if (settings.contains(key))
      {
        tableView->horizontalHeader()->restoreState(settings.value(key).toByteArray());
-      // qDebug()<<"Restoring table state  for "<<tableView->objectName();
+       qDebug()<<"Restoring table state  for "<<tableView->objectName();
      }
 }
 

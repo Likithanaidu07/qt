@@ -196,6 +196,9 @@ void Table_OrderBook_Delegate::paint(QPainter *painter, const QStyleOptionViewIt
         else if (Leg1_OrderState == "13" || Leg3_OrderState == "13" || Leg4_OrderState == "13" || Leg2_OrderState == "13") {
             bgColor = QColor(215, 207, 232);  // Light purple background color
         }
+        else if (Leg1_OrderState == "8" || Leg3_OrderState == "8" || Leg4_OrderState == "8" || Leg2_OrderState == "8") {
+          bgColor = QColor(190, 180, 220);  // little light purple background color
+        }
        // Set the background color
         painter->fillRect(option.rect, bgColor);
 
