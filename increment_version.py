@@ -1,9 +1,10 @@
 import re
+import sys
 
-pro_file = "new_speedtrade.pro"  # Ensure correct file name
+pro_file = "new_speedtrade.pro"  # Ensure correct filename
 
 try:
-    with open(pro_file, "r") as file:
+    with open(pro_file, "r", encoding="utf-8") as file:
         lines = file.readlines()
 
     # Ensure we match only the correct VERSION line
@@ -23,13 +24,13 @@ try:
             new_lines.append(line)
 
     if new_version:
-        with open(pro_file, "w") as file:
+        with open(pro_file, "w", encoding="utf-8") as file:
             file.writelines(new_lines)
         print(f"✅ Version updated to {new_version}")
     else:
         print("❌ [ERROR] VERSION line not found in new_speedtrade.pro!")
-        exit(1)
+        sys.exit(1)
 
 except Exception as e:
     print(f"❌ [ERROR] Failed to update version: {e}")
-    exit(1)
+    sys.exit(1)
