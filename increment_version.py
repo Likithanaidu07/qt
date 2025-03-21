@@ -7,7 +7,7 @@ try:
     with open(pro_file, "r", encoding="utf-8") as file:
         lines = file.readlines()
 
-    # Ensure we match only the correct VERSION line
+    # Strictly match only the VERSION line
     version_pattern = re.compile(r"^\s*VERSION\s*=\s*(\d+)\.(\d+)\.(\d+)\s*$")
 
     new_lines = []
@@ -28,7 +28,7 @@ try:
             file.writelines(new_lines)
         print(f"✅ Version updated to {new_version}")
     else:
-        print("❌ [ERROR] VERSION line not found in new_speedtrade.pro!")
+        print("❌ [ERROR] VERSION line not found in new_speedtrade.pro! Check the file format.")
         sys.exit(1)
 
 except Exception as e:
