@@ -187,7 +187,7 @@ void add_algo_btfly_bid::selectedAction(){
             emit progressSignal(false,"");
 
 
-            qDebug() << "model_start_strike_BFLY_BID  Time:" << timer1.elapsed() << "milliseconds";
+            qDebug()<<"model_start_strike_BFLY_BID Total data:"<<BFLY_BID_Tokens.count() << ", model_start_strike_BFLY_BID  Time:" << timer1.elapsed() << "milliseconds";
 
             // Close the progress dialog once done
         });

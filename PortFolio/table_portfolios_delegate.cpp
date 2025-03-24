@@ -109,7 +109,7 @@ bool Table_Portfolios_Delegate::editorEvent(QEvent *event, QAbstractItemModel *m
 
 QWidget *Table_Portfolios_Delegate::createEditor(QWidget *parent, const QStyleOptionViewItem & option , const QModelIndex & index ) const
 {
-    QFont font("Work Sans");
+   // QFont font("Work Sans");
     int c = index.column();
     if ( c == PortfolioData_Idx::_OrderQuantity)
     {

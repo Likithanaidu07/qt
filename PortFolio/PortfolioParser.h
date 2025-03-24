@@ -29,6 +29,8 @@ public:
     void CalculateBS1331PriceDifference(PortfolioObject &portfolio, QHash<QString, MBP_Data_Struct> MBP_Data_Hash, double devicer, int decimal_precision, int type);
 
     void CalculateOpenBoxPriceDifference(PortfolioObject &portfolio, QHash<QString, MBP_Data_Struct> MBP_Data_Hash, double devicer, int decimal_precision, int type);
+    void CalculateOpen2LPriceDifference(PortfolioObject &portfolio, QHash<QString, MBP_Data_Struct> MBP_Data_Hash, double devicer, int decimal_precision, int type);
+
 };
 
 

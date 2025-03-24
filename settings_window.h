@@ -189,6 +189,7 @@ public:
     QList<HotKeysData_Grouped> hotKeyDataList; // this for UI pourpouse to group in treeview
     QMap<QString, HotKeyDetails> updatedHotKeys; // To store modified hotkeys
     QHash<QString, HotKeyDetails> HotKeysHash; // To store  hotkeys data accross app
+    void initFontSett();
 
 private:
     Ui::Settings_Window *ui;
@@ -205,6 +206,7 @@ private slots:
     void on_pushButtonSaveHotKeys_clicked();
     void treeviewHotKeyItemEdited(QStandardItem *item);
 
+    void on_pushButtonChangeFont_clicked();
 };
 
 #endif // SETTINGS_WINDOW_H

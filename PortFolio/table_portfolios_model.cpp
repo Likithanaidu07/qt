@@ -164,10 +164,11 @@ QVariant Table_Portfolios_Model::data(const QModelIndex &index, int role) const
             return QVariant();
     }
     case Qt::FontRole: {
-        QFont font("Work Sans");
+        QFont font("Work Sans", 9);
+        //font.setBold(false);
         if (c == PortfolioData_Idx::_AlgoName){
             font.setPointSize(8);
-            font.setBold(true);
+           // font.setBold(true);
             return font;
         }
         else if(c == PortfolioData_Idx::_Status ||
@@ -821,10 +822,10 @@ void Table_Portfolios_Model::updateModelDataList(QList <PortfolioObject*> portfo
         }
 
         //emit resize column signal only once
-        QFont font;
-        font.setFamily("Kanit");
-        font.setPointSize(12);
-        QFontMetrics fontMetrics(font);
+       // QFont font;
+        //font.setFamily("Work Sans");
+       // font.setPointSize(12);
+       // QFontMetrics fontMetrics(font);
 
         if(largestText==""){
             largestText = "Algo Name";

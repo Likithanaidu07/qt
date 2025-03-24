@@ -154,7 +154,7 @@ void convert_to_algo_bs1221_1331::selectedAction(PortfolioType _Portfolio_Type){
         emit progressSignal(false,"");
 
 
-        qDebug() << "model_start_strike_BFLY_BID  Time:" << timer1.elapsed() << "milliseconds";
+        qDebug()<<"model_start_strike_BS1XX1 Total data:"<<BS1XX1_Tokens.count() << ", model_start_strike_BS1XX1  Time:" << timer1.elapsed() << "milliseconds";
 
         // Close the progress dialog once done
     });

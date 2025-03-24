@@ -56,8 +56,8 @@ MainWindow::MainWindow(QWidget *parent)
 
 {
     //ui->lineEditSearch->hide();
-    QFontDatabase::addApplicationFont(":/WorkSans-Bold.ttf");
-    QFontDatabase::addApplicationFont(":/WorkSans-ExtraBold.ttf");
+   QFontDatabase::addApplicationFont(":/WorkSans-Bold.ttf");
+   QFontDatabase::addApplicationFont(":/WorkSans-ExtraBold.ttf");
 
     ui->setupUi(this);
 
@@ -1930,6 +1930,31 @@ void MainWindow::createINIFileIfNotExist(){
             settings.setValue("login_password","");
         settings.endGroup();
     }
+
+    //create them sett file if not exist
+    QDir dir1(appDataPath+"/Data");
+    // Check if the directory already exists
+    if (!dir1.exists()) {
+        // If it doesn't exist, create it
+        if (dir1.mkpath(".")) {
+            qDebug() << "App Data Directory created:" << appDataPath+"/Data";
+        } else {
+            qDebug() << "Error creating directory:" << appDataPath+"/Data";
+        }
+    }
+    QString theme_fileName = appDataPath+"/Data/theme_sett.ini";
+
+    //create INI File if not exist
+    if (!QFile(theme_fileName).exists()){
+        QSettings settings(theme_fileName, QSettings::IniFormat);
+        settings.beginGroup("font_sett");
+        settings.setValue("Family", "Work Sans");
+        settings.setValue("PointSize", 9);
+        settings.setValue("Bold", true);
+        settings.setValue("Italic", true);
+        settings.endGroup();
+    }
+
 }
 
 void MainWindow::loadSettings(){

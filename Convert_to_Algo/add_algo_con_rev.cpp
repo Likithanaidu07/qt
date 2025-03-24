@@ -173,7 +173,7 @@ void add_algo_con_rev::selectedAction(){
                emit progressSignal(false,"");
 
 
-               qDebug() << "model_Fut_CR  Time:" << timer1.elapsed() << "milliseconds";
+               qDebug()<<"CR Model Total data:"<<Fut_Tokens.count() << ", CR Model Loading time:" << timer1.elapsed() << "milliseconds";
 
                // Close the progress dialog once done
            });

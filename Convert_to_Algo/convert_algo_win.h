@@ -9,6 +9,8 @@
 #include "convert_algo_shared_var.h"
 #include "convert_to_algo_bfly.h"
 #include "Convert_to_Algo/convert_to_algo_box_bid.h"
+#include "Convert_to_Algo/convert_to_algo_open_2l.h"
+
 #include "add_algo_con_rev.h"
 #include "mysql_conn.h"
 #include "convert_to_algo_bfly_bid.h"
@@ -90,6 +92,8 @@ private:
 
     add_algo_btfly_bid *algoBtFlyBid;
     convert_to_algo_box_bid *algoBoxBid;
+    convert_to_algo_open_2L *algoOpen2L;
+
 
     convert_to_algo_bs1221_1331 *algoBS_1221_1331;
     QStringList ExFilterPF;
@@ -103,6 +107,8 @@ private:
   //  QListView *listViewStartStrike;
   //  QListView *listViewEndStrike;
     QListView *listViewFut;
+    void setCustomRatioValidator(QLineEdit *lineEdit, int maxDigits);
+
 
 signals:
     void update_ui_signal(int);

@@ -181,6 +181,9 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
         else if(obj.PortfolioType==QString::number(PortfolioType::BS1331)){
             obj.QuantityRatio="1:3:3:1";
         }
+        else if(obj.PortfolioType==QString::number(PortfolioType::OPEN2L)){
+            obj.QuantityRatio=QString::number(obj.Leg1Ratio)+":"+QString::number(obj.Leg2Ratio);
+        }
         else{
             obj.QuantityRatio="N/A";
         }
@@ -543,6 +546,11 @@ bool PortfolioParser::ToObject(QSqlQuery& query, PortfolioObject& obj, QHash<QSt
             obj.AdditionalData1 = query.value("AdditionalData1").toString();//.Convert.ToString(reader["AdditionalData1"]);
             break;
 
+        case PortfolioType::OPEN2L:
+            obj.Leg1 = ContractDetail::getInstance().GetStrikePrice(obj.Leg1TokenNo,type);
+            obj.Leg2 = ContractDetail::getInstance().GetStrikePrice(obj.Leg2TokenNo,type);
+            break;
+
 
         default:
             break;
@@ -660,7 +668,7 @@ QString PortfolioParser::get_Algo_Name(PortfolioType algo_type,int leg1_token_nu
     if(algo_type==PortfolioType::F2F){
         Algo_Name = "F2F-";//-Nifty";
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg1_token_number,"MMM",algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"MMM",algo_type);
-        Algo_Name_For_Sorting = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg1_token_number,"ddMMMyyyy",algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"MMM",algo_type);
+        Algo_Name_For_Sorting = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg1_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg1_token_number,"ddMMMyyyy",algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"MMM",algo_type)+"-0-ZE";
 
 
     }
@@ -724,7 +732,7 @@ QString PortfolioParser::get_Algo_Name(PortfolioType algo_type,int leg1_token_nu
         Algo_Name = "BX-";//Nifty-18000-CE-200";
         double diff = (ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
         Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff);
-        Algo_Name_For_Sorting = "BX-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff);
+        Algo_Name_For_Sorting = "BX-"+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMMyyyy",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+"-ZE";
     }
     else if(algo_type==PortfolioType::BS1221 ){
         Algo_Name = "BS12-";//Nifty-18000-CE-200";
@@ -753,6 +761,12 @@ QString PortfolioParser::get_Algo_Name(PortfolioType algo_type,int leg1_token_nu
                 ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+
                 ContractDetail::getInstance().GetStrikePrice(leg3_token_number,algo_type) +"-"+
                 ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
+    }
+    else if(algo_type==PortfolioType::OPEN2L){
+        Algo_Name = "Open2L-";
+        double diff = (ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type).toDouble()- ContractDetail::getInstance().GetStrikePrice(leg1_token_number,algo_type).toDouble());
+        Algo_Name = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+"-"+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
+        Algo_Name_For_Sorting = Algo_Name+ContractDetail::getInstance().GetInstrumentName(leg2_token_number,algo_type)+"-"+ContractDetail::getInstance().GetExpiry(leg2_token_number,"ddMMM",algo_type)+"-"+ ContractDetail::getInstance().GetStrikePrice(leg2_token_number,algo_type) +"-"+QString::number(diff)+"-"+ContractDetail::getInstance().GetOptionType(leg1_token_number,algo_type);
     }
 
 
@@ -1643,6 +1657,72 @@ void PortfolioParser::CalculateAveragePrice(PortfolioObject &portfolio,    QHash
         }
     }
 
+    case PortfolioType::OPEN2L:{
+        double leg1BuyPrice = DBL_MAX;
+        double leg1SellPrice =DBL_MAX;
+        double leg2BuyPrice = DBL_MAX;
+        double leg2SellPrice = DBL_MAX;
+        QString key1 = QString::number(portfolio.PortfolioNumber)+"_"+QString::number(portfolio.Leg1TokenNo);
+        if(averagePriceList.contains(key1)){
+            PortfolioAvgPrice leg1 = averagePriceList[key1];
+            leg1SellPrice = leg1.AvgPrice;
+        }
+        key1 = QString::number(portfolio.PortfolioNumber + 1500000)+"_"+QString::number(portfolio.Leg1TokenNo);
+        if(averagePriceList.contains(key1)){
+            PortfolioAvgPrice leg1 = averagePriceList[key1];
+            leg1BuyPrice = leg1.AvgPrice;
+        }
+
+        QString key2 = QString::number(portfolio.PortfolioNumber)+"_"+QString::number(portfolio.Leg2TokenNo);
+        if(averagePriceList.contains(key2)){
+            PortfolioAvgPrice leg2 = averagePriceList[key2];
+            leg2BuyPrice = leg2.AvgPrice;
+        }
+        key2 = QString::number(portfolio.PortfolioNumber + 1500000)+"_"+QString::number(portfolio.Leg2TokenNo);
+        if(averagePriceList.contains(key2)){
+            PortfolioAvgPrice leg2 = averagePriceList[key2];
+            leg2SellPrice = leg2.AvgPrice;
+        }
+
+
+        QHash<QString, contract_table> Contract =  ContractDetail::getInstance().GetContracts();
+        double ratio = portfolio.Leg1Ratio/portfolio.Leg2Ratio;
+
+
+        if (leg2BuyPrice == DBL_MAX || leg1SellPrice == DBL_MAX)
+        {
+            portfolio.SellAveragePrice = "-";
+        }
+        else
+        {
+            double diff = (leg1SellPrice - ratio * leg2BuyPrice);
+
+            QString d = QString::number(diff, 'f', decimal_precision);
+            if (portfolio.SellAveragePrice != d)
+            {
+                portfolio.AverageUpdateTime =QDateTime::currentDateTime();
+                portfolio.SellAveragePrice = d;
+            }
+        }
+        if (leg1BuyPrice == DBL_MAX || leg2SellPrice == DBL_MAX)
+        {
+            portfolio.BuyAveragePrice = "-";
+        }
+        else
+        {
+            double diff = ratio * leg2SellPrice - leg1BuyPrice;
+            QString d = QString::number(diff, 'f', decimal_precision);
+            if (portfolio.BuyAveragePrice != d)
+            {
+                portfolio.AverageUpdateTime = QDateTime::currentDateTime();
+                portfolio.BuyAveragePrice = d;
+            }
+        }
+
+
+        break;
+    }
+
     default:
         break;
     }
@@ -1684,6 +1764,9 @@ void PortfolioParser::CalculatePriceDifference(PortfolioObject &portfolio, QHash
         case PortfolioType::OPEN_BOX:
             return CalculateOpenBoxPriceDifference(portfolio,MBP_Data_Hash,devicer,decimal_precision,portfolio.PortfolioTypeEnum);
 
+        case PortfolioType::OPEN2L:
+            return CalculateOpen2LPriceDifference(portfolio,MBP_Data_Hash,devicer,decimal_precision,portfolio.PortfolioTypeEnum);
+
 
             /* case PortfolioType::R2L:
                      return CalculateR2LPriceDifference(portfolio);
@@ -1722,6 +1805,60 @@ void PortfolioParser::CalculatePriceDifference(PortfolioObject &portfolio, QHash
     } catch (...) {}
 
 
+}
+
+void PortfolioParser::CalculateOpen2LPriceDifference(PortfolioObject &portfolio, QHash<QString, MBP_Data_Struct> MBP_Data_Hash, double devicer, int decimal_precision, int type)
+{
+    if (!MBP_Data_Hash.contains(QString::number(portfolio.Leg1TokenNo)))
+    {
+        portfolio.BuyMarketRate = 0;//DBL_MAX;
+        portfolio.SellMarketRate = 0;//DBL_MAX;
+        return;
+    }
+
+    if (!MBP_Data_Hash.contains(QString::number(portfolio.Leg2TokenNo)))
+    {
+        portfolio.BuyMarketRate = 0;//DBL_MAX;
+        portfolio.SellMarketRate = 0;//DBL_MAX;
+        return;
+    }
+
+
+    double ratio = portfolio.Leg1Ratio/portfolio.Leg2Ratio;
+
+
+
+
+    MBP_Data_Struct leg1 = MBP_Data_Hash[QString::number(portfolio.Leg1TokenNo)];
+    MBP_Data_Struct leg2 = MBP_Data_Hash[QString::number(portfolio.Leg2TokenNo)];
+
+
+    double leg1BuyPrice = leg1.recordBuffer[0].price.toDouble();
+    double leg1SellPrice = leg1.recordBuffer[5].price.toDouble();
+    double leg2BuyPrice = leg2.recordBuffer[0].price.toDouble();
+    double leg2SellPrice = leg2.recordBuffer[5].price.toDouble();
+
+
+    portfolio.Cost = QString::number((( (leg1.lastTradedPrice.toDouble() + leg2.lastTradedPrice.toDouble()) * 2 * ratio ) / devicer), 'f', decimal_precision);
+
+    double diff = (-ratio * leg2SellPrice + leg1BuyPrice);
+    diff = diff / devicer;
+
+
+    if (diff != portfolio.SellMarketRate)
+    {
+        portfolio.SellMarketRate = diff;
+    }
+
+    diff = -leg1SellPrice + ratio * leg2BuyPrice;
+    diff = diff / devicer;
+
+    if (portfolio.BuyMarketRate != diff)
+    {
+        portfolio.BuyMarketRate = diff;
+    }
+
+    return;
 }
 
 void PortfolioParser::CalculateF2FPriceDifference(PortfolioObject &portfolio, QHash<QString, MBP_Data_Struct> MBP_Data_Hash,double devicer,int decimal_precision)

@@ -1,4 +1,6 @@
-#include "convert_to_algo_box_bid.h"
+#include "convert_to_algo_open_2l.h"
+
+
 
 #include "custom_q_completer.h"
 #include "contractdetail.h"
@@ -6,26 +8,27 @@
 #include <QFuture>
 #include <QtConcurrent/QtConcurrent>
 #include <QProgressDialog>
-convert_to_algo_box_bid::convert_to_algo_box_bid(QObject *parent)
+convert_to_algo_open_2L::convert_to_algo_open_2L(QObject *parent)
     : QObject{parent}
 {
     //  model_start_strike_BFLY = new QStandardItemModel;
     sharedData = &AddAlgoSharedVar::getInstance();
     model_end_strike = new QStandardItemModel;
-    model_start_strike_BOX_BID = new QStandardItemModel;
-    BX_BID_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::BX_BID);
+    model_start_strike_OPEN_2L = new QStandardItemModel;
+    OPEN_2L_Tokens = ContractDetail::getInstance().Get_Tokens_For_PortfolioType(PortfolioType::OPEN2L);
 
 
 }
-void convert_to_algo_box_bid::clearAllModel(){
+void convert_to_algo_open_2L::clearAllModel(){
     model_end_strike->clear();
-    model_start_strike_BOX_BID->clear();
+    model_start_strike_OPEN_2L->clear();
 }
-void convert_to_algo_box_bid::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_,QPushButton *addButton_){
+void convert_to_algo_open_2L::copyUIElement(QDialog *parentWidget,QTableWidget *tableWidget_, QLineEdit *lineEdit_Start_strike_, QLineEdit *lineEdit_EndStrike_, QLineEdit *lineEdit_StrikeDifference_, QLineEdit *lineEdit_2LRatio_,QPushButton *addButton_){
 
     lineEdit_Start_strike = lineEdit_Start_strike_;
     lineEdit_EndStrike = lineEdit_EndStrike_;
     lineEdit_StrikeDifference = lineEdit_StrikeDifference_;
+    lineEdit_2LRatio = lineEdit_2LRatio_;
     tableWidget = tableWidget_;
     addButton = addButton_;
     QSizePolicy sizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
@@ -37,13 +40,11 @@ void convert_to_algo_box_bid::copyUIElement(QDialog *parentWidget,QTableWidget *
     startStrikeListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 
-
-
-     endStrikeListView = new QListView(parentWidget);
-     connect(endStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
-     endStrikeListView->setSizePolicy(sizePolicy);
-     endStrikeListView->setFixedSize(230, 200);
-     endStrikeListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
+    endStrikeListView = new QListView(parentWidget);
+    connect(endStrikeListView, SIGNAL(clicked(QModelIndex)), this, SLOT(itemSelectedEndStrike(QModelIndex)));
+    endStrikeListView->setSizePolicy(sizePolicy);
+    endStrikeListView->setFixedSize(230, 200);
+    endStrikeListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
 
     startStrikeListView->hide();
@@ -62,9 +63,8 @@ void convert_to_algo_box_bid::copyUIElement(QDialog *parentWidget,QTableWidget *
     endStrikeListView->installEventFilter(eventFilterEnd);
 
 
-   // model_start_strike_BOX_BID = ContractDetail::getInstance().Get_model_start_strike_BOX_BID();
     //create qcompleter and fill with abovie model
-    CustomSearchWidget *startstrikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_BOX_BID);
+    CustomSearchWidget *startstrikeCustomWidget = new CustomSearchWidget(startStrikeListView,model_start_strike_OPEN_2L);
     startstrikeCustomWidget->name = "startStrike";
     connect(lineEdit_Start_strike, SIGNAL(textEdited(QString)),startstrikeCustomWidget, SLOT(filterItems(QString)));
     connect(lineEdit_Start_strike, SIGNAL(textChanged(QString)),this, SLOT(slotStartHide(QString)));
@@ -82,7 +82,7 @@ void convert_to_algo_box_bid::copyUIElement(QDialog *parentWidget,QTableWidget *
 }
 
 
-void convert_to_algo_box_bid::selectedAction(){
+void convert_to_algo_open_2L::selectedAction(){
 
     foo_token_number_start_strike = "";
     foo_token_number_end_strike = "";
@@ -94,61 +94,61 @@ void convert_to_algo_box_bid::selectedAction(){
     startStrikeListView->hide();
     endStrikeListView->hide();
 
-    model_start_strike_BOX_BID->clear();
+    model_start_strike_OPEN_2L->clear();
     // Create a lambda function for processing in the background
-        QFuture<void> future = QtConcurrent::run([=]() {
+    QFuture<void> future = QtConcurrent::run([=]() {
         QElapsedTimer timer1;
         timer1.start();
         emit progressSignal(true,"Loading...");
-        for(int i=0;i<BX_BID_Tokens.length();i++){
-                const auto& contract = sharedData->contract_table_hash[BX_BID_Tokens[i]];
-                //Only CE record need to avoaid duplicate
-                if(contract.OptionType=="PE")
-                    continue;
-                unsigned int unix_time= contract.Expiry;
-//                QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-//                dt = dt.addYears(10);
-//                // Check if the target year is a leap year
-//                int targetYear = dt.date().year();
-//                bool isLeapYear = QDate::isLeapYear(targetYear);
+        for(int i=0;i<OPEN_2L_Tokens.length();i++){
+            const auto& contract = sharedData->contract_table_hash[OPEN_2L_Tokens[i]];
+            //Only CE record need to avoaid duplicate
+            if(contract.OptionType=="PE")
+                continue;
+            unsigned int unix_time= contract.Expiry;
+            //                QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+            //                dt = dt.addYears(10);
+            //                // Check if the target year is a leap year
+            //                int targetYear = dt.date().year();
+            //                bool isLeapYear = QDate::isLeapYear(targetYear);
 
-//                // If it is a leap year, and the date is after Feb 29, subtract one day
-//                if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-//                    dt = dt.addDays(-1);
-//                }
-                QDateTime dt;
-                dt.setOffsetFromUtc(0);
-                dt.setDate(QDate(1980, 1, 1));
-                dt.setTime(QTime(0, 0, 0));
-                dt = dt.addSecs(unix_time);
-                QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
-                dt1 = dt1.addYears(10);
-                QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
-                dt.setDate(newDate);
+            //                // If it is a leap year, and the date is after Feb 29, subtract one day
+            //                if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+            //                    dt = dt.addDays(-1);
+            //                }
+            QDateTime dt;
+            dt.setOffsetFromUtc(0);
+            dt.setDate(QDate(1980, 1, 1));
+            dt.setTime(QTime(0, 0, 0));
+            dt = dt.addSecs(unix_time);
+            QDateTime dt1 = QDateTime::fromSecsSinceEpoch(unix_time);
+            dt1 = dt1.addYears(10);
+            QDate newDate = QDate(dt1.date().year(), dt.date().month(), dt.date().day());
+            dt.setDate(newDate);
 
-                QString Expiry = dt.toString("MMM dd yyyy").toUpper();
+            QString Expiry = dt.toString("MMM dd yyyy").toUpper();
 
-                QString instrument_name = contract.InstrumentName;
+            QString instrument_name = contract.InstrumentName;
 
-                QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/sharedData->strike_price_devider,'f', sharedData->decimal_precision);
-                QStandardItem *itemBOX_BID = new QStandardItem;
-                itemBOX_BID->setText(algo_combination);
-                itemBOX_BID->setData(contract.TokenNumber, Qt::UserRole + 1);
+            QString algo_combination = contract.InstrumentName+" "+Expiry+" "+QString::number(contract.StrikePrice/sharedData->strike_price_devider,'f', sharedData->decimal_precision);
+            QStandardItem *itemOPEN_2L = new QStandardItem;
+            itemOPEN_2L->setText(algo_combination);
+            itemOPEN_2L->setData(contract.TokenNumber, Qt::UserRole + 1);
 
-                QString strik_price = QString::number(contract.StrikePrice/sharedData->strike_price_devider,'f', sharedData->decimal_precision);
-                // Create custom data for sorting
-                QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd") + "-" + strik_price;
-                // Set the composite key as data for sorting
-                itemBOX_BID->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
+            QString strik_price = QString::number(contract.StrikePrice/sharedData->strike_price_devider,'f', sharedData->decimal_precision);
+            // Create custom data for sorting
+            QString compositeKey = instrument_name + "-" + dt.toString("yyyyMMdd") + "-" + strik_price;
+            // Set the composite key as data for sorting
+            itemOPEN_2L->setData(compositeKey, ConvertAlog_Model_Roles::CustomSortingDataRole);
 
-                QMetaObject::invokeMethod(this, [=]() {
-                      model_start_strike_BOX_BID->appendRow(itemBOX_BID);
+            QMetaObject::invokeMethod(this, [=]() {
+                    model_start_strike_OPEN_2L->appendRow(itemOPEN_2L);
                 }, Qt::QueuedConnection);
-           }
+        }
         emit progressSignal(false,"");
 
 
-        qDebug()<<"model_start_strike_BOX_BID Total data:"<<BX_BID_Tokens.count() << ", model_start_strike_BOX_BID  Time:" << timer1.elapsed() << "milliseconds";
+        qDebug()<<"model_start_strike_OPEN_2L Total data:"<<OPEN_2L_Tokens.count() << ", model_start_strike_OPEN_2L  Time:" << timer1.elapsed() << "milliseconds";
 
         // Close the progress dialog once done
     });
@@ -168,7 +168,7 @@ void convert_to_algo_box_bid::selectedAction(){
 }
 
 
-void convert_to_algo_box_bid::createEndStrikeModelAndPopulateListView(){
+void convert_to_algo_open_2L::createEndStrikeModelAndPopulateListView(){
 
 
     model_end_strike->clear();
@@ -184,14 +184,14 @@ void convert_to_algo_box_bid::createEndStrikeModelAndPopulateListView(){
     float start_strike = sharedData->contract_table_hash[key].StrikePrice;
 
 
-    for(int i=0;i<BX_BID_Tokens.length();i++) {
-        contract_table tmp = sharedData->contract_table_hash[BX_BID_Tokens[i]];
+    for(int i=0;i<OPEN_2L_Tokens.length();i++) {
+        contract_table tmp = sharedData->contract_table_hash[OPEN_2L_Tokens[i]];
         float end_strike = tmp.StrikePrice;
         if(start_strike>end_strike)
             continue;
 
 
-        if(tmp.InstrumentName==Instr_Name&&Expiry==tmp.Expiry&&tmp.OptionType=="CE"){
+        if(tmp.InstrumentName==Instr_Name&&Expiry==tmp.Expiry&&tmp.OptionType==Option_Type){
 
             if(!strike_priceList.contains(QString::number(tmp.StrikePrice))){
                 strike_priceList.append(QString::number(tmp.StrikePrice/sharedData->strike_price_devider,'f',sharedData->decimal_precision)); // store in Rs
@@ -202,15 +202,15 @@ void convert_to_algo_box_bid::createEndStrikeModelAndPopulateListView(){
                 continue;
 
             unsigned int unix_time= tmp.Expiry;
-//            QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
-//            dt = dt.addYears(10);
-//            int targetYear = dt.date().year();
-//            bool isLeapYear = QDate::isLeapYear(targetYear);
+            //            QDateTime dt = QDateTime::fromSecsSinceEpoch(unix_time);
+            //            dt = dt.addYears(10);
+            //            int targetYear = dt.date().year();
+            //            bool isLeapYear = QDate::isLeapYear(targetYear);
 
-//            // If it is a leap year, and the date is after Feb 29, subtract one day
-//            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-//                dt = dt.addDays(-1);
-//            }
+            //            // If it is a leap year, and the date is after Feb 29, subtract one day
+            //            if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+            //                dt = dt.addDays(-1);
+            //            }
             QDateTime dt;
             dt.setOffsetFromUtc(0);
             dt.setDate(QDate(1980, 1, 1));
@@ -240,7 +240,7 @@ void convert_to_algo_box_bid::createEndStrikeModelAndPopulateListView(){
 
 
 }
-void convert_to_algo_box_bid::generateAlgo()
+void convert_to_algo_open_2L::generateAlgo()
 {
 
 
@@ -271,22 +271,20 @@ void convert_to_algo_box_bid::generateAlgo()
         return;
     }
 
- ///-----------------Logic----------------------------
-//    Start Strike	End Strike	Strike Diff		Contract
-//        80             120          10              80
-//                                                    100
-//                                                    110
-//                                                    120
+    QString ratioText = lineEdit_2LRatio->text().trimmed();
+    QStringList RatioList = ratioText.split(":");
 
-//    Strike 1	Strike 2        Strike 3        Strike 4
-//    100 CE      100 PE          110 CE          110 PE
-//    110 CE      110 PE          120 CE          120 PE
-//    120 CE      120 PE          130 CE          130 PE
+    if (ratioText.isEmpty() || RatioList.size() != 2 || RatioList[0].isEmpty() || RatioList[1].isEmpty()) {
+        QMessageBox msgBox;
+        msgBox.setText("Please Enter Valid 2L Ratio.");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
+        return;
+    }
+
 
     QList<QString> Leg1_token_number_list;
     QList<QString> Leg2_token_number_list;
-    QList<QString> Leg3_token_number_list;
-    QList<QString> Leg4_token_number_list;
     QList<QString> Algo_Name_list;
 
 
@@ -294,17 +292,17 @@ void convert_to_algo_box_bid::generateAlgo()
     int endStrike = sharedData->contract_table_hash[endStrikeToken].StrikePrice;///sharedData->strike_price_devider;// will be in paise so converted to Rs
 
     long long Expiry = sharedData->contract_table_hash[startStrikeToken].Expiry; //both start and end expiry will be same chose any one of it
-   // long long startExpiry2 = sharedData->contract_table_hash[endStrikeToken].Expiry;
+    // long long startExpiry2 = sharedData->contract_table_hash[endStrikeToken].Expiry;
     QString Instr_Name = sharedData->contract_table_hash[startStrikeToken].InstrumentName;// both start and end instrument will be same, so chose an of it
-//    QDateTime dt = QDateTime::fromSecsSinceEpoch(Expiry);
-//    dt = dt.addYears(10);
-//    int targetYear = dt.date().year();
-//    bool isLeapYear = QDate::isLeapYear(targetYear);
+    //    QDateTime dt = QDateTime::fromSecsSinceEpoch(Expiry);
+    //    dt = dt.addYears(10);
+    //    int targetYear = dt.date().year();
+    //    bool isLeapYear = QDate::isLeapYear(targetYear);
 
-//    // If it is a leap year, and the date is after Feb 29, subtract one day
-//    if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
-//        dt = dt.addDays(-1);
-//    }
+    //    // If it is a leap year, and the date is after Feb 29, subtract one day
+    //    if (isLeapYear && dt.date() > QDate(targetYear, 2, 29)) {
+    //        dt = dt.addDays(-1);
+    //    }
     QDateTime dt;
     dt.setOffsetFromUtc(0);
     dt.setDate(QDate(1980, 1, 1));
@@ -321,30 +319,25 @@ void convert_to_algo_box_bid::generateAlgo()
     // filtered token betweeen start and end strike(endStrike+StrikeDifference) and generate hash with tokens
     QHash<QString, QString> strikePrice_TokenFiltered;
     QList<int> strikePriceListFiltered;
-    for(int i=0;i<BX_BID_Tokens.length();i++){
-        contract_table c = sharedData->contract_table_hash[BX_BID_Tokens[i]];
-        if(Instr_Name== c.InstrumentName&&Expiry == c.Expiry&&c.StrikePrice >= startStrike && c.StrikePrice <= endStrike+StrikeDifference){
-            QString key = QString::number(c.StrikePrice)+"_"+c.OptionType;
+    for(int i=0;i<OPEN_2L_Tokens.length();i++){
+        contract_table c = sharedData->contract_table_hash[OPEN_2L_Tokens[i]];
+        if(Instr_Name== c.InstrumentName&&Expiry == c.Expiry&&Option_Type == c.OptionType&&c.StrikePrice >= startStrike && c.StrikePrice <= endStrike+StrikeDifference){
+            QString key = QString::number(c.StrikePrice);
             strikePrice_TokenFiltered.insert(key,QString::number(c.TokenNumber));
-            if(c.OptionType=="CE") //both PE and CE will have same stike so avoid duplicate.
-                strikePriceListFiltered.append(c.StrikePrice);
+            strikePriceListFiltered.append(c.StrikePrice);
         }
     }
     std::sort(strikePriceListFiltered.begin(), strikePriceListFiltered.end());
 
 
     for(int i=0;i<strikePriceListFiltered.length();i++){
-        QString key1 = QString::number(strikePriceListFiltered[i])+"_CE";
-        QString key2 = QString::number(strikePriceListFiltered[i])+"_PE";
-        QString key3 = QString::number(strikePriceListFiltered[i]+StrikeDifference)+"_CE";
-        QString key4 = QString::number(strikePriceListFiltered[i]+StrikeDifference)+"_PE";
+        QString key1 = QString::number(strikePriceListFiltered[i]);
+        QString key2 = QString::number(strikePriceListFiltered[i]+StrikeDifference);
 
-        if(strikePrice_TokenFiltered.contains(key1)&&strikePrice_TokenFiltered.contains(key2)&&strikePrice_TokenFiltered.contains(key3)&&strikePrice_TokenFiltered.contains(key4)){
+        if(strikePrice_TokenFiltered.contains(key1)&&strikePrice_TokenFiltered.contains(key2)){
             Leg1_token_number_list.append(strikePrice_TokenFiltered[key1]);
             Leg2_token_number_list.append(strikePrice_TokenFiltered[key2]);
-            Leg3_token_number_list.append(strikePrice_TokenFiltered[key3]);
-            Leg4_token_number_list.append(strikePrice_TokenFiltered[key4]);
-            QString Algo_Name = "BX-" + Instr_Name+"-"+ExpiryTimeStr+"-"+QString::number(strikePriceListFiltered[i]/sharedData->strike_price_devider)+"-"+QString::number(StrikeDifference/sharedData->strike_price_devider);
+            QString Algo_Name = "OPEN_2L-" + Instr_Name+"-"+ExpiryTimeStr+"-"+QString::number(strikePriceListFiltered[i]/sharedData->strike_price_devider)+"-"+QString::number(StrikeDifference/sharedData->strike_price_devider);
 
             Algo_Name_list.append(Algo_Name);
 
@@ -363,26 +356,24 @@ void convert_to_algo_box_bid::generateAlgo()
 
 
     if(Leg1_token_number_list.size()==0){
-       QMessageBox msgBox;
-       msgBox.setText("Not able to generate algos for given input, Cannot find token number from contract");
-       msgBox.setIcon(QMessageBox::Warning);
-       msgBox.exec();
-       return;
+        QMessageBox msgBox;
+        msgBox.setText("Not able to generate algos for given input, Cannot find token number from contract");
+        msgBox.setIcon(QMessageBox::Warning);
+        msgBox.exec();
+        return;
     }
 
     QStringList duplicateList;
     for(int i=0;i<Leg1_token_number_list.size();i++){
         QString Leg1_Strike=QString::number(sharedData->contract_table_hash[Leg1_token_number_list[i]].StrikePrice/sharedData->strike_price_devider,'f', sharedData->decimal_precision)+" "+sharedData->contract_table_hash[Leg1_token_number_list[i]].OptionType;
         QString Leg2_Strike=QString::number(sharedData->contract_table_hash[Leg2_token_number_list[i]].StrikePrice/sharedData->strike_price_devider,'f', sharedData->decimal_precision)+" "+sharedData->contract_table_hash[Leg2_token_number_list[i]].OptionType;
-        QString Leg3_Strike=QString::number(sharedData->contract_table_hash[Leg3_token_number_list[i]].StrikePrice/sharedData->strike_price_devider,'f', sharedData->decimal_precision)+" "+sharedData->contract_table_hash[Leg3_token_number_list[i]].OptionType;
-        QString Leg4_Strike=QString::number(sharedData->contract_table_hash[Leg4_token_number_list[i]].StrikePrice/sharedData->strike_price_devider,'f', sharedData->decimal_precision)+" "+sharedData->contract_table_hash[Leg4_token_number_list[i]].OptionType;
 
 
 
         bool exist=false;
         for(int k=0;k<sharedData->algo_data_list.length();k++){
             algo_data_to_insert tmp = sharedData->algo_data_list[k];
-            if(tmp.Algo_Name == Algo_Name_list[i] && tmp.Leg1_token_number == Leg1_token_number_list[i] && tmp.Leg2_token_number == Leg2_token_number_list[i]&& tmp.Leg3_token_number == Leg3_token_number_list[i]&& tmp.Leg4_token_number == Leg4_token_number_list[i]){
+            if(tmp.Algo_Name == Algo_Name_list[i] && tmp.Leg1_token_number == Leg1_token_number_list[i] && tmp.Leg2_token_number == Leg2_token_number_list[i]){
                 exist=true;
                 break;
             }
@@ -394,8 +385,6 @@ void convert_to_algo_box_bid::generateAlgo()
             QString ExpiryTime_tmp = "";
             QString Leg1_Strike_tmp= "";
             QString Leg2_Strike_tmp= "";
-            QString Leg3_Strike_tmp= "";
-            QString Leg4_Strike_tmp= "";
 
             QTableWidgetItem *item0 = tableWidget->item(row, 0);
             if (item0) {
@@ -411,16 +400,9 @@ void convert_to_algo_box_bid::generateAlgo()
             }
             QTableWidgetItem *item3 = tableWidget->item(row, 3);
             if (item3) {
-                 Leg2_Strike_tmp= item3->text();
+                Leg2_Strike_tmp= item3->text();
             }
-            QTableWidgetItem *item4 = tableWidget->item(row, 4);
-            if (item4) {
-                Leg3_Strike_tmp = item4->text();
-            }
-            QTableWidgetItem *item5 = tableWidget->item(row, 5);
-            if (item5) {
-                Leg4_Strike_tmp = item5->text();
-            }
+
 
 
 
@@ -428,9 +410,7 @@ void convert_to_algo_box_bid::generateAlgo()
                 Instr_Name_Tmp==Instr_Name&&
                 ExpiryTime_tmp==ExpiryTimeStr&&
                 Leg1_Strike_tmp==Leg1_Strike&&
-                Leg2_Strike_tmp==Leg2_Strike&&
-                Leg3_Strike_tmp==Leg3_Strike&&
-                Leg4_Strike_tmp==Leg4_Strike
+                Leg2_Strike_tmp==Leg2_Strike
                 ){
                 exist=true;
                 break;
@@ -439,7 +419,7 @@ void convert_to_algo_box_bid::generateAlgo()
         }
 
         if(exist){
-            duplicateList.append("Duplicate entry Skipping, Leg1="+Leg1_token_number_list[i]+", Leg2="+Leg2_token_number_list[i]+", Leg3="+Leg3_token_number_list[i]+", Leg4="+Leg4_token_number_list[i]);
+            duplicateList.append("Duplicate entry Skipping, Leg1="+Leg1_token_number_list[i]+", Leg2="+Leg2_token_number_list[i]);
             continue;
         }
 
@@ -469,47 +449,33 @@ void convert_to_algo_box_bid::generateAlgo()
         c4->setTextAlignment(Qt::AlignCenter);
         tableWidget->setItem(tableWidget->rowCount()-1, 3, c4);
 
-        QTableWidgetItem *c5 = new QTableWidgetItem(Leg3_Strike);
-        c5->setFlags(c5->flags() ^ Qt::ItemIsEditable);
-        c5->setTextAlignment(Qt::AlignCenter);
-        tableWidget->setItem(tableWidget->rowCount()-1, 4, c5);
-
-        QTableWidgetItem *c51 = new QTableWidgetItem(Leg4_Strike);
-        c51->setFlags(c51->flags() ^ Qt::ItemIsEditable);
-        c51->setTextAlignment(Qt::AlignCenter);
-        tableWidget->setItem(tableWidget->rowCount()-1, 5, c51);
-
-//        QTableWidgetItem *c6 = new QTableWidgetItem("NA");
-//        c6->setFlags(c6->flags() ^ Qt::ItemIsEditable);
-//        tableWidget->setItem(tableWidget->rowCount()-1, 6, c6);
-
-//        QTableWidgetItem *c7 = new QTableWidgetItem("NA");
-//        c7->setFlags(c7->flags() ^ Qt::ItemIsEditable);
-//        tableWidget->setItem(tableWidget->rowCount()-1, 7, c7);
 
 
         QTableWidgetItem *c6 = new QTableWidgetItem("To be Uploaded");
         c6->setFlags(c6->flags() ^ Qt::ItemIsEditable);
         c6->setTextAlignment(Qt::AlignCenter);
-        tableWidget->setItem(tableWidget->rowCount()-1, 6, c6);
+        tableWidget->setItem(tableWidget->rowCount()-1, 4, c6);
 
         algo_data_to_insert data;
         data.Algo_Status = "DisabledByUser";
-        data.algo_type = QString::number(PortfolioType::BX_BID);
+        data.algo_type = QString::number(PortfolioType::OPEN2L);
         data.exchange = sharedData->exchange;
         data.table_row_unique_id = sharedData->unique_id;
         data.user_id = sharedData->foo_user_id;
         data.Algo_Name = Algo_Name_list[i];
         data.Leg1_token_number = Leg1_token_number_list[i];
         data.Leg2_token_number = Leg2_token_number_list[i];
-        data.Leg3_token_number = Leg3_token_number_list[i];
-        data.Leg4_token_number = Leg4_token_number_list[i];
+        data.Leg3_token_number = "";
+        data.Leg4_token_number = "";
         data.indicator = "1";
         data.Leg1_Strike = Leg1_Strike;
         data.Leg2_Strike = Leg2_Strike;
-        data.Leg3_Strike = Leg3_Strike;
-        data.Leg4_Strike = Leg4_Strike;
+        data.Leg3_Strike =  "";
+        data.Leg4_Strike =  "";
         data.option_type = Option_Type;
+        data.Leg1Ratio = RatioList[0];
+        data.Leg2Ratio = RatioList[1];
+
         data.uploaded=false; // this flag is used to id
 
         sharedData->algo_data_list.append(data);
@@ -532,36 +498,35 @@ void convert_to_algo_box_bid::generateAlgo()
 
     tableWidget->resizeColumnsToContents();
 
-    tableWidget->resizeColumnsToContents();
 
 
 }
 
-void convert_to_algo_box_bid::slotStartHide(QString)
+void convert_to_algo_open_2L::slotStartHide(QString)
 {
     endStrikeListView->hide();
 }
 
-void convert_to_algo_box_bid::slotEndHide(QString)
+void convert_to_algo_open_2L::slotEndHide(QString)
 {    startStrikeListView->hide();
 
 }
 
-void convert_to_algo_box_bid::itemSelectedStartStrike(QModelIndex index)
+void convert_to_algo_open_2L::itemSelectedStartStrike(QModelIndex index)
 {
     if(index.isValid())
     {
         QVariant dData = index.data(Qt::DisplayRole);
         if (dData.isValid())
         {
-            for (int row = 0; row < model_start_strike_BOX_BID->rowCount(); ++row)
+            for (int row = 0; row < model_start_strike_OPEN_2L->rowCount(); ++row)
             {
-                QModelIndex index = model_start_strike_BOX_BID->index(row, 0);
+                QModelIndex index = model_start_strike_OPEN_2L->index(row, 0);
                 // Check if the item's display role value matches
-                QVariant displayData = model_start_strike_BOX_BID->data(index, Qt::DisplayRole);
+                QVariant displayData = model_start_strike_OPEN_2L->data(index, Qt::DisplayRole);
                 if (displayData.isValid() && displayData.toString() == dData)
                 {
-                    QVariant userData = model_start_strike_BOX_BID->data(index, Qt::UserRole + 1);
+                    QVariant userData = model_start_strike_OPEN_2L->data(index, Qt::UserRole + 1);
                     if (userData.isValid())
                     {
                         foo_token_number_start_strike = userData.toString();
@@ -584,7 +549,7 @@ void convert_to_algo_box_bid::itemSelectedStartStrike(QModelIndex index)
     }
 }
 
-void convert_to_algo_box_bid::itemSelectedEndStrike(QModelIndex index)
+void convert_to_algo_open_2L::itemSelectedEndStrike(QModelIndex index)
 {
     if(index.isValid())
     {

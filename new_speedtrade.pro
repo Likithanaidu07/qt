@@ -11,7 +11,7 @@ DEFINES += QT_MESSAGELOGCONTEXT
 CONFIG += c++17
 
 #manually Increment Version Before Build
-VERSION = 1.0.13
+VERSION = 1.0.16
 TARGET = New_Speedtrade_$${VERSION}
 
 
@@ -34,6 +34,7 @@ SOURCES += \
     Convert_to_Algo/convert_to_algo_bfly_bid.cpp \
     Convert_to_Algo/convert_to_algo_box_bid.cpp \
     Convert_to_Algo/convert_to_algo_bs1221_1331.cpp \
+    Convert_to_Algo/convert_to_algo_open_2l.cpp \
     Convert_to_Algo/customtablewidget.cpp \
     Convert_to_Algo/eventfilterlistview.cpp \
     F1_F2/f1_f2_buysell.cpp \
@@ -110,6 +111,7 @@ HEADERS += \
     Convert_to_Algo/convert_to_algo_bfly_bid.h \
     Convert_to_Algo/convert_to_algo_box_bid.h \
     Convert_to_Algo/convert_to_algo_bs1221_1331.h \
+    Convert_to_Algo/convert_to_algo_open_2l.h \
     Convert_to_Algo/customtablewidget.h \
     Convert_to_Algo/eventfilterlistview.h \
     F1_F2/f1_f2_buysell.h \

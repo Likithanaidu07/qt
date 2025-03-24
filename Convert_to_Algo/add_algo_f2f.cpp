@@ -139,8 +139,7 @@ void add_algo_f2f::selectedAction(){
         }
         emit progressSignal(false,"");
 
-
-        qDebug() << "model_searchInstrument_F2F_Leg1  Time:" << timer1.elapsed() << "milliseconds";
+        qDebug()<<"F2F Total data:"<<F2F_Tokens.count() << ", model_searchInstrument_F2F_Leg1  Time:" << timer1.elapsed() << "milliseconds";
 
         // Close the progress dialog once done
     });

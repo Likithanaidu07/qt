@@ -1,4 +1,5 @@
 #include "settings_window.h"
+#include <QFontDialog>
 
 Settings_Window::Settings_Window(QWidget *parent) :
     QDialog(parent),
@@ -65,6 +66,7 @@ Settings_Window::Settings_Window(QWidget *parent) :
        createHotKeyData(settingFile);
        //loadHotkeyFromIniFileAndPopulateTreeView(settingFile);
 
+       initFontSett();
 
 }
 
@@ -458,3 +460,70 @@ void Settings_Window::on_pushButtonSaveHotKeys_clicked()
 
 }
 
+/**********************Font settings******************/
+
+void Settings_Window::initFontSett(){
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString theme_fileName = appDataPath + "/Data/theme_sett.ini";
+
+    // Read the saved font from the ini file
+    QSettings settings(theme_fileName, QSettings::IniFormat);
+    settings.beginGroup("font_sett");
+    QString family = settings.value("Family", "Arial").toString();
+    int pointSize = settings.value("PointSize", 12).toInt();
+    bool bold = settings.value("Bold", false).toBool();
+    bool italic = settings.value("Italic", false).toBool();
+    settings.endGroup();
+
+    QFont defaultFont(family, pointSize, bold ? QFont::Bold : QFont::Normal, italic);
+
+    QString fontDescription = QString("%1, %2pt%3%4")
+                                  .arg(defaultFont.family())
+                                  .arg(defaultFont.pointSize())
+                                  .arg(defaultFont.bold() ? ", Bold" : "")
+                                  .arg(defaultFont.italic() ? ", Italic" : "");
+
+    // Set the label text
+    ui->label_font->setText(fontDescription);
+}
+void Settings_Window::on_pushButtonChangeFont_clicked()
+{
+    QString appDataPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+    QString theme_fileName = appDataPath + "/Data/theme_sett.ini";
+
+    // Read the saved font from the ini file
+    QSettings settings(theme_fileName, QSettings::IniFormat);
+    settings.beginGroup("font_sett");
+    QString family = settings.value("Family", "Arial").toString();
+    int pointSize = settings.value("PointSize", 12).toInt();
+    bool bold = settings.value("Bold", false).toBool();
+    bool italic = settings.value("Italic", false).toBool();
+    settings.endGroup();
+
+    QFont defaultFont(family, pointSize, bold ? QFont::Bold : QFont::Normal, italic);
+
+    // Open font dialog with the loaded font as default
+    bool ok;
+    QFont font = QFontDialog::getFont(&ok, defaultFont, this);
+
+    if (ok) {
+        // Save the selected font back to the ini file
+        settings.beginGroup("font_sett");
+        settings.setValue("Family", font.family());
+        settings.setValue("PointSize", font.pointSize());
+        settings.setValue("Bold", font.bold());
+        settings.setValue("Italic", font.italic());
+        settings.endGroup();
+        qDebug() << "Font saved:" << font;
+
+        QString fontDescription = QString("%1, %2pt%3%4")
+                                      .arg(font.family())
+                                      .arg(font.pointSize())
+                                      .arg(font.bold() ? ", Bold" : "")
+                                      .arg(font.italic() ? ", Italic" : "");
+
+        // Set the label text
+        ui->label_font->setText(fontDescription);
+    }
+}
+/*****************************************************/

@@ -162,7 +162,7 @@ void add_algo_cr_jelly_bid::selectedAction(){
             /********************************************************************/
         }
         emit progressSignal(false,"");
-        qDebug() << "model_Fut_CR_JELLY_BID  Time:" << timer1.elapsed() << "milliseconds";
+        qDebug()<<"model_Fut_CR_JELLY_BID Total data:"<<Fut_Tokens.count() << ", model_Fut_CR_JELLY_BID  Time:" << timer1.elapsed() << "milliseconds";
 
         // Close the progress dialog once done
     });

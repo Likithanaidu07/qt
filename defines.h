@@ -242,6 +242,7 @@ enum PortfolioType
     BX_BID=254,
     BS1221=255,
     BS1331=256,
+    OPEN2L=257,
     JBX,
     JBX_3L,
     JBX_2L,
@@ -310,7 +311,7 @@ struct algo_data_to_insert{
     QString Leg3_Strike;
     QString Leg4_Strike;
     QString option_type;
-    QString  Algo_Name;
+    QString Algo_Name;
     QString exchange;
     QString AdditionalData1;
     QString AdditionalData2;

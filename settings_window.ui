@@ -35,15 +35,14 @@
       <enum>QTabWidget::Triangular</enum>
      </property>
      <property name="currentIndex">
-      <number>1</number>
+      <number>2</number>
      </property>
      <property name="elideMode">
       <enum>Qt::ElideNone</enum>
      </property>
      <widget class="QWidget" name="tabGeneral">
       <attribute name="icon">
-       <iconset theme="folder">
-        <normaloff>.</normaloff>.</iconset>
+       <iconset theme="folder"/>
       </attribute>
       <attribute name="title">
        <string>General</string>
@@ -51,8 +50,7 @@
      </widget>
      <widget class="QWidget" name="tabHotkeys">
       <attribute name="icon">
-       <iconset theme="applications-accessories">
-        <normaloff>.</normaloff>.</iconset>
+       <iconset theme="applications-accessories"/>
       </attribute>
       <attribute name="title">
        <string>Hotkeys</string>
@@ -82,6 +80,64 @@
         <widget class="QTreeView" name="treeView"/>
        </item>
       </layout>
+     </widget>
+     <widget class="QWidget" name="tab">
+      <attribute name="title">
+       <string>Theme</string>
+      </attribute>
+      <widget class="QGroupBox" name="groupBox">
+       <property name="geometry">
+        <rect>
+         <x>30</x>
+         <y>10</y>
+         <width>351</width>
+         <height>61</height>
+        </rect>
+       </property>
+       <property name="title">
+        <string>Font Settings</string>
+       </property>
+       <layout class="QGridLayout" name="gridLayout_3">
+        <item row="0" column="0">
+         <widget class="QLabel" name="label">
+          <property name="maximumSize">
+           <size>
+            <width>40</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="font">
+           <font>
+            <bold>true</bold>
+           </font>
+          </property>
+          <property name="text">
+           <string>Font: </string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="1">
+         <widget class="QLabel" name="label_font">
+          <property name="text">
+           <string>...........</string>
+          </property>
+         </widget>
+        </item>
+        <item row="0" column="2">
+         <widget class="QPushButton" name="pushButtonChangeFont">
+          <property name="maximumSize">
+           <size>
+            <width>60</width>
+            <height>16777215</height>
+           </size>
+          </property>
+          <property name="text">
+           <string>Change</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </widget>
      </widget>
     </widget>
    </item>

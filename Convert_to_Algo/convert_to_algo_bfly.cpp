@@ -165,8 +165,8 @@ void add_algo_btfly::selectedAction(){
             }
         emit progressSignal(false,"");
 
+        qDebug()<<"model_start_strike_BFLY Total data:"<<BFLY_Tokens.count() << ", model_start_strike_BFLY  Time:" << timer1.elapsed() << "milliseconds";
 
-        qDebug() << "model_start_strike_BFLY  Time:" << timer1.elapsed() << "milliseconds";
 
         // Close the progress dialog once done
     });

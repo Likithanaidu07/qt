@@ -275,6 +275,12 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
     /*******Class to generate BtFly-bid algos************/
 
 
+    /*******Class to generate open_2L algos************/
+    algoOpen2L= new convert_to_algo_open_2L();
+    algoOpen2L->copyUIElement(this,ui->tableWidget,ui->lineEdit_Start_strike_Open_2L,ui->lineEdit_EndStrike_Open_2L,ui->lineEdit_StrikeDifference_Open_2L,ui->lineEdit_2LRatio_Open_2L,ui->pushButtonAdd);
+    connect(algoOpen2L,SIGNAL(progressSignal(bool,QString)),this,SLOT(progressSlot(bool,QString)));
+
+    /*******Class to generate BtFly-bid algos************/
 
 
 
@@ -283,7 +289,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
     val->setNotation(QDoubleValidator::StandardNotation);
     ui->lineEdit_StrikeDifference_Btfy->setValidator(val);
     ui->lineEdit_StrikeDifference_BtfyBid->setValidator(val);
-
+    setCustomRatioValidator(ui->lineEdit_2LRatio_Open_2L,4);
 
 
     sharedData->unique_id = 0; // this used to identyfy table row and algo_data to upload
@@ -327,6 +333,7 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
     comboxItems.append("F2F-BID");
     comboxItems.append("BS12-BID");
     comboxItems.append("BS13-BID");
+    comboxItems.append("OPEN-2L");
 
     for (const QString& item : comboxItems) {
         if (!ExFilterPF.contains(item)) {  // Add only if it is NOT in ExFilterPF
@@ -442,6 +449,15 @@ ConvertAlgo_Win::ConvertAlgo_Win(QWidget *parent, const QStringList &list) :
 
 
 }
+
+
+void ConvertAlgo_Win::setCustomRatioValidator(QLineEdit *lineEdit, int maxDigits) {
+    // Create regex with dynamic max digits for both sides
+    QString pattern = QString(R"(^(?:[1-9]\d{0,%1}):(?:[1-9]\d{0,%1})$)").arg(maxDigits - 1);
+    QRegularExpression regex(pattern);
+    QRegularExpressionValidator *validator = new QRegularExpressionValidator(regex, lineEdit);
+    lineEdit->setValidator(validator);
+}
 bool ConvertAlgo_Win::eventFilter(QObject *watched, QEvent *event) {
 
     if (watched == ui->tableWidget && event->type() == QEvent::KeyPress) {
@@ -488,6 +504,10 @@ void ConvertAlgo_Win::hideAnyListViewVisible(){
     algoBS_1221_1331->slotStartHide("");
     algoBS_1221_1331->slotStartHide("");
 
+    algoOpen2L->slotStartHide("");
+    algoOpen2L->slotEndHide("");
+
+
 }
 
 
@@ -497,6 +517,7 @@ void ConvertAlgo_Win::on_Close_clicked()
 
     algoBS_1221_1331->clearAllModel();
     algoBoxBid->clearAllModel();
+    algoOpen2L->clearAllModel();
     algoCRJellyBid->clearAllModel();
     algoBtFlyBid->clearAllModel();
     algoConRev->clearAllModel();
@@ -730,6 +751,8 @@ void ConvertAlgo_Win::resetTableWidget() {
         headers = {"Algo Name", "Expiry", "Strike1", "Strike2", "Strike3", "Strike4", "Status"};
     }else if (algoType == "BS13-BID") {
         headers = {"Algo Name", "Expiry", "Strike1", "Strike2", "Strike3", "Strike4", "Status"};
+    }else if (algoType == "OPEN-2L") {
+        headers = {"Algo Name", "Expiry", "Strike1", "Strike2","Status"};
     }
 
     ui->tableWidget->clear();
@@ -820,6 +843,11 @@ void ConvertAlgo_Win::on_pushButtonAdd_clicked()
     else if(algo_type=="BS13-BID"){
         algoBS_1221_1331->generateAlgo();
     }
+    else if(algo_type=="OPEN-2L"){
+        algoOpen2L->generateAlgo();
+    }
+
+
 //    if(algo_type=="BOX"){
 //        algoBOX->generateAlgo();
 //    }
@@ -889,6 +917,11 @@ void ConvertAlgo_Win::on_comboBox_AlgoType_currentTextChanged(const QString algo
         ui->stackedWidget->setCurrentWidget(ui->pagBS1221_1331);
         algoBS_1221_1331->selectedAction(PortfolioType::BS1331);
     }
+    else if(algoType=="OPEN-2L"){
+        ui->stackedWidget->setCurrentWidget(ui->pageOpen_2L);
+        algoOpen2L->selectedAction();
+    }
+
 //    else if(algoType=="2L Straddle"){
 
 //        ui->lineEdit_Fut->setVisible(false);
@@ -1006,6 +1039,9 @@ void ConvertAlgo_Win::on_pushButtonUpload_clicked()
                     algo_type="BS12-BID";
                 else if(algo_type==QString::number(PortfolioType::BS1331))
                     algo_type="BS13-BID";
+                else if(algo_type==QString::number(PortfolioType::OPEN2L))
+                    algo_type="OPEN-2L";
+
 
 
 
