@@ -11,7 +11,7 @@ DEFINES += QT_MESSAGELOGCONTEXT
 CONFIG += c++17
 
 #manually Increment Version Before Build
-VERSION = 1.0.24
+VERSION = 1.0.25
 TARGET = New_Speedtrade_$${VERSION}
 
 version_script = $$PWD/increment_version.py
